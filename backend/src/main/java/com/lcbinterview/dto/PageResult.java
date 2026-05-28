@@ -4,6 +4,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
+/**
+ * 通用分页结果。
+ * @param <T> 数据类型
+ * @author chongan
+ */
 @Schema(description = "分页结果")
 public record PageResult<T>(
         @Schema(description = "数据列表") List<T> content,

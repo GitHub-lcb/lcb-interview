@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * SpringDoc OpenAPI 配置。
  * 访问地址：http://localhost:8080/swagger-ui.html
+ * @author chongan
  */
 @Configuration
 public class SwaggerConfig {

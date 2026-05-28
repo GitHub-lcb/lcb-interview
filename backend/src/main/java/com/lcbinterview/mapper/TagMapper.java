@@ -5,6 +5,7 @@ import com.lcbinterview.model.Tag;
 
 /**
  * 标签 Mapper。
+ * @author chongan
  */
 public interface TagMapper extends BaseMapper<Tag> {
 }

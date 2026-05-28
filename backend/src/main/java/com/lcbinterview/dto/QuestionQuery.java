@@ -3,6 +3,10 @@ package com.lcbinterview.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
+/**
+ * 题目查询参数。使用 Builder 模式构建，支持可选参数。
+ * @author chongan
+ */
 @Builder
 @Schema(description = "题目查询参数")
 public record QuestionQuery(

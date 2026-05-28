@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 /**
  * 题目标签。对应 question_tag 中间表。
+ * @author chongan
  */
 @Data
 @TableName("tag")

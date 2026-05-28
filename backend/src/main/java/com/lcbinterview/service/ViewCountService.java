@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *   <li>生产者 — increment() 每次浏览请求触发，内存累加无锁竞争</li>
  *   <li>消费者 — flush() 每隔 5 分钟批量写入 DB</li>
  * </ul>
+ * @author chongan
  */
 @Slf4j
 @Service

@@ -8,6 +8,7 @@ import java.util.List;
 /**
  * 题目视图对象，对外展示不暴露 Entity 内部结构。
  * 由 Service 层组装 categoryName 和 tags。
+ * @author chongan
  */
 @Schema(description = "题目视图对象")
 public record QuestionVO(

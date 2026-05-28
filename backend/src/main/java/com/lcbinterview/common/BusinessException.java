@@ -2,6 +2,10 @@ package com.lcbinterview.common;
 
 import lombok.Getter;
 
+/**
+ * 业务异常。由 GlobalExceptionHandler 统一捕获处理。
+ * @author chongan
+ */
 @Getter
 public class BusinessException extends RuntimeException {
     private final int code;

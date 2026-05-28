@@ -10,6 +10,7 @@ import java.time.Duration;
 
 /**
  * Redis 缓存配置。默认所有缓存 TTL 10 分钟。
+ * @author chongan
  */
 @Configuration
 public class CacheConfig {

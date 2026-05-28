@@ -1,3 +1,8 @@
+DROP TABLE IF EXISTS question_tag;
+DROP TABLE IF EXISTS question;
+DROP TABLE IF EXISTS tag;
+DROP TABLE IF EXISTS category;
+
 CREATE TABLE IF NOT EXISTS category (
     id          BIGINT       AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
     name        VARCHAR(50)  NOT NULL UNIQUE            COMMENT '分类名称',
@@ -6,7 +11,7 @@ CREATE TABLE IF NOT EXISTS category (
     sort_order  INT          DEFAULT 0                  COMMENT '排序权重',
     create_time DATETIME     NOT NULL                   COMMENT '创建时间',
     update_time DATETIME     NOT NULL                   COMMENT '更新时间',
-    is_deleted  TINYINT(1)   DEFAULT 0                  COMMENT '逻辑删除标记',
+    is_deleted  TINYINT   DEFAULT 0                  COMMENT '逻辑删除标记',
     INDEX idx_sort_order (sort_order)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '题库分类';
 
@@ -15,7 +20,7 @@ CREATE TABLE IF NOT EXISTS tag (
     name        VARCHAR(50)  NOT NULL UNIQUE            COMMENT '标签名称',
     create_time DATETIME     NOT NULL                   COMMENT '创建时间',
     update_time DATETIME     NOT NULL                   COMMENT '更新时间',
-    is_deleted  TINYINT(1)   DEFAULT 0                  COMMENT '逻辑删除标记'
+    is_deleted  TINYINT   DEFAULT 0                  COMMENT '逻辑删除标记'
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '题目标签';
 
 CREATE TABLE IF NOT EXISTS question (
@@ -28,7 +33,7 @@ CREATE TABLE IF NOT EXISTS question (
     view_count  INT          DEFAULT 0                  COMMENT '浏览次数',
     create_time DATETIME     NOT NULL                   COMMENT '创建时间',
     update_time DATETIME     NOT NULL                   COMMENT '更新时间',
-    is_deleted  TINYINT(1)   DEFAULT 0                  COMMENT '逻辑删除标记',
+    is_deleted  TINYINT   DEFAULT 0                  COMMENT '逻辑删除标记',
     INDEX idx_category (category_id),
     INDEX idx_difficulty (difficulty),
     INDEX idx_view_count (view_count DESC),

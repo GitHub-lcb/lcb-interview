@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * MyBatis-Plus 核心配置。
  * 注册分页插件，扫描 mapper 接口。
+ * @author chongan
  */
 @Configuration
 @MapperScan("com.lcbinterview.mapper")
