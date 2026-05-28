@@ -13,8 +13,8 @@ export default function HotQuestions() {
   const fetch = () => {
     setLoading(true)
     setError(false)
-    getHotQuestions(10).then(res => {
-      setQuestions(res.content)
+    getHotQuestions(10).then(data => {
+      setQuestions(data)
       setLoading(false)
     }).catch(() => { setError(true); setLoading(false) })
   }

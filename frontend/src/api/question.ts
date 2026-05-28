@@ -18,5 +18,5 @@ export const getQuestionById = (id: number) =>
   api.get<{ data: Question }>(`/questions/${id}`).then(res => res.data.data)
 
 export const getHotQuestions = (size = 10) =>
-  api.get<{ data: PageResult<Question> }>('/questions/hot', { params: { size } })
+  api.get<{ data: Question[] }>('/questions/hot', { params: { size } })
     .then(res => res.data.data)
