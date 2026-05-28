@@ -39,10 +39,13 @@ public class AiQuestionService {
     private String apiUrl;
 
     /**
-     * 异步生成题目。分批调用 DeepSeek API，每批最多 5 题。
+     * 异步生成题目。调用 DeepSeek API 批量生成。
      */
     public Long generate(GenerationRequest req) {
         Long taskId = System.currentTimeMillis();
+        log.info("AI生成任务创建 taskId={}, category={}, difficulty={}, count={}, topic={}",
+                taskId, req.category(), req.difficulty(), req.count(), req.topic());
+
         taskStore.put(taskId, new GenerationTaskVO(taskId, "RUNNING", req.count(), 0, 0, List.of(), List.of()));
 
         scheduler.submit(() -> {
@@ -50,14 +53,23 @@ public class AiQuestionService {
             List<Long> generatedIds = new ArrayList<>();
             int success = 0;
             int fail = 0;
-            int batchSize = Math.min(req.count(), 5);
+
+            long startTime = System.currentTimeMillis();
 
             try {
+                log.info("构建 prompt...");
                 String prompt = buildPrompt(req);
-                String responseJson = callDeepSeek(prompt);
-                List<Question> questions = parseQuestions(responseJson);
+                log.info("Prompt 长度: {} 字符, 开始调用 DeepSeek API (model={}, url={})", prompt.length(), model, apiUrl);
 
-                for (int i = 0; i < Math.min(questions.size(), req.count()); i++) {
+                String responseJson = callDeepSeek(prompt);
+                long apiTime = System.currentTimeMillis() - startTime;
+                log.info("DeepSeek API 返回, 耗时 {}ms, 响应体长度: {} 字符", apiTime, responseJson.length());
+
+                List<Question> questions = parseQuestions(responseJson);
+                log.info("解析完成, 获得 {} 道题目", questions.size());
+
+                int toSave = Math.min(questions.size(), req.count());
+                for (int i = 0; i < toSave; i++) {
                     try {
                         Question q = questions.get(i);
                         q.setStatus("DRAFT");
@@ -66,14 +78,16 @@ public class AiQuestionService {
                         questionMapper.insert(q);
                         generatedIds.add(q.getId());
                         success++;
+                        log.info("保存题目成功 [{}/{}]: id={}, title={}", i + 1, toSave, q.getId(), q.getTitle());
                     } catch (Exception e) {
-                        log.error("保存题目失败", e);
+                        log.error("保存题目失败 [{}]", i + 1, e);
                         errors.add("第 " + (i + 1) + " 题保存失败: " + e.getMessage());
                         fail++;
                     }
                 }
 
                 if (questions.size() < req.count()) {
+                    log.warn("API 返回 {} 道题，少于请求的 {}", questions.size(), req.count());
                     errors.add("API 返回了 " + questions.size() + " 道题，少于请求的 " + req.count());
                 }
             } catch (Exception e) {
@@ -82,7 +96,11 @@ public class AiQuestionService {
                 fail = req.count() - success;
             }
 
+            long totalTime = System.currentTimeMillis() - startTime;
             String taskStatus = fail == 0 ? "COMPLETED" : (success > 0 ? "PARTIAL" : "FAILED");
+            log.info("AI生成任务完成 taskId={}, status={}, success={}, fail={}, 总耗时 {}ms",
+                    taskId, taskStatus, success, fail, totalTime);
+
             taskStore.put(taskId, new GenerationTaskVO(
                     taskId, taskStatus, req.count(), success, fail,
                     List.copyOf(errors), List.copyOf(generatedIds)));
@@ -125,25 +143,35 @@ public class AiQuestionService {
         requestBody.put("temperature", 0.7);
         requestBody.put("max_tokens", 65536);
 
+        log.info("发送请求到 DeepSeek, model={}, prompt长度={}", model, prompt.length());
+        long t = System.currentTimeMillis();
+
         RestClient restClient = RestClient.create();
-        return restClient.post()
+        String response = restClient.post()
                 .uri(apiUrl)
                 .header("Authorization", "Bearer " + apiKey)
                 .header("Content-Type", "application/json")
                 .body(requestBody)
                 .retrieve()
                 .body(String.class);
+
+        log.info("DeepSeek 响应耗时 {}ms, 响应长度 {} 字符", System.currentTimeMillis() - t, response.length());
+        return response;
     }
 
     private List<Question> parseQuestions(String responseJson) {
         try {
             JsonNode root = objectMapper.readTree(responseJson);
-            String content = root.path("choices").get(0).path("message").path("content").asText();
-            // 如果有 reasoning_content（思考模式输出），忽略它，只取 content
+            JsonNode choice = root.path("choices").get(0);
+            if (choice == null) {
+                log.error("API 返回无 choices 字段, 原始响应: {}", responseJson);
+                throw new RuntimeException("API 返回格式异常: 无 choices");
+            }
+            String content = choice.path("message").path("content").asText();
+            int totalTokens = root.path("usage").path("total_tokens").asInt(0);
+            log.info("解析响应, content 长度={} 字符, usage total_tokens={}", content.length(), totalTokens);
 
-            // 清理可能的 Markdown 代码块标记
             content = content.replaceAll("(?s)^```json\\s*", "").replaceAll("(?s)\\s*```$", "").trim();
-            // 找到第一个 [ 和最后一个 ] 之间的内容（容错处理）
             int start = content.indexOf('[');
             int end = content.lastIndexOf(']');
             if (start >= 0 && end > start) {
@@ -169,10 +197,11 @@ public class AiQuestionService {
                     questions.add(q);
                 }
             }
+            log.info("解析完成: {} 道有效题目", questions.size());
             return questions;
         } catch (Exception e) {
-            log.error("解析 AI 返回结果失败，原始响应长度={}", responseJson.length());
-            log.debug("原始响应: {}", responseJson);
+            log.error("解析 AI 返回结果失败, 原始响应长度={}", responseJson.length());
+            log.debug("原始响应前500字符: {}", responseJson.substring(0, Math.min(500, responseJson.length())));
             throw new RuntimeException("解析 AI 返回结果失败: " + e.getMessage(), e);
         }
     }
