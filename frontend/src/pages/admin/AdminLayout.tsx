@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { Layout, Menu } from 'antd'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import {
-  DashboardOutlined, RobotOutlined, FileSearchOutlined, TagOutlined
+  DashboardOutlined, RobotOutlined, FileSearchOutlined
 } from '@ant-design/icons'
 
 const { Sider, Content } = Layout
@@ -11,7 +11,6 @@ const menuItems = [
   { key: '/admin/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
   { key: '/admin/ai-generate', icon: <RobotOutlined />, label: '生成题目' },
   { key: '/admin/draft-review', icon: <FileSearchOutlined />, label: '审核草稿' },
-  { key: '/admin/categories', icon: <TagOutlined />, label: '分类管理' },
 ]
 
 export default function AdminLayout() {
