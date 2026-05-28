@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { List, Spin, Tag } from 'antd'
+import { List, Tag, Skeleton, Empty, Alert, Button } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { getHotQuestions } from '../../api/question'
 import type { Question } from '../../types'
@@ -7,16 +7,23 @@ import type { Question } from '../../types'
 export default function HotQuestions() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const navigate = useNavigate()
 
-  useEffect(() => {
+  const fetch = () => {
+    setLoading(true)
+    setError(false)
     getHotQuestions(10).then(res => {
       setQuestions(res.content)
       setLoading(false)
-    })
-  }, [])
+    }).catch(() => { setError(true); setLoading(false) })
+  }
 
-  if (loading) return <Spin />
+  useEffect(() => { fetch() }, [])
+
+  if (loading) return <Skeleton active paragraph={{ rows: 5 }} />
+  if (error) return <Alert type="error" message="加载失败" action={<Button onClick={fetch}>重试</Button>} />
+  if (questions.length === 0) return <Empty description="暂无热门题目" />
 
   return (
     <List
