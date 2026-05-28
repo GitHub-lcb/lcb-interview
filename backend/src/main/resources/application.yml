@@ -34,3 +34,6 @@ springdoc:
 logging:
   level:
     com.lcbinterview: info
+
+admin:
+  token: lcb-admin-2026
