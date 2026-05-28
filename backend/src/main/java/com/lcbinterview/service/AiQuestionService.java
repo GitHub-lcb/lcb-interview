@@ -24,8 +24,6 @@ import java.util.concurrent.*;
 @RequiredArgsConstructor
 public class AiQuestionService {
 
-    private static final String API_URL = "https://api.deepseek.com/chat/completions";
-
     private final QuestionMapper questionMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Map<Long, GenerationTaskVO> taskStore = new ConcurrentHashMap<>();
@@ -34,8 +32,11 @@ public class AiQuestionService {
     @Value("${deepseek.api-key}")
     private String apiKey;
 
-    @Value("${deepseek.model:deepseek-chat}")
+    @Value("${deepseek.model:deepseek-v4-flash}")
     private String model;
+
+    @Value("${deepseek.url:https://api.deepseek.com/chat/completions}")
+    private String apiUrl;
 
     /**
      * 异步生成题目。分批调用 DeepSeek API，每批最多 5 题。
@@ -127,7 +128,7 @@ public class AiQuestionService {
 
         RestClient restClient = RestClient.create();
         return restClient.post()
-                .uri(API_URL)
+                .uri(apiUrl)
                 .header("Authorization", "Bearer " + apiKey)
                 .header("Content-Type", "application/json")
                 .body(requestBody)
