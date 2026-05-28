@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Card, Row, Col, Skeleton, Empty, Alert, Button } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { getCategories } from '../../api/category'
+import { getCategoryIcon } from '../../utils/categoryIcons'
 import type { Category } from '../../types'
 
 export default function QuestionBank() {
@@ -36,7 +37,7 @@ export default function QuestionBank() {
       {categories.map(cat => (
         <Col xs={24} sm={12} md={8} key={cat.id}>
           <Card hoverable onClick={() => navigate(`/bank/${cat.id}`)}>
-            <Card.Meta title={cat.name} description={cat.description} />
+            <Card.Meta avatar={getCategoryIcon(cat.icon)} title={cat.name} description={cat.description} />
           </Card>
         </Col>
       ))}

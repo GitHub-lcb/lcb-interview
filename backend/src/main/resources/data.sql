@@ -1,8 +1,8 @@
 INSERT INTO category (name, icon, description, sort_order, create_time, update_time) VALUES
-('Java 基础', 'https://via.placeholder.com/64?text=Java', 'Java 基础面试题，涵盖数据类型、面向对象、集合框架等', 1, NOW(), NOW()),
-('MySQL', 'https://via.placeholder.com/64?text=SQL', 'MySQL 数据库面试题，包括索引、事务、SQL 优化等', 2, NOW(), NOW()),
-('Redis', 'https://via.placeholder.com/64?text=Redis', 'Redis 缓存面试题，包括数据结构、持久化、集群等', 3, NOW(), NOW()),
-('Spring', 'https://via.placeholder.com/64?text=Spring', 'Spring 框架面试题，包括 IoC、AOP、事务管理等', 4, NOW(), NOW());
+('Java 基础', 'icon-java', 'Java 基础面试题，涵盖数据类型、面向对象、集合框架等', 1, NOW(), NOW()),
+('MySQL', 'icon-mysql', 'MySQL 数据库面试题，包括索引、事务、SQL 优化等', 2, NOW(), NOW()),
+('Redis', 'icon-redis', 'Redis 缓存面试题，包括数据结构、持久化、集群等', 3, NOW(), NOW()),
+('Spring', 'icon-spring', 'Spring 框架面试题，包括 IoC、AOP、事务管理等', 4, NOW(), NOW());
 
 INSERT INTO tag (name, create_time, update_time) VALUES
 ('Java', NOW(), NOW()), ('集合', NOW(), NOW()), ('多线程', NOW(), NOW()),

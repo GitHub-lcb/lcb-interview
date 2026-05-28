@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Card, Row, Col, Skeleton, Empty, Alert, Button } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { getCategories } from '../../api/category'
+import { getCategoryIcon } from '../../utils/categoryIcons'
 import type { Category } from '../../types'
 
 export default function CategoryGrid() {
@@ -37,7 +38,7 @@ export default function CategoryGrid() {
         <Col xs={24} sm={12} md={8} lg={6} key={cat.id}>
           <Card hoverable onClick={() => navigate(`/bank/${cat.id}`)}>
             <Card.Meta
-              avatar={<img src={cat.icon} alt="" style={{ width: 48, height: 48 }} />}
+              avatar={getCategoryIcon(cat.icon)}
               title={cat.name}
               description={cat.description}
             />
