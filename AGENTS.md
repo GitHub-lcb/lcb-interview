@@ -46,6 +46,12 @@ lcb-interview/
 - **Controller** (`controller/`): 统一返回 `ResponseEntity<ApiResponse<T>>`，路径 `/api/...`
 - **DTO** (`dto/`): 使用 `record`，与 Entity 分离。`QuestionQuery` 用 `@Builder`，`QuestionVO` 含 `from()` 工厂方法
 
+### 代码风格
+
+- **强制大括号**：`if` / `else` / `for` / `while` 即使只有一行也必须使用 `{}`，禁止单行无括号写法
+  - 正确：`if (page == null) { page = 0; }`
+  - 错误：`if (page == null) page = 0;`
+
 ### 注释规范
 
 - **类注释**：每个类必须有 Javadoc，说明类职责和设计意图（如 `题目 Service，处理题目的分页查询、详情查看、缓存等业务逻辑`）

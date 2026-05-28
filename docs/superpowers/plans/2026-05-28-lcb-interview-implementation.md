@@ -1211,8 +1211,8 @@ public record QuestionQuery(
         @Builder.Default @Schema(description = "每页条数") Integer size
 ) {
     public QuestionQuery {
-        if (page == null) page = 0;
-        if (size == null) size = 20;
+        if (page == null) { page = 0; }
+        if (size == null) { size = 20; }
     }
 }
 ```
