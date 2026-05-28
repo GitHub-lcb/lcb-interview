@@ -29,6 +29,14 @@ export default function ContentView({ question, defaultOpen = false }: Props) {
     })
   }
 
+  if (question.content) {
+    sections.push({
+      key: 'content',
+      label: '题目内容',
+      content: <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>{question.content}</Markdown>,
+    })
+  }
+
   const fields: [string, string | undefined | null][] = [
     ['原理', question.principle],
     ['对比分析', question.comparison],
@@ -67,7 +75,7 @@ export default function ContentView({ question, defaultOpen = false }: Props) {
 
   return (
     <Collapse
-      defaultActiveKey={defaultOpen ? sections.map(s => s.key) : ['summary']}
+      defaultActiveKey={defaultOpen ? sections.map(s => s.key) : sections.length > 0 ? [sections[0].key] : []}
       items={sections.map(s => ({ key: s.key, label: s.label, children: s.content }))}
       expandIconPosition="end"
     />
