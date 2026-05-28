@@ -752,7 +752,7 @@ export const getGenerationTask = (taskId: number) =>
     .then(res => res.data.data)
 
 export const listDrafts = (page = 0, size = 20) =>
-  api.get<{ data: import('../types').PageResult<import('../types').QuestionAdmin> }>('/admin/questions/draft', { params: { page, size } })
+  api.get<{ data: { records: import('../types').QuestionAdmin[], total: number, current: number, pages: number } }>('/admin/questions/draft', { params: { page, size } })
     .then(res => res.data.data)
 
 export const getDraft = (id: number) =>
@@ -1276,7 +1276,7 @@ export default function DraftReview() {
   const load = (p: number) => {
     setLoading(true)
     listDrafts(p).then(res => {
-      setData(res.content as QuestionAdmin[])
+      setData((res.records || res.content) as QuestionAdmin[])
       setTotal(res.total)
       setLoading(false)
     })
