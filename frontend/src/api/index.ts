@@ -6,6 +6,14 @@ const api = axios.create({
   timeout: 10000,
 })
 
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('adminToken')
+  if (token && config.url?.startsWith('/admin/')) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
 api.interceptors.response.use(
   (res) => {
     if (res.data.code !== 200) {
