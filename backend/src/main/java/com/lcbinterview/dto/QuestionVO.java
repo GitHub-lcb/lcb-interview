@@ -14,8 +14,16 @@ import java.util.List;
 public record QuestionVO(
         @Schema(description = "题目 ID") Long id,
         @Schema(description = "标题") String title,
+        @Schema(description = "摘要") String summary,
         @Schema(description = "题目内容，Markdown 格式") String content,
-        @Schema(description = "答案，Markdown 格式") String answer,
+        @Schema(description = "原理解析") String principle,
+        @Schema(description = "对比分析") String comparison,
+        @Schema(description = "适用场景") String scenario,
+        @Schema(description = "风险与避坑") String risk,
+        @Schema(description = "项目实战") String projectExp,
+        @Schema(description = "代码示例") String codeExamples,
+        @Schema(description = "图解") String diagrams,
+        @Schema(description = "关联题目 ID") String relatedIds,
         @Schema(description = "难度") String difficulty,
         @Schema(description = "分类 ID") Long categoryId,
         @Schema(description = "分类名称") String categoryName,
@@ -29,7 +37,11 @@ public record QuestionVO(
     public static QuestionVO from(Question question, String categoryName, List<String> tags) {
         return new QuestionVO(
                 question.getId(), question.getTitle(),
-                question.getContent(), question.getAnswer(),
+                question.getSummary(), question.getContent(),
+                question.getPrinciple(), question.getComparison(),
+                question.getScenario(), question.getRisk(),
+                question.getProjectExp(), question.getCodeExamples(),
+                question.getDiagrams(), question.getRelatedIds(),
                 question.getDifficulty(), question.getCategoryId(),
                 categoryName, tags,
                 question.getViewCount(), question.getCreateTime()

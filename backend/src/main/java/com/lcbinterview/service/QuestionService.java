@@ -29,8 +29,8 @@ public class QuestionService {
     private final ViewCountService viewCountService;
 
     /**
-     * 分页搜索题目。支持分类筛选、难度筛选、关键词模糊搜索、标签筛选。
-     * 所有筛选条件均为可选，动态拼接 SQL（MyBatis-Plus LambdaQueryWrapper）。
+     * 分页搜索题目。支持分类筛选、难度筛选、关键词全文搜索、标签筛选。
+     * 关键词搜索走 MySQL FULLTEXT INDEX（ngram 中文分词）。
      */
     public IPage<Question> search(Long categoryId, String difficulty, String keyword,
                                    Long tagId, int page, int size) {
@@ -44,14 +44,15 @@ public class QuestionService {
             return mpPage;
         }
 
+        if (StringUtils.isNotBlank(keyword)) {
+            log.info("全文搜索 keyword={}, categoryId={}, difficulty={}", keyword, categoryId, difficulty);
+            return questionMapper.searchFulltext(mpPage, keyword, categoryId, difficulty);
+        }
+
         LambdaQueryWrapper<Question> wrapper = new LambdaQueryWrapper<Question>()
+                .eq(Question::getStatus, "PUBLISHED")
                 .eq(categoryId != null, Question::getCategoryId, categoryId)
                 .eq(StringUtils.isNotBlank(difficulty), Question::getDifficulty, difficulty)
-                .and(StringUtils.isNotBlank(keyword), w ->
-                        w.like(Question::getTitle, keyword)
-                         .or()
-                         .like(Question::getContent, keyword)
-                )
                 .orderByDesc(Question::getCreateTime);
 
         log.info("搜索题目: categoryId={}, difficulty={}, keyword={}, page={}, size={}",

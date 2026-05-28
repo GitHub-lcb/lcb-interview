@@ -2,6 +2,7 @@ package com.lcbinterview.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.lcbinterview.common.ApiResponse;
+import com.lcbinterview.common.BusinessException;
 import com.lcbinterview.dto.PageResult;
 import com.lcbinterview.dto.QuestionQuery;
 import com.lcbinterview.dto.QuestionVO;
@@ -46,6 +47,9 @@ public class QuestionController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<QuestionVO>> getById(@PathVariable Long id) {
         Question question = questionService.getById(id);
+        if (!"PUBLISHED".equals(question.getStatus())) {
+            throw new BusinessException(404, "题目不存在");
+        }
         return ResponseEntity.ok(ApiResponse.success(
                 QuestionVO.from(question, null, List.of())));
     }
