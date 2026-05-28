@@ -36,7 +36,7 @@ public class QuestionAdminController {
         IPage<Question> result = questionMapper.selectPage(mpPage, wrapper);
         Page<QuestionAdminVO> voPage = new Page<>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream().map(QuestionAdminVO::from).toList());
-        return ResponseEntity.ok(ApiResponse.ok(voPage));
+        return ResponseEntity.ok(ApiResponse.success(voPage));
     }
 
     /**
@@ -48,7 +48,7 @@ public class QuestionAdminController {
         if (q == null) {
             return ResponseEntity.ok(ApiResponse.error(404, "题目不存在"));
         }
-        return ResponseEntity.ok(ApiResponse.ok(QuestionAdminVO.from(q)));
+        return ResponseEntity.ok(ApiResponse.success(QuestionAdminVO.from(q)));
     }
 
     /**
@@ -59,7 +59,7 @@ public class QuestionAdminController {
                                                           @RequestBody Question question) {
         question.setId(id);
         questionMapper.updateById(question);
-        return ResponseEntity.ok(ApiResponse.ok(null));
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     /**
@@ -71,7 +71,7 @@ public class QuestionAdminController {
         q.setId(id);
         q.setStatus("PUBLISHED");
         questionMapper.updateById(q);
-        return ResponseEntity.ok(ApiResponse.ok(null));
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     /**
@@ -83,6 +83,6 @@ public class QuestionAdminController {
         q.setId(id);
         q.setStatus("REJECTED");
         questionMapper.updateById(q);
-        return ResponseEntity.ok(ApiResponse.ok(null));
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

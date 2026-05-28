@@ -26,7 +26,7 @@ public class AiGenerationController {
     @PostMapping("/generate")
     public ResponseEntity<ApiResponse<Long>> generate(@Valid @RequestBody GenerationRequest req) {
         Long taskId = aiQuestionService.generate(req);
-        return ResponseEntity.ok(ApiResponse.ok(taskId));
+        return ResponseEntity.ok(ApiResponse.success(taskId));
     }
 
     /**
@@ -38,6 +38,6 @@ public class AiGenerationController {
         if (task == null) {
             return ResponseEntity.ok(ApiResponse.error(404, "任务不存在"));
         }
-        return ResponseEntity.ok(ApiResponse.ok(task));
+        return ResponseEntity.ok(ApiResponse.success(task));
     }
 }
