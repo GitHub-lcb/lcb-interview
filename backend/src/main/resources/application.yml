@@ -37,3 +37,7 @@ logging:
 
 admin:
   token: lcb-admin-2026
+
+deepseek:
+  api-key: sk-your-deepseek-api-key
+  model: deepseek-chat
