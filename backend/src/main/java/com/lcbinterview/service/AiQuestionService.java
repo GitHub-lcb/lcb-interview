@@ -123,8 +123,7 @@ public class AiQuestionService {
                 Map.of("role", "user", "content", prompt)
         ));
         requestBody.put("temperature", 0.7);
-        requestBody.put("max_tokens", 8192);
-        requestBody.put("thinking_mode", true);
+        requestBody.put("max_tokens", 65536);
 
         RestClient restClient = RestClient.create();
         return restClient.post()
@@ -140,9 +139,16 @@ public class AiQuestionService {
         try {
             JsonNode root = objectMapper.readTree(responseJson);
             String content = root.path("choices").get(0).path("message").path("content").asText();
+            // 如果有 reasoning_content（思考模式输出），忽略它，只取 content
 
             // 清理可能的 Markdown 代码块标记
-            content = content.replaceAll("^```json\\s*", "").replaceAll("\\s*```$", "").trim();
+            content = content.replaceAll("(?s)^```json\\s*", "").replaceAll("(?s)\\s*```$", "").trim();
+            // 找到第一个 [ 和最后一个 ] 之间的内容（容错处理）
+            int start = content.indexOf('[');
+            int end = content.lastIndexOf(']');
+            if (start >= 0 && end > start) {
+                content = content.substring(start, end + 1);
+            }
 
             JsonNode questionsArray = objectMapper.readTree(content);
             List<Question> questions = new ArrayList<>();
@@ -165,7 +171,8 @@ public class AiQuestionService {
             }
             return questions;
         } catch (Exception e) {
-            log.error("解析 AI 返回结果失败", e);
+            log.error("解析 AI 返回结果失败，原始响应长度={}", responseJson.length());
+            log.debug("原始响应: {}", responseJson);
             throw new RuntimeException("解析 AI 返回结果失败: " + e.getMessage(), e);
         }
     }
