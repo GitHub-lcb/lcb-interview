@@ -15,8 +15,8 @@ export default function DraftReview() {
 
   const load = (p: number) => {
     setLoading(true)
-    listDrafts(p).then(res => {
-      setData(res.content as QuestionAdmin[])
+    listDrafts(p).then((res: any) => {
+      setData((res.records || res.content) as QuestionAdmin[])
       setTotal(res.total)
       setLoading(false)
     }).catch(() => setLoading(false))
