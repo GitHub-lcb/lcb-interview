@@ -1,10 +1,13 @@
 package com.lcbinterview.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lcbinterview.dto.GenerationRequest;
 import com.lcbinterview.dto.GenerationTaskVO;
+import com.lcbinterview.mapper.CategoryMapper;
 import com.lcbinterview.mapper.QuestionMapper;
+import com.lcbinterview.model.Category;
 import com.lcbinterview.model.Question;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +28,7 @@ import java.util.concurrent.*;
 public class AiQuestionService {
 
     private final QuestionMapper questionMapper;
+    private final CategoryMapper categoryMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Map<Long, GenerationTaskVO> taskStore = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
@@ -74,7 +78,7 @@ public class AiQuestionService {
                         Question q = questions.get(i);
                         q.setStatus("DRAFT");
                         q.setSource("AI_GENERATED");
-                        q.setCategoryId(1L);
+                        q.setCategoryId(resolveCategoryId(req.category()));
                         questionMapper.insert(q);
                         generatedIds.add(q.getId());
                         success++;
@@ -215,5 +219,60 @@ public class AiQuestionService {
      */
     public GenerationTaskVO getTask(Long taskId) {
         return taskStore.get(taskId);
+    }
+
+    /**
+     * 根据分类名称解析分类 ID。支持模糊匹配（包含关系）。
+     *
+     * @param categoryName 分类名称
+     * @return 分类 ID，未匹配时返回 1L（Java 基础）
+     */
+    public Long resolveCategoryId(String categoryName) {
+        if (categoryName == null || categoryName.isBlank()) {
+            return 1L;
+        }
+        List<Category> all = categoryMapper.selectList(
+                new LambdaQueryWrapper<Category>().select(Category::getId, Category::getName));
+        for (Category c : all) {
+            if (c.getName().equals(categoryName)) {
+                return c.getId();
+            }
+        }
+        for (Category c : all) {
+            if (c.getName().contains(categoryName) || categoryName.contains(c.getName())) {
+                return c.getId();
+            }
+        }
+        log.warn("未匹配到分类 '{}'，默认使用 categoryId=1", categoryName);
+        return 1L;
+    }
+
+    /**
+     * 同步生成题目（供 BatchGenerationRunner 调用）。
+     *
+     * @param req      生成请求
+     * @param categoryId 目标分类 ID
+     * @return 成功保存的题目 ID 列表
+     */
+    public List<Long> generateSync(GenerationRequest req, Long categoryId) {
+        log.info("同步生成: category={}, categoryId={}, count={}, topic={}",
+                req.category(), categoryId, req.count(), req.topic());
+
+        String prompt = buildPrompt(req);
+        String responseJson = callDeepSeek(prompt);
+        List<Question> questions = parseQuestions(responseJson);
+
+        List<Long> ids = new ArrayList<>();
+        int toSave = Math.min(questions.size(), req.count());
+        for (int i = 0; i < toSave; i++) {
+            Question q = questions.get(i);
+            q.setStatus("PUBLISHED");
+            q.setSource("AI_GENERATED");
+            q.setCategoryId(categoryId);
+            questionMapper.insert(q);
+            ids.add(q.getId());
+            log.info("同步保存 [{}/{}]: id={}, title={}", i + 1, toSave, q.getId(), q.getTitle());
+        }
+        return ids;
     }
 }
