@@ -2,18 +2,18 @@ import { useState, useEffect } from 'react'
 import { Card, Form, Select, InputNumber, Input, Button, Progress, Alert, message, Radio, Space, Tag, Divider } from 'antd'
 import { generateQuestions, getGenerationTask, batchGenerate, getBatchStatus } from '../../api/admin'
 import { getCategories } from '../../api/category'
-import type { Category } from '../../types'
+import type { Category, BatchProgress, GenerationTask } from '../../types'
 
 export default function AIGenerate() {
   const [mode, setMode] = useState<'single' | 'batch'>('single')
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(false)
-  const [task, setTask] = useState<any>(null)
-  const [batchStatus, setBatchStatus] = useState<'IDLE' | 'RUNNING'>('IDLE')
+  const [task, setTask] = useState<GenerationTask | null>(null)
+  const [batchProgress, setBatchProgress] = useState<BatchProgress | null>(null)
 
   useEffect(() => {
     getCategories().then(setCategories).catch(() => {})
-    getBatchStatus().then(s => setBatchStatus(s as any)).catch(() => {})
+    getBatchStatus().then(p => setBatchProgress(p as any)).catch(() => {})
   }, [])
 
   const categoryOptions = categories.map(c => ({ value: c.name, label: c.name }))
@@ -61,8 +61,7 @@ export default function AIGenerate() {
         categoryName: values.categoryName,
         delaySeconds: values.delaySeconds ?? 3,
       })
-      message.success('批量生成任务已启动，请查看后端日志跟踪进度')
-      setBatchStatus('RUNNING')
+      message.success('批量生成任务已启动')
       pollBatchStatus()
     } catch {
       message.error('启动批量任务失败')
@@ -73,18 +72,18 @@ export default function AIGenerate() {
   const pollBatchStatus = () => {
     const timer = setInterval(async () => {
       try {
-        const s = await getBatchStatus()
-        setBatchStatus(s as any)
-        if (s === 'IDLE') {
+        const p = await getBatchStatus()
+        setBatchProgress(p)
+        if (p.status === 'IDLE') {
           clearInterval(timer)
           setLoading(false)
-          message.success('批量生成任务已完成，请查看后端日志了解详情')
+          message.success('批量生成任务完成')
         }
       } catch {
         clearInterval(timer)
         setLoading(false)
       }
-    }, 5000)
+    }, 3000)
   }
 
   return (
@@ -122,10 +121,35 @@ export default function AIGenerate() {
         <>
           <Space style={{ marginBottom: 16 }}>
             <span>批量任务状态：</span>
-            <Tag color={batchStatus === 'RUNNING' ? 'processing' : 'default'}>
-              {batchStatus === 'RUNNING' ? '运行中' : '空闲'}
+            <Tag color={batchProgress?.status === 'RUNNING' ? 'processing' : 'default'}>
+              {batchProgress?.status === 'RUNNING' ? '运行中' : '空闲'}
             </Tag>
           </Space>
+
+          {batchProgress?.status === 'RUNNING' && (
+            <Card size="small" style={{ marginBottom: 16 }}>
+              <Progress
+                percent={batchProgress.totalCategories > 0
+                  ? Math.round(batchProgress.completedCategories / batchProgress.totalCategories * 100)
+                  : 0}
+              />
+              <p>
+                分类进度: {batchProgress.completedCategories}/{batchProgress.totalCategories}
+                &nbsp;&nbsp;题目进度: {batchProgress.generatedQuestions}/{batchProgress.totalQuestions}
+                &nbsp;&nbsp;失败: {batchProgress.failedCategories}
+              </p>
+              {batchProgress.currentMessage && (
+                <p><Tag color="processing">{batchProgress.currentMessage}</Tag></p>
+              )}
+              {batchProgress.currentCategory && (
+                <p>当前分类: <Tag color="blue">{batchProgress.currentCategory}</Tag></p>
+              )}
+              {batchProgress.errors?.length > 0 && (
+                <Alert type="warning" message={batchProgress.errors.join('; ')} showIcon />
+              )}
+            </Card>
+          )}
+
           <Form layout="vertical" onFinish={onBatchFinish} style={{ maxWidth: 500 }}>
             <Form.Item name="countPerCategory" label="每个分类生成数量" initialValue={10}>
               <InputNumber min={1} max={20} />
@@ -161,6 +185,7 @@ export default function AIGenerate() {
       {task && mode === 'single' && (
         <Card size="small" style={{ marginTop: 16 }}>
           <Progress percent={task.total > 0 ? Math.round((task.successCount + task.failCount) / task.total * 100) : 0} />
+          {task.message && task.status === 'RUNNING' && <p><Tag color="processing">{task.message}</Tag></p>}
           <p>成功: {task.successCount} / 失败: {task.failCount} / 共: {task.total}</p>
           {task.errors?.length > 0 && (
             <Alert type="error" message={task.errors.join('; ')} />

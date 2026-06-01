@@ -12,8 +12,11 @@ import com.lcbinterview.model.Question;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -33,6 +36,17 @@ public class AiQuestionService {
     private final Map<Long, GenerationTaskVO> taskStore = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 
+    private final RestClient restClient = buildRestClient();
+
+    private static RestClient buildRestClient() {
+        JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(
+                HttpClient.newBuilder()
+                        .connectTimeout(Duration.ofSeconds(10))
+                        .build());
+        factory.setReadTimeout(Duration.ofSeconds(120));
+        return RestClient.builder().requestFactory(factory).build();
+    }
+
     @Value("${deepseek.api-key}")
     private String apiKey;
 
@@ -50,7 +64,7 @@ public class AiQuestionService {
         log.info("AI生成任务创建 taskId={}, category={}, difficulty={}, count={}, topic={}",
                 taskId, req.category(), req.difficulty(), req.count(), req.topic());
 
-        taskStore.put(taskId, new GenerationTaskVO(taskId, "RUNNING", req.count(), 0, 0, List.of(), List.of()));
+        taskStore.put(taskId, new GenerationTaskVO(taskId, "RUNNING", req.count(), 0, 0, "构建 prompt...", List.of(), List.of()));
 
         scheduler.submit(() -> {
             List<String> errors = new ArrayList<>();
@@ -61,16 +75,18 @@ public class AiQuestionService {
             long startTime = System.currentTimeMillis();
 
             try {
-                log.info("构建 prompt...");
+                updateProgress(taskId, req.count(), 0, 0, "构建 prompt...");
+
                 String prompt = buildPrompt(req);
-                log.info("Prompt 长度: {} 字符, 开始调用 DeepSeek API (model={}, url={})", prompt.length(), model, apiUrl);
+
+                updateProgress(taskId, req.count(), 0, 0, "调用 DeepSeek API 生成中...");
 
                 String responseJson = callDeepSeek(prompt);
                 long apiTime = System.currentTimeMillis() - startTime;
-                log.info("DeepSeek API 返回, 耗时 {}ms, 响应体长度: {} 字符", apiTime, responseJson.length());
+
+                updateProgress(taskId, req.count(), 0, 0, "解析 AI 返回结果...");
 
                 List<Question> questions = parseQuestions(responseJson);
-                log.info("解析完成, 获得 {} 道题目", questions.size());
 
                 int toSave = Math.min(questions.size(), req.count());
                 for (int i = 0; i < toSave; i++) {
@@ -82,6 +98,9 @@ public class AiQuestionService {
                         questionMapper.insert(q);
                         generatedIds.add(q.getId());
                         success++;
+
+                        updateProgress(taskId, req.count(), success, fail,
+                                String.format("保存中 %d/%d", success + fail, req.count()));
                         log.info("保存题目成功 [{}/{}]: id={}, title={}", i + 1, toSave, q.getId(), q.getTitle());
                     } catch (Exception e) {
                         log.error("保存题目失败 [{}]", i + 1, e);
@@ -107,6 +126,7 @@ public class AiQuestionService {
 
             taskStore.put(taskId, new GenerationTaskVO(
                     taskId, taskStatus, req.count(), success, fail,
+                    taskStatus.equals("FAILED") ? errors.isEmpty() ? "生成失败" : errors.get(0) : "完成",
                     List.copyOf(errors), List.copyOf(generatedIds)));
         });
 
@@ -150,7 +170,6 @@ public class AiQuestionService {
         log.info("发送请求到 DeepSeek, model={}, prompt长度={}", model, prompt.length());
         long t = System.currentTimeMillis();
 
-        RestClient restClient = RestClient.create();
         String response = restClient.post()
                 .uri(apiUrl)
                 .header("Authorization", "Bearer " + apiKey)
@@ -245,6 +264,15 @@ public class AiQuestionService {
         }
         log.warn("未匹配到分类 '{}'，默认使用 categoryId=1", categoryName);
         return 1L;
+    }
+
+    private void updateProgress(Long taskId, int total, int success, int fail, String message) {
+        GenerationTaskVO current = taskStore.get(taskId);
+        if (current != null) {
+            taskStore.put(taskId, new GenerationTaskVO(
+                    taskId, "RUNNING", total, success, fail, message,
+                    current.errors(), current.generatedIds()));
+        }
     }
 
     /**

@@ -2,6 +2,7 @@ package com.lcbinterview.controller.admin;
 
 import com.lcbinterview.common.ApiResponse;
 import com.lcbinterview.dto.BatchGenerationRequest;
+import com.lcbinterview.dto.BatchProgressVO;
 import com.lcbinterview.dto.GenerationRequest;
 import com.lcbinterview.dto.GenerationTaskVO;
 import com.lcbinterview.service.AiQuestionService;
@@ -58,11 +59,10 @@ public class AiGenerationController {
     }
 
     /**
-     * 查询批量任务状态。
+     * 查询批量任务进度。
      */
     @GetMapping("/batch/status")
-    public ResponseEntity<ApiResponse<String>> batchStatus() {
-        String status = batchRunner.isRunning() ? "RUNNING" : "IDLE";
-        return ResponseEntity.ok(ApiResponse.success(status));
+    public ResponseEntity<ApiResponse<BatchProgressVO>> batchStatus() {
+        return ResponseEntity.ok(ApiResponse.success(batchRunner.getProgress()));
     }
 }

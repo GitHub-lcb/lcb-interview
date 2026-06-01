@@ -1,6 +1,7 @@
 package com.lcbinterview.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.lcbinterview.dto.BatchProgressVO;
 import com.lcbinterview.dto.GenerationRequest;
 import com.lcbinterview.mapper.QuestionMapper;
 import com.lcbinterview.model.Category;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 批量题目生成器。遍历所有分类，调用 AI 服务批量生成面试题目。
@@ -29,6 +31,8 @@ public class BatchGenerationRunner {
     private final AiQuestionService aiQuestionService;
 
     private final AtomicBoolean running = new AtomicBoolean(false);
+    private final AtomicReference<BatchProgressVO> progress = new AtomicReference<>(
+            new BatchProgressVO("IDLE", 0, 0, 0, 0, 0, null, null, List.of()));
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     /** 分类 → 生成主题提示词映射 */
@@ -90,16 +94,17 @@ public class BatchGenerationRunner {
                 log.error("批量生成任务异常", e);
             } finally {
                 running.set(false);
+                progress.set(new BatchProgressVO("IDLE", 0, 0, 0, 0, 0, null, null, List.of()));
             }
         });
         return true;
     }
 
     /**
-     * 查询是否正在运行。
+     * 查询当前进度。
      */
-    public boolean isRunning() {
-        return running.get();
+    public BatchProgressVO getProgress() {
+        return progress.get();
     }
 
     private void runBatch(int countPerCategory, String categoryName, int delaySeconds) {
@@ -120,8 +125,25 @@ public class BatchGenerationRunner {
 
         int totalSuccess = 0;
         int totalFail = 0;
-        List<String> failedCategories = new ArrayList<>();
+        int totalToGenerate = 0;
+        List<String> errorList = new ArrayList<>();
 
+        // 先估算总题数
+        for (Category cat : categories) {
+            if (SKIP_CATEGORIES.contains(cat.getName())) { continue; }
+            long existing = questionMapper.selectCount(
+                    new LambdaQueryWrapper<Question>()
+                            .eq(Question::getCategoryId, cat.getId())
+                            .eq(Question::getStatus, "PUBLISHED"));
+            if (existing < countPerCategory) {
+                totalToGenerate += (int) (countPerCategory - existing);
+            }
+        }
+
+        progress.set(new BatchProgressVO("RUNNING",
+                categories.size(), 0, totalToGenerate, 0, 0, null, "准备中...", List.of()));
+
+        int completedCategories = 0;
         for (int i = 0; i < categories.size(); i++) {
             Category cat = categories.get(i);
 
@@ -145,6 +167,10 @@ public class BatchGenerationRunner {
             log.info("[{}/{}] 开始生成分类 '{}': 已有 {} 道，需生成 {} 道",
                     i + 1, categories.size(), cat.getName(), existingCount, toGenerate);
 
+            progress.set(new BatchProgressVO("RUNNING",
+                    categories.size(), completedCategories, totalToGenerate, totalSuccess, totalFail,
+                    cat.getName(), "调用 AI 生成中...", List.copyOf(errorList)));
+
             try {
                 String topic = CATEGORY_TOPICS.getOrDefault(cat.getName(), cat.getDescription());
                 String difficulty = pickDifficulty(i);
@@ -154,17 +180,27 @@ public class BatchGenerationRunner {
 
                 List<Long> ids = aiQuestionService.generateSync(req, cat.getId());
                 totalSuccess += ids.size();
+                completedCategories++;
                 log.info("[{}/{}] 分类 '{}' 生成完成: {} 道",
                         i + 1, categories.size(), cat.getName(), ids.size());
 
             } catch (Exception e) {
                 log.error("[{}/{}] 分类 '{}' 生成失败", i + 1, categories.size(), cat.getName(), e);
                 totalFail++;
-                failedCategories.add(cat.getName());
+                completedCategories++;
+                errorList.add(cat.getName() + ": " + e.getMessage());
             }
+
+            progress.set(new BatchProgressVO("RUNNING",
+                    categories.size(), completedCategories, totalToGenerate, totalSuccess, totalFail,
+                    null, "已完成 " + completedCategories + "/" + categories.size() + " 个分类",
+                    List.copyOf(errorList)));
 
             if (i < categories.size() - 1 && delaySeconds > 0) {
                 try {
+                    progress.set(new BatchProgressVO("RUNNING",
+                            categories.size(), completedCategories, totalToGenerate, totalSuccess, totalFail,
+                            null, "等待 " + delaySeconds + "s 后继续...", List.copyOf(errorList)));
                     log.info("等待 {}s 后继续...", delaySeconds);
                     Thread.sleep(delaySeconds * 1000L);
                 } catch (InterruptedException e) {
@@ -176,8 +212,8 @@ public class BatchGenerationRunner {
         }
 
         log.info("===== 批量生成任务完成: 成功 {} 道, 失败 {} 个分类 =====", totalSuccess, totalFail);
-        if (!failedCategories.isEmpty()) {
-            log.warn("失败分类: {}", failedCategories);
+        if (!errorList.isEmpty()) {
+            log.warn("失败分类: {}", errorList);
         }
     }
 

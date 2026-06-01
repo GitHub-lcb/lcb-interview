@@ -22,7 +22,7 @@ export const batchGenerate = (params: {
     .then(res => res.data.data)
 
 export const getBatchStatus = () =>
-  api.get<{ data: string }>('/admin/ai/batch/status')
+  api.get<{ data: import('../types').BatchProgress }>('/admin/ai/batch/status')
     .then(res => res.data.data)
 
 export const listDrafts = (page = 0, size = 20) =>
