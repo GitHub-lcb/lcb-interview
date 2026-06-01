@@ -13,6 +13,18 @@ export const getGenerationTask = (taskId: number) =>
   api.get<{ data: import('../types').GenerationTask }>(`/admin/ai/tasks/${taskId}`)
     .then(res => res.data.data)
 
+export const batchGenerate = (params: {
+  countPerCategory?: number
+  categoryName?: string
+  delaySeconds?: number
+}) =>
+  api.post<{ data: string }>('/admin/ai/batch', params)
+    .then(res => res.data.data)
+
+export const getBatchStatus = () =>
+  api.get<{ data: import('../types').BatchProgress }>('/admin/ai/batch/status')
+    .then(res => res.data.data)
+
 export const listDrafts = (page = 0, size = 20) =>
   api.get<{ data: { records: import('../types').QuestionAdmin[], total: number, current: number, pages: number } }>('/admin/questions/draft', { params: { page, size } })
     .then(res => res.data.data)

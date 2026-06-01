@@ -12,6 +12,7 @@ public record GenerationTaskVO(
         int total,
         int successCount,
         int failCount,
+        String message,
         List<String> errors,
         List<Long> generatedIds
 ) {}

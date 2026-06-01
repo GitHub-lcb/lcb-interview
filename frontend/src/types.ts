@@ -50,12 +50,25 @@ export interface Diagram {
   caption: string
 }
 
+export interface BatchProgress {
+  status: 'RUNNING' | 'IDLE'
+  totalCategories: number
+  completedCategories: number
+  totalQuestions: number
+  generatedQuestions: number
+  failedCategories: number
+  currentCategory: string | null
+  currentMessage: string | null
+  errors: string[]
+}
+
 export interface GenerationTask {
   taskId: number
   status: 'RUNNING' | 'COMPLETED' | 'FAILED' | 'PARTIAL'
   total: number
   successCount: number
   failCount: number
+  message: string
   errors: string[]
   generatedIds: number[]
 }

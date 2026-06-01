@@ -39,6 +39,6 @@ admin:
   token: lcb-admin-2026
 
 deepseek:
-  api-key: sk-your-deepseek-api-key
-  model: deepseek-v4-flash
+  api-key: xxx
+  model: deepseek-v4-pro
   url: https://api.deepseek.com/chat/completions
