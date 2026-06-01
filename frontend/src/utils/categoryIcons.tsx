@@ -1,9 +1,9 @@
 import React from 'react'
 
-const icon = (fill: string, label: string, fontSize = 16) => (
-  <svg viewBox="0 0 64 64" fill="none" width={48} height={48}>
-    <rect width="64" height="64" rx="12" fill={fill} />
-    <text x="32" y="42" textAnchor="middle" fill="white" fontSize={fontSize} fontWeight="bold" fontFamily="Arial">{label}</text>
+const icon = (fill: string, label: string, fontSize = 16, size = 40) => (
+  <svg viewBox="0 0 64 64" fill="none" width={size} height={size}>
+    <rect width="64" height="64" rx="12" fill={fill} opacity="0.9" />
+    <text x="32" y="42" textAnchor="middle" fill="white" fontSize={fontSize} fontWeight="bold" fontFamily="'Inter', Arial, sans-serif">{label}</text>
   </svg>
 )
 
@@ -35,14 +35,15 @@ const icons: Record<string, React.ReactNode> = {
   'icon-hr': icon('#7C3AED', 'HR', 20),
 }
 
-export function getCategoryIcon(iconKey: string | undefined): React.ReactNode {
+export function getCategoryIcon(iconKey: string | undefined, size = 40): React.ReactNode {
   if (iconKey && icons[iconKey]) {
-    return icons[iconKey]
+    const node = icons[iconKey] as React.ReactElement
+    return React.cloneElement(node, { width: size, height: size } as React.SVGAttributes<SVGSVGElement>)
   }
   return (
-    <svg viewBox="0 0 64 64" fill="none" width={48} height={48}>
-      <rect width="64" height="64" rx="12" fill="#1677ff" />
-      <text x="32" y="42" textAnchor="middle" fill="white" fontSize="20" fontWeight="bold" fontFamily="Arial">?</text>
+    <svg viewBox="0 0 64 64" fill="none" width={size} height={size}>
+      <rect width="64" height="64" rx="12" fill="#2563EB" />
+      <text x="32" y="42" textAnchor="middle" fill="white" fontSize="20" fontWeight="bold" fontFamily="'Inter', Arial, sans-serif">?</text>
     </svg>
   )
 }

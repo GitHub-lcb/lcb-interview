@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { List, Spin, Typography, Empty, Alert, Button } from 'antd'
+import { Spin, Empty, Alert, Button } from 'antd'
 import { getQuestions } from '../../api/question'
 import type { Question } from '../../types'
-
-const { Title } = Typography
 
 export default function SearchResult() {
   const [searchParams] = useSearchParams()
@@ -29,23 +27,56 @@ export default function SearchResult() {
 
   return (
     <div>
-      <Title level={4}>搜索：{keyword}</Title>
-      {loading && <Spin size="large" style={{ display: 'block', margin: '100px auto' }} />}
-      {error && <Alert type="error" message="搜索失败" action={<Button onClick={doSearch}>重试</Button>} />}
+      <h1 className="section-title" style={{ fontSize: 24 }}>搜索结果</h1>
+      <p className="section-subtitle">
+        关于 "<strong style={{ color: '#18181B' }}>{keyword}</strong>" 的搜索结果
+      </p>
+
+      {loading && (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
+          <Spin size="large" />
+        </div>
+      )}
+
+      {error && (
+        <Alert type="error" message="搜索失败" showIcon
+          action={<Button onClick={doSearch} size="small">重试</Button>}
+        />
+      )}
+
       {!loading && !error && questions.length === 0 && (
         <Empty description={`未找到与"${keyword}"相关的题目`}>
-          <Button onClick={() => navigate('/banks')}>浏览全部题目</Button>
+          <Button type="primary" ghost onClick={() => navigate('/banks')}>浏览全部题目</Button>
         </Empty>
       )}
+
       {!loading && !error && questions.length > 0 && (
-        <List
-          dataSource={questions}
-          renderItem={q => (
-            <List.Item onClick={() => navigate(`/question/${q.id}`)} style={{ cursor: 'pointer' }}>
-              <List.Item.Meta title={q.title} description={q.categoryName} />
-            </List.Item>
-          )}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {questions.map((q, i) => (
+            <div
+              key={q.id}
+              className={`magazine-card fade-in-up`}
+              style={{
+                padding: '18px 24px',
+                cursor: 'pointer',
+                animationDelay: `${i * 0.04}s`,
+              }}
+              onClick={() => navigate(`/question/${q.id}`)}
+            >
+              <div style={{
+                fontSize: 16,
+                fontWeight: 500,
+                color: '#18181B',
+                lineHeight: 1.4,
+              }}>
+                {q.title}
+              </div>
+              <div style={{ fontSize: 13, color: '#A1A1AA', marginTop: 4 }}>
+                {q.categoryName}
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   )

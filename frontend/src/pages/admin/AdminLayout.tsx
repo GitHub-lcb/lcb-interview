@@ -25,13 +25,28 @@ export default function AdminLayout() {
   }, [navigate])
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider>
-        <div style={{ color: '#fff', padding: 16, fontWeight: 'bold', fontSize: 16 }}>Admin</div>
-        <Menu theme="dark" mode="inline" selectedKeys={[location.pathname]} items={menuItems}
-              onClick={({ key }) => navigate(key)} />
+    <Layout style={{ minHeight: '100vh', background: '#FAFAF9' }}>
+      <Sider theme="light" style={{ borderRight: '1px solid #E4E4E7', background: '#FFFFFF' }}>
+        <div style={{
+          padding: '20px 16px',
+          fontFamily: "'DM Serif Display', serif",
+          fontSize: 18,
+          fontWeight: 700,
+          color: '#18181B',
+          letterSpacing: '-0.03em',
+          borderBottom: '1px solid #F1F1F3',
+        }}>
+          LCB Admin
+        </div>
+        <Menu
+          mode="inline"
+          selectedKeys={[location.pathname]}
+          items={menuItems}
+          onClick={({ key }) => navigate(key)}
+          style={{ borderInlineEnd: 'none', marginTop: 8 }}
+        />
       </Sider>
-      <Content style={{ padding: 24 }}>
+      <Content style={{ padding: 32 }}>
         <Outlet />
       </Content>
     </Layout>

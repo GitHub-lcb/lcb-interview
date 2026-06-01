@@ -34,7 +34,7 @@ public class QuestionService {
      */
     public IPage<Question> search(Long categoryId, String difficulty, String keyword,
                                    Long tagId, int page, int size) {
-        Page<Question> mpPage = new Page<>(page, size);
+        Page<Question> mpPage = new Page<>(page + 1, size);
 
         if (tagId != null) {
             log.info("按标签筛选题目，tagId={}, page={}, size={}", tagId, page, size);
