@@ -36,11 +36,13 @@ export default function AdminLogin() {
       alignItems: 'center',
       justifyContent: 'center',
       background: '#FAFAF9',
+      padding: 16,
     }}>
       <div className="magazine-card" style={{
-        padding: 40,
         width: 400,
-        maxWidth: '90%',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
+        padding: '40px 24px',
       }}>
         <h1 style={{
           fontFamily: "'DM Serif Display', serif",

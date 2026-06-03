@@ -12,11 +12,11 @@ import com.lcbinterview.model.Question;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
-import java.net.http.HttpClient;
-import java.time.Duration;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -36,28 +36,17 @@ public class AiQuestionService {
     private final Map<Long, GenerationTaskVO> taskStore = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 
-    private final RestClient restClient = buildRestClient();
-
-    private static RestClient buildRestClient() {
-        JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(
-                HttpClient.newBuilder()
-                        .connectTimeout(Duration.ofSeconds(10))
-                        .build());
-        factory.setReadTimeout(Duration.ofSeconds(120));
-        return RestClient.builder().requestFactory(factory).build();
-    }
-
-    @Value("${deepseek.api-key}")
+    @Value("${ai.deepseek.api-key}")
     private String apiKey;
 
-    @Value("${deepseek.model:deepseek-v4-flash}")
+    @Value("${ai.deepseek.model:deepseek-v4-flash}")
     private String model;
 
-    @Value("${deepseek.url:https://api.deepseek.com/chat/completions}")
+    @Value("${ai.deepseek.url:https://opencode.ai/zen/go/v1/chat/completions}")
     private String apiUrl;
 
     /**
-     * 异步生成题目。调用 DeepSeek API 批量生成。
+     * 异步生成题目。每次 API 只生成 1 道题，循环 count 次，避免超时。
      */
     public Long generate(GenerationRequest req) {
         Long taskId = System.currentTimeMillis();
@@ -74,49 +63,39 @@ public class AiQuestionService {
 
             long startTime = System.currentTimeMillis();
 
-            try {
-                updateProgress(taskId, req.count(), 0, 0, "构建 prompt...");
+            for (int i = 1; i <= req.count(); i++) {
+                try {
+                    updateProgress(taskId, req.count(), success, fail,
+                            String.format("生成中 %d/%d", i, req.count()));
 
-                String prompt = buildPrompt(req);
+                    GenerationRequest singleReq = new GenerationRequest(
+                            req.category(), req.difficulty(), 1, req.topic());
+                    String prompt = buildPrompt(singleReq);
+                    String responseJson = callDeepSeek(prompt);
+                    List<Question> questions = parseQuestions(responseJson);
 
-                updateProgress(taskId, req.count(), 0, 0, "调用 DeepSeek API 生成中...");
-
-                String responseJson = callDeepSeek(prompt);
-                long apiTime = System.currentTimeMillis() - startTime;
-
-                updateProgress(taskId, req.count(), 0, 0, "解析 AI 返回结果...");
-
-                List<Question> questions = parseQuestions(responseJson);
-
-                int toSave = Math.min(questions.size(), req.count());
-                for (int i = 0; i < toSave; i++) {
-                    try {
-                        Question q = questions.get(i);
-                        q.setStatus("DRAFT");
-                        q.setSource("AI_GENERATED");
-                        q.setCategoryId(resolveCategoryId(req.category()));
-                        questionMapper.insert(q);
-                        generatedIds.add(q.getId());
-                        success++;
-
-                        updateProgress(taskId, req.count(), success, fail,
-                                String.format("保存中 %d/%d", success + fail, req.count()));
-                        log.info("保存题目成功 [{}/{}]: id={}, title={}", i + 1, toSave, q.getId(), q.getTitle());
-                    } catch (Exception e) {
-                        log.error("保存题目失败 [{}]", i + 1, e);
-                        errors.add("第 " + (i + 1) + " 题保存失败: " + e.getMessage());
+                    if (questions.isEmpty()) {
                         fail++;
+                        errors.add("第 " + i + " 题: API 返回为空");
+                        continue;
                     }
-                }
 
-                if (questions.size() < req.count()) {
-                    log.warn("API 返回 {} 道题，少于请求的 {}", questions.size(), req.count());
-                    errors.add("API 返回了 " + questions.size() + " 道题，少于请求的 " + req.count());
+                    Question q = questions.get(0);
+                    q.setStatus("DRAFT");
+                    q.setSource("AI_GENERATED");
+                    q.setCategoryId(resolveCategoryId(req.category()));
+                    questionMapper.insert(q);
+                    generatedIds.add(q.getId());
+                    success++;
+
+                    updateProgress(taskId, req.count(), success, fail,
+                            String.format("保存中 %d/%d", i, req.count()));
+                    log.info("保存题目成功 [{}/{}]: id={}, title={}", i, req.count(), q.getId(), q.getTitle());
+                } catch (Exception e) {
+                    log.error("生成题目失败 [{}]", i, e);
+                    errors.add("第 " + i + " 题: " + e.getMessage());
+                    fail++;
                 }
-            } catch (Exception e) {
-                log.error("AI 生成任务异常", e);
-                errors.add("任务执行异常: " + e.getMessage());
-                fail = req.count() - success;
             }
 
             long totalTime = System.currentTimeMillis() - startTime;
@@ -165,21 +144,46 @@ public class AiQuestionService {
                 Map.of("role", "user", "content", prompt)
         ));
         requestBody.put("temperature", 0.7);
-        requestBody.put("max_tokens", 65536);
+        requestBody.put("max_tokens", 8192);
 
         log.info("发送请求到 DeepSeek, model={}, prompt长度={}", model, prompt.length());
         long t = System.currentTimeMillis();
 
-        String response = restClient.post()
-                .uri(apiUrl)
-                .header("Authorization", "Bearer " + apiKey)
-                .header("Content-Type", "application/json")
-                .body(requestBody)
-                .retrieve()
-                .body(String.class);
+        try {
+            String json = objectMapper.writeValueAsString(requestBody);
 
-        log.info("DeepSeek 响应耗时 {}ms, 响应长度 {} 字符", System.currentTimeMillis() - t, response.length());
-        return response;
+            HttpURLConnection conn = (HttpURLConnection) URI.create(apiUrl).toURL().openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(600000);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(json.getBytes(StandardCharsets.UTF_8));
+            }
+
+            int status = conn.getResponseCode();
+            log.info("DeepSeek 响应状态码={}, 耗时 {}ms", status, System.currentTimeMillis() - t);
+
+            if (status == 200) {
+                String response = new String(
+                        conn.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+                log.info("DeepSeek 响应长度 {} 字符", response.length());
+                return response;
+            }
+
+            String errorBody = new String(
+                    conn.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
+            log.error("DeepSeek API 错误: status={}, body={}", status, errorBody);
+            throw new RuntimeException("DeepSeek API 错误: " + status + " " + errorBody);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("调用 DeepSeek API 异常", e);
+            throw new RuntimeException("调用 DeepSeek API 失败: " + e.getMessage(), e);
+        }
     }
 
     private List<Question> parseQuestions(String responseJson) {

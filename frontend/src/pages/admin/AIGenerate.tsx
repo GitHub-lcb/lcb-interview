@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Card, Form, Select, InputNumber, Input, Button, Progress, Alert, message, Radio, Space, Tag, Divider } from 'antd'
+import { Card, Form, Select, InputNumber, Input, Button, Progress, Alert, message, Segmented, Space, Tag, Divider } from 'antd'
 import { generateQuestions, getGenerationTask, batchGenerate, getBatchStatus } from '../../api/admin'
 import { getCategories } from '../../api/category'
 import type { Category, BatchProgress, GenerationTask } from '../../types'
@@ -88,10 +88,15 @@ export default function AIGenerate() {
 
   return (
     <Card title="AI 生成题目">
-      <Radio.Group value={mode} onChange={e => setMode(e.target.value)} style={{ marginBottom: 24 }}>
-        <Radio.Button value="single">单分类生成</Radio.Button>
-        <Radio.Button value="batch">批量生成（全部分类）</Radio.Button>
-      </Radio.Group>
+      <Segmented
+        value={mode}
+        onChange={v => setMode(v as 'single' | 'batch')}
+        options={[
+          { value: 'single', label: '单分类生成' },
+          { value: 'batch', label: '批量生成' },
+        ]}
+        style={{ marginBottom: 24 }}
+      />
 
       {mode === 'single' && (
         <Form layout="vertical" onFinish={onSingleFinish} style={{ maxWidth: 500 }}>
@@ -133,11 +138,11 @@ export default function AIGenerate() {
                   ? Math.round(batchProgress.completedCategories / batchProgress.totalCategories * 100)
                   : 0}
               />
-              <p>
-                分类进度: {batchProgress.completedCategories}/{batchProgress.totalCategories}
-                &nbsp;&nbsp;题目进度: {batchProgress.generatedQuestions}/{batchProgress.totalQuestions}
-                &nbsp;&nbsp;失败: {batchProgress.failedCategories}
-              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px', fontSize: 14, color: '#52525B' }}>
+                <span>分类进度: {batchProgress.completedCategories}/{batchProgress.totalCategories}</span>
+                <span>题目进度: {batchProgress.generatedQuestions}/{batchProgress.totalQuestions}</span>
+                <span>失败: {batchProgress.failedCategories}</span>
+              </div>
               {batchProgress.currentMessage && (
                 <p><Tag color="processing">{batchProgress.currentMessage}</Tag></p>
               )}
@@ -186,7 +191,11 @@ export default function AIGenerate() {
         <Card size="small" style={{ marginTop: 16 }}>
           <Progress percent={task.total > 0 ? Math.round((task.successCount + task.failCount) / task.total * 100) : 0} />
           {task.message && task.status === 'RUNNING' && <p><Tag color="processing">{task.message}</Tag></p>}
-          <p>成功: {task.successCount} / 失败: {task.failCount} / 共: {task.total}</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px', fontSize: 14, color: '#52525B' }}>
+            <span>成功: {task.successCount}</span>
+            <span>失败: {task.failCount}</span>
+            <span>共: {task.total}</span>
+          </div>
           {task.errors?.length > 0 && (
             <Alert type="error" message={task.errors.join('; ')} />
           )}

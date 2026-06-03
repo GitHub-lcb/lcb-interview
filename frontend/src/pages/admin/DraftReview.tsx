@@ -59,7 +59,7 @@ export default function DraftReview() {
     {
       title: '操作', width: 200,
       render: (_: any, r: QuestionAdmin) => (
-        <Space>
+        <Space wrap>
           <Button size="small" onClick={() => handlePreview(r.id)}>预览</Button>
           <Button size="small" type="primary" onClick={() => handleApprove(r.id)}>通过</Button>
           <Button size="small" danger onClick={() => handleReject(r.id)}>驳回</Button>
@@ -75,10 +75,16 @@ export default function DraftReview() {
         columns={columns}
         dataSource={data}
         loading={loading}
-        pagination={{ current: page + 1, total, onChange: p => { setPage(p - 1); load(p - 1) }}}
+        scroll={{ x: 'max-content' }}
+        pagination={{
+          current: page + 1, total,
+          onChange: p => { setPage(p - 1); load(p - 1) },
+          showSizeChanger: false,
+        }}
       />
       <Modal title="草稿预览" open={previewOpen} onCancel={() => setPreviewOpen(false)}
-             width={800} footer={null}>
+             width={800} footer={null}
+             styles={{ body: { overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' } }}>
         {preview && <ContentView question={preview} defaultOpen />}
       </Modal>
     </>

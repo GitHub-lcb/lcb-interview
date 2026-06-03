@@ -38,7 +38,8 @@ logging:
 admin:
   token: lcb-admin-2026
 
-deepseek:
-  api-key: xxx
-  model: deepseek-v4-pro
-  url: https://api.deepseek.com/chat/completions
+ai:
+  deepseek:
+    api-key: xx
+    model: deepseek-v4-pro
+    url: https://opencode.ai/zen/go/v1/chat/completions

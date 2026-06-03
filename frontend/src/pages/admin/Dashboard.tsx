@@ -10,8 +10,8 @@ export default function AdminDashboard() {
   }, [])
 
   return (
-    <Row gutter={16}>
-      <Col span={6}>
+    <Row gutter={[16, 16]}>
+      <Col xs={24} sm={12} lg={6}>
         <Card><Statistic title="草稿题目" value={draftCount} /></Card>
       </Col>
     </Row>
