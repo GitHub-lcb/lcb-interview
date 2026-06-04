@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+
 DROP TABLE IF EXISTS question_tag;
 DROP TABLE IF EXISTS question;
 DROP TABLE IF EXISTS tag;

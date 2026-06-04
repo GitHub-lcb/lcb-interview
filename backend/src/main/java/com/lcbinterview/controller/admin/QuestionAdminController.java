@@ -1,6 +1,7 @@
 package com.lcbinterview.controller.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lcbinterview.common.ApiResponse;
@@ -10,6 +11,8 @@ import com.lcbinterview.model.Question;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 管理端题目接口。草稿列表、编辑、审核通过/驳回。
@@ -29,10 +32,11 @@ public class QuestionAdminController {
     public ResponseEntity<ApiResponse<IPage<QuestionAdminVO>>> listDrafts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        Page<Question> mpPage = new Page<>(page, size);
+        Page<Question> mpPage = new Page<>(Math.max(1, page + 1), size);
         LambdaQueryWrapper<Question> wrapper = new LambdaQueryWrapper<Question>()
                 .eq(Question::getStatus, "DRAFT")
-                .orderByDesc(Question::getCreateTime);
+                .orderByAsc(Question::getId)
+                .orderByDesc(Question::getUpdateTime);
         IPage<Question> result = questionMapper.selectPage(mpPage, wrapper);
         Page<QuestionAdminVO> voPage = new Page<>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream().map(QuestionAdminVO::from).toList());
@@ -83,6 +87,36 @@ public class QuestionAdminController {
         q.setId(id);
         q.setStatus("REJECTED");
         questionMapper.updateById(q);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    /**
+     * 批量审核通过。
+     */
+    @PostMapping("/draft/batch-approve")
+    public ResponseEntity<ApiResponse<Void>> batchApprove(@RequestBody List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return ResponseEntity.ok(ApiResponse.error(400, "ID 列表不能为空"));
+        }
+        questionMapper.update(null, new LambdaUpdateWrapper<Question>()
+                .set(Question::getStatus, "PUBLISHED")
+                .in(Question::getId, ids)
+                .eq(Question::getStatus, "DRAFT"));
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    /**
+     * 批量审核驳回。
+     */
+    @PostMapping("/draft/batch-reject")
+    public ResponseEntity<ApiResponse<Void>> batchReject(@RequestBody List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return ResponseEntity.ok(ApiResponse.error(400, "ID 列表不能为空"));
+        }
+        questionMapper.update(null, new LambdaUpdateWrapper<Question>()
+                .set(Question::getStatus, "REJECTED")
+                .in(Question::getId, ids)
+                .eq(Question::getStatus, "DRAFT"));
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

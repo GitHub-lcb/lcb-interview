@@ -1,0 +1,560 @@
+{
+  "categoryId": 16,
+  "categoryName": "设计模式",
+  "bankIds": [
+    "1801559627969929217"
+  ],
+  "totalQuestions": 36,
+  "questions": [
+    {
+      "title": "什么是设计模式？请简述其作用。",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1801818229490130946",
+      "sourceId": "1801818229490130946",
+      "viewNum": 18772,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "23 种设计模式分为哪三大类？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1801818359295451137",
+      "sourceId": "1801818359295451137",
+      "viewNum": 11654,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释什么是单例模式，并给出一个使用场景",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1801818689919852545",
+      "sourceId": "1801818689919852545",
+      "viewNum": 9493,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "单例模式有哪几种实现？如何保证线程安全？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1801818854546284546",
+      "sourceId": "1801818854546284546",
+      "viewNum": 13606,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "工厂模式和抽象工厂模式有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1801818998708707329",
+      "sourceId": "1801818998708707329",
+      "viewNum": 13729,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述简单工厂模式的工作原理。",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802171196621791233",
+      "sourceId": "1802171196621791233",
+      "viewNum": 12935,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是建造者模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802171325634387970",
+      "sourceId": "1802171325634387970",
+      "viewNum": 4496,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是原型模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802171457641717761",
+      "sourceId": "1802171457641717761",
+      "viewNum": 4200,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是适配器模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802171589225422850",
+      "sourceId": "1802171589225422850",
+      "viewNum": 3925,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是桥接模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802171736231583745",
+      "sourceId": "1802171736231583745",
+      "viewNum": 2631,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是组合模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802557097684312065",
+      "sourceId": "1802557097684312065",
+      "viewNum": 2416,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是装饰器模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803766849256890369",
+      "sourceId": "1803766849256890369",
+      "viewNum": 3003,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "装饰器、适配器、代理、桥接这四种设计模式有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802557281373855745",
+      "sourceId": "1802557281373855745",
+      "viewNum": 2479,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是外观模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802557443223658498",
+      "sourceId": "1802557443223658498",
+      "viewNum": 1751,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是享元模式？一般用在什么场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802557572714405889",
+      "sourceId": "1802557572714405889",
+      "viewNum": 1777,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是代理模式？一般用在什么场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802557695141945346",
+      "sourceId": "1802557695141945346",
+      "viewNum": 11353,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是观察者模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802938904808333313",
+      "sourceId": "1802938904808333313",
+      "viewNum": 10594,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是迭代器模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802939021862969346",
+      "sourceId": "1802939021862969346",
+      "viewNum": 1616,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是模板方法模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802939152477790209",
+      "sourceId": "1802939152477790209",
+      "viewNum": 12092,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是命令模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802939265333927937",
+      "sourceId": "1802939265333927937",
+      "viewNum": 1414,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是状态模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802939360414605313",
+      "sourceId": "1802939360414605313",
+      "viewNum": 1491,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是策略模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803305303140720641",
+      "sourceId": "1803305303140720641",
+      "viewNum": 15817,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是责任链模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803305518413373442",
+      "sourceId": "1803305518413373442",
+      "viewNum": 11043,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是中介者模式？一般用在什么场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803305756926664705",
+      "sourceId": "1803305756926664705",
+      "viewNum": 1211,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是访问者模式？一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803306004491264002",
+      "sourceId": "1803306004491264002",
+      "viewNum": 1169,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是备忘录模式，一般用在什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803306495400992770",
+      "sourceId": "1803306495400992770",
+      "viewNum": 1239,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是单一职责原则？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805168825888088065",
+      "sourceId": "1805168825888088065",
+      "viewNum": 2539,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是开闭原则？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803656708741390338",
+      "sourceId": "1803656708741390338",
+      "viewNum": 2893,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是里氏替换原则？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803657348456636417",
+      "sourceId": "1803657348456636417",
+      "viewNum": 2333,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是接口隔离原则？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803658438468165633",
+      "sourceId": "1803658438468165633",
+      "viewNum": 2134,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是依赖倒置原则？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803659195447762946",
+      "sourceId": "1803659195447762946",
+      "viewNum": 2183,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是迪米特法则？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1804010153396871170",
+      "sourceId": "1804010153396871170",
+      "viewNum": 2096,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "谈谈你了解的最常见的几种设计模式，说说他们的应用场景",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1804014835632644098",
+      "sourceId": "1804014835632644098",
+      "viewNum": 16419,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "请用一句话概括，什么是设计模式？为什么要用？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1804016809748930562",
+      "sourceId": "1804016809748930562",
+      "viewNum": 4356,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你认为好的代码应该是什么样的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java",
+        "JavaScript",
+        "Go",
+        "C++",
+        "Python",
+        "PHP"
+      ],
+      "tagIds": [
+        1,
+        56,
+        51,
+        53,
+        52,
+        55
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1864577861988179969",
+      "sourceId": "1864577861988179969",
+      "viewNum": 3995,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是合成复用原则？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1913069251782299649",
+      "sourceId": "1913069251782299649",
+      "viewNum": 605,
+      "needVip": true,
+      "hasAnswer": false
+    }
+  ]
+}

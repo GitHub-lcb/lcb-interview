@@ -17,3 +17,9 @@ dist/
 # Env
 .env
 .env.local
+
+# Generated
+backend/app.log
+backend/scripts/sql/init.sql
+backend/scripts/sql/insert-draft.sql
+backend/scripts/sql/ai-update-answers.sql

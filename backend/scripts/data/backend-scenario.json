@@ -1,0 +1,4412 @@
+{
+  "categoryId": 25,
+  "categoryName": "后端场景题",
+  "bankIds": [
+    "1795650132375805954",
+    "1813047072704741378",
+    "1813047122807881729",
+    "1772565012490067970"
+  ],
+  "totalQuestions": 291,
+  "questions": [
+    {
+      "title": "针对支付宝最近出现的八折优惠事故，说说如何才能避免类似事件的发生？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1880466209896218626",
+      "sourceId": "1880466209896218626",
+      "viewNum": 13685,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "让你设计一个 RPC 框架，怎么设计？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1796073573673205762",
+      "sourceId": "1796073573673205762",
+      "viewNum": 21046,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "有一张表里面有三个字段，分别是（id，开始时间，结束时间），表中数据量为 5000W，如何统计流量最大的时候有多少条数据？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1864632553515585537",
+      "sourceId": "1864632553515585537",
+      "viewNum": 8807,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何设计一个秒杀功能？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1818587621468135426",
+      "sourceId": "1818587621468135426",
+      "viewNum": 20923,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "让你设计一个消息队列，怎么设计？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1795654204034162689",
+      "sourceId": "1795654204034162689",
+      "viewNum": 11082,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "消息队列设计成推消息还是拉消息？推拉模式的优缺点？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "消息队列",
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [
+        28
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802333941753257985",
+      "sourceId": "1802333941753257985",
+      "viewNum": 11303,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "让你设计一个短链系统，怎么设计？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1796413025973043202",
+      "sourceId": "1796413025973043202",
+      "viewNum": 10383,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "让你实现一个分布式单例对象，如何实现？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798614886358245378",
+      "sourceId": "1798614886358245378",
+      "viewNum": 6531,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "分布式锁一般都怎样实现？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800458377811533825",
+      "sourceId": "1800458377811533825",
+      "viewNum": 15397,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果让你统计每个接口每分钟调用次数怎么统计？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800483933047300098",
+      "sourceId": "1800483933047300098",
+      "viewNum": 7068,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "让你设计一个文件上传系统，怎么设计？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1801086758341124097",
+      "sourceId": "1801086758341124097",
+      "viewNum": 7800,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "让你设计一个分布式 ID 发号器，怎么设计？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1801517567179038722",
+      "sourceId": "1801517567179038722",
+      "viewNum": 8857,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是限流？限流算法有哪些？怎么实现的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1802901573531410433",
+      "sourceId": "1802901573531410433",
+      "viewNum": 10879,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "即时通讯项目中怎么实现历史消息的下拉分页加载？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1821408560444809217",
+      "sourceId": "1821408560444809217",
+      "viewNum": 6485,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "HashMap 是不是线程安全的？如果让你来实现一个线程安全的 HashMap 你要怎么设计？如果不用加锁你要怎么设计？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1854417729925881858",
+      "sourceId": "1854417729925881858",
+      "viewNum": 6503,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "接口变慢了应该如何排查？导致接口变慢的原因有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1891761559626002433",
+      "sourceId": "1891761559626002433",
+      "viewNum": 8464,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写一段代码，使得这段代码必定会产生死锁，不能使用Thread.sleep()",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题",
+        " Java"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1896861989806215170",
+      "sourceId": "1896861989806215170",
+      "viewNum": 5590,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "现在手头上有一个单体项目，系统的整体 QPS 到了 1 万了，要微服务化拆分吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1924670464916062209",
+      "sourceId": "1924670464916062209",
+      "viewNum": 3743,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "系统每天晚上都会有一小时左右的时间瘫痪，你觉得可能的原因是什么？有遇到过这样的情况吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1921865492917030913",
+      "sourceId": "1921865492917030913",
+      "viewNum": 3374,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "现在有 40 亿个 QQ 号，给你 1G 的内存，如何实现去重？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1924306376057065474",
+      "sourceId": "1924306376057065474",
+      "viewNum": 4623,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Java 中，不使用锁如何实现一个线程安全的单例？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java",
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1920758567711932418",
+      "sourceId": "1920758567711932418",
+      "viewNum": 3386,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果要实现一个抢红包的功能，红包金额是如何计算的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1923242337547452418",
+      "sourceId": "1923242337547452418",
+      "viewNum": 2749,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "让你设计一个 HashMap ，怎么设计？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294766977025",
+      "sourceId": "1780933294766977025",
+      "viewNum": 7137,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "线上业务服务器 CPU 飙高如何排查？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "线上问题排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1807672527650004993",
+      "sourceId": "1807672527650004993",
+      "viewNum": 13023,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "线上 CPU Load 飙高如何排查？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1923315698594385922",
+      "sourceId": "1923315698594385922",
+      "viewNum": 2454,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "系统上线后，发现某个接口响应很慢，你如何定位可能的原因，以及对应的解决思路？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1924404806943150081",
+      "sourceId": "1924404806943150081",
+      "viewNum": 2893,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果项目需要你实现敏感词过滤功能，如何实现？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1920772653550309378",
+      "sourceId": "1920772653550309378",
+      "viewNum": 2527,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果现在有 500G 数据需要排序，但是你只有 4G 内存，如何实现？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1920799091749982210",
+      "sourceId": "1920799091749982210",
+      "viewNum": 2861,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "项目上现在需要存储 IP 地址，数据库应该用什么类型来存储？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1921064474499256322",
+      "sourceId": "1921064474499256322",
+      "viewNum": 2334,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "一笔订单，在取消的那一刻用户刚好付款了，怎么办？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1797465845035827202",
+      "sourceId": "1797465845035827202",
+      "viewNum": 16755,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何避免用户重复下单（多次下单未支付，占用库存）",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1856228340908228610",
+      "sourceId": "1856228340908228610",
+      "viewNum": 8765,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "线上发现 Redis 机器爆了，如何优化？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1795660206586503170",
+      "sourceId": "1795660206586503170",
+      "viewNum": 13047,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "项目上有个导出 excel 场景发现很慢，怎么优化？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1795715838014431233",
+      "sourceId": "1795715838014431233",
+      "viewNum": 9907,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "项目上需要导入一个几百万数据 excel 文件到数据库中，有哪些注意点？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1795728040788271105",
+      "sourceId": "1795728040788271105",
+      "viewNum": 8999,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果一笔订单，用户在微信和支付宝同时支付，会怎么样？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1795733216311943169",
+      "sourceId": "1795733216311943169",
+      "viewNum": 8082,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "假设有一个 1G 大的 HashMap，此时用户请求过来刚好触发它的扩容，会怎样？让你改造下 HashMap 的实现该怎样优化？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1797473188553293825",
+      "sourceId": "1797473188553293825",
+      "viewNum": 12015,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "微服务中远程调用的超时时间应该设置为多少合适？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1856282033593380866",
+      "sourceId": "1856282033593380866",
+      "viewNum": 4029,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "从网关再到各个后端服务，如何设置 RPC 的超时时间，要考虑哪些问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1797902903277649922",
+      "sourceId": "1797902903277649922",
+      "viewNum": 5702,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "让你设计一个线程池，怎么设计？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294901194754",
+      "sourceId": "1780933294901194754",
+      "viewNum": 9051,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果没有内存限制，如何快速、安全地将 1000 亿条数据插入到 HashMap 中？",
+      "difficulty": "HARD",
+      "tags": [
+        "HashMap",
+        "Java 集合",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1799763214902566914",
+      "sourceId": "1799763214902566914",
+      "viewNum": 6727,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "线上数据库连接池爆满问题排查",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "线上问题排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1797943801076121602",
+      "sourceId": "1797943801076121602",
+      "viewNum": 6975,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何实现数据库的不停服迁移？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库",
+        "场景题"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1813456791649378305",
+      "sourceId": "1813456791649378305",
+      "viewNum": 10243,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中如何进行 SQL 调优？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库",
+        "场景题"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295521951745",
+      "sourceId": "1780933295521951745",
+      "viewNum": 24694,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中如何解决深度分页的问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库",
+        "场景题"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295572283394",
+      "sourceId": "1780933295572283394",
+      "viewNum": 17893,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中使用索引一定有效吗？如何排查索引效果？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库",
+        "场景题"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295463231490",
+      "sourceId": "1780933295463231490",
+      "viewNum": 29171,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "每次进入订单列表页面都会触发全量同步？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "线程问题排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1797947062881484801",
+      "sourceId": "1797947062881484801",
+      "viewNum": 4607,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "JDK 序列化问题排查",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "线上问题排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1798182188865421313",
+      "sourceId": "1798182188865421313",
+      "viewNum": 4857,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring Cloud Gateway 500 问题排查",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "线上问题排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1798184874058842113",
+      "sourceId": "1798184874058842113",
+      "viewNum": 5903,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "线上消息队列故障，兜底改造方案",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "线上问题排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1800848932970242050",
+      "sourceId": "1800848932970242050",
+      "viewNum": 5394,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何设计一个点赞系统？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772882950057148418",
+      "sourceId": "1772882950057148418",
+      "viewNum": 10922,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "怎么分析 JVM 当前的内存占用情况？OOM 后怎么分析？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "场景题",
+        "JVM"
+      ],
+      "tagIds": [
+        4
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1818990174270726145",
+      "sourceId": "1818990174270726145",
+      "viewNum": 11015,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果发现 Redis 内存溢出了？你会怎么做？请给出排查思路和解决方案",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1823991791071256577",
+      "sourceId": "1823991791071256577",
+      "viewNum": 8670,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "两百万个生产者发送消息，仅一个消费者，如何高效设计锁？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1828638030178779137",
+      "sourceId": "1828638030178779137",
+      "viewNum": 6523,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在附近 100w 的商户中，快速找到离你最近的 5 家商户？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1828677059139244033",
+      "sourceId": "1828677059139244033",
+      "viewNum": 5570,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 写入文件到磁盘会经历哪些过程？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1828689122435698689",
+      "sourceId": "1828689122435698689",
+      "viewNum": 4273,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你说你项目上用了分布式锁，加锁后并发度不就降低了吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1921123402194747394",
+      "sourceId": "1921123402194747394",
+      "viewNum": 2138,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "让你设计一个购物车功能，怎么设计？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1921844172930060290",
+      "sourceId": "1921844172930060290",
+      "viewNum": 3065,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "会员表中有500万条会员数据，有什么方式可以对即将过期的会员提前7天进行提醒？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1921820528721657857",
+      "sourceId": "1921820528721657857",
+      "viewNum": 1602,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "商家想要知道自己店铺卖的最好的 top 50 商品，如何实现这个功能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798954841471246338",
+      "sourceId": "1798954841471246338",
+      "viewNum": 6556,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中 如果我 select * from 一个有 1000 万行的表，内存会飙升么？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1854440758043156482",
+      "sourceId": "1854440758043156482",
+      "viewNum": 9416,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "1000 个任务，每个任务 0.1s，最大响应时间 1s，线程池参数怎么设置？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Java",
+        "场景题"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1862033355574534145",
+      "sourceId": "1862033355574534145",
+      "viewNum": 3954,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "让你实现一个订单超时取消功能，怎么设计？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798608210805469186",
+      "sourceId": "1798608210805469186",
+      "viewNum": 7160,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "调用第三方接口应注意哪些问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1921828418685632514",
+      "sourceId": "1921828418685632514",
+      "viewNum": 1632,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "朋友圈点赞功能如何实现，简单说说？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798957444758298626",
+      "sourceId": "1798957444758298626",
+      "viewNum": 6703,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 里有 2000w 数据，Redis 中只存 20w 的数据，如何保证 Redis 中的数据都是热点数据?",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1924394290486837249",
+      "sourceId": "1924394290486837249",
+      "viewNum": 2837,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "横跨十几个分布式服务的慢请求要如何排查？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1924775989415845889",
+      "sourceId": "1924775989415845889",
+      "viewNum": 1143,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "项目用了 Redis 缓存来提升并发度，假设 Redis 挂了怎么办？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1925076527210635265",
+      "sourceId": "1925076527210635265",
+      "viewNum": 1413,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "现在我让你把单体服务拆成多个微服务，这些服务之间如何自动发现彼此？具体原理是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1925102006358548481",
+      "sourceId": "1925102006358548481",
+      "viewNum": 1276,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "暂时先不考虑分库分表，如果单表的数据量很大，如何优化？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1925486641632378882",
+      "sourceId": "1925486641632378882",
+      "viewNum": 1646,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 应用的内存持续性增长，但是监控显示堆内存没有什么变化，可能的原因有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1925511725919109121",
+      "sourceId": "1925511725919109121",
+      "viewNum": 1062,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "用 Bitmap 来存储 100  个用户 ID，但是这个 ID 的范围很大，此时会有什么问题？如何解决？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1926924856458932226",
+      "sourceId": "1926924856458932226",
+      "viewNum": 1162,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "当前有个本地操作 A，远程操作 B，我需要保证 A 和 B 事务的一致性，你会如何实现？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1926931070609715202",
+      "sourceId": "1926931070609715202",
+      "viewNum": 1295,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "把单体项目进行了多机部署，多台服务器是如何共享用户登录信息的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1926935981883846657",
+      "sourceId": "1926935981883846657",
+      "viewNum": 1089,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "可以用几行代码实现一个负载均衡器吗？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1927629069916274689",
+      "sourceId": "1927629069916274689",
+      "viewNum": 1738,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "现在需要你设计一个将已登录的用户踢下线的功能，如何实现？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1927645903880826882",
+      "sourceId": "1927645903880826882",
+      "viewNum": 1666,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "不能使用大于小于号，如何判断两个正整数的大小？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1927658650706227202",
+      "sourceId": "1927658650706227202",
+      "viewNum": 1535,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "一条 1s 请求的响应，怎么优化成 1ms？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1933444093889282049",
+      "sourceId": "1933444093889282049",
+      "viewNum": 1453,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "WebSocket 知道吗？如果让你设计一个 IM 协议，你会考虑什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1933460494523891713",
+      "sourceId": "1933460494523891713",
+      "viewNum": 1352,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 命令行敲下一行命令，会进行哪些事情？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1940669335884062721",
+      "sourceId": "1940669335884062721",
+      "viewNum": 874,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "现在让你负责一个核心系统，需要实现核心数据的缓存预热，如何做？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1935588620457254913",
+      "sourceId": "1935588620457254913",
+      "viewNum": 1105,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "设计数据库表时，关联表和在一个表中加冗余字段关联各有什么优势？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1940678789890166785",
+      "sourceId": "1940678789890166785",
+      "viewNum": 955,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "当客户端有重连机制，当服务意外宕机重新部署启动时，怎么避免流量洪峰？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1935599105317093377",
+      "sourceId": "1935599105317093377",
+      "viewNum": 743,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "第三方上游接口接入做异步处理，是否可以使用 MQ？主要考虑什么？如果不用 MQ，还有什么方式？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1935615612415721473",
+      "sourceId": "1935615612415721473",
+      "viewNum": 915,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "4C8G和8C16G，这两个配置的服务器你们选哪个？为什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1935627498639122433",
+      "sourceId": "1935627498639122433",
+      "viewNum": 1042,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Agent 死循环问题有遇到过吗？如何解决？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "AI",
+        "大模型",
+        "场景题"
+      ],
+      "tagIds": [
+        64,
+        65
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1935997509803618306",
+      "sourceId": "1935997509803618306",
+      "viewNum": 2391,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果一个GPU集群的LLM处理能力为1000tokenss，那1000个用户同时并发访问，响应给每个用户的性能只有1 tokens吗？怎么分析性能瓶颈",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题",
+        "大模型"
+      ],
+      "tagIds": [
+        65
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1937353814227668994",
+      "sourceId": "1937353814227668994",
+      "viewNum": 1602,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你项目用的 JWT，那如何保证安全性？别人拿到你这个 Token 不就可以直接登录你的账号了吗？怎么办？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1937410775111553026",
+      "sourceId": "1937410775111553026",
+      "viewNum": 1394,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "我们线上软件安装包地址，这几天访问量暴增，现在 CDN 流量一直异常，这是什么原因？如何解决？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1937417283120717826",
+      "sourceId": "1937417283120717826",
+      "viewNum": 647,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果线上接口被恶意刷流量了，要如何解决？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1937428860874903554",
+      "sourceId": "1937428860874903554",
+      "viewNum": 952,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "项目中同样的功能，可能是环境或其他要求原因，需要适配多种数据库，如何实现？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1937439476286283778",
+      "sourceId": "1937439476286283778",
+      "viewNum": 779,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "除了代码，还有哪些地方可以优化性能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1938143021650206722",
+      "sourceId": "1938143021650206722",
+      "viewNum": 1342,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "新项目要上线了，你会关注哪些指标，为什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1938152375002652674",
+      "sourceId": "1938152375002652674",
+      "viewNum": 1037,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何设计一个 OAuth2.0 授权服务？Token 如何管理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题",
+        "系统设计"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1938178814455173121",
+      "sourceId": "1938178814455173121",
+      "viewNum": 1099,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "有人恶意攻击我们的注册功能，伪造手机号大量下发验证码，除了限流之外，如何解决这个问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1939620211168436225",
+      "sourceId": "1939620211168436225",
+      "viewNum": 1028,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "数据库表上新增一个字段，如果这个表正在进行读写操作，如何处理才能不影响现有读写操作？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1940247212111749121",
+      "sourceId": "1940247212111749121",
+      "viewNum": 1051,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何快速定位到五分钟内重复登录了两次的QQ号，用什么数据结构？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1940293052079595522",
+      "sourceId": "1940293052079595522",
+      "viewNum": 974,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "公司目前有一些海外业务，从国内将数据发送到海外延迟比较大，如何处理这个问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1940298901811220481",
+      "sourceId": "1940298901811220481",
+      "viewNum": 922,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "现在有一天内的大量日志，每条日志记录了用户id, 登陆时间,登出时间 {userid, login_time, logout_time}, 时间单位是秒。怎么求出一天内的最大在线人数？以及维持最大在线人数的最长持续时间？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1940312953049636865",
+      "sourceId": "1940312953049636865",
+      "viewNum": 963,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "主线程如何得知线程池中多个并行任务的完成并收集它们的结果？​",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1940317968538390530",
+      "sourceId": "1940317968538390530",
+      "viewNum": 925,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "每秒 200 笔订单请求到支付服务，支付服务需调用第三方支付，限流 100 笔每秒。请你设计支付服务，要求分布式的，并且是 FIFO，不超过第三方限流量，但是要用满第三方100 笔每秒的量，请问如何设计，需要考虑哪些方面？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1942123697002057729",
+      "sourceId": "1942123697002057729",
+      "viewNum": 1180,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL数据库一亿条数据，怎么快速加索引？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1958778987900289025",
+      "sourceId": "1958778987900289025",
+      "viewNum": 1573,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "ArrayList 里有 1 亿条数据，要怎么去重？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1961249021889458177",
+      "sourceId": "1961249021889458177",
+      "viewNum": 1532,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "怎么设计电商系统的订单数据同步方案（同步到数仓）？要求数据准确、性能高",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题",
+        "系统设计题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1977674988269887489",
+      "sourceId": "1977674988269887489",
+      "viewNum": 1320,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "设计一个实时数据同步系统，将 MySQL 数据实时同步到数据仓库？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题",
+        "系统设计题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1977679759160664065",
+      "sourceId": "1977679759160664065",
+      "viewNum": 1185,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何设计一个高可用的数据同步系统？需要考虑哪些容错机制？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题",
+        "系统设计题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1978006531630813185",
+      "sourceId": "1978006531630813185",
+      "viewNum": 963,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用 LIMIT OFFSET 进行分页同步时，发现数据丢失了，可能是什么原因？如何解决？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1978014047995547649",
+      "sourceId": "1978014047995547649",
+      "viewNum": 427,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "数据同步过程中出现 OOM 内存溢出，应该如何排查和解决？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1978026493166604290",
+      "sourceId": "1978026493166604290",
+      "viewNum": 596,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "双十一期间订单量暴增，实时数据同步系统出现消息堆积，如何应对？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1978033531883999233",
+      "sourceId": "1978033531883999233",
+      "viewNum": 514,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用消息队列实现数据同步时，发现订单状态更新的顺序错乱了，如何解决？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1978055194600132610",
+      "sourceId": "1978055194600132610",
+      "viewNum": 471,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "数据同步任务执行到一半失败了，如何保证数据的一致性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1978061470616899585",
+      "sourceId": "1978061470616899585",
+      "viewNum": 551,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "让你设计一个 API 网关，需要考虑哪些核心功能？如何实现动态路由和限流？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "API网关",
+        "微服务",
+        "限流"
+      ],
+      "tagIds": [
+        36,
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1993601548814401538",
+      "sourceId": "1993601548814401538",
+      "viewNum": 789,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "API 网关如何实现接口版本管理？如果要同时支持 v1、v2、v3 多个版本的接口，你会怎么设计？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "API网关"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1993609353239740417",
+      "sourceId": "1993609353239740417",
+      "viewNum": 530,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "网关层如何防止接口重放攻击？如果攻击者抓取了请求包进行重放，你如何识别和拦截？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "API网关",
+        "安全"
+      ],
+      "tagIds": [
+        36,
+        50
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1993952992327385089",
+      "sourceId": "1993952992327385089",
+      "viewNum": 531,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "微服务架构中，如何设计一个配置中心？配置变更后如何实时通知各个服务？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "配置中心"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1993971513287524354",
+      "sourceId": "1993971513287524354",
+      "viewNum": 651,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果配置中心挂了，各个微服务应该如何保证可用性？你会设计什么降级策略？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "微服务",
+        "配置中心"
+      ],
+      "tagIds": [
+        36,
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1994352163454730242",
+      "sourceId": "1994352163454730242",
+      "viewNum": 662,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "电商系统中，用户下单后如何保证订单、库存、支付三个服务的数据一致性？请设计一个分布式事务方案",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "电商"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1994384680429830145",
+      "sourceId": "1994384680429830145",
+      "viewNum": 897,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果让你实现一个分布式事务的补偿机制，应该注意哪些问题？补偿失败了怎么办？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "分布式事务"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1995420528919199745",
+      "sourceId": "1995420528919199745",
+      "viewNum": 642,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "分布式缓存中，如何实现一致性 Hash 算法？相比普通 Hash，它解决了什么问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "一致性Hash",
+        "分布式缓存",
+        "负载均衡"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1995439056628068354",
+      "sourceId": "1995439056628068354",
+      "viewNum": 566,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何设计一个灰度发布系统？如何控制流量逐步切换到新版本？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1995455868547739650",
+      "sourceId": "1995455868547739650",
+      "viewNum": 653,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "灰度发布过程中，如何保证新旧版本数据的一致性？如果新版本有数据库结构变更怎么办？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "数据库",
+        "灰度发布"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1995747051551453185",
+      "sourceId": "1995747051551453185",
+      "viewNum": 267,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何实现一个单点登录（SSO）系统？如果有多个子系统，用户只需登录一次即可访问所有系统",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "单点登录"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1995792309882580993",
+      "sourceId": "1995792309882580993",
+      "viewNum": 1115,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "SSO 系统中，如果认证中心挂了怎么办？如何保证已登录用户不受影响？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "单点登录"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1995795824780636162",
+      "sourceId": "1995795824780636162",
+      "viewNum": 633,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何设计一个接口签名验证机制？防止参数被篡改和重放攻击？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "安全"
+      ],
+      "tagIds": [
+        36,
+        50
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1995813193468997634",
+      "sourceId": "1995813193468997634",
+      "viewNum": 600,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "接口中的敏感数据（如身份证号、手机号）应该如何加密传输和存储？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "安全"
+      ],
+      "tagIds": [
+        36,
+        50
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1995822400511537154",
+      "sourceId": "1995822400511537154",
+      "viewNum": 862,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "加密后的数据怎么支持模糊搜索？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1995838874668101633",
+      "sourceId": "1995838874668101633",
+      "viewNum": 945,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何防止接口被恶意刷量？除了限流，还有哪些防护手段？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "安全"
+      ],
+      "tagIds": [
+        36,
+        50
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1998944444497272834",
+      "sourceId": "1998944444497272834",
+      "viewNum": 775,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何实现一个滑动验证码功能？如何防止被机器识别破解？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "安全",
+        "人机识别",
+        "验证码"
+      ],
+      "tagIds": [
+        36,
+        50
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1998949356958392321",
+      "sourceId": "1998949356958392321",
+      "viewNum": 731,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "短信验证码如何防止被恶意轰炸？如果有人不断请求发送验证码，你会如何限制？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "安全"
+      ],
+      "tagIds": [
+        36,
+        50
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1998958844604063746",
+      "sourceId": "1998958844604063746",
+      "viewNum": 735,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何用消息队列实现延迟任务？比如订单30分钟未支付自动取消？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题",
+        "消息队列",
+        "延迟消息",
+        "定时任务"
+      ],
+      "tagIds": [
+        28
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1999003901692485634",
+      "sourceId": "1999003901692485634",
+      "viewNum": 435,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是死信队列？在什么场景下会用到？如何设计死信队列的处理机制？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "系统设计",
+        "场景题",
+        "消息队列"
+      ],
+      "tagIds": [
+        36,
+        28
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1999046326603489281",
+      "sourceId": "1999046326603489281",
+      "viewNum": 1007,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "微信扫码登录是如何实现的？请描述一下技术方案",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "场景题",
+        "系统设计"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/2009455720558354434",
+      "sourceId": "2009455720558354434",
+      "viewNum": 1174,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询所有客户的姓名和电话",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL电商场景",
+        "SQL基础"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052097759932417",
+      "sourceId": "1813052097759932417",
+      "viewNum": 4214,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询所有订单的总金额和订单日期",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052097759932418",
+      "sourceId": "1813052097759932418",
+      "viewNum": 2094,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，统计共有多少客户",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052099177607170",
+      "sourceId": "1813052099177607170",
+      "viewNum": 2142,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询总金额大于 100 的所有订单",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052099471208449",
+      "sourceId": "1813052099471208449",
+      "viewNum": 1782,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，按创建时间升序查询所有客户",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052099722866690",
+      "sourceId": "1813052099722866690",
+      "viewNum": 1454,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询订单总金额的平均值",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052099940970498",
+      "sourceId": "1813052099940970498",
+      "viewNum": 1450,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个订单的总商品数量",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052100209405953",
+      "sourceId": "1813052100209405953",
+      "viewNum": 1380,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询最早的订单日期",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052100414926849",
+      "sourceId": "1813052100414926849",
+      "viewNum": 1471,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询创建时间在 2023 年 2 月份的所有客户",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052100641419265",
+      "sourceId": "1813052100641419265",
+      "viewNum": 1330,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询价格最高的商品信息",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052100876300290",
+      "sourceId": "1813052100876300290",
+      "viewNum": 1362,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询所有客户的姓名和创建时间，结果按照创建时间降序排序",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052101111181313",
+      "sourceId": "1813052101111181313",
+      "viewNum": 1256,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个订单的详细商品信息，包括商品 ID、数量、价格和总金额",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052101316702209",
+      "sourceId": "1813052101316702209",
+      "viewNum": 1841,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个商品的销售总数量及其对应的订单总金额",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052101564166145",
+      "sourceId": "1813052101564166145",
+      "viewNum": 1452,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询所有客户的姓名，并将其姓名转换为大写",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052101807435777",
+      "sourceId": "1813052101807435777",
+      "viewNum": 1348,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，统计每个客户的订单总金额",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052101996179457",
+      "sourceId": "1813052101996179457",
+      "viewNum": 1107,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询总金额大于 100 的订单及其对应客户的姓名",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052102222671874",
+      "sourceId": "1813052102222671874",
+      "viewNum": 778,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询订单数量最多的客户姓名和订单数量",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052102423998465",
+      "sourceId": "1813052102423998465",
+      "viewNum": 537,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个客户的订单总金额，并按总金额降序排序",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052102633713666",
+      "sourceId": "1813052102633713666",
+      "viewNum": 577,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询在 2023 年 3 月份的所有订单及其对应客户的姓名",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052102935703553",
+      "sourceId": "1813052102935703553",
+      "viewNum": 510,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询所有订单的总商品数量和总金额，并按订单日期升序排序",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052103267053569",
+      "sourceId": "1813052103267053569",
+      "viewNum": 484,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个订单的总金额及其包含的商品总数量",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052103564849153",
+      "sourceId": "1813052103564849153",
+      "viewNum": 461,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询订单总金额最高的客户姓名和对应的订单总金额",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052103858450434",
+      "sourceId": "1813052103858450434",
+      "viewNum": 442,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询有订单记录的客户姓名及其最新的订单日期",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052104084942849",
+      "sourceId": "1813052104084942849",
+      "viewNum": 464,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询在 2023 年 1 月份下的所有订单及其对应的商品详细信息",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052104303046658",
+      "sourceId": "1813052104303046658",
+      "viewNum": 431,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个客户的订单总数量和总金额，并按总金额降序排序",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052104546316289",
+      "sourceId": "1813052104546316289",
+      "viewNum": 481,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询所有订单在每个客户订单中的累计总金额，并按订单日期升序排序",
+      "difficulty": "HARD",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052104760225794",
+      "sourceId": "1813052104760225794",
+      "viewNum": 1207,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个客户的最新订单总金额及其在客户所有订单总金额中的比例",
+      "difficulty": "HARD",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052104969940994",
+      "sourceId": "1813052104969940994",
+      "viewNum": 769,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个订单的总商品数量及其包含的商品列表（用逗号分隔）",
+      "difficulty": "HARD",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052105221599234",
+      "sourceId": "1813052105221599234",
+      "viewNum": 689,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个订单的订单日期，并计算订单日期的年份和季度",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052105456480257",
+      "sourceId": "1813052105456480257",
+      "viewNum": 602,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个客户的姓名及其上一个订单的总金额",
+      "difficulty": "HARD",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052105657806849",
+      "sourceId": "1813052105657806849",
+      "viewNum": 951,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询订单总金额超过其客户所有订单平均金额的订单",
+      "difficulty": "HARD",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052105930436610",
+      "sourceId": "1813052105930436610",
+      "viewNum": 821,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询订单数量超过 5 的每个客户的订单数量",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052106114985985",
+      "sourceId": "1813052106114985985",
+      "viewNum": 634,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个客户的姓名及其第一个订单的总金额",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052106303729666",
+      "sourceId": "1813052106303729666",
+      "viewNum": 520,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询至少有一个订单金额超过 200 的客户姓名",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL电商场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813052106500861954",
+      "sourceId": "1813052106500861954",
+      "viewNum": 932,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询访问记录表中所有页面的页面 ID 和访问日期",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050003241873410",
+      "sourceId": "1813050003241873410",
+      "viewNum": 6036,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询页面表中页面路径为 '/home' 的页面名称",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050004537913345",
+      "sourceId": "1813050004537913345",
+      "viewNum": 3041,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询访问记录表中用户IP为 '192.168.1.1' 的所有记录",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050004730851329",
+      "sourceId": "1813050004730851329",
+      "viewNum": 2383,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询用户表中性别为 '男' 的所有用户的用户名",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050004927983617",
+      "sourceId": "1813050004927983617",
+      "viewNum": 1962,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询页面表中所有页面的页面 ID，并按页面 ID 升序排序",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050005146087425",
+      "sourceId": "1813050005146087425",
+      "viewNum": 1694,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询访问记录表中每个页面的总访问次数",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050005347414018",
+      "sourceId": "1813050005347414018",
+      "viewNum": 1576,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询用户表中注册日期最早的 3 个用户的用户名和注册日期",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050005515186178",
+      "sourceId": "1813050005515186178",
+      "viewNum": 1530,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询访问记录表中每个用户的总访问次数",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050005771038722",
+      "sourceId": "1813050005771038722",
+      "viewNum": 1403,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询用户表中年龄在 25 岁及以下的所有用户的用户名和年龄",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050005984948225",
+      "sourceId": "1813050005984948225",
+      "viewNum": 1411,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询用户表中每个性别的用户数量",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050006228217858",
+      "sourceId": "1813050006228217858",
+      "viewNum": 1309,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询用户表中年龄在 25 岁及以下且性别为 '女' 的用户的用户名",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050006458904577",
+      "sourceId": "1813050006458904577",
+      "viewNum": 1254,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询用户表中注册日期在 2024 年 1 月 1 日之后的用户名和注册日期",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050006656036866",
+      "sourceId": "1813050006656036866",
+      "viewNum": 1209,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询用户表中用户名包含 '张' 字的所有用户",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050006832197634",
+      "sourceId": "1813050006832197634",
+      "viewNum": 1376,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询所有用户中年龄最大的用户信息",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050007050301441",
+      "sourceId": "1813050007050301441",
+      "viewNum": 1185,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询用户表中每个性别的平均年龄，并按性别分组",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050007255822338",
+      "sourceId": "1813050007255822338",
+      "viewNum": 1154,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询用户表中，注册日期在 2024 年 1 月 1 日和 2024 年 6 月 30 日之间的所有用户",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050007482314754",
+      "sourceId": "1813050007482314754",
+      "viewNum": 1130,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个页面的第一次访问日期",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050007687835649",
+      "sourceId": "1813050007687835649",
+      "viewNum": 1194,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询访问记录表中，每个页面最近一次访问的日期",
+      "difficulty": "EASY",
+      "tags": [
+        "SQL",
+        "SQL基础",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050007872385026",
+      "sourceId": "1813050007872385026",
+      "viewNum": 1071,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询访问记录表中每个页面的访问次数，按访问次数从高到低排序",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050008082100225",
+      "sourceId": "1813050008082100225",
+      "viewNum": 2150,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个用户访问的不同页面的总数量",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050008291815425",
+      "sourceId": "1813050008291815425",
+      "viewNum": 1742,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询在 2024 年 7 月 1 日访问过的所有用户的用户名（不能重复）",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050008467976193",
+      "sourceId": "1813050008467976193",
+      "viewNum": 1424,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询所有页面中访问次数最多的页面的页面名称",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050008673497090",
+      "sourceId": "1813050008673497090",
+      "viewNum": 1187,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询在 2024 年 7 月 1 日访问次数最多的页面的页面路径",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050008845463554",
+      "sourceId": "1813050008845463554",
+      "viewNum": 1061,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个用户最近一次访问的页面路径及访问日期",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050009017430017",
+      "sourceId": "1813050009017430017",
+      "viewNum": 937,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个页面路径的独立访问用户数",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050009222950913",
+      "sourceId": "1813050009222950913",
+      "viewNum": 841,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个页面路径的访问次数和独立访问用户数，并按页面 ID 升序排序",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050009386528770",
+      "sourceId": "1813050009386528770",
+      "viewNum": 727,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询在 2024 年 7 月 1 日访问过 '/home' 页面且年龄大于 25 岁的用户的用户名（去重）",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050009558495233",
+      "sourceId": "1813050009558495233",
+      "viewNum": 688,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询访问次数超过 2 次的所有用户的用户名和访问次数",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050009768210433",
+      "sourceId": "1813050009768210433",
+      "viewNum": 691,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询所有用户的用户名和注册日期，要求格式化注册日期为 'YYYY-MM' 格式",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050009969537025",
+      "sourceId": "1813050009969537025",
+      "viewNum": 630,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个页面在 2024 年 7 月的总访问次数，并按访问次数降序排列",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050010162475009",
+      "sourceId": "1813050010162475009",
+      "viewNum": 604,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询访问记录表中访问次数最多的前两个页面路径",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050010367995905",
+      "sourceId": "1813050010367995905",
+      "viewNum": 554,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个用户名访问的不同页面的数量，要求该数量大于 1",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050010560933889",
+      "sourceId": "1813050010560933889",
+      "viewNum": 524,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，使用开窗函数查询每个页面的累计访问次数",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050010766454786",
+      "sourceId": "1813050010766454786",
+      "viewNum": 642,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询在 2024 年 7 月 1 日访问了 '/home' 页面但没有访问 '/contact' 页面的用户的用户名（去重）",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050010946809857",
+      "sourceId": "1813050010946809857",
+      "viewNum": 545,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询所有在 2024 年 7 月访问过网站的用户的用户名（去重）",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050011160719362",
+      "sourceId": "1813050011160719362",
+      "viewNum": 499,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询总访问次数大于 2 的每个页面的总访问次数",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050011387211778",
+      "sourceId": "1813050011387211778",
+      "viewNum": 485,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个用户名的平均访问时长，并且平均访问时长超过 100 秒的用户名",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050011601121281",
+      "sourceId": "1813050011601121281",
+      "viewNum": 509,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询在 2024 年 7 月 1 日访问过 '/product/123' 页面的所有用户的用户 ID 和访问日期",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050011852779522",
+      "sourceId": "1813050011852779522",
+      "viewNum": 438,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个用户的访问记录，并增加一个序号列，按访问日期排序",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050012033134594",
+      "sourceId": "1813050012033134594",
+      "viewNum": 415,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询在 2024 年访问过网站的所有用户中，访问次数最多的前五名用户的用户名及其访问次数",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050012226072577",
+      "sourceId": "1813050012226072577",
+      "viewNum": 413,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询每个页面在每个月的总访问次数，并按页面 ID 和月份排序",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050012431593473",
+      "sourceId": "1813050012431593473",
+      "viewNum": 391,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，使用开窗函数查询每个用户最近一次访问的页面路径及其访问日期",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050012624531458",
+      "sourceId": "1813050012624531458",
+      "viewNum": 388,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询在 2024 年 7 月访问次数最多的 3 个页面的页面名称",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050012842635265",
+      "sourceId": "1813050012842635265",
+      "viewNum": 409,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询所有注册日期在 2024 年 6 月之后且访问过 '/contact' 页面的用户的用户名",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050013052350466",
+      "sourceId": "1813050013052350466",
+      "viewNum": 387,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 SQL，查询用户表中所有用户的用户名和年龄",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "SQL",
+        "SQL进阶",
+        "SQL网站场景"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1813050003241873409",
+      "sourceId": "1813050003241873409",
+      "viewNum": 3900,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "JDK 和 JRE 和 JVM 分别是什么，有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772565639773396993",
+      "sourceId": "1772565639773396993",
+      "viewNum": 3391,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是字节码？采用字节码的最大好处是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772566662923526145",
+      "sourceId": "1772566662923526145",
+      "viewNum": 1465,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 和 C++、Go 语言的区别，各自的优缺点？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772566989882105858",
+      "sourceId": "1772566989882105858",
+      "viewNum": 1254,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 final 关键字有什么用？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772568162827608065",
+      "sourceId": "1772568162827608065",
+      "viewNum": 1670,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 hashCode 和 equals 方法是什么？它们与 == 操作符有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772568783219695618",
+      "sourceId": "1772568783219695618",
+      "viewNum": 30033,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是反射机制？说说反射机制的优缺点、应用场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772573071266390017",
+      "sourceId": "1772573071266390017",
+      "viewNum": 2981,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 访问修饰符 public、private、protected，以及无修饰符（默认）的区别",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772573577451773954",
+      "sourceId": "1772573577451773954",
+      "viewNum": 1024,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "String 和 StringBuffer、StringBuilder 的区别是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772573871761891330",
+      "sourceId": "1772573871761891330",
+      "viewNum": 1276,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 内部类？ 内部类的分类有哪些 ？内部类有哪些优点和应用场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772574379134263297",
+      "sourceId": "1772574379134263297",
+      "viewNum": 927,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是数据库事务？讲一下事务的 ACID 特性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772574696160731137",
+      "sourceId": "1772574696160731137",
+      "viewNum": 4279,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中的日志类型有哪些？binlog、redo log 和 undo log 的作用和区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772575207802904578",
+      "sourceId": "1772575207802904578",
+      "viewNum": 11131,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是数据库的索引？索引的作用是什么？索引适用于哪些场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772576803819462658",
+      "sourceId": "1772576803819462658",
+      "viewNum": 1638,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MySQL 中进行数据备份？如何恢复半个月前的数据？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772577234398322690",
+      "sourceId": "1772577234398322690",
+      "viewNum": 885,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 事务的隔离级别有哪些？每个隔离级别的特点是什么？MySQL 默认的隔离级别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772580224828022785",
+      "sourceId": "1772580224828022785",
+      "viewNum": 1604,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中的意向锁是什么？作用是什么？它是表级锁还是行级锁？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772581095645224961",
+      "sourceId": "1772581095645224961",
+      "viewNum": 1446,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中的覆盖索引和联合索引是什么？索引的最左前缀匹配原则是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772582920637227009",
+      "sourceId": "1772582920637227009",
+      "viewNum": 1754,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 MySQL 的执行计划？如何获取执行计划并对其进行分析？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772583519495757826",
+      "sourceId": "1772583519495757826",
+      "viewNum": 781,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 支持哪些存储引擎？默认使用哪个？MyISAM 和 InnoDB 引擎有什么区别，如何选择？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772585151591718914",
+      "sourceId": "1772585151591718914",
+      "viewNum": 919,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 框架是什么？使用 Spring 框架有哪些好处？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772810031624929282",
+      "sourceId": "1772810031624929282",
+      "viewNum": 868,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 的两大核心概念是什么？简单讲一下你对它们的理解",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772812023982243842",
+      "sourceId": "1772812023982243842",
+      "viewNum": 677,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 IOC，简单讲一下 Spring IOC 的实现机制？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772813140589854721",
+      "sourceId": "1772813140589854721",
+      "viewNum": 1382,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 框架中都用到了哪些设计模式？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772814247567343617",
+      "sourceId": "1772814247567343617",
+      "viewNum": 1169,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring、SpringMVC、SpringBoot 三者之间是什么关系？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772815827649740802",
+      "sourceId": "1772815827649740802",
+      "viewNum": 2175,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "有哪些注解可以注入 Bean？@Autowired 和 @Resource 的区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772816244379009026",
+      "sourceId": "1772816244379009026",
+      "viewNum": 2747,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 如何处理线程并发问题，ThreadLocal 你了解过吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772818452722008066",
+      "sourceId": "1772818452722008066",
+      "viewNum": 1680,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 BeanFactory 和 ApplicationContext 有什么区别和联系？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772823521546780673",
+      "sourceId": "1772823521546780673",
+      "viewNum": 897,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "讲一讲 Spring 框架中 Bean 的生命周期？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772823973042634754",
+      "sourceId": "1772823973042634754",
+      "viewNum": 1075,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 支持哪几种事务管理类型，Spring 的事务实现方式和实现原理是？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772825388641206274",
+      "sourceId": "1772825388641206274",
+      "viewNum": 1410,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Spring 的依赖注入，依赖注入的基本原则以及好处？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772825780024295426",
+      "sourceId": "1772825780024295426",
+      "viewNum": 1089,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 AOP？有哪些实现 AOP 的方式？Spring AOP 和 AspectJ AOP 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772826987228872706",
+      "sourceId": "1772826987228872706",
+      "viewNum": 1755,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Redis 是什么？Redis 的特点和常见应用场景有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Redis"
+      ],
+      "tagIds": [
+        18
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772827984068132865",
+      "sourceId": "1772827984068132865",
+      "viewNum": 804,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Redis 的单线程模型是什么？IO 多路复用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Redis "
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772828482716352513",
+      "sourceId": "1772828482716352513",
+      "viewNum": 2020,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Redis 基础类型中的 String 底层实现是什么？",
+      "difficulty": "HARD",
+      "tags": [
+        "Redis"
+      ],
+      "tagIds": [
+        18
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772829641560604673",
+      "sourceId": "1772829641560604673",
+      "viewNum": 713,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Redis 实现一个排行榜？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Redis"
+      ],
+      "tagIds": [
+        18
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772830587208384514",
+      "sourceId": "1772830587208384514",
+      "viewNum": 807,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Redis 的持久化机制有哪些？它们的优缺点和应用场景是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Redis"
+      ],
+      "tagIds": [
+        18
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772831636359004161",
+      "sourceId": "1772831636359004161",
+      "viewNum": 1096,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何用 Redis 实现分布式 Session？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Redis"
+      ],
+      "tagIds": [
+        18
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772837481117433857",
+      "sourceId": "1772837481117433857",
+      "viewNum": 901,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Redis 的内存淘汰机制是什么？有哪些内存淘汰策略？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Redis"
+      ],
+      "tagIds": [
+        18
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772837748386873345",
+      "sourceId": "1772837748386873345",
+      "viewNum": 961,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Redis 中有哪些数据类型？基础数据结构有几种？有哪些高级数据结构？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Redis"
+      ],
+      "tagIds": [
+        18
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772838958330331138",
+      "sourceId": "1772838958330331138",
+      "viewNum": 1340,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Redis 实现分布式锁？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Redis"
+      ],
+      "tagIds": [
+        18
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772839809966981122",
+      "sourceId": "1772839809966981122",
+      "viewNum": 1511,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Redis 的 HyperLogLog 统计页面 UV？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Redis"
+      ],
+      "tagIds": [
+        18
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772840399447048193",
+      "sourceId": "1772840399447048193",
+      "viewNum": 621,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "简述计算机网络七层模型和各自的作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772861032310554626",
+      "sourceId": "1772861032310554626",
+      "viewNum": 777,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "HTTP 是哪一层的协议？简述它的作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772862721000259585",
+      "sourceId": "1772862721000259585",
+      "viewNum": 720,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "TCP 和 UDP 协议有什么区别，分别适用于什么场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772863972567990274",
+      "sourceId": "1772863972567990274",
+      "viewNum": 644,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "HTTP 协议中 GET 和 POST 有什么区别？分别适用于什么场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772864984859066369",
+      "sourceId": "1772864984859066369",
+      "viewNum": 669,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "简述 TCP 三次握手、四次挥手的流程？为什么需要三次握手？为什么需要四次挥手？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772866230168895489",
+      "sourceId": "1772866230168895489",
+      "viewNum": 804,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是进程和线程？它们有哪些区别和联系？",
+      "difficulty": "EASY",
+      "tags": [
+        "操作系统"
+      ],
+      "tagIds": [
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772867257542688769",
+      "sourceId": "1772867257542688769",
+      "viewNum": 851,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "死锁是什么？如何预防和避免死锁？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "操作系统"
+      ],
+      "tagIds": [
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772868692149846018",
+      "sourceId": "1772868692149846018",
+      "viewNum": 1847,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "线程间有哪些通信方式？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "操作系统"
+      ],
+      "tagIds": [
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772869133533233153",
+      "sourceId": "1772869133533233153",
+      "viewNum": 2075,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是零拷贝？说一说你对零拷贝的理解？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "操作系统"
+      ],
+      "tagIds": [
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772870467183493121",
+      "sourceId": "1772870467183493121",
+      "viewNum": 1141,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是分布式？为什么需要分布式？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "分布式"
+      ],
+      "tagIds": [
+        10
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772870844448555009",
+      "sourceId": "1772870844448555009",
+      "viewNum": 1848,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是网关，网关有哪些作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "分布式"
+      ],
+      "tagIds": [
+        10
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772871271869104130",
+      "sourceId": "1772871271869104130",
+      "viewNum": 687,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Dubbo 是什么？是否了解过它的架构设计？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "分布式"
+      ],
+      "tagIds": [
+        10
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772872218695483394",
+      "sourceId": "1772872218695483394",
+      "viewNum": 531,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是分布式的 CAP 理论？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "分布式"
+      ],
+      "tagIds": [
+        10
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772873058764242946",
+      "sourceId": "1772873058764242946",
+      "viewNum": 2318,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 RPC？目前有哪些常见的 RPC 框架？实现 RPC 框架的核心原理是什么？",
+      "difficulty": "HARD",
+      "tags": [
+        "分布式"
+      ],
+      "tagIds": [
+        10
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772873837122207746",
+      "sourceId": "1772873837122207746",
+      "viewNum": 2326,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是注册中心？如何实现一个注册中心？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "分布式"
+      ],
+      "tagIds": [
+        10
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772874277926780930",
+      "sourceId": "1772874277926780930",
+      "viewNum": 944,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是分布式的 BASE 理论，它与 CAP 理论有什么联系？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "分布式"
+      ],
+      "tagIds": [
+        10
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772874743305781250",
+      "sourceId": "1772874743305781250",
+      "viewNum": 812,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是消息队列？消息队列有哪些应用场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "消息队列"
+      ],
+      "tagIds": [
+        28
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772875123703988225",
+      "sourceId": "1772875123703988225",
+      "viewNum": 892,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "有哪些主流的消息队列，它们分别有什么优缺点、各自的适用场景是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "消息队列"
+      ],
+      "tagIds": [
+        28
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772875433931489282",
+      "sourceId": "1772875433931489282",
+      "viewNum": 435,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "有哪些常见的消息队列模型？分别适用于什么场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "消息队列"
+      ],
+      "tagIds": [
+        28
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772876445136240641",
+      "sourceId": "1772876445136240641",
+      "viewNum": 449,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "设计模式是什么？为什么要学习和使用设计模式？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772877468273786882",
+      "sourceId": "1772877468273786882",
+      "viewNum": 1310,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是单例模式？使用单例模式有什么好处？有哪些常用的单例模式实现方式？各自的应用场景是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772878046886412290",
+      "sourceId": "1772878046886412290",
+      "viewNum": 1452,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "设计模式可以分为哪几类？一共有多少种主流的设计模式？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772878543450062849",
+      "sourceId": "1772878543450062849",
+      "viewNum": 899,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是工厂模式？使用工厂模式有什么好处？工厂模式有哪些分类？各自的应用场景是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "设计模式"
+      ],
+      "tagIds": [
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772879115683151874",
+      "sourceId": "1772879115683151874",
+      "viewNum": 956,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "并发和并行有什么区别？同步和异步有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "并发编程"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772879449918849026",
+      "sourceId": "1772879449918849026",
+      "viewNum": 667,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 BIO、NIO、AIO？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java",
+        "Java 基础"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772880236942245889",
+      "sourceId": "1772880236942245889",
+      "viewNum": 18328,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "线程的生命周期是什么，线程有几种状态，什么是上下文切换？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "并发编程"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772881978031390721",
+      "sourceId": "1772881978031390721",
+      "viewNum": 1478,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "synchronized 关键字是什么，有什么作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "并发编程"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772882419037290498",
+      "sourceId": "1772882419037290498",
+      "viewNum": 1384,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 10 亿个数据中找到最大的 1 万个？",
+      "difficulty": "HARD",
+      "tags": [
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772883436399280130",
+      "sourceId": "1772883436399280130",
+      "viewNum": 770,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "有几台机器存储着几亿的淘宝搜索日志，假设你只有一台 2g 的电脑，如何选出搜索热度最高的十个关键词？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772884484836868097",
+      "sourceId": "1772884484836868097",
+      "viewNum": 459,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "请你介绍下 JVM 内存模型，分为哪些区域？各区域的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM"
+      ],
+      "tagIds": [
+        4
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772885398603743234",
+      "sourceId": "1772885398603743234",
+      "viewNum": 1507,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "常见的垃圾回收算法有几种类型？他们对应的优缺点是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM "
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772888498672549889",
+      "sourceId": "1772888498672549889",
+      "viewNum": 564,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Git 的 fork 命令？它和 clone 命令有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "Git"
+      ],
+      "tagIds": [
+        34
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772888867775496194",
+      "sourceId": "1772888867775496194",
+      "viewNum": 456,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Git 的 cherry-pick？",
+      "difficulty": "EASY",
+      "tags": [
+        "Git"
+      ],
+      "tagIds": [
+        34
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772891573319680002",
+      "sourceId": "1772891573319680002",
+      "viewNum": 381,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Linux 中的硬链接和软连接是什么，二者有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Linux"
+      ],
+      "tagIds": [
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772892114301009921",
+      "sourceId": "1772892114301009921",
+      "viewNum": 7629,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "CC 攻击是什么？什么叫 DDOS 攻击？什么是网站数据库注入？",
+      "difficulty": "EASY",
+      "tags": [
+        "Linux"
+      ],
+      "tagIds": [
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772892490454581250",
+      "sourceId": "1772892490454581250",
+      "viewNum": 5043,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 中查看系统资源使用情况？比如内存、CPU、网络端口。",
+      "difficulty": "EASY",
+      "tags": [
+        "Linux"
+      ],
+      "tagIds": [
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772892870856982530",
+      "sourceId": "1772892870856982530",
+      "viewNum": 5381,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Nginx 是什么？它有哪些应用场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "Nginx"
+      ],
+      "tagIds": [
+        31
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772893116840329217",
+      "sourceId": "1772893116840329217",
+      "viewNum": 5268,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是正向代理和反向代理，如何使用 Nginx 做反向代理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Nginx"
+      ],
+      "tagIds": [
+        31
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772893331903266817",
+      "sourceId": "1772893331903266817",
+      "viewNum": 4001,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何用 Nginx 做限流，有几种限流算法，分别如何实现？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Nginx"
+      ],
+      "tagIds": [
+        31
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772893879301881857",
+      "sourceId": "1772893879301881857",
+      "viewNum": 2855,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是云原生？它有哪些优缺点？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前沿技术"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772894304629473282",
+      "sourceId": "1772894304629473282",
+      "viewNum": 731,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你是否了解过新版本的 Java 特性？对 Java 未来的发展有什么看法？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前沿技术"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1772894443284774914",
+      "sourceId": "1772894443284774914",
+      "viewNum": 555,
+      "needVip": true,
+      "hasAnswer": false
+    }
+  ]
+}

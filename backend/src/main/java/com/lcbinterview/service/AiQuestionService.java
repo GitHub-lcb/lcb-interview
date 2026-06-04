@@ -1,6 +1,7 @@
 package com.lcbinterview.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lcbinterview.dto.GenerationRequest;
@@ -280,7 +281,120 @@ public class AiQuestionService {
     }
 
     /**
-     * 同步生成题目（供 BatchGenerationRunner 调用）。
+     * 为已有 DRAFT 题目补全答案。读取指定分类下 content 为空的草稿，
+     * 以题目为 prompt 调用 AI 生成完整答案并更新。
+     */
+    public Long fillAnswers(Long categoryId, int count) {
+        Long taskId = System.currentTimeMillis();
+        log.info("AI补答案任务创建 taskId={}, categoryId={}, count={}", taskId, categoryId, count);
+
+        taskStore.put(taskId, new GenerationTaskVO(taskId, "RUNNING", count, 0, 0, "查询待补题目...", List.of(), List.of()));
+
+        scheduler.submit(() -> {
+            List<String> errors = new ArrayList<>();
+            List<Long> updatedIds = new ArrayList<>();
+            int success = 0;
+            int fail = 0;
+            long startTime = System.currentTimeMillis();
+
+            // 查询 DRAFT 待补题目
+            LambdaQueryWrapper<Question> wrapper = new LambdaQueryWrapper<Question>()
+                    .eq(Question::getStatus, "DRAFT")
+                    .and(w -> w.isNull(Question::getContent).or().eq(Question::getContent, ""))
+                    .orderByAsc(Question::getId);
+            if (categoryId != null) {
+                wrapper.eq(Question::getCategoryId, categoryId);
+            }
+            wrapper.last("LIMIT " + count);
+
+            List<Question> draftQuestions = questionMapper.selectList(wrapper);
+            log.info("找到 {} 道待补题目", draftQuestions.size());
+
+            int total = Math.min(draftQuestions.size(), count);
+            taskStore.put(taskId, new GenerationTaskVO(taskId, "RUNNING", total, 0, 0, "开始补全...", List.of(), List.of()));
+
+            for (int i = 0; i < total; i++) {
+                Question q = draftQuestions.get(i);
+                try {
+                    updateProgress(taskId, total, success, fail,
+                            String.format("补全中 %d/%d: %s", i + 1, total, truncate(q.getTitle(), 30)));
+
+                    String prompt = buildFillPrompt(q.getTitle());
+                    String responseJson = callDeepSeek(prompt);
+                    List<Question> parsed = parseQuestions(responseJson);
+
+                    if (parsed.isEmpty()) {
+                        fail++;
+                        errors.add("第 " + (i + 1) + " 题: API 返回为空");
+                        continue;
+                    }
+
+                    Question answer = parsed.get(0);
+                    Question update = new Question();
+                    update.setId(q.getId());
+                    update.setSummary(answer.getSummary());
+                    update.setContent(answer.getContent());
+                    update.setPrinciple(answer.getPrinciple());
+                    update.setComparison(answer.getComparison());
+                    update.setScenario(answer.getScenario());
+                    update.setRisk(answer.getRisk());
+                    update.setProjectExp(answer.getProjectExp());
+                    update.setCodeExamples(answer.getCodeExamples());
+                    if (answer.getDifficulty() != null && !answer.getDifficulty().isBlank()) {
+                        update.setDifficulty(answer.getDifficulty());
+                    }
+                    questionMapper.updateById(update);
+                    updatedIds.add(q.getId());
+                    success++;
+
+                    log.info("补全答案成功 [{}/{}]: id={}, title={}", i + 1, total, q.getId(), q.getTitle());
+                } catch (Exception e) {
+                    log.error("补全答案失败 [{}]: id={}, title={}", i + 1, q.getId(), q.getTitle(), e);
+                    errors.add("第 " + (i + 1) + " 题: " + e.getMessage());
+                    fail++;
+                }
+            }
+
+            long totalTime = System.currentTimeMillis() - startTime;
+            String taskStatus = fail == 0 ? "COMPLETED" : (success > 0 ? "PARTIAL" : "FAILED");
+            log.info("AI补答案任务完成 taskId={}, status={}, success={}, fail={}, 总耗时 {}ms",
+                    taskId, taskStatus, success, fail, totalTime);
+
+            taskStore.put(taskId, new GenerationTaskVO(
+                    taskId, taskStatus, total, success, fail,
+                    taskStatus.equals("FAILED") ? errors.isEmpty() ? "补全失败" : errors.get(0) : "完成",
+                    List.copyOf(errors), List.copyOf(updatedIds)));
+        });
+
+        return taskId;
+    }
+
+    private String buildFillPrompt(String title) {
+        return """
+            请为以下面试题生成完整的结构化答案。
+
+            题目：%s
+
+            以 JSON 格式返回，包含以下字段：
+            - summary: 一句话摘要（50-100字纯文本）
+            - content: 标准答案（Markdown 格式，500-1500字，详细完整）
+            - principle: 原理解析（Markdown，深入底层机制，200-800字）
+            - comparison: 对比分析（Markdown，与同类技术对比，如无可为 null）
+            - scenario: 适用场景（Markdown，如无可为 null）
+            - risk: 风险与避坑（Markdown，如无可为 null）
+            - project_exp: 项目实战经验（Markdown，如无可为 null）
+            - code_examples: 代码示例数组 [{lang,title,code,description}]，如无需为空数组
+            - difficulty: 难度 EASY/MEDIUM/HARD
+
+            只返回 JSON 对象，不要包含其他文字。
+            """.formatted(title);
+    }
+
+    private String truncate(String s, int max) {
+        return s == null ? "" : s.length() <= max ? s : s.substring(0, max) + "...";
+    }
+
+    /** 同步生成题目（供 BatchGenerationRunner 调用）。
      *
      * @param req      生成请求
      * @param categoryId 目标分类 ID

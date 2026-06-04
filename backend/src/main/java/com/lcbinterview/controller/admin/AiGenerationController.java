@@ -3,6 +3,7 @@ package com.lcbinterview.controller.admin;
 import com.lcbinterview.common.ApiResponse;
 import com.lcbinterview.dto.BatchGenerationRequest;
 import com.lcbinterview.dto.BatchProgressVO;
+import com.lcbinterview.dto.FillAnswersRequest;
 import com.lcbinterview.dto.GenerationRequest;
 import com.lcbinterview.dto.GenerationTaskVO;
 import com.lcbinterview.service.AiQuestionService;
@@ -11,6 +12,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /**
  * AI 题目生成接口。
@@ -64,5 +67,14 @@ public class AiGenerationController {
     @GetMapping("/batch/status")
     public ResponseEntity<ApiResponse<BatchProgressVO>> batchStatus() {
         return ResponseEntity.ok(ApiResponse.success(batchRunner.getProgress()));
+    }
+
+    /**
+     * 为已有 DRAFT 草稿题补全答案。按分类读取 content 为空的草稿，调用 AI 生成答案。
+     */
+    @PostMapping("/fill-answers")
+    public ResponseEntity<ApiResponse<Long>> fillAnswers(@Valid @RequestBody FillAnswersRequest req) {
+        Long taskId = aiQuestionService.fillAnswers(req.categoryId(), req.count());
+        return ResponseEntity.ok(ApiResponse.success(taskId));
     }
 }

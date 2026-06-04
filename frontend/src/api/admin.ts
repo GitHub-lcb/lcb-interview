@@ -41,3 +41,13 @@ export const approveDraft = (id: number) =>
 
 export const rejectDraft = (id: number) =>
   api.post(`/admin/questions/draft/${id}/reject`)
+
+export const batchApproveDrafts = (ids: number[]) =>
+  api.post('/admin/questions/draft/batch-approve', ids)
+
+export const batchRejectDrafts = (ids: number[]) =>
+  api.post('/admin/questions/draft/batch-reject', ids)
+
+export const fillAnswers = (params: { categoryId?: number; count: number }) =>
+  api.post<{ data: number }>('/admin/ai/fill-answers', params)
+    .then(res => res.data.data)

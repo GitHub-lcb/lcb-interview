@@ -1,0 +1,975 @@
+{
+  "categoryId": 10,
+  "categoryName": "SpringCloud",
+  "bankIds": [
+    "1797453053310402561"
+  ],
+  "totalQuestions": 55,
+  "questions": [
+    {
+      "title": "什么情况下需要使用分布式事务，有哪些方案？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "分布式事务",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797616463733981185",
+      "sourceId": "1797616463733981185",
+      "viewNum": 13821,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "SpringCloud 有哪些核心组件？",
+      "difficulty": "EASY",
+      "tags": [
+        "Spring Cloud",
+        "后端",
+        "微服务"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1958129334720516097",
+      "sourceId": "1958129334720516097",
+      "viewNum": 4773,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "分布式和微服务有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "后端",
+        "分布式"
+      ],
+      "tagIds": [
+        16,
+        10
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798351981564264450",
+      "sourceId": "1798351981564264450",
+      "viewNum": 10760,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是分布式事务的防悬挂，空回滚?",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Boot",
+        "Spring Cloud"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1844362927433420802",
+      "sourceId": "1844362927433420802",
+      "viewNum": 6560,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是配置中心？有哪些常见的配置中心？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring Cloud"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1795829113869697025",
+      "sourceId": "1795829113869697025",
+      "viewNum": 18353,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你知道 Nacos 配置中心的实现原理吗？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "Spring Cloud"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1796136214777167873",
+      "sourceId": "1796136214777167873",
+      "viewNum": 12926,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么需要服务注册发现？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "后端",
+        "微服务"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1795823559642316802",
+      "sourceId": "1795823559642316802",
+      "viewNum": 9371,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么需要在微服务中使用链路追踪？Spring Cloud 可以选择哪些微服务链路追踪方案？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "微服务",
+        "链路追踪",
+        "Spring Cloud"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1796163389530177538",
+      "sourceId": "1796163389530177538",
+      "viewNum": 7907,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring Cloud 的优缺点有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "微服务",
+        "后端",
+        "Spring Cloud"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1796264231268646914",
+      "sourceId": "1796264231268646914",
+      "viewNum": 7914,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring Boot 和 Spring Cloud 之间的区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "Spring Boot",
+        "后端",
+        "Spring Cloud"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1796265454814232577",
+      "sourceId": "1796265454814232577",
+      "viewNum": 8985,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你是怎么理解微服务的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "后端"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1797531381849522178",
+      "sourceId": "1797531381849522178",
+      "viewNum": 8719,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "单体应用、SOA、微服务架构有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "后端",
+        "微服务"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797557927163330562",
+      "sourceId": "1797557927163330562",
+      "viewNum": 7029,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring Cloud Config 是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "后端"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1797615613980573698",
+      "sourceId": "1797615613980573698",
+      "viewNum": 5848,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你们的服务是怎么做日志收集的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "后端",
+        "日志采集"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797940474200326145",
+      "sourceId": "1797940474200326145",
+      "viewNum": 6716,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "说一下你对于 DDD 的了解？",
+      "difficulty": "HARD",
+      "tags": [
+        "DDD",
+        "Spring Cloud",
+        "微服务",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797946963518423041",
+      "sourceId": "1797946963518423041",
+      "viewNum": 8455,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Seata？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Seata",
+        "微服务",
+        "Spring Cloud",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797947969769701378",
+      "sourceId": "1797947969769701378",
+      "viewNum": 11561,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Seata 支持哪些模式的分布式事务？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "Seata",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797986686995660801",
+      "sourceId": "1797986686995660801",
+      "viewNum": 6937,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "了解 Seata 的实现原理吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Seata",
+        "Spring Cloud",
+        "微服务"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797990270533500929",
+      "sourceId": "1797990270533500929",
+      "viewNum": 5772,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Seata 的事务回滚是怎么实现的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud ",
+        "微服务",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798300726968057857",
+      "sourceId": "1798300726968057857",
+      "viewNum": 4568,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring Cloud 有哪些注册中心？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "注册中心",
+        "Spring Cloud",
+        "微服务"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798525333268463617",
+      "sourceId": "1798525333268463617",
+      "viewNum": 6000,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Eureka?",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "注册中心",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798530283667062785",
+      "sourceId": "1798530283667062785",
+      "viewNum": 4577,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Eureka 的实现原理说一下？",
+      "difficulty": "HARD",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "注册中心",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798539876321329153",
+      "sourceId": "1798539876321329153",
+      "viewNum": 4165,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring Cloud 由什么组成？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1796270754107621378",
+      "sourceId": "1796270754107621378",
+      "viewNum": 8219,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring Cloud 如何实现服务注册？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798867487179988993",
+      "sourceId": "1798867487179988993",
+      "viewNum": 4763,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Consul 是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799044261750317057",
+      "sourceId": "1799044261750317057",
+      "viewNum": 3812,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Eureka、Zookeeper、Nacos、Consul 的区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring Cloud",
+        "微服务"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799058621826670594",
+      "sourceId": "1799058621826670594",
+      "viewNum": 4730,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Nacos 中的 Namespace 是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799072188256821249",
+      "sourceId": "1799072188256821249",
+      "viewNum": 4820,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么需要负载均衡？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "负载均衡",
+        "后端",
+        "微服务",
+        "Spring Cloud"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799709699933020161",
+      "sourceId": "1799709699933020161",
+      "viewNum": 5087,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "负载均衡的实现方式有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "负载均衡",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799711500140879873",
+      "sourceId": "1799711500140879873",
+      "viewNum": 4982,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "负载均衡算法有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "负载均衡",
+        "Spring Cloud",
+        "微服务",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799731326863351810",
+      "sourceId": "1799731326863351810",
+      "viewNum": 7746,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "HTTP 与 RPC 之间的区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "微服务",
+        "Spring Cloud",
+        "远程调用",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799803242210992130",
+      "sourceId": "1799803242210992130",
+      "viewNum": 9247,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Feign？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "后端",
+        "远程调用",
+        "Feign"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799961758146043906",
+      "sourceId": "1799961758146043906",
+      "viewNum": 5449,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Feign 是如何实现负载均衡的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "远程调用",
+        "微服务",
+        "Spring Cloud",
+        "后端",
+        "Feign"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799957296983646209",
+      "sourceId": "1799957296983646209",
+      "viewNum": 4888,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Feign 第一次调用耗时很长？",
+      "difficulty": "HARD",
+      "tags": [
+        "服务调用",
+        "远程调用",
+        "Spring Cloud",
+        "微服务",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799961166812094466",
+      "sourceId": "1799961166812094466",
+      "viewNum": 4530,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Feign 和 OpenFeign 的区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "服务调用",
+        " Spring Cloud",
+        "微服务",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799927359123824641",
+      "sourceId": "1799927359123824641",
+      "viewNum": 6245,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Feign 和 Dubbo 的区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "服务调用",
+        "远程调用",
+        "微服务",
+        "后端",
+        "Dubbo",
+        "OpenFeign"
+      ],
+      "tagIds": [
+        16,
+        38
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799933482451148802",
+      "sourceId": "1799933482451148802",
+      "viewNum": 5044,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是熔断器？为什么需要熔断器？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "服务容灾",
+        "Spring Cloud",
+        "微服务",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800265978489413634",
+      "sourceId": "1800265978489413634",
+      "viewNum": 4340,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Hystrix？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "后端",
+        "服务容灾",
+        "Hystrix"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800269898032947201",
+      "sourceId": "1800269898032947201",
+      "viewNum": 3741,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是服务雪崩？",
+      "difficulty": "EASY",
+      "tags": [
+        "服务容灾",
+        "Spring Cloud",
+        "微服务",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800272846473469954",
+      "sourceId": "1800272846473469954",
+      "viewNum": 8927,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是服务降级？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "后端",
+        "服务降级"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800275120583155713",
+      "sourceId": "1800275120583155713",
+      "viewNum": 8466,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是服务熔断？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "服务熔断",
+        "后端",
+        "微服务"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800278016326443010",
+      "sourceId": "1800278016326443010",
+      "viewNum": 8019,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是服务限流？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "后端",
+        "服务容灾"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800279704189870082",
+      "sourceId": "1800279704189870082",
+      "viewNum": 4527,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Sentinel 是怎么实现限流的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "后端",
+        "服务容灾"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800604610672795649",
+      "sourceId": "1800604610672795649",
+      "viewNum": 5254,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Sentinel 与 Hystrix 的区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "后端",
+        "Hystrix"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800609512660738049",
+      "sourceId": "1800609512660738049",
+      "viewNum": 3238,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Sentinel 是怎么实现集群限流的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "后端",
+        "服务容灾",
+        "Sentinel"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800624807353851906",
+      "sourceId": "1800624807353851906",
+      "viewNum": 3179,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是服务网格？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "服务网格",
+        "微服务",
+        "Spring Cloud"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800652188693110786",
+      "sourceId": "1800652188693110786",
+      "viewNum": 2876,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是灰度发布、金丝雀部署以及蓝绿部署？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "发布",
+        "微服务",
+        "Spring Cloud",
+        "后端"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800657816547303425",
+      "sourceId": "1800657816547303425",
+      "viewNum": 3729,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是微服务网关？为什么需要服务网关？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务",
+        "后端",
+        "网关"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800850165625856002",
+      "sourceId": "1800850165625856002",
+      "viewNum": 4170,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring Cloud  可以选择哪些 API 网关？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "服务网关",
+        "后端",
+        "微服务"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1801044881243971585",
+      "sourceId": "1801044881243971585",
+      "viewNum": 3685,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Spring Cloud Zuul？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud",
+        "微服务网关",
+        "Spring Cloud Zuul",
+        "Zuul",
+        "后端",
+        "微服务"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1801047706921410562",
+      "sourceId": "1801047706921410562",
+      "viewNum": 2783,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Spring Cloud Gateway？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud Gateway",
+        "微服务",
+        "后端",
+        "网关"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1801050484079140865",
+      "sourceId": "1801050484079140865",
+      "viewNum": 4878,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你项目里为什么选择 Gateway 作为网关？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring Cloud Gateway",
+        "微服务",
+        "后端",
+        "Spring Cloud"
+      ],
+      "tagIds": [
+        16
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1801427927256342530",
+      "sourceId": "1801427927256342530",
+      "viewNum": 5165,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "说说什么是 API 网关？它有什么作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "分布式",
+        "Spring Cloud"
+      ],
+      "tagIds": [
+        10
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1818921408619024386",
+      "sourceId": "1818921408619024386",
+      "viewNum": 8035,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Dubbo 和 Spring Cloud Gateway 有什么区别？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "分布式",
+        "Spring Cloud",
+        "Dubbo"
+      ],
+      "tagIds": [
+        10,
+        38
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1818923905676939265",
+      "sourceId": "1818923905676939265",
+      "viewNum": 8368,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是令牌桶算法？工作原理是什么？使用它有哪些优点和注意事项？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "限流算法"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1821514194020409345",
+      "sourceId": "1821514194020409345",
+      "viewNum": 4646,
+      "needVip": true,
+      "hasAnswer": false
+    }
+  ]
+}

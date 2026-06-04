@@ -1,0 +1,604 @@
+{
+  "categoryId": 18,
+  "categoryName": "RabbitMQ",
+  "bankIds": [
+    "1850081848441466881"
+  ],
+  "totalQuestions": 33,
+  "questions": [
+    {
+      "title": "RabbitMQ 是什么？它有哪些主要应用场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081849150304258",
+      "sourceId": "1850081849150304258",
+      "viewNum": 7215,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "RabbitMQ 的基本架构是什么？包括哪些核心组件？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081849821392897",
+      "sourceId": "1850081849821392897",
+      "viewNum": 4959,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 RabbitMQ 中声明一个队列？有哪些必要参数？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081851079684097",
+      "sourceId": "1850081851079684097",
+      "viewNum": 3892,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 RabbitMQ 中的消费者和生产者？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081853218779138",
+      "sourceId": "1850081853218779138",
+      "viewNum": 3421,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "RabbitMQ 的交换机有哪几种类型？它们的工作方式是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081853931810818",
+      "sourceId": "1850081853931810818",
+      "viewNum": 3860,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 RabbitMQ 中，如何确保消息不会丢失？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081854640648194",
+      "sourceId": "1850081854640648194",
+      "viewNum": 4462,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 RabbitMQ 中实现消息的持久化？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081855202684929",
+      "sourceId": "1850081855202684929",
+      "viewNum": 3488,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "RabbitMQ 的消息确认机制是如何工作的？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081855798276098",
+      "sourceId": "1850081855798276098",
+      "viewNum": 3204,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "RabbitMQ 中的 prefetch 参数的作用是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081857706684418",
+      "sourceId": "1850081857706684418",
+      "viewNum": 2159,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 RabbitMQ 中配置消息的 TTL（过期时间）？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081858268721153",
+      "sourceId": "1850081858268721153",
+      "viewNum": 2538,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 RabbitMQ 中的死信队列（DLX）？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081858793009154",
+      "sourceId": "1850081858793009154",
+      "viewNum": 3074,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 RabbitMQ 中，如何实现延迟消息？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081859908694018",
+      "sourceId": "1850081859908694018",
+      "viewNum": 2817,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "RabbitMQ 中如何处理未被消费者确认的消息？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081861166985218",
+      "sourceId": "1850081861166985218",
+      "viewNum": 2383,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 RabbitMQ 中创建一个镜像队列？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081864778280962",
+      "sourceId": "1850081864778280962",
+      "viewNum": 1940,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 RabbitMQ 中的虚拟主机（vhost）？有什么作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081865575198721",
+      "sourceId": "1850081865575198721",
+      "viewNum": 1766,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "RabbitMQ 如何实现消息的路由？有哪些常见的路由策略？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081867026427906",
+      "sourceId": "1850081867026427906",
+      "viewNum": 1978,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "RabbitMQ 中的持久化队列与非持久化队列有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081868616069122",
+      "sourceId": "1850081868616069122",
+      "viewNum": 1938,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 RabbitMQ 中处理消息的重复消费问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081869287157761",
+      "sourceId": "1850081869287157761",
+      "viewNum": 2877,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 RabbitMQ 中，如何防止消息堆积？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081871292035073",
+      "sourceId": "1850081871292035073",
+      "viewNum": 2918,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "RabbitMQ 中的消息如何确保顺序性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081874630701058",
+      "sourceId": "1850081874630701058",
+      "viewNum": 2776,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 RabbitMQ 中设置队列的最大长度？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081876551692289",
+      "sourceId": "1850081876551692289",
+      "viewNum": 1792,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 RabbitMQ 集群中，节点间如何同步数据？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081882339831810",
+      "sourceId": "1850081882339831810",
+      "viewNum": 1629,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "RabbitMQ 的流控机制（Flow Control）是什么？为什么需要它？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081883321298946",
+      "sourceId": "1850081883321298946",
+      "viewNum": 1420,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 RabbitMQ 中实现消息的批量消费？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081884185325570",
+      "sourceId": "1850081884185325570",
+      "viewNum": 1769,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 RabbitMQ 中的分区问题？如何解决？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081885150015489",
+      "sourceId": "1850081885150015489",
+      "viewNum": 1525,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "RabbitMQ 如何与其他消息队列（如 Kafka）进行对比？它们适用的场景有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081886068568066",
+      "sourceId": "1850081886068568066",
+      "viewNum": 2102,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "RabbitMQ 的镜像队列和 Quorum Queue 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081891315642369",
+      "sourceId": "1850081891315642369",
+      "viewNum": 1363,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "RabbitMQ 的高可用集群模式有哪些？如何实现？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081892171280385",
+      "sourceId": "1850081892171280385",
+      "viewNum": 1736,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "RabbitMQ 如何通过插件扩展功能？常用的插件有哪些？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081893018529794",
+      "sourceId": "1850081893018529794",
+      "viewNum": 1450,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何确保 RabbitMQ 在极端情况下不会丢失消息？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081893928693761",
+      "sourceId": "1850081893928693761",
+      "viewNum": 2087,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 RabbitMQ 中实现消息幂等性？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1850081898936692737",
+      "sourceId": "1850081898936692737",
+      "viewNum": 2958,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "说说 RabbitMQ 的集群模式？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "RabbitMQ",
+        "消息队列",
+        "后端"
+      ],
+      "tagIds": [
+        30,
+        28
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805318051737575426",
+      "sourceId": "1805318051737575426",
+      "viewNum": 4175,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "RabbitMQ 怎么实现延迟队列？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "消息队列",
+        "RabbitMQ"
+      ],
+      "tagIds": [
+        28,
+        30
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1824003166933868546",
+      "sourceId": "1824003166933868546",
+      "viewNum": 19822,
+      "needVip": true,
+      "hasAnswer": false
+    }
+  ]
+}

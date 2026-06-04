@@ -1,0 +1,2685 @@
+{
+  "categoryId": 28,
+  "categoryName": "DevOps",
+  "bankIds": [
+    "1811358596541374466"
+  ],
+  "totalQuestions": 150,
+  "questions": [
+    {
+      "title": "请简述 Jenkins 的主要功能和优势。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361905629990913",
+      "sourceId": "1811361905629990913",
+      "viewNum": 3226,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GitLab CI 和 Jenkins 在功能上有哪些主要区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GitLab CI",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361906670178306",
+      "sourceId": "1811361906670178306",
+      "viewNum": 2074,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Jenkins 中配置流水线以实现持续集成和持续部署？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361906770841601",
+      "sourceId": "1811361906770841601",
+      "viewNum": 1518,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Jenkins 的 Pipeline 脚本有哪几种类型？请分别简述它们的特点。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361906858921985",
+      "sourceId": "1811361906858921985",
+      "viewNum": 1210,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Jenkins 中如何实现多分支流水线的管理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361906955390978",
+      "sourceId": "1811361906955390978",
+      "viewNum": 975,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Travis CI 的配置文件通常使用什么格式编写？请简述其基本结构。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Travis CI",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361907056054273",
+      "sourceId": "1811361907056054273",
+      "viewNum": 594,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GitLab CI 如何通过配置文件实现自动化测试和部署？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GitLab CI",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361907169300482",
+      "sourceId": "1811361907169300482",
+      "viewNum": 714,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 CI/CD 流程中，如何使用 Jenkins 与 Docker 集成？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "Docker",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        32,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361907253186561",
+      "sourceId": "1811361907253186561",
+      "viewNum": 3757,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GitLab Runner 在 GitLab CI/CD 流程中扮演什么角色？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GitLab CI",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361907341266946",
+      "sourceId": "1811361907341266946",
+      "viewNum": 634,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Jenkins 中 Blue Ocean 插件的主要功能及其使用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361907420958721",
+      "sourceId": "1811361907420958721",
+      "viewNum": 479,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 GitLab CI 中配置多阶段流水线？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GitLab CI",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361907509039105",
+      "sourceId": "1811361907509039105",
+      "viewNum": 513,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Jenkins 如何实现与 Git 的集成以便自动触发构建？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361907601313794",
+      "sourceId": "1811361907601313794",
+      "viewNum": 680,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Travis CI 如何设置环境变量以便在构建过程中使用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Travis CI",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361907689394178",
+      "sourceId": "1811361907689394178",
+      "viewNum": 276,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Jenkins 中，如何使用 Groovy 语言编写 Pipeline 脚本？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361907781668865",
+      "sourceId": "1811361907781668865",
+      "viewNum": 459,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Jenkins 如何实现分布式构建，具体步骤是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361907869749249",
+      "sourceId": "1811361907869749249",
+      "viewNum": 537,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Jenkins 中的 Jenkinsfile 文件的作用及其基本结构。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361907974606850",
+      "sourceId": "1811361907974606850",
+      "viewNum": 449,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 GitLab CI 中，如何使用 cache 加速构建过程？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GitLab CI",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361908071075841",
+      "sourceId": "1811361908071075841",
+      "viewNum": 321,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Travis CI 如何与 GitHub 集成实现自动构建和部署？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Travis CI",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361908159156226",
+      "sourceId": "1811361908159156226",
+      "viewNum": 212,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Jenkins 中，如何配置构建参数以实现不同环境的部署？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361908280791042",
+      "sourceId": "1811361908280791042",
+      "viewNum": 395,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GitLab CI 中的 artifacts 有什么作用？如何配置？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GitLab CI",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361908394037249",
+      "sourceId": "1811361908394037249",
+      "viewNum": 272,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Jenkins 如何与 SonarQube 集成进行代码质量分析？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361908503089154",
+      "sourceId": "1811361908503089154",
+      "viewNum": 495,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Travis CI 支持哪些编程语言的构建？请举例说明。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Travis CI",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361908595363841",
+      "sourceId": "1811361908595363841",
+      "viewNum": 175,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Jenkins 中，如何使用 credentials 插件管理敏感信息？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361908687638529",
+      "sourceId": "1811361908687638529",
+      "viewNum": 253,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GitLab CI 中的 stages 和 jobs 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GitLab CI",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361908775718914",
+      "sourceId": "1811361908775718914",
+      "viewNum": 284,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Jenkins 如何实现与 Ansible 的集成以自动化配置管理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361908859604993",
+      "sourceId": "1811361908859604993",
+      "viewNum": 372,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Travis CI 中，如何使用 matrix 功能进行多环境测试？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Travis CI",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361908935102465",
+      "sourceId": "1811361908935102465",
+      "viewNum": 151,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GitLab CI 中的 include 关键字有什么作用？如何使用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GitLab CI",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361909010599937",
+      "sourceId": "1811361909010599937",
+      "viewNum": 205,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Jenkins 中，如何使用 post 部分定义构建后操作？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361909086097410",
+      "sourceId": "1811361909086097410",
+      "viewNum": 256,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GitLab CI 中的 environment 关键字如何实现环境区分？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GitLab CI",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361909169983489",
+      "sourceId": "1811361909169983489",
+      "viewNum": 220,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Jenkins 如何实现构建历史的管理和清理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Jenkins",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361909241286658",
+      "sourceId": "1811361909241286658",
+      "viewNum": 315,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Terraform 与 CloudFormation 的主要区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "CloudFormation",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361909308395522",
+      "sourceId": "1811361909308395522",
+      "viewNum": 358,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Terraform 中，什么是状态文件（state file），其作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361909379698690",
+      "sourceId": "1811361909379698690",
+      "viewNum": 218,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Terraform 管理多环境（如开发、测试、生产）配置？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361909480361985",
+      "sourceId": "1811361909480361985",
+      "viewNum": 253,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请简述 CloudFormation 中 Stack 的概念及其主要用途。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "CloudFormation",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361909555859457",
+      "sourceId": "1811361909555859457",
+      "viewNum": 120,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Terraform 中的模块（module）有什么作用？如何创建一个模块？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361909631356929",
+      "sourceId": "1811361909631356929",
+      "viewNum": 167,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 CloudFormation 中，如何使用条件语句来控制资源的创建？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "CloudFormation",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361909727825921",
+      "sourceId": "1811361909727825921",
+      "viewNum": 82,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Terraform 中如何处理资源的依赖关系？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361909799129090",
+      "sourceId": "1811361909799129090",
+      "viewNum": 148,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "CloudFormation 如何实现自动回滚（rollback）功能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "CloudFormation",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361909895598081",
+      "sourceId": "1811361909895598081",
+      "viewNum": 92,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Terraform 中，什么是输出变量（output variable），如何使用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361909983678466",
+      "sourceId": "1811361909983678466",
+      "viewNum": 119,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Terraform 实现基础设施的版本控制？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361910054981634",
+      "sourceId": "1811361910054981634",
+      "viewNum": 168,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "CloudFormation 的模板文件通常使用什么格式编写？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "CloudFormation",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361910138867713",
+      "sourceId": "1811361910138867713",
+      "viewNum": 70,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Terraform 中，什么是动态块（dynamic block），其使用场景有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361910222753794",
+      "sourceId": "1811361910222753794",
+      "viewNum": 115,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Terraform 的 plan 和 apply 操作的区别。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361910306639873",
+      "sourceId": "1811361910306639873",
+      "viewNum": 111,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "CloudFormation 如何使用 Change Sets 管理变更？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "CloudFormation",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361910382137346",
+      "sourceId": "1811361910382137346",
+      "viewNum": 56,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Terraform 的 provider 有什么作用？请举例说明常见的 provider。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361910474412034",
+      "sourceId": "1811361910474412034",
+      "viewNum": 104,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Terraform 中定义并使用变量（variable）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361910549909506",
+      "sourceId": "1811361910549909506",
+      "viewNum": 98,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "CloudFormation 中的 Parameter 和 Output 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "CloudFormation",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361910625406977",
+      "sourceId": "1811361910625406977",
+      "viewNum": 58,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Terraform 中，如何使用 data 源获取外部数据？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361910696710146",
+      "sourceId": "1811361910696710146",
+      "viewNum": 98,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "CloudFormation 的模板文件中，Resources 部分如何定义？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "CloudFormation",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361910809956353",
+      "sourceId": "1811361910809956353",
+      "viewNum": 55,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Terraform 中使用本地执行计划（local-exec）和远程执行计划（remote-exec）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361910885453825",
+      "sourceId": "1811361910885453825",
+      "viewNum": 91,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "CloudFormation 中的条件（Conditions）如何配置？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "CloudFormation",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361910981922817",
+      "sourceId": "1811361910981922817",
+      "viewNum": 55,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Terraform 中，如何使用 workspace 管理不同的工作环境？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361911057420290",
+      "sourceId": "1811361911057420290",
+      "viewNum": 94,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "CloudFormation 中如何定义跨栈引用（cross-stack reference）？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "DevOps",
+        "CloudFormation",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361911132917761",
+      "sourceId": "1811361911132917761",
+      "viewNum": 60,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Terraform 中的 backend 配置有什么作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361911220998145",
+      "sourceId": "1811361911220998145",
+      "viewNum": 85,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "CloudFormation 中的变更集（Change Set）如何使用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "CloudFormation",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361911317467137",
+      "sourceId": "1811361911317467137",
+      "viewNum": 44,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Terraform 中，如何处理敏感数据（如密码）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361911401353217",
+      "sourceId": "1811361911401353217",
+      "viewNum": 110,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "CloudFormation 的 StackSet 有什么作用？如何使用？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "DevOps",
+        "CloudFormation",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361911502016513",
+      "sourceId": "1811361911502016513",
+      "viewNum": 55,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Terraform 管理多云环境的基础设施？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361911602679810",
+      "sourceId": "1811361911602679810",
+      "viewNum": 110,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "CloudFormation 中的宏（Macro）如何实现模板自定义？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "DevOps",
+        "CloudFormation",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361911690760193",
+      "sourceId": "1811361911690760193",
+      "viewNum": 49,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Terraform 中的 lifecycle 块有什么作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Terraform",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361911778840577",
+      "sourceId": "1811361911778840577",
+      "viewNum": 79,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请简述 Docker 的基本概念和工作原理。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361911896281089",
+      "sourceId": "1811361911896281089",
+      "viewNum": 3397,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Kubernetes 中的 Pod 是什么？其作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361911980167169",
+      "sourceId": "1811361911980167169",
+      "viewNum": 1972,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Docker Compose 的主要用途是什么？请举例说明。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361912064053249",
+      "sourceId": "1811361912064053249",
+      "viewNum": 2346,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Kubernetes 中实现服务的自动伸缩（autoscaling）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361912152133634",
+      "sourceId": "1811361912152133634",
+      "viewNum": 1679,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Docker 中，镜像（image）与容器（container）有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361912236019713",
+      "sourceId": "1811361912236019713",
+      "viewNum": 2403,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Kubernetes 中的 Deployment 和 StatefulSet 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361912319905794",
+      "sourceId": "1811361912319905794",
+      "viewNum": 1523,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Dockerfile 创建自定义镜像？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361912416374785",
+      "sourceId": "1811361912416374785",
+      "viewNum": 2259,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Kubernetes 中，ConfigMap 和 Secret 的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361912508649474",
+      "sourceId": "1811361912508649474",
+      "viewNum": 1369,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Docker Swarm 和 Kubernetes 在集群管理上的主要区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        32,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361912600924161",
+      "sourceId": "1811361912600924161",
+      "viewNum": 2515,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Kubernetes 中，如何实现持久化存储（Persistent Storage）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361912697393154",
+      "sourceId": "1811361912697393154",
+      "viewNum": 1399,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Docker 中的多阶段构建（multi-stage build）有什么优势？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361912802250753",
+      "sourceId": "1811361912802250753",
+      "viewNum": 1530,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Kubernetes 中的 Ingress 资源有什么作用？如何配置？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361912923885570",
+      "sourceId": "1811361912923885570",
+      "viewNum": 1457,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Docker 的网络模型（network model）及其主要类型。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361913032937474",
+      "sourceId": "1811361913032937474",
+      "viewNum": 1655,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Kubernetes 中使用 Helm 部署应用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361913116823553",
+      "sourceId": "1811361913116823553",
+      "viewNum": 1319,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Docker 的容器编排（orchestration）有哪些常见工具？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        32,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361913221681153",
+      "sourceId": "1811361913221681153",
+      "viewNum": 2892,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Docker 中实现数据卷（volume）的持久化存储？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361913305567233",
+      "sourceId": "1811361913305567233",
+      "viewNum": 1688,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Kubernetes 中的 DaemonSet 有什么作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361913393647617",
+      "sourceId": "1811361913393647617",
+      "viewNum": 1316,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Docker 镜像的多层结构是如何实现的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361913485922306",
+      "sourceId": "1811361913485922306",
+      "viewNum": 1643,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Kubernetes 中的 ReplicaSet 和 ReplicationController 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361913561419777",
+      "sourceId": "1811361913561419777",
+      "viewNum": 1217,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Docker 的 bridge 网络模式如何配置和使用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361913649500161",
+      "sourceId": "1811361913649500161",
+      "viewNum": 1470,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Kubernetes 中的 Service 有哪几种类型？请分别简述。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361913745969153",
+      "sourceId": "1811361913745969153",
+      "viewNum": 1490,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Docker 中如何实现镜像的推送和拉取？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361913817272322",
+      "sourceId": "1811361913817272322",
+      "viewNum": 1815,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Kubernetes 的 Helm Charts 如何实现应用的版本控制？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361913888575490",
+      "sourceId": "1811361913888575490",
+      "viewNum": 1088,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Docker 容器如何实现资源限制（如 CPU 和内存）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361913976655873",
+      "sourceId": "1811361913976655873",
+      "viewNum": 1687,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Kubernetes 中的 Job 和 CronJob 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361914085707777",
+      "sourceId": "1811361914085707777",
+      "viewNum": 1244,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Docker Swarm 部署一个高可用集群？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361914169593857",
+      "sourceId": "1811361914169593857",
+      "viewNum": 1381,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Kubernetes 中的 Persistent Volume 和 Persistent Volume Claim 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361914236702721",
+      "sourceId": "1811361914236702721",
+      "viewNum": 1145,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Docker 中的 overlay 网络模式如何配置？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361914308005889",
+      "sourceId": "1811361914308005889",
+      "viewNum": 1332,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Kubernetes 中的网络策略（Network Policy）如何实现？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361914383503362",
+      "sourceId": "1811361914383503362",
+      "viewNum": 1499,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Docker 中，如何构建多阶段镜像以减少镜像体积？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361914459000834",
+      "sourceId": "1811361914459000834",
+      "viewNum": 1559,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请比较 AWS、Azure 和 GCP 的主要区别和优势。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "AWS",
+        "Azure",
+        "GCP",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361914534498306",
+      "sourceId": "1811361914534498306",
+      "viewNum": 394,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 AWS 中使用 IAM 管理用户和权限？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "AWS",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361914635161602",
+      "sourceId": "1811361914635161602",
+      "viewNum": 233,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Azure 的资源管理器（Resource Manager）有什么作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Azure",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361914719047682",
+      "sourceId": "1811361914719047682",
+      "viewNum": 127,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GCP 的 App Engine 与 Kubernetes Engine 有什么不同？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GCP",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361914832293889",
+      "sourceId": "1811361914832293889",
+      "viewNum": 120,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 AWS 中实现自动化部署（Auto Deployment）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "AWS",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361914949734401",
+      "sourceId": "1811361914949734401",
+      "viewNum": 201,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Azure 的虚拟网络（Virtual Network）有哪些配置方式？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Azure",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361915058786306",
+      "sourceId": "1811361915058786306",
+      "viewNum": 121,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 GCP 的 IAM 策略及其使用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GCP",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361915151060993",
+      "sourceId": "1811361915151060993",
+      "viewNum": 92,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "AWS 的 CloudFormation 与 Terraform 有何异同？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "DevOps",
+        "AWS",
+        "Terraform",
+        "云服务",
+        "IaC"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361915251724290",
+      "sourceId": "1811361915251724290",
+      "viewNum": 508,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Azure 中的应用服务（App Services）有哪些特点？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Azure",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361915339804674",
+      "sourceId": "1811361915339804674",
+      "viewNum": 80,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GCP 的 Cloud Functions 如何实现无服务器计算（Serverless Computing）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GCP",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361915427885058",
+      "sourceId": "1811361915427885058",
+      "viewNum": 79,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 AWS 中使用 S3 存储和管理数据？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "AWS",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361915515965442",
+      "sourceId": "1811361915515965442",
+      "viewNum": 187,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Azure 的监控服务（Azure Monitor）有什么功能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Azure",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361915608240129",
+      "sourceId": "1811361915608240129",
+      "viewNum": 86,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GCP 的 BigQuery 在数据分析中有哪些优势？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GCP",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361915700514818",
+      "sourceId": "1811361915700514818",
+      "viewNum": 65,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "AWS 中的 Lambda 函数的应用场景有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "AWS",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361915796983810",
+      "sourceId": "1811361915796983810",
+      "viewNum": 121,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Azure 的 DevOps 工具进行 CI/CD 管理？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Azure",
+        "云服务",
+        "CI/CD"
+      ],
+      "tagIds": [
+        72,
+        40
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361915901841410",
+      "sourceId": "1811361915901841410",
+      "viewNum": 416,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "AWS 的 EC2 实例类型有哪些？如何选择合适的实例类型？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "AWS",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361916002504706",
+      "sourceId": "1811361916002504706",
+      "viewNum": 121,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Azure 的存储账户（Storage Account）有哪些类型？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Azure",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361916090585089",
+      "sourceId": "1811361916090585089",
+      "viewNum": 69,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GCP 的 Cloud Storage 如何配置存储桶（Bucket）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GCP",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361916199636994",
+      "sourceId": "1811361916199636994",
+      "viewNum": 62,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "AWS 的 RDS 支持哪些数据库引擎？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "AWS",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361916291911681",
+      "sourceId": "1811361916291911681",
+      "viewNum": 105,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Azure 的虚拟机（Virtual Machine）如何配置和管理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Azure",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361916375797761",
+      "sourceId": "1811361916375797761",
+      "viewNum": 81,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GCP 的 Compute Engine 如何创建和管理实例？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GCP",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361916489043970",
+      "sourceId": "1811361916489043970",
+      "viewNum": 56,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "AWS 的 S3 如何配置生命周期策略（Lifecycle Policy）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "AWS",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361916581318658",
+      "sourceId": "1811361916581318658",
+      "viewNum": 104,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Azure 的 Cosmos DB 有哪些主要特点？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Azure",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361916698759170",
+      "sourceId": "1811361916698759170",
+      "viewNum": 65,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GCP 的 Pub/Sub 服务如何实现消息发布和订阅？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GCP",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361916782645250",
+      "sourceId": "1811361916782645250",
+      "viewNum": 56,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "AWS 的 CloudWatch 如何实现监控和告警？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "AWS",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361916879114241",
+      "sourceId": "1811361916879114241",
+      "viewNum": 102,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Azure 的 Kubernetes 服务（AKS）如何配置和使用？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Azure",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361916983971842",
+      "sourceId": "1811361916983971842",
+      "viewNum": 134,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GCP 的 Bigtable 在处理大数据时有哪些优势？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GCP",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361917088829441",
+      "sourceId": "1811361917088829441",
+      "viewNum": 57,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "AWS 的 VPC 如何配置子网和路由表？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "AWS",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361917181104129",
+      "sourceId": "1811361917181104129",
+      "viewNum": 130,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Azure 的 Blob 存储如何实现静态网站托管？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "Azure",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361917277573122",
+      "sourceId": "1811361917277573122",
+      "viewNum": 63,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "GCP 的 Dataflow 如何实现数据流处理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "DevOps",
+        "GCP",
+        "云服务"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361917348876289",
+      "sourceId": "1811361917348876289",
+      "viewNum": 62,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请编写一个 Python 脚本实现文件的批量重命名。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361917432762369",
+      "sourceId": "1811361917432762369",
+      "viewNum": 137,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Bash 脚本中实现条件判断和循环操作？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361917508259841",
+      "sourceId": "1811361917508259841",
+      "viewNum": 503,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请用 Python 实现一个简单的 HTTP 服务器。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361917575368705",
+      "sourceId": "1811361917575368705",
+      "viewNum": 266,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Shell 脚本中使用管道（pipeline）实现数据传递？",
+      "difficulty": "EASY",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361917659254786",
+      "sourceId": "1811361917659254786",
+      "viewNum": 532,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用 Python 读取和写入 JSON 文件的方式有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361917726363649",
+      "sourceId": "1811361917726363649",
+      "viewNum": 114,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请编写一个 Shell 脚本监控系统的 CPU 使用率。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361917810249730",
+      "sourceId": "1811361917810249730",
+      "viewNum": 776,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Python 中，如何使用多线程（multithreading）提高程序性能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361917906718722",
+      "sourceId": "1811361917906718722",
+      "viewNum": 129,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Bash 中如何通过函数实现代码的重用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361917973827585",
+      "sourceId": "1811361917973827585",
+      "viewNum": 397,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用 Python 的 requests 库如何发送 HTTP 请求？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361918045130754",
+      "sourceId": "1811361918045130754",
+      "viewNum": 126,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Shell 脚本中的重定向（redirection）操作及其用途。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361918129016833",
+      "sourceId": "1811361918129016833",
+      "viewNum": 434,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Python 的 argparse 模块解析命令行参数？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361918233874433",
+      "sourceId": "1811361918233874433",
+      "viewNum": 81,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请编写一个 Bash 脚本实现定时备份功能。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361918313566210",
+      "sourceId": "1811361918313566210",
+      "viewNum": 520,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Python 中，如何处理文件的异常情况？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361918393257986",
+      "sourceId": "1811361918393257986",
+      "viewNum": 104,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Shell 脚本中如何使用 here document 实现多行文本输入？",
+      "difficulty": "EASY",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361918472949762",
+      "sourceId": "1811361918472949762",
+      "viewNum": 396,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用 Python 实现对一个目录下所有文件的遍历操作。",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361918552641537",
+      "sourceId": "1811361918552641537",
+      "viewNum": 91,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请编写一个 Python 脚本定时抓取某个网页的内容。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        72,
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361918623944706",
+      "sourceId": "1811361918623944706",
+      "viewNum": 118,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Bash 脚本中处理数组（array）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361918695247874",
+      "sourceId": "1811361918695247874",
+      "viewNum": 459,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请用 Python 实现一个简单的 TCP 客户端和服务器。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361918770745346",
+      "sourceId": "1811361918770745346",
+      "viewNum": 113,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Shell 脚本中实现文件的读写操作？",
+      "difficulty": "EASY",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361918846242817",
+      "sourceId": "1811361918846242817",
+      "viewNum": 550,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用 Python 的 pandas 库如何处理 CSV 文件？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361918917545986",
+      "sourceId": "1811361918917545986",
+      "viewNum": 200,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请编写一个 Shell 脚本监控目录的变化并记录日志。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361918997237761",
+      "sourceId": "1811361918997237761",
+      "viewNum": 495,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Python 中，如何使用 asyncio 实现异步编程？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361919081123842",
+      "sourceId": "1811361919081123842",
+      "viewNum": 140,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Bash 中如何使用正则表达式进行文本处理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361919160815617",
+      "sourceId": "1811361919160815617",
+      "viewNum": 441,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用 Python 的 smtplib 库如何发送电子邮件？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        72,
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361919244701697",
+      "sourceId": "1811361919244701697",
+      "viewNum": 83,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Shell 脚本中的位置参数（positional parameter）及其使用方法。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361919739629569",
+      "sourceId": "1811361919739629569",
+      "viewNum": 384,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Python 的 logging 模块记录日志？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361919806738434",
+      "sourceId": "1811361919806738434",
+      "viewNum": 108,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请编写一个 Bash 脚本检查系统中的所有服务状态。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361919882235906",
+      "sourceId": "1811361919882235906",
+      "viewNum": 449,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Python 中，如何处理和解析 XML 文件？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361919970316289",
+      "sourceId": "1811361919970316289",
+      "viewNum": 131,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Shell 脚本中如何使用 trap 命令捕捉和处理信号？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361920041619457",
+      "sourceId": "1811361920041619457",
+      "viewNum": 499,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用 Python 实现一个简单的图像处理程序。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361920112922625",
+      "sourceId": "1811361920112922625",
+      "viewNum": 170,
+      "needVip": false,
+      "hasAnswer": false
+    }
+  ]
+}

@@ -1,0 +1,935 @@
+{
+  "categoryId": 39,
+  "categoryName": "前端手写代码",
+  "bankIds": [
+    "1820434920244424705"
+  ],
+  "totalQuestions": 54,
+  "questions": [
+    {
+      "title": "如何在 JS 中实现继承（用尽可能多的方式）？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428733589258241",
+      "sourceId": "1820428733589258241",
+      "viewNum": 3578,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现发布订阅模式？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码",
+        "设计模式"
+      ],
+      "tagIds": [
+        56,
+        27
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428736672071682",
+      "sourceId": "1820428736672071682",
+      "viewNum": 2116,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现斐波那契数列？请写出具体代码",
+      "difficulty": "EASY",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428737141833729",
+      "sourceId": "1820428737141833729",
+      "viewNum": 1800,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 查找文章中出现频率最高的单词？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428734612668418",
+      "sourceId": "1820428734612668418",
+      "viewNum": 2220,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 找到字符串中不重复的最长子串长度？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428734780440578",
+      "sourceId": "1820428734780440578",
+      "viewNum": 1118,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现防抖函数？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428734948212738",
+      "sourceId": "1820428734948212738",
+      "viewNum": 1511,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现节流函数？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428735107596290",
+      "sourceId": "1820428735107596290",
+      "viewNum": 945,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现函数柯里化？请写出具体代码",
+      "difficulty": "HARD",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码",
+        "函数柯里化"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428735254396930",
+      "sourceId": "1820428735254396930",
+      "viewNum": 1136,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现链式调用？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码",
+        "链式调用"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428735409586178",
+      "sourceId": "1820428735409586178",
+      "viewNum": 840,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现类数组对象转换为数组？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428735552192513",
+      "sourceId": "1820428735552192513",
+      "viewNum": 711,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 ES6 语法对函数所有参数进行求和？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码",
+        "ES6"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428735724158977",
+      "sourceId": "1820428735724158977",
+      "viewNum": 609,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现交换两个变量的值（不使用临时变量）？请写出具体代码",
+      "difficulty": "EASY",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428735887736833",
+      "sourceId": "1820428735887736833",
+      "viewNum": 692,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现非负大整数的相加？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428736038731778",
+      "sourceId": "1820428736038731778",
+      "viewNum": 523,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现将对象转换为树形结构？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428736219086849",
+      "sourceId": "1820428736219086849",
+      "viewNum": 594,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 解析 URL 参数为对象？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428736374276097",
+      "sourceId": "1820428736374276097",
+      "viewNum": 594,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现每隔一秒打印 1, 2, 3, 4？请写出具体代码",
+      "difficulty": "EASY",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428736529465346",
+      "sourceId": "1820428736529465346",
+      "viewNum": 867,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现双向数据绑定？请写出具体代码",
+      "difficulty": "HARD",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428736839843841",
+      "sourceId": "1820428736839843841",
+      "viewNum": 817,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现一个简单的路由功能？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428736986644481",
+      "sourceId": "1820428736986644481",
+      "viewNum": 534,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现 setTimeout 功能来模拟 setInterval？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428737284440066",
+      "sourceId": "1820428737284440066",
+      "viewNum": 542,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现一个模板引擎的功能？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428737427046401",
+      "sourceId": "1820428737427046401",
+      "viewNum": 445,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现一个下划线驼峰相互转换的函数？请写出具体代码",
+      "difficulty": "EASY",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428737578041345",
+      "sourceId": "1820428737578041345",
+      "viewNum": 473,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现一个 JSON.stringify函数？请写出具体代码",
+      "difficulty": "HARD",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428737720647681",
+      "sourceId": "1820428737720647681",
+      "viewNum": 463,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现一个 JSON.parser函数？请写出具体代码",
+      "difficulty": "HARD",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428737875836929",
+      "sourceId": "1820428737875836929",
+      "viewNum": 365,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现红黄绿三个灯不断交替重复亮灯？请写出具体代码",
+      "difficulty": "EASY",
+      "tags": [],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428738022637569",
+      "sourceId": "1820428738022637569",
+      "viewNum": 540,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何基于XMLHttpRequest对象实现 AJAX 请求？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码",
+        "异步"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428730351255554",
+      "sourceId": "1820428730351255554",
+      "viewNum": 422,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现基于 Promise 的 AJAX 请求封装？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码",
+        "异步",
+        "Promise"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428730519027713",
+      "sourceId": "1820428730519027713",
+      "viewNum": 484,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现 jsonp 请求？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码",
+        "异步"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428730678411266",
+      "sourceId": "1820428730678411266",
+      "viewNum": 382,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现数组的乱序输出？请写出具体代码",
+      "difficulty": "EASY",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428730841989121",
+      "sourceId": "1820428730841989121",
+      "viewNum": 411,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现数组元素的求和？请写出具体代码",
+      "difficulty": "EASY",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428730988789761",
+      "sourceId": "1820428730988789761",
+      "viewNum": 368,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现数组的扁平化？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428731148173314",
+      "sourceId": "1820428731148173314",
+      "viewNum": 495,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现数组去重？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428731299168258",
+      "sourceId": "1820428731299168258",
+      "viewNum": 527,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现数组的 flat 方法？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428731462746114",
+      "sourceId": "1820428731462746114",
+      "viewNum": 352,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现数组的 push 方法？请写出具体代码",
+      "difficulty": "EASY",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428731609546753",
+      "sourceId": "1820428731609546753",
+      "viewNum": 361,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现数组的 filter 方法？请写出具体代码",
+      "difficulty": "EASY",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428731764736001",
+      "sourceId": "1820428731764736001",
+      "viewNum": 286,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现数组的 map 方法？请写出具体代码",
+      "difficulty": "EASY",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428731924119553",
+      "sourceId": "1820428731924119553",
+      "viewNum": 313,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 的 reduce 方法对数组求和？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428732075114497",
+      "sourceId": "1820428732075114497",
+      "viewNum": 296,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现 Object.create 方法？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428732247080961",
+      "sourceId": "1820428732247080961",
+      "viewNum": 299,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 模拟实现 instanceof 操作符？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428732389687297",
+      "sourceId": "1820428732389687297",
+      "viewNum": 289,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 模拟实现 new 操作符？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428732603596801",
+      "sourceId": "1820428732603596801",
+      "viewNum": 304,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现类型判断函数，实现和 typeof 操作符一样的功能？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428732788146177",
+      "sourceId": "1820428732788146177",
+      "viewNum": 245,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现 call 方法？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428732951724033",
+      "sourceId": "1820428732951724033",
+      "viewNum": 380,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现 apply 方法？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428733102718977",
+      "sourceId": "1820428733102718977",
+      "viewNum": 251,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现 bind 方法？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428733283074049",
+      "sourceId": "1820428733283074049",
+      "viewNum": 265,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现一个深拷贝函数（Deep Copy）？请写出具体代码",
+      "difficulty": "HARD",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428733450846210",
+      "sourceId": "1820428733450846210",
+      "viewNum": 528,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 判断对象是否存在循环引用？请写出具体代码",
+      "difficulty": "HARD",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428733778001921",
+      "sourceId": "1820428733778001921",
+      "viewNum": 356,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现日期格式化函数？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428733937385473",
+      "sourceId": "1820428733937385473",
+      "viewNum": 284,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现字符串的 repeat 方法？请写出具体代码",
+      "difficulty": "EASY",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428734096769026",
+      "sourceId": "1820428734096769026",
+      "viewNum": 290,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现字符串翻转？请写出具体代码",
+      "difficulty": "EASY",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428734243569666",
+      "sourceId": "1820428734243569666",
+      "viewNum": 364,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何用 JS 实现将数字每千分位用逗号隔开（1000 转为 1,000）？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428734402953218",
+      "sourceId": "1820428734402953218",
+      "viewNum": 359,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现 Promise 对象？请写出具体代码",
+      "difficulty": "HARD",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码",
+        "Promise"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428729512394753",
+      "sourceId": "1820428729512394753",
+      "viewNum": 1284,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现 Promise 的 then 方法？请写出具体代码",
+      "difficulty": "HARD",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码",
+        "Promise"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428729701138433",
+      "sourceId": "1820428729701138433",
+      "viewNum": 633,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现 Promise 的 all 方法？请写出具体代码",
+      "difficulty": "HARD",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码",
+        "Promise"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428729856327682",
+      "sourceId": "1820428729856327682",
+      "viewNum": 622,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS 实现 Promise 的 race 方法？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码",
+        "Promise"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428730032488450",
+      "sourceId": "1820428730032488450",
+      "viewNum": 384,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 JS + HTML 实现图片懒加载？请写出具体代码",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "JavaScript",
+        "前端手写代码"
+      ],
+      "tagIds": [
+        56
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1820428730191872002",
+      "sourceId": "1820428730191872002",
+      "viewNum": 717,
+      "needVip": true,
+      "hasAnswer": false
+    }
+  ]
+}

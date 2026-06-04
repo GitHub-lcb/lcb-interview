@@ -148,3 +148,99 @@ if (tagId != null) { ... }
 - SPA 路由：`try_files $uri $uri/ /index.html`
 - API 反向代理 `/api/` → backend:8080
 - 静态资源 `/assets/` 缓存 1 年
+
+## 题目数据工作流
+
+### 1. 从 mianshiya.com 抓取题目
+
+```bash
+cd backend/scripts
+node fetch-questions.js
+```
+
+从 mianshiya.com API 抓取 46 个分类的题目，输出：
+- `data/{slug}.json` — 每分类的题目数据（标题、难度、标签、来源 URL）
+- `sql/insert-draft.sql` — DRAFT 状态的 INSERT SQL（含题目-标签关联）
+
+### 2. 初始化数据库（一站式）
+
+```bash
+# init.sql 包含: 建表 + 46个分类 + 74个标签 + 6386道DRAFT题目
+mysql -u root -p lcb_interview < backend/scripts/sql/init.sql
+```
+
+### 3. AI 填充答案（中后台）
+
+通过管理后台 `/admin/ai-generate` 使用 AI 补答案功能，
+或手动运行 `node ai-generate-answers.js` 生成 UPDATE SQL。
+
+```bash
+# 列出所有可用分类
+node ai-generate-answers.js
+
+# 处理单个分类
+node ai-generate-answers.js java-basics
+
+# 处理所有分类
+node ai-generate-answers.js --all
+```
+
+输出文件: `sql/ai-update-answers.sql`
+
+### 4. 发布（可选）
+
+```sql
+UPDATE question SET status = 'PUBLISHED' WHERE status = 'DRAFT' AND source = 'AI_GENERATED';
+```
+
+### 46 个分类
+
+| 分类 | Slug | 抓取题目数 | 包含子题库 |
+|------|------|-----------|-----------|
+| Java 基础 | java-basics | 237 | Java面试题/面试鸭Java后端/手写代码 |
+| Java 集合 | java-collections | 26 | |
+| Java 并发 | java-concurrency | 63 | |
+| JVM | jvm | 46 | |
+| MySQL | mysql | 82 | |
+| Redis | redis | 53 | |
+| MongoDB | mongodb | 72 | |
+| Spring | spring | 71 | |
+| SpringBoot | spring-boot | 26 | |
+| SpringCloud | spring-cloud | 55 | |
+| MyBatis | mybatis | 17 | |
+| Netty | netty | 13 | |
+| 计算机网络 | computer-network | 161 | 网络配置/协议/安全/故障排查/网络工程师 |
+| 操作系统 | os | 24 | |
+| 算法与数据结构 | algorithm-data-structure | 242 | 数据结构、大厂算法真题 |
+| 设计模式 | design-patterns | 36 | |
+| 消息队列 | message-queue | 31 | |
+| RabbitMQ | rabbitmq | 33 | |
+| Kafka | kafka | 59 | |
+| Nginx | nginx | 115 | 原理/配置/应用 |
+| Docker 与 K8s | docker-k8s | 53 | Docker + Kubernetes |
+| Git | git | 183 | 基础/进阶/操作/概念/协作 |
+| Linux | linux | 44 | |
+| 后端系统设计 | system-design | 181 | 分布式系统/微服务/Zookeeper |
+| 后端场景题 | backend-scenario | 291 | SQL电商/网站场景/后端经典合集 |
+| Dubbo | dubbo | 66 | 原理/配置/性能优化 |
+| Elasticsearch | elasticsearch | 177 | 原理/集群/配置/应用/评分/优化 |
+| DevOps | devops | 150 | |
+| HR 面试 | hr | 55 | |
+| Go | go | 231 | 基础/标准库/并发/GC/代码分析 |
+| Python | python | 126 | 基础/代码分析/手写代码 |
+| C++ | c-plus-plus | 113 | 基础/进阶/新特性/STL/并发 |
+| C# | c-sharp | 696 | .NET/框架/并发/集合/底层/WPF |
+| PHP | php | 151 | 基础/OOP/框架/应用场景 |
+| JavaScript | javascript | 293 | 基础/进阶/ES6 |
+| TypeScript | typescript | 43 | |
+| Vue | vue | 304 | 基础/进阶/Router/状态管理/Vue3 |
+| React | react | 365 | 基础/进阶/Router/状态管理/React Native |
+| 前端手写代码 | frontend-handwrite | 54 | |
+| 前端代码分析 | frontend-code-analysis | 62 | |
+| 前端工程化 | frontend-engineering | 347 | HTML/CSS/场景/系统设计/Webpack/优化 |
+| AI 大模型 | ai-llm | 345 | RAG/Agent/LangChain/Prompt/微调 |
+| AI 项目实战 | ai-project | 363 | 智能体/应用平台/评测/部署 |
+| 系统运维 | system-ops | 101 | |
+| IT 运维 | it-ops | 101 | |
+| OpenClaw | openclaw | 29 | |
+| **合计** | | **6386** | 含所有子题库，已去重 |

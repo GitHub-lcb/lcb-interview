@@ -1,0 +1,725 @@
+{
+  "categoryId": 29,
+  "categoryName": "HR 面试",
+  "bankIds": [
+    "1818997293283516418"
+  ],
+  "totalQuestions": 55,
+  "questions": [
+    {
+      "title": "你选择这份工作的主要动机和原因是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992208368390146",
+      "sourceId": "1818992208368390146",
+      "viewNum": 9210,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你有什么想要问我们的问题？比如想了解我们公司的哪些情况？",
+      "difficulty": "EASY",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992208464859138",
+      "sourceId": "1818992208464859138",
+      "viewNum": 6603,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你对我们公司的情况了解多少？",
+      "difficulty": "EASY",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992208548745218",
+      "sourceId": "1818992208548745218",
+      "viewNum": 5188,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你认为自己能为我们公司带来哪些具体贡献？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992208624242690",
+      "sourceId": "1818992208624242690",
+      "viewNum": 4056,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "对于这份工作，你的期望和目标是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992208716517377",
+      "sourceId": "1818992208716517377",
+      "viewNum": 4087,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果你在工作中与同事或上级相处困难，你会如何解决？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992208808792066",
+      "sourceId": "1818992208808792066",
+      "viewNum": 3407,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你如何适应一个新的工作环境？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992208888483842",
+      "sourceId": "1818992208888483842",
+      "viewNum": 3162,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在工作中，做什么事或者达到什么成就会让你最满足？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992208980758530",
+      "sourceId": "1818992208980758530",
+      "viewNum": 2404,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "对于这份工作，你认为可能会面临哪些困难？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992209064644610",
+      "sourceId": "1818992209064644610",
+      "viewNum": 2244,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你在前一家公司的离职原因是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992209148530689",
+      "sourceId": "1818992209148530689",
+      "viewNum": 5313,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为了更好地完成工作，你会如何获得同事的支持和帮助？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992209240805378",
+      "sourceId": "1818992209240805378",
+      "viewNum": 1976,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果你在这次面试中未能被录用，你会怎么做？比如怎么调整求职计划",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992209337274370",
+      "sourceId": "1818992209337274370",
+      "viewNum": 2837,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果你的工作经验不足，你将如何弥补？如何胜任这项工作？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992209412771841",
+      "sourceId": "1818992209412771841",
+      "viewNum": 2313,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你如何高效地安排自己的工作时间？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992209492463617",
+      "sourceId": "1818992209492463617",
+      "viewNum": 1970,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么选择应聘和加入我们公司？",
+      "difficulty": "EASY",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992209572155393",
+      "sourceId": "1818992209572155393",
+      "viewNum": 2636,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在你的工作经历中，学到了哪些重要的技能或知识？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992209647652865",
+      "sourceId": "1818992209647652865",
+      "viewNum": 1855,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "除了我们公司，你还申请了哪些其他公司？",
+      "difficulty": "EASY",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992209731538945",
+      "sourceId": "1818992209731538945",
+      "viewNum": 2755,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请做一个简单的自我介绍，比如你的职业背景？",
+      "difficulty": "EASY",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992209815425026",
+      "sourceId": "1818992209815425026",
+      "viewNum": 4339,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你认为自己在性格上的最大优点是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992209907699714",
+      "sourceId": "1818992209907699714",
+      "viewNum": 2974,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你认为自己最大的缺点是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992209991585794",
+      "sourceId": "1818992209991585794",
+      "viewNum": 3785,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你如何看待加班？你对加班的态度是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992210067083265",
+      "sourceId": "1818992210067083265",
+      "viewNum": 3255,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你对薪资的期望是多少？",
+      "difficulty": "EASY",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992210142580737",
+      "sourceId": "1818992210142580737",
+      "viewNum": 4000,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请谈谈你的职业发展规划？尤其是未来 1 - 5 年的规划",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992210218078210",
+      "sourceId": "1818992210218078210",
+      "viewNum": 2839,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你觉得年龄是否会影响你的工作表现？你如何看待程序员的年龄对工作的影响？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992210297769985",
+      "sourceId": "1818992210297769985",
+      "viewNum": 1373,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果我们录用你，但在试用期间发现你不适合该职位，你会如何处理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992210390044673",
+      "sourceId": "1818992210390044673",
+      "viewNum": 2132,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "当你和领导存在意见分歧、或者认为他的方法不对时，你会如何处理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992210490707970",
+      "sourceId": "1818992210490707970",
+      "viewNum": 1561,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "说说你对跳槽的看法和考虑？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992210570399746",
+      "sourceId": "1818992210570399746",
+      "viewNum": 1759,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你最擅长的技术方向是什么？请简单介绍",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992210654285826",
+      "sourceId": "1818992210654285826",
+      "viewNum": 1835,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请用三个词来概括一下你自己？",
+      "difficulty": "EASY",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992210738171905",
+      "sourceId": "1818992210738171905",
+      "viewNum": 2526,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "对于你申请的职位，你认为自己还存在哪些不足之处？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992210822057986",
+      "sourceId": "1818992210822057986",
+      "viewNum": 1190,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "当面对他人的批评时，你通常会如何处理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992210910138370",
+      "sourceId": "1818992210910138370",
+      "viewNum": 1099,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你如何看待和面对自己的失败经历？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992211031773186",
+      "sourceId": "1818992211031773186",
+      "viewNum": 1154,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果你的工作失误导致公司经济损失，你会如何应对？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992211111464962",
+      "sourceId": "1818992211111464962",
+      "viewNum": 1260,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "当你在工作中与他人发生争执时，你会如何解决？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992211186962433",
+      "sourceId": "1818992211186962433",
+      "viewNum": 1058,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果你被录用，你将如何规划和开展你的工作？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992211266654210",
+      "sourceId": "1818992211266654210",
+      "viewNum": 1286,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果你在工作中发现领导的方法不如你自己的更优，你会如何处理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992211346345985",
+      "sourceId": "1818992211346345985",
+      "viewNum": 942,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你曾经有哪些成功案例或出色的工作？你具体是怎么做的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992211421843458",
+      "sourceId": "1818992211421843458",
+      "viewNum": 946,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你的朋友对你的评价是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992211509923842",
+      "sourceId": "1818992211509923842",
+      "viewNum": 1424,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你会如何应对工作中的困难？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992211593809922",
+      "sourceId": "1818992211593809922",
+      "viewNum": 1292,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你如何理解你申请的这个职位？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992211686084610",
+      "sourceId": "1818992211686084610",
+      "viewNum": 888,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你为什么觉得自己适合这个职位？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992211757387778",
+      "sourceId": "1818992211757387778",
+      "viewNum": 968,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你最早可以什么时候到岗？",
+      "difficulty": "EASY",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992211841273858",
+      "sourceId": "1818992211841273858",
+      "viewNum": 2587,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "当别人贬低你的项目时，你会怎么做？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992211925159937",
+      "sourceId": "1818992211925159937",
+      "viewNum": 1353,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你的学历较低，你认为自己能胜任这个职位的理由是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992212013240321",
+      "sourceId": "1818992212013240321",
+      "viewNum": 1225,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你的年龄较小，你如何证明自己能够承担项目责任？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992212092932097",
+      "sourceId": "1818992212092932097",
+      "viewNum": 1100,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述一个你曾经面临的技术难题，以及你是如何解决它的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992212172623874",
+      "sourceId": "1818992212172623874",
+      "viewNum": 1571,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你如何看待技术债务？在你的工作中如何管理或减轻技术债务？",
+      "difficulty": "HARD",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992212248121345",
+      "sourceId": "1818992212248121345",
+      "viewNum": 1431,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果你发现团队在某个项目上遇到了瓶颈，你会如何帮助团队突破这些瓶颈？",
+      "difficulty": "HARD",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992212319424514",
+      "sourceId": "1818992212319424514",
+      "viewNum": 1346,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你在工作中如何平衡速度和质量？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992212394921985",
+      "sourceId": "1818992212394921985",
+      "viewNum": 1105,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在团队项目中，你通常扮演什么角色？如何与团队成员有效合作？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992212474613762",
+      "sourceId": "1818992212474613762",
+      "viewNum": 1315,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你有没有跨团队合作经历？如何确保不同部门之间的协调合作？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992212562694145",
+      "sourceId": "1818992212562694145",
+      "viewNum": 1145,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你对新兴技术（如人工智能、区块链等）有什么看法？这些技术会如何影响你的工作？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992212642385922",
+      "sourceId": "1818992212642385922",
+      "viewNum": 1651,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果公司正在考虑引入一个新的技术栈，你会如何评估它是否适合公司需求？",
+      "difficulty": "HARD",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992212726272002",
+      "sourceId": "1818992212726272002",
+      "viewNum": 1909,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你参与过的最具挑战性的项目是什么？你具体做了什么？又如何从中获得成长？",
+      "difficulty": "HARD",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992212801769473",
+      "sourceId": "1818992212801769473",
+      "viewNum": 2082,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "当你遇到无法立即解决的技术问题时，你会如何处理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "HR面试"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1818992212889849857",
+      "sourceId": "1818992212889849857",
+      "viewNum": 2003,
+      "needVip": false,
+      "hasAnswer": false
+    }
+  ]
+}

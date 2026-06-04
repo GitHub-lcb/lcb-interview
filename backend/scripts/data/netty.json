@@ -1,0 +1,218 @@
+{
+  "categoryId": 12,
+  "categoryName": "Netty",
+  "bankIds": [
+    "1804354610222800897"
+  ],
+  "totalQuestions": 13,
+  "questions": [
+    {
+      "title": "什么是 Netty，它在网络编程中解决了什么问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Netty",
+        "后端"
+      ],
+      "tagIds": [
+        21
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1804439053360898050",
+      "sourceId": "1804439053360898050",
+      "viewNum": 6838,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "说说你知道的几种 I/O 模型",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Netty",
+        "后端"
+      ],
+      "tagIds": [
+        21
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1804476796656885762",
+      "sourceId": "1804476796656885762",
+      "viewNum": 13003,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "说一下 Netty 的应用场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Netty",
+        "后端"
+      ],
+      "tagIds": [
+        21
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1804860496687079425",
+      "sourceId": "1804860496687079425",
+      "viewNum": 5882,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "介绍一下 Reactor 线程模型？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Netty",
+        "后端"
+      ],
+      "tagIds": [
+        21
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1804877046357893121",
+      "sourceId": "1804877046357893121",
+      "viewNum": 6769,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "简单说说 Netty 的零拷贝机制？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Netty",
+        "后端"
+      ],
+      "tagIds": [
+        21
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1804893517888823297",
+      "sourceId": "1804893517888823297",
+      "viewNum": 7446,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "简单说说 Netty 的线程模型，并且其是如何完成工作的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Netty",
+        "后端"
+      ],
+      "tagIds": [
+        21
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805157175260815361",
+      "sourceId": "1805157175260815361",
+      "viewNum": 1967,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么不选择使用原生的 NIO 而选择使用 Netty 呢？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Netty",
+        "后端"
+      ],
+      "tagIds": [
+        21
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805360631846215681",
+      "sourceId": "1805360631846215681",
+      "viewNum": 5106,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Netty 性能为什么这么高？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Netty",
+        "后端"
+      ],
+      "tagIds": [
+        21
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805363325361135618",
+      "sourceId": "1805363325361135618",
+      "viewNum": 4795,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "说一下 TCP 半包和粘包问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Netty",
+        "后端"
+      ],
+      "tagIds": [
+        21
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805367724032598017",
+      "sourceId": "1805367724032598017",
+      "viewNum": 2728,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Netty 是如何解决粘包和拆包问题的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Netty",
+        "后端"
+      ],
+      "tagIds": [
+        21
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805371281377009665",
+      "sourceId": "1805371281377009665",
+      "viewNum": 6434,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Netty 采用了哪些设计模式？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Netty",
+        "后端"
+      ],
+      "tagIds": [
+        21
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805374399812673537",
+      "sourceId": "1805374399812673537",
+      "viewNum": 5271,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Netty 如何解决 JDK NIO 中的空轮询 Bug？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Netty",
+        "后端"
+      ],
+      "tagIds": [
+        21
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1806039947026817025",
+      "sourceId": "1806039947026817025",
+      "viewNum": 5738,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Netty 中，什么是 Channel ？ 什么是 ChannelHandlerContext？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Netty",
+        "后端"
+      ],
+      "tagIds": [
+        21
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1806051777895915521",
+      "sourceId": "1806051777895915521",
+      "viewNum": 2005,
+      "needVip": true,
+      "hasAnswer": false
+    }
+  ]
+}
