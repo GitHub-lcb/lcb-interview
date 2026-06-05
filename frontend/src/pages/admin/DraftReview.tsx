@@ -66,14 +66,21 @@ export default function DraftReview() {
 
   const columns: ColumnsType<QuestionAdmin> = [
     { title: 'ID', dataIndex: 'id', width: 60 },
-    { title: '标题', dataIndex: 'title', ellipsis: true },
+    { title: '标题', dataIndex: 'title', ellipsis: true, width: 240 },
+    {
+      title: '摘要', dataIndex: 'summary', width: 300, ellipsis: true,
+      render: (_: any, r: QuestionAdmin) => {
+        const txt = r.summary || (r.content || r.answer || '').replace(/<[^>]*>/g, '').replace(/```[\s\S]*?```/g, '').slice(0, 120)
+        return txt ? <span style={{ color: '#71717A', fontSize: 13 }}>{txt}...</span> : <Tag color="warning">无内容</Tag>
+      },
+    },
     { title: '难度', dataIndex: 'difficulty', width: 80,
       render: (v: string) => <Tag>{v}</Tag>,
     },
-    { title: '来源', dataIndex: 'source', width: 100 },
-    { title: '创建时间', dataIndex: 'createTime', width: 160 },
+    { title: '来源', dataIndex: 'source', width: 90 },
+    { title: '创建时间', dataIndex: 'createTime', width: 155 },
     {
-      title: '操作', width: 200,
+      title: '操作', width: 210, fixed: 'right',
       render: (_: any, r: QuestionAdmin) => (
         <Space wrap>
           <Button size="small" onClick={() => handlePreview(r.id)}>预览</Button>

@@ -16,6 +16,7 @@ export interface Question {
   title: string
   summary?: string
   content: string
+  answer?: string        // 备选答案（当 content 为空时使用）
   principle?: string
   comparison?: string
   scenario?: string
@@ -26,6 +27,7 @@ export interface Question {
   relatedIds?: string
   difficulty: string
   categoryName: string
+  categoryId?: number
   tags: string[]
   viewCount: number
   createTime: string
@@ -71,6 +73,12 @@ export interface GenerationTask {
   message: string
   errors: string[]
   generatedIds: number[]
+  thinking?: string       // AI 思考过程（reasoning_content）
+}
+
+export interface StreamEvent {
+  type: 'thinking' | 'content' | 'progress' | 'question_result' | 'total' | 'done' | 'error' | 'info'
+  data: string
 }
 
 export interface PageResult<T> {

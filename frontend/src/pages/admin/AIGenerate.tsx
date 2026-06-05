@@ -1,17 +1,26 @@
-import { useState, useEffect } from 'react'
-import { Card, Form, Select, InputNumber, Input, Button, Progress, Alert, message, Segmented, Space, Tag, Divider, Statistic, Row, Col } from 'antd'
-import { generateQuestions, getGenerationTask, batchGenerate, getBatchStatus, fillAnswers } from '../../api/admin'
+import { useState, useEffect, useRef } from 'react'
+import { Card, Form, Select, InputNumber, Input, Button, Progress, Alert, message, Segmented, Tag, Divider, Statistic, Row, Col, Collapse, List, Badge, Space } from 'antd'
+import { batchGenerate, getBatchStatus, streamGenerate, streamFillAnswer } from '../../api/admin'
 import { getCategories } from '../../api/category'
 import { listDrafts } from '../../api/admin'
-import type { Category, BatchProgress, GenerationTask } from '../../types'
+import type { Category, BatchProgress, StreamEvent } from '../../types'
 
 export default function AIGenerate() {
-  const [mode, setMode] = useState<'single' | 'batch' | 'fill'>('single')
+  const [mode, setMode] = useState<'batch' | 'stream' | 'streamFill'>('stream')
   const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(false)
-  const [task, setTask] = useState<GenerationTask | null>(null)
   const [batchProgress, setBatchProgress] = useState<BatchProgress | null>(null)
   const [draftCount, setDraftCount] = useState(0)
+
+  const [streamStatus, setStreamStatus] = useState<'idle' | 'connecting' | 'streaming' | 'done' | 'error'>('idle')
+  const [streamCurrent, setStreamCurrent] = useState(0)
+  const [streamTotal, setStreamTotal] = useState(0)
+  const [streamThinking, setStreamThinking] = useState('')
+  const [streamContent, setStreamContent] = useState('')
+  const [streamResults, setStreamResults] = useState<any[]>([])
+  const [streamDoneResult, setStreamDoneResult] = useState<any>(null)
+  const streamAbortRef = useRef<AbortController | null>(null)
+
+  const [batchLoading, setBatchLoading] = useState(false)
 
   useEffect(() => {
     getCategories().then(setCategories).catch(() => {})
@@ -21,35 +30,13 @@ export default function AIGenerate() {
 
   const categoryOptions = categories.map(c => ({ value: c.name, label: c.name }))
 
-  const pollTask = (id: number) => {
-    const timer = setInterval(async () => {
-      try {
-        const t = await getGenerationTask(id)
-        setTask(t)
-        if (t.status === 'COMPLETED' || t.status === 'FAILED' || t.status === 'PARTIAL') {
-          clearInterval(timer)
-          setLoading(false)
-          if (t.status === 'COMPLETED') message.success(`成功 ${t.successCount} 道`)
-          else if (t.status === 'PARTIAL') message.warning(`部分成功：${t.successCount}/${t.total}`)
-          else message.error('失败')
-        }
-      } catch { clearInterval(timer); setLoading(false) }
-    }, 3000)
-  }
-
-  const onSingleFinish = async (values: any) => {
-    setLoading(true); setTask(null)
-    try { const id = await generateQuestions(values); pollTask(id) }
-    catch { message.error('生成失败'); setLoading(false) }
-  }
-
   const onBatchFinish = async (values: any) => {
-    setLoading(true)
+    setBatchLoading(true)
     try {
       await batchGenerate({ countPerCategory: values.countPerCategory ?? 10, categoryName: values.categoryName, delaySeconds: values.delaySeconds ?? 3 })
       message.success('批量任务已启动')
       pollBatchStatus()
-    } catch { message.error('启动失败'); setLoading(false) }
+    } catch { message.error('启动失败'); setBatchLoading(false) }
   }
 
   const pollBatchStatus = () => {
@@ -57,52 +44,239 @@ export default function AIGenerate() {
       try {
         const p = await getBatchStatus()
         setBatchProgress(p)
-        if (p.status === 'IDLE') { clearInterval(timer); setLoading(false); message.success('批量任务完成') }
-      } catch { clearInterval(timer); setLoading(false) }
+        if (p.status === 'IDLE') { clearInterval(timer); setBatchLoading(false); message.success('批量任务完成') }
+      } catch { clearInterval(timer); setBatchLoading(false) }
     }, 3000)
   }
 
-  const onFillFinish = async (values: any) => {
-    setLoading(true); setTask(null)
-    try {
-      const id = await fillAnswers({ categoryId: values.categoryId, count: values.count ?? 10 })
-      pollTask(id)
-    } catch { message.error('补全失败'); setLoading(false) }
+  const handleStreamEvent = (event: StreamEvent) => {
+    switch (event.type) {
+      case 'progress': {
+        const p = JSON.parse(event.data)
+        if (p.current !== streamCurrent) {
+          setStreamThinking('')
+          setStreamContent('')
+          setStreamCurrent(p.current)
+          setStreamTotal(p.total)
+        }
+        setStreamStatus('streaming')
+        break
+      }
+      case 'thinking':
+        setStreamThinking(prev => prev + event.data)
+        setStreamStatus('streaming')
+        break
+      case 'content':
+        setStreamContent(prev => prev + event.data)
+        setStreamStatus('streaming')
+        break
+      case 'question_result': {
+        const r = JSON.parse(event.data)
+        setStreamResults(prev => {
+          if (prev.find(x => x.current === r.current)) return prev
+          return [...prev, r]
+        })
+        break
+      }
+      case 'total':
+        setStreamTotal(Number(event.data))
+        break
+      case 'done':
+        setStreamStatus('done')
+        setStreamDoneResult(JSON.parse(event.data))
+        message.success(`全部完成！成功 ${JSON.parse(event.data).success} 题`)
+        break
+      case 'error':
+        setStreamStatus('error')
+        message.error(event.data)
+        break
+      case 'info':
+        break
+    }
   }
 
+  const onStreamFinish = (values: any) => {
+    setStreamStatus('connecting')
+    setStreamCurrent(0)
+    setStreamTotal(0)
+    setStreamThinking('')
+    setStreamContent('')
+    setStreamResults([])
+    setStreamDoneResult(null)
+
+    const abort = streamGenerate(
+      { category: values.category, difficulty: values.difficulty, count: values.count ?? 5, topic: values.topic },
+      handleStreamEvent
+    )
+    streamAbortRef.current = abort
+  }
+
+  const onStreamFillFinish = (values: any) => {
+    setStreamStatus('connecting')
+    setStreamCurrent(0)
+    setStreamTotal(0)
+    setStreamThinking('')
+    setStreamContent('')
+    setStreamResults([])
+    setStreamDoneResult(null)
+
+    const abort = streamFillAnswer(
+      handleStreamEvent,
+      values.categoryId,
+      values.count ?? 5
+    )
+    streamAbortRef.current = abort
+  }
+
+  useEffect(() => {
+    return () => { streamAbortRef.current?.abort() }
+  }, [])
+
+  const renderStreamResult = () => (
+    <Card size="small" style={{ marginTop: 16 }}>
+      {streamTotal > 0 && (
+        <div style={{ marginBottom: 12 }}>
+          <Progress
+            percent={Math.round(streamResults.length / streamTotal * 100)}
+            format={() => `${streamResults.length}/${streamTotal}`}
+          />
+        </div>
+      )}
+
+      {streamStatus === 'connecting' && <p><Tag color="processing">正在连接 AI...</Tag></p>}
+      {streamStatus === 'streaming' && (
+        <p><Tag color="processing">正在生成第 {streamCurrent}/{streamTotal} 题...</Tag></p>
+      )}
+      {streamStatus === 'done' && streamDoneResult && (
+        <Alert type="success" showIcon message={`全部完成！成功 ${streamDoneResult.success} 题，失败 ${streamDoneResult.fail} 题`} style={{ marginBottom: 12 }} />
+      )}
+      {streamStatus === 'error' && <Alert type="error" showIcon message="流式生成失败" />}
+
+      {streamResults.length > 0 && (
+        <List
+          size="small"
+          header={<div>已完成题目</div>}
+          dataSource={streamResults}
+          renderItem={item => (
+            <List.Item>
+              <Badge status={item.status === 'completed' ? 'success' : 'error'} />
+              <span style={{ marginLeft: 8 }}>
+                <Tag color="blue">#{item.current}</Tag>
+                {item.title || `题目 ID: ${item.questionId}`}
+              </span>
+            </List.Item>
+          )}
+          style={{ marginBottom: 12 }}
+        />
+      )}
+
+      {streamThinking && (
+        <Collapse
+          size="small"
+          defaultActiveKey={['thinking']}
+          items={[{
+            key: 'thinking',
+            label: <span>当前题 AI 思考过程 <Tag color="purple">{streamThinking.length} 字符</Tag></span>,
+            children: <pre style={{ whiteSpace: 'pre-wrap', fontSize: 13, maxHeight: 400, overflow: 'auto', background: '#f5f5f5', padding: 12, borderRadius: 6 }}>{streamThinking}</pre>,
+          }]}
+          style={{ marginTop: 8 }}
+        />
+      )}
+
+      {streamContent && (
+        <div style={{ marginTop: 12 }}>
+          <h4>当前题生成内容 <Tag color="blue">{streamContent.length} 字符</Tag></h4>
+          <div style={{ whiteSpace: 'pre-wrap', fontSize: 13, maxHeight: 500, overflow: 'auto', background: '#fafafa', padding: 12, borderRadius: 6, border: '1px solid #e8e8e8' }}>
+            {streamContent}
+          </div>
+        </div>
+      )}
+    </Card>
+  )
+
   return (
-    <Card title="AI 生成题目">
+    <Card title="AI 题目生成 — 1M上下文 + Max模式">
       <Segmented
         value={mode}
-        onChange={v => setMode(v as 'single' | 'batch' | 'fill')}
+        onChange={v => setMode(v as any)}
         options={[
-          { value: 'single', label: '单分类生成' },
+          { value: 'stream', label: '流式生成' },
+          { value: 'streamFill', label: '流式补答案' },
           { value: 'batch', label: '批量生成' },
-          { value: 'fill', label: '补全答案' },
         ]}
         style={{ marginBottom: 24 }}
       />
 
-      {mode === 'single' && (
-        <Form layout="vertical" onFinish={onSingleFinish} style={{ maxWidth: 500 }}>
-          <Form.Item name="category" label="分类" rules={[{ required: true }]}>
-            <Select options={categoryOptions} showSearch placeholder="选择分类" />
-          </Form.Item>
-          <Form.Item name="difficulty" label="难度">
-            <Select allowClear options={[
-              { value: 'EASY', label: '简单' }, { value: 'MEDIUM', label: '中等' }, { value: 'HARD', label: '困难' },
-            ]} />
-          </Form.Item>
-          <Form.Item name="count" label="生成数量" initialValue={5}>
-            <InputNumber min={1} max={20} />
-          </Form.Item>
-          <Form.Item name="topic" label="主题关键词（可选）">
-            <Input placeholder="如：HashMap原理" />
-          </Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading}>开始生成</Button>
-        </Form>
+      {/* 流式生成 */}
+      {mode === 'stream' && (
+        <>
+          <Alert type="info" showIcon message="逐题生成" description="每道题独立发送 AI 请求，实时展示思考过程和生成内容，可随时取消。" style={{ marginBottom: 16 }} />
+          <Form layout="vertical" onFinish={onStreamFinish} style={{ maxWidth: 500 }}>
+            <Form.Item name="category" label="分类" rules={[{ required: true }]}>
+              <Select options={categoryOptions} showSearch placeholder="选择分类" />
+            </Form.Item>
+            <Form.Item name="difficulty" label="难度">
+              <Select allowClear options={[
+                { value: 'EASY', label: '简单' }, { value: 'MEDIUM', label: '中等' }, { value: 'HARD', label: '困难' },
+              ]} />
+            </Form.Item>
+            <Form.Item name="count" label="生成数量" initialValue={5}>
+              <InputNumber min={1} max={20} />
+            </Form.Item>
+            <Form.Item name="topic" label="主题关键词（可选）">
+              <Input placeholder="如：HashMap原理" />
+            </Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit" loading={streamStatus === 'connecting' || streamStatus === 'streaming'}
+                disabled={streamStatus === 'connecting' || streamStatus === 'streaming'}>
+                逐题流式生成
+              </Button>
+              {(streamStatus === 'connecting' || streamStatus === 'streaming') && (
+                <Button danger onClick={() => { streamAbortRef.current?.abort(); setStreamStatus('idle') }}>
+                  取消
+                </Button>
+              )}
+            </Space>
+          </Form>
+
+          {streamStatus !== 'idle' && renderStreamResult()}
+        </>
       )}
 
+      {/* 流式补答案 */}
+      {mode === 'streamFill' && (
+        <>
+          <Alert type="info" showIcon message="逐题补答案" description="每道题独立发送 AI 请求，实时展示思考过程和补全内容，可随时取消。" style={{ marginBottom: 16 }} />
+          <Row gutter={16} style={{ marginBottom: 16 }}>
+            <Col>
+              <Statistic title="待补草稿" value={draftCount} suffix="题" />
+            </Col>
+          </Row>
+          <Form layout="vertical" onFinish={onStreamFillFinish} style={{ maxWidth: 500 }}>
+            <Form.Item name="categoryId" label="分类（留空则补所有分类）">
+              <Select allowClear options={categories.map(c => ({ value: c.id, label: c.name }))} showSearch placeholder="选择分类" />
+            </Form.Item>
+            <Form.Item name="count" label="补全数量" initialValue={5} tooltip="一次最多补 20 道">
+              <InputNumber min={1} max={20} />
+            </Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit" loading={streamStatus === 'connecting' || streamStatus === 'streaming'}
+                disabled={streamStatus === 'connecting' || streamStatus === 'streaming'}>
+                逐题流式补答案
+              </Button>
+              {(streamStatus === 'connecting' || streamStatus === 'streaming') && (
+                <Button danger onClick={() => { streamAbortRef.current?.abort(); setStreamStatus('idle') }}>
+                  取消
+                </Button>
+              )}
+            </Space>
+          </Form>
+
+          {streamStatus !== 'idle' && renderStreamResult()}
+        </>
+      )}
+
+      {/* 批量生成 */}
       {mode === 'batch' && (
         <>
           <Space style={{ marginBottom: 16 }}>
@@ -134,7 +308,7 @@ export default function AIGenerate() {
             <Form.Item name="delaySeconds" label="API 调用间隔（秒）" initialValue={3}>
               <InputNumber min={1} max={30} />
             </Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} danger>启动批量生成</Button>
+            <Button type="primary" htmlType="submit" loading={batchLoading} danger>启动批量生成</Button>
           </Form>
           <Divider />
           <Alert type="info" showIcon message="批量生成说明"
@@ -144,49 +318,6 @@ export default function AIGenerate() {
               <li>生成的题目直接发布（PUBLISHED），无需审核</li>
             </ul>} />
         </>
-      )}
-
-      {mode === 'fill' && (
-        <>
-          <Row gutter={16} style={{ marginBottom: 16 }}>
-            <Col>
-              <Statistic title="待补草稿" value={draftCount} suffix="题" />
-            </Col>
-          </Row>
-          <Form layout="vertical" onFinish={onFillFinish} style={{ maxWidth: 500 }}>
-            <Form.Item name="categoryId" label="分类（留空则补所有分类）">
-              <Select allowClear options={categories.map(c => ({ value: c.id, label: c.name }))} showSearch placeholder="选择分类" />
-            </Form.Item>
-            <Form.Item name="count" label="补全数量" initialValue={10} tooltip="一次最多补 100 道">
-              <InputNumber min={1} max={100} />
-            </Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading}>开始补全</Button>
-          </Form>
-
-          {task && (
-            <Card size="small" style={{ marginTop: 16 }}>
-              <Progress percent={task.total > 0 ? Math.round((task.successCount + task.failCount) / task.total * 100) : 0} />
-              {task.message && task.status === 'RUNNING' && <p><Tag color="processing">{task.message}</Tag></p>}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px', fontSize: 14, color: '#52525B' }}>
-                <span>成功: {task.successCount}</span>
-                <span>失败: {task.failCount}</span>
-                <span>共: {task.total}</span>
-              </div>
-              {task.errors?.length > 0 && <Alert type="error" message={task.errors.join('; ')} />}
-            </Card>
-          )}
-        </>
-      )}
-
-      {task && mode === 'single' && (
-        <Card size="small" style={{ marginTop: 16 }}>
-          <Progress percent={task.total > 0 ? Math.round((task.successCount + task.failCount) / task.total * 100) : 0} />
-          {task.message && task.status === 'RUNNING' && <p><Tag color="processing">{task.message}</Tag></p>}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px', fontSize: 14, color: '#52525B' }}>
-            <span>成功: {task.successCount}</span><span>失败: {task.failCount}</span><span>共: {task.total}</span>
-          </div>
-          {task.errors?.length > 0 && <Alert type="error" message={task.errors.join('; ')} />}
-        </Card>
       )}
     </Card>
   )

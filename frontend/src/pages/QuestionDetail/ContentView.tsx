@@ -99,13 +99,14 @@ export default function ContentView({ question, defaultOpen = false }: Props) {
     })
   }
 
-  if (question.content) {
+  const displayContent = question.content || question.answer
+  if (displayContent) {
     sections.push({
       key: 'content',
       label: '题目内容',
       content: (
         <div className="prose">
-          <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>{question.content}</Markdown>
+          <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>{displayContent}</Markdown>
         </div>
       ),
     })

@@ -9,7 +9,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 /**
- * Admin API Token 校验过滤器。所有 /api/admin/* 请求需要携带 Authorization: Bearer <token>。
+ * Admin API Token 校验过滤器。所有 /api/admin/* 请求需要携带 Authorization: Bearer <token>
+ * 或查询参数 ?token=<token>（后者用于 EventSource 等无法自定义请求头的场景）。
  * @author chongan
  */
 @Component
@@ -33,13 +34,20 @@ public class AdminTokenFilter implements Filter {
         }
 
         String auth = req.getHeader("Authorization");
-        if (auth == null || !auth.equals("Bearer " + adminToken)) {
-            res.setStatus(401);
-            res.setContentType("application/json;charset=UTF-8");
-            res.getWriter().write("{\"code\":401,\"message\":\"Unauthorized\"}");
+        if (auth != null && auth.equals("Bearer " + adminToken)) {
+            chain.doFilter(request, response);
             return;
         }
 
-        chain.doFilter(request, response);
+        // EventSource 不支持自定义请求头，允许通过查询参数传递 token
+        String queryToken = req.getParameter("token");
+        if (queryToken != null && queryToken.equals(adminToken)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        res.setStatus(401);
+        res.setContentType("application/json;charset=UTF-8");
+        res.getWriter().write("{\"code\":401,\"message\":\"Unauthorized\"}");
     }
 }

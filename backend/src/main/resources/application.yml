@@ -22,7 +22,7 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
     map-underscore-to-camel-case: true
 
 springdoc:
@@ -34,12 +34,16 @@ springdoc:
 logging:
   level:
     com.lcbinterview: info
+    com.baomidou.mybatisplus: warn
 
 admin:
   token: lcb-admin-2026
 
 ai:
   deepseek:
-    api-key: xx
-    model: deepseek-v4-pro
+    api-key: sk-Lz3bHKegKd6FR6F7kooQvVsWI9X7E93HTdwZirsy2Mb1IvrDj7wejHUovTbSU9fk
+    model: deepseek-v4-flash
     url: https://opencode.ai/zen/go/v1/chat/completions
+    # 1M 上下文 + max 模式
+    max-tokens: 65536
+    thinking-tokens: 32768
