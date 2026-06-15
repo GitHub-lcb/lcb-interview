@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Alert, Button } from 'antd'
-import { ArrowLeftOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined, PlayCircleOutlined } from '@ant-design/icons'
 import { getQuestionById } from '../../api/question'
+import AnswerQualityPanel from '../../components/AnswerQualityPanel'
+import StudyActionButtons from '../../components/StudyActionButtons'
+import StudyStatusBadge from '../../components/StudyStatusBadge'
+import { useStudyProgress } from '../../hooks/useStudyProgress'
 import ContentView from './ContentView'
 import Skeleton from './Skeleton'
 import type { Question } from '../../types'
@@ -11,108 +15,108 @@ const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中�
 
 export default function QuestionDetail() {
   const { id } = useParams()
-  const navigate = useNavigate()
   const [q, setQ] = useState<Question | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const navigate = useNavigate()
+  const { getState, rememberQuestion, setInPlan, setStatus } = useStudyProgress()
 
   const fetchQuestion = () => {
-    if (!id) return
+    if (!id) {
+      return
+    }
     setLoading(true)
     setError(false)
     getQuestionById(Number(id))
-      .then(data => { setQ(data); setLoading(false) })
-      .catch(() => { setError(true); setLoading(false) })
+      .then(data => {
+        setQ(data)
+        rememberQuestion(data)
+        setLoading(false)
+      })
+      .catch(() => {
+        setError(true)
+        setLoading(false)
+      })
   }
 
-  useEffect(() => { fetchQuestion() }, [id])
+  useEffect(() => {
+    fetchQuestion()
+  }, [id])
 
-  if (loading) return <Skeleton />
-  if (error) return (
-    <div className="magazine-card" style={{ padding: 24 }}>
-      <Alert
-        type="error"
-        message="题目加载失败"
-        showIcon
-        action={<Button onClick={fetchQuestion} size="small">重试</Button>}
-      />
-    </div>
-  )
-  if (!q) return (
-    <div className="magazine-card" style={{ padding: 24 }}>
-      <Alert type="warning" message="题目不存在" showIcon />
-    </div>
-  )
+  if (loading) {
+    return <Skeleton />
+  }
+
+  if (error) {
+    return (
+      <div className="detail-state-card">
+        <Alert
+          type="error"
+          message="题目加载失败"
+          showIcon
+          action={<Button onClick={fetchQuestion} size="small">重试</Button>}
+        />
+      </div>
+    )
+  }
+
+  if (!q) {
+    return (
+      <div className="detail-state-card">
+        <Alert type="warning" message="题目不存在" showIcon />
+      </div>
+    )
+  }
+
+  const studyState = getState(q.id)
 
   return (
-    <article>
-      <button
-        onClick={() => window.history.back()}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          marginBottom: 16,
-          padding: '6px 14px',
-          borderRadius: 8,
-          border: 'none',
-          background: '#F4F4F5',
-          color: '#52525B',
-          fontSize: 13,
-          cursor: 'pointer',
-          lineHeight: 1,
-        }}
-      >
+    <article className="question-detail-page">
+      <button className="detail-back-button" onClick={() => window.history.back()}>
         <ArrowLeftOutlined />
         返回
       </button>
 
-      <header style={{ marginBottom: 24 }}>
-        <h1 style={{
-          fontFamily: "'DM Serif Display', serif",
-          fontSize: 24,
-          fontWeight: 700,
-          color: '#18181B',
-          lineHeight: 1.35,
-          letterSpacing: '-0.03em',
-          margin: '0 0 12px 0',
-          scrollMarginTop: 72,
-        }}>
-          {q.title}
-        </h1>
+      <div className="question-detail-shell">
+        <main className="question-detail-main">
+          <header className="question-detail-header">
+            <div className="dashboard-kicker">题目详情</div>
+            <h1>{q.title}</h1>
+            <div className="question-meta-row">
+              <span className="question-category-pill">{q.categoryName}</span>
+              <span className={`difficulty-tag ${q.difficulty.toLowerCase()}`}>
+                {difficultyLabels[q.difficulty] || q.difficulty}
+              </span>
+              <StudyStatusBadge status={studyState.status} addedToPlan={studyState.addedToPlan} />
+              {q.tags?.map(tag => (
+                <span key={tag} className="question-tag-pill">{tag}</span>
+              ))}
+              <span className="question-view-count">{q.viewCount} 次浏览</span>
+            </div>
+            <div className="question-detail-actions">
+              <StudyActionButtons
+                questionId={q.id}
+                state={studyState}
+                onPlanChange={setInPlan}
+                onMarkWeak={(questionId) => setStatus(questionId, 'weak')}
+                onMarkMastered={(questionId) => setStatus(questionId, 'mastered')}
+              />
+              <Button
+                type="primary"
+                icon={<PlayCircleOutlined />}
+                onClick={() => navigate('/practice')}
+              >
+                模拟面试
+              </Button>
+            </div>
+          </header>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          <span style={{
-            fontSize: 12,
-            color: '#52525B',
-            background: '#F4F4F5',
-            padding: '2px 8px',
-            borderRadius: 4,
-          }}>
-            {q.categoryName}
-          </span>
-          <span className={`difficulty-tag ${q.difficulty.toLowerCase()}`}>
-            {difficultyLabels[q.difficulty] || q.difficulty}
-          </span>
-          {q.tags?.map(t => (
-            <span key={t} style={{
-              fontSize: 11,
-              color: '#71717A',
-              background: '#F4F4F5',
-              padding: '2px 8px',
-              borderRadius: 4,
-            }}>
-              {t}
-            </span>
-          ))}
-          <span style={{ fontSize: 12, color: '#A1A1AA', marginLeft: 'auto' }}>
-            {q.viewCount} 次浏览
-          </span>
-        </div>
-      </header>
+          <div className="content-card">
+            <ContentView question={q} />
+          </div>
+        </main>
 
-      <div className="magazine-card" style={{ padding: 0, overflow: 'hidden' }}>
-        <ContentView question={q} />
+        <AnswerQualityPanel question={q} />
       </div>
     </article>
   )

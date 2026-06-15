@@ -11,7 +11,7 @@ export default function AppLayout() {
       <Content className="main-content" style={{
         padding: '28px 24px',
         minHeight: 280,
-        maxWidth: 960,
+        maxWidth: 1120,
         width: '100%',
         margin: '0 auto',
       }}>

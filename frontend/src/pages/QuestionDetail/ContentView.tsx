@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { DownOutlined } from '@ant-design/icons'
 import Markdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
@@ -6,69 +6,59 @@ import remarkGfm from 'remark-gfm'
 import CodeBlock from './CodeBlock'
 import DiagramBlock from './DiagramBlock'
 import type { Question, CodeExample, Diagram } from '../../types'
+import { getQuickAnswer } from '../../utils/answerQuality'
 
 interface Props {
   question: Question
   defaultOpen?: boolean
 }
 
-function parseJson<T>(val: string | undefined | null): T[] {
-  if (!val) return []
-  try { return JSON.parse(val) } catch { return [] }
+interface SectionItem {
+  key: string
+  label: string
+  content: ReactNode
+  defaultOpen?: boolean
 }
 
-function Section({ label, children, defaultOpen }: { label: string; children: React.ReactNode; defaultOpen?: boolean }) {
+function parseJson<T>(val: string | undefined | null): T[] {
+  if (!val) {
+    return []
+  }
+  try {
+    return JSON.parse(val)
+  } catch {
+    return []
+  }
+}
+
+function Section({
+  index,
+  label,
+  children,
+  defaultOpen,
+}: {
+  index: number
+  label: string
+  children: ReactNode
+  defaultOpen?: boolean
+}) {
   const [open, setOpen] = useState(defaultOpen ?? false)
   return (
-    <div style={{ borderBottom: '1px solid #E4E4E7' }}>
+    <div className="answer-section">
       <button
+        className="answer-section-toggle"
         onClick={() => setOpen(!open)}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '100%',
-          padding: '14px 16px',
-          border: 'none',
-          background: 'transparent',
-          cursor: 'pointer',
-          fontFamily: "'DM Serif Display', serif",
-          fontSize: 17,
-          fontWeight: 700,
-          color: '#18181B',
-          letterSpacing: '-0.02em',
-          textAlign: 'left',
-          borderRadius: 8,
-          transition: 'background 0.15s',
-        }}
-        onTouchStart={(e) => {
-          e.currentTarget.style.background = '#F4F4F5'
-        }}
-        onTouchEnd={(e) => {
-          e.currentTarget.style.background = 'transparent'
-        }}
-        onMouseEnter={(e) => { e.currentTarget.style.background = '#F4F4F5' }}
-        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
       >
-        {label}
-        <span style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 28,
-          height: 28,
-          borderRadius: 6,
-          background: open ? '#2563EB' : '#E4E4E7',
-          color: open ? '#fff' : '#18181B',
-          fontSize: 12,
-          flexShrink: 0,
-          transition: 'all 0.2s',
-        }}>
-          <DownOutlined style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+        <span className="answer-section-label">
+          <em>{String(index + 1).padStart(2, '0')}</em>
+          {label}
+        </span>
+        <span className={open ? 'answer-section-icon open' : 'answer-section-icon'}>
+          <DownOutlined />
         </span>
       </button>
       {open && (
-        <div style={{ padding: '4px 16px 20px 16px', fontSize: 15, lineHeight: 1.8, color: '#52525B' }}>
+        <div className="answer-section-body">
           {children}
         </div>
       )}
@@ -77,33 +67,21 @@ function Section({ label, children, defaultOpen }: { label: string; children: Re
 }
 
 export default function ContentView({ question, defaultOpen = false }: Props) {
-  const sections: { key: string; label: string; content: React.ReactNode }[] = []
-
-  if (question.summary) {
-    sections.push({
-      key: 'summary',
-      label: '摘要',
-      content: (
-        <div style={{
-          background: '#F8F8FA',
-          borderRadius: 8,
-          padding: '14px 18px',
-          fontSize: 14,
-          lineHeight: 1.7,
-          color: '#52525B',
-          borderLeft: '3px solid #2563EB',
-        }}>
-          {question.summary}
-        </div>
-      ),
-    })
-  }
+  const sections: SectionItem[] = [
+    {
+      key: 'quick-answer',
+      label: '30 秒口径',
+      defaultOpen: true,
+      content: <div className="quick-answer-box">{getQuickAnswer(question)}</div>,
+    },
+  ]
 
   const displayContent = question.content || question.answer
   if (displayContent) {
     sections.push({
       key: 'content',
-      label: '题目内容',
+      label: '标准回答',
+      defaultOpen: true,
       content: (
         <div className="prose">
           <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>{displayContent}</Markdown>
@@ -112,18 +90,18 @@ export default function ContentView({ question, defaultOpen = false }: Props) {
     })
   }
 
-  const fields: [string, string | undefined | null][] = [
-    ['原理', question.principle],
-    ['对比分析', question.comparison],
-    ['适用场景', question.scenario],
-    ['风险与避坑', question.risk],
-    ['项目实战', question.projectExp],
+  const fields: Array<[string, string, string | undefined | null]> = [
+    ['principle', '原理深挖', question.principle],
+    ['comparison', '对比分析', question.comparison],
+    ['scenario', '适用场景', question.scenario],
+    ['risk', '风险误区', question.risk],
+    ['projectExp', '项目落地', question.projectExp],
   ]
 
-  for (const [label, value] of fields) {
+  for (const [key, label, value] of fields) {
     if (value) {
       sections.push({
-        key: label,
+        key,
         label,
         content: (
           <div className="prose">
@@ -154,9 +132,14 @@ export default function ContentView({ question, defaultOpen = false }: Props) {
 
   return (
     <div>
-      {sections.map((s, i) => (
-        <Section key={s.key} label={s.label} defaultOpen={defaultOpen || i === 0}>
-          {s.content}
+      {sections.map((section, index) => (
+        <Section
+          key={section.key}
+          index={index}
+          label={section.label}
+          defaultOpen={defaultOpen || section.defaultOpen || index < 2}
+        >
+          {section.content}
         </Section>
       ))}
     </div>

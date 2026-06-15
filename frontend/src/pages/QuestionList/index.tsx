@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Select, Pagination, Skeleton, Empty, Alert, Button } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeftOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined, FilterOutlined, PlayCircleOutlined } from '@ant-design/icons'
 import { getQuestions } from '../../api/question'
 import { getCategoryById } from '../../api/category'
+import StudyActionButtons from '../../components/StudyActionButtons'
+import StudyStatusBadge from '../../components/StudyStatusBadge'
+import { useStudyProgress } from '../../hooks/useStudyProgress'
 import type { Question, Category } from '../../types'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
@@ -18,84 +21,108 @@ export default function QuestionList() {
   const [total, setTotal] = useState(0)
   const [difficulty, setDifficulty] = useState<string>()
   const navigate = useNavigate()
+  const { getState, rememberQuestions, setInPlan, setStatus } = useStudyProgress()
 
   const fetch = () => {
-    if (!id) return
+    if (!id) {
+      return
+    }
     setLoading(true)
     setError(false)
     Promise.all([
-      getCategoryById(Number(id)).then(setCategory).catch(() => {}),
+      getCategoryById(Number(id)).then(setCategory).catch(() => undefined),
       getQuestions({ category: Number(id), difficulty, page: page - 1, size: 20 })
         .then(res => {
           setQuestions(res.content)
           setTotal(res.total)
+          rememberQuestions(res.content)
         }),
-    ]).catch(() => { setError(true) }).finally(() => setLoading(false))
+    ]).catch(() => {
+      setError(true)
+    }).finally(() => {
+      setLoading(false)
+    })
   }
 
-  useEffect(() => { fetch() }, [id, difficulty, page])
+  useEffect(() => {
+    fetch()
+  }, [id, difficulty, page])
 
-  if (error) return (
-    <Alert type="error" message="加载失败" showIcon
-      action={<Button onClick={fetch} size="small">重试</Button>}
-    />
-  )
+  if (error) {
+    return (
+      <Alert
+        type="error"
+        message="加载失败"
+        showIcon
+        action={<Button onClick={fetch} size="small">重试</Button>}
+      />
+    )
+  }
+
+  const trackedOnPage = questions.filter(question => {
+    const state = getState(question.id)
+    return state.status !== 'new' || state.addedToPlan
+  }).length
 
   return (
-    <div>
+    <div className="question-list-page">
       <button
+        className="detail-back-button"
         onClick={() => navigate('/banks')}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          marginBottom: 16,
-          padding: '6px 14px',
-          borderRadius: 8,
-          border: 'none',
-          background: '#F4F4F5',
-          color: '#52525B',
-          fontSize: 13,
-          cursor: 'pointer',
-          lineHeight: 1,
-        }}
       >
         <ArrowLeftOutlined />
         全部题库
       </button>
 
-      <div style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
-        marginBottom: 20,
-        flexWrap: 'wrap',
-        gap: 12,
-      }}>
+      <header className="question-list-hero">
         <div>
-          <h1 className="section-title" style={{ fontSize: 22, margin: 0 }}>
-            {category?.name || '题目列表'}
-          </h1>
-          <p className="section-subtitle" style={{ margin: '2px 0 0 0' }}>共 {total} 道题目</p>
+          <div className="dashboard-kicker">分类刷题</div>
+          <h1>{category?.name || '题目列表'}</h1>
+          <p>{category?.description || '按难度筛选题目，把重点题加入今日计划后进入训练。'}</p>
         </div>
-        <Select
-          placeholder="难度"
-          allowClear
-          size="small"
-          style={{ width: 100 }}
-          onChange={(v) => { setDifficulty(v); setPage(1) }}
-          options={[
-            { value: 'EASY', label: '简单' },
-            { value: 'MEDIUM', label: '中等' },
-            { value: 'HARD', label: '困难' },
-          ]}
-        />
+        <div className="question-list-hero-stats">
+          <div>
+            <span>题目总数</span>
+            <strong>{total}</strong>
+          </div>
+          <div>
+            <span>本页已跟踪</span>
+            <strong>{trackedOnPage}</strong>
+          </div>
+        </div>
+      </header>
+
+      <div className="question-list-toolbar">
+        <div>
+          <FilterOutlined />
+          <span>{difficulty ? `已筛选：${difficultyLabels[difficulty] || difficulty}` : '全部难度'}</span>
+        </div>
+        <div className="question-list-toolbar-actions">
+          <Select
+            placeholder="难度"
+            allowClear
+            value={difficulty}
+            style={{ width: 120 }}
+            onChange={(value) => {
+              setDifficulty(value)
+              setPage(1)
+            }}
+            options={[
+              { value: 'EASY', label: '简单' },
+              { value: 'MEDIUM', label: '中等' },
+              { value: 'HARD', label: '困难' },
+            ]}
+          />
+          <Button icon={<PlayCircleOutlined />} type="primary" ghost onClick={() => navigate('/practice')}>
+            开始训练
+          </Button>
+        </div>
       </div>
 
       {loading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="magazine-card" style={{ padding: 16 }}>
+        <div className="question-list-stack">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div key={index} className="question-list-card">
               <Skeleton active paragraph={{ rows: 1 }} title={{ width: '60%' }} />
             </div>
           ))}
@@ -104,42 +131,53 @@ export default function QuestionList() {
         <Empty description="该分类暂无题目" />
       ) : (
         <>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {questions.map((q) => (
-              <div
-                key={q.id}
-                className="magazine-card"
-                onClick={() => navigate(`/question/${q.id}`)}
-                style={{ padding: '14px 18px', cursor: 'pointer' }}
-              >
-                <div style={{ fontSize: 15, fontWeight: 500, color: '#18181B', lineHeight: 1.4 }}>
-                  {q.title}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
-                  <span className={`difficulty-tag ${q.difficulty.toLowerCase()}`}>
-                    {difficultyLabels[q.difficulty] || q.difficulty}
-                  </span>
-                  {q.tags?.map(t => (
-                    <span key={t} style={{
-                      fontSize: 11, color: '#71717A', background: '#F4F4F5',
-                      padding: '2px 6px', borderRadius: 4,
-                    }}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
+          <div className="question-list-stack">
+            {questions.map((q) => {
+              const studyState = getState(q.id)
+              return (
+                <article
+                  key={q.id}
+                  className="question-list-card"
+                  onClick={() => navigate(`/question/${q.id}`)}
+                >
+                  <div className="question-list-card-main">
+                    <h2>{q.title}</h2>
+                    <div className="question-list-card-meta">
+                      <span className={`difficulty-tag ${q.difficulty.toLowerCase()}`}>
+                        {difficultyLabels[q.difficulty] || q.difficulty}
+                      </span>
+                      <StudyStatusBadge status={studyState.status} addedToPlan={studyState.addedToPlan} />
+                      <span>{q.viewCount.toLocaleString()} 次浏览</span>
+                      {q.tags?.slice(0, 5).map(tag => (
+                        <span key={tag} className="question-tag-pill">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="question-card-actions">
+                    <StudyActionButtons
+                      compact
+                      questionId={q.id}
+                      state={studyState}
+                      onPlanChange={setInPlan}
+                      onMarkWeak={(questionId) => setStatus(questionId, 'weak')}
+                      onMarkMastered={(questionId) => setStatus(questionId, 'mastered')}
+                    />
+                  </div>
+                </article>
+              )
+            })}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
+          <div className="question-list-pagination">
             <Pagination
               current={page}
               total={total}
               pageSize={20}
-              onChange={p => setPage(p)}
+              onChange={paginationPage => setPage(paginationPage)}
               showSizeChanger={false}
               hideOnSinglePage
-              showTotal={t => `共 ${t} 条`}
+              showTotal={count => `共 ${count} 条`}
             />
           </div>
         </>

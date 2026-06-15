@@ -88,3 +88,95 @@ export interface PageResult<T> {
   total: number
   totalPages: number
 }
+
+export type StudyQuestionStatus = 'new' | 'learning' | 'mastered' | 'weak'
+
+export interface QuestionStudyState {
+  status: StudyQuestionStatus
+  addedToPlan: boolean
+  lastReviewedAt?: string
+  reviewCount: number
+}
+
+export interface QuestionSnapshot {
+  id: number
+  title: string
+  difficulty: string
+  categoryName: string
+  categoryId?: number
+  tags: string[]
+  viewCount: number
+}
+
+export interface StudyProgress {
+  targetRole: string
+  sprintDays: number
+  questionStates: Record<number, QuestionStudyState>
+  questionSnapshots: Record<number, QuestionSnapshot>
+  interviewAttempts: Record<number, InterviewAttempt[]>
+  dailyPlan: number[]
+  updatedAt: string
+}
+
+export interface StudySummary {
+  totalTracked: number
+  mastered: number
+  weak: number
+  learning: number
+  masteryRate: number
+}
+
+export interface WeakArea {
+  categoryId?: number
+  categoryName: string
+  score: number
+  weakCount: number
+  learningCount: number
+  masteredCount: number
+}
+
+export interface ReviewQueueItem extends QuestionSnapshot {
+  status: StudyQuestionStatus
+  lastReviewedAt?: string
+  reviewCount: number
+  reason: string
+}
+
+export type PracticeQueueSource = 'review' | 'plan' | 'new'
+
+export interface PracticeQueueItem extends QuestionSnapshot {
+  status: StudyQuestionStatus
+  source: PracticeQueueSource
+}
+
+export type InterviewCriterionKey = 'coverage' | 'structure' | 'specificity' | 'risk'
+
+export interface InterviewCriterion {
+  key: InterviewCriterionKey
+  label: string
+  score: number
+  summary: string
+}
+
+export interface InterviewFeedback {
+  score: number
+  level: 'strong' | 'pass' | 'needs-work'
+  criteria: InterviewCriterion[]
+  advice: string[]
+  followUps: string[]
+  source?: 'RULE_BASED' | 'LOCAL_RULE_BASED' | 'AI'
+}
+
+export interface InterviewAttempt {
+  questionId: number
+  answer: string
+  feedback: InterviewFeedback
+  createdAt: string
+}
+
+export interface AnswerQualityResult {
+  score: number
+  level: 'excellent' | 'good' | 'needs-work'
+  completedFields: string[]
+  missingFields: string[]
+}
