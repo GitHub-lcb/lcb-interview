@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Empty, Input, Progress, Spin } from 'antd'
 import {
   ArrowRightOutlined,
@@ -36,6 +36,22 @@ const feedbackSourceLabels: Record<NonNullable<InterviewFeedback['source']>, str
   AI: 'AI评分',
   RULE_BASED: '后端规则',
   LOCAL_RULE_BASED: '本地规则',
+}
+
+const scopedQuestionDetailCache = new Map<number, Promise<Question>>()
+
+function getScopedQuestionById(questionId: number): Promise<Question> {
+  const cached = scopedQuestionDetailCache.get(questionId)
+  if (cached) {
+    return cached
+  }
+
+  const request = getQuestionById(questionId).catch(error => {
+    scopedQuestionDetailCache.delete(questionId)
+    throw error
+  })
+  scopedQuestionDetailCache.set(questionId, request)
+  return request
 }
 
 function resolveScoreTone(score?: number) {
@@ -81,13 +97,18 @@ export default function Practice() {
   const [feedback, setFeedback] = useState<InterviewFeedback | null>(null)
   const [isEvaluating, setIsEvaluating] = useState(false)
   const [hotQuestions, setHotQuestions] = useState<Question[]>([])
+  const [scopedQuestions, setScopedQuestions] = useState<Question[]>([])
   const [focusedQuestion, setFocusedQuestion] = useState<Question | null>(null)
   const [appliedFocusId, setAppliedFocusId] = useState<number | null>(null)
   const [isLoadingSeeds, setIsLoadingSeeds] = useState(true)
+  const [isLoadingScope, setIsLoadingScope] = useState(false)
   const [isLoadingFocus, setIsLoadingFocus] = useState(false)
+  const scopedRequestIdsRef = useRef<Set<number>>(new Set())
+  const latestQueueParamRef = useRef<string | null>(null)
   const searchParamKey = searchParams.toString()
   const focusQuestionParam = searchParams.get('question')
   const queueParam = searchParams.get('queue')
+  latestQueueParamRef.current = queueParam
   const focusQuestionId = useMemo(() => {
     const value = Number(focusQuestionParam)
     return Number.isFinite(value) && value > 0 ? value : null
@@ -103,11 +124,40 @@ export default function Practice() {
       .slice(0, 30)
   }, [queueParam])
   const candidateQuestions = useMemo(() => {
-    if (!focusedQuestion) {
-      return hotQuestions
-    }
-    return [focusedQuestion, ...hotQuestions.filter(question => question.id !== focusedQuestion.id)]
-  }, [focusedQuestion, hotQuestions])
+    const candidates = [
+      ...(focusedQuestion ? [focusedQuestion] : []),
+      ...scopedQuestions,
+      ...hotQuestions,
+    ]
+    const seen = new Set<number>()
+    return candidates.filter(question => {
+      if (seen.has(question.id)) {
+        return false
+      }
+      seen.add(question.id)
+      return true
+    })
+  }, [focusedQuestion, hotQuestions, scopedQuestions])
+
+  const missingScopedQuestionIds = useMemo(() => {
+    const loadedIds = new Set([
+      ...Object.keys(progress.questionSnapshots).map(Number),
+      ...scopedQuestions.map(question => question.id),
+    ])
+    return scopedQuestionIds
+      .filter(questionId => !loadedIds.has(questionId))
+      .slice(0, 12)
+  }, [progress.questionSnapshots, scopedQuestionIds, scopedQuestions])
+
+  useEffect(() => {
+    scopedRequestIdsRef.current.clear()
+    const scopedSet = new Set(scopedQuestionIds)
+    setScopedQuestions(currentQuestions => {
+      const nextQuestions = currentQuestions.filter(question => scopedSet.has(question.id))
+      return nextQuestions.length === currentQuestions.length ? currentQuestions : nextQuestions
+    })
+  }, [queueParam, scopedQuestionIds])
+
   const queue = useMemo(
     () => buildScopedPracticeQueue(progress, candidateQuestions, scopedQuestionIds, focusQuestionId, 12),
     [candidateQuestions, focusQuestionId, progress, scopedQuestionIds],
@@ -140,6 +190,47 @@ export default function Practice() {
       ignore = true
     }
   }, [rememberQuestions])
+
+  useEffect(() => {
+    const requestIds = missingScopedQuestionIds.filter(
+      questionId => !scopedRequestIdsRef.current.has(questionId),
+    )
+
+    if (requestIds.length === 0) {
+      setIsLoadingScope(false)
+      return
+    }
+
+    const requestQueueParam = queueParam
+    setIsLoadingScope(true)
+    requestIds.forEach(questionId => scopedRequestIdsRef.current.add(questionId))
+
+    Promise.allSettled(requestIds.map(questionId => getScopedQuestionById(questionId)))
+      .then(results => {
+        if (requestQueueParam !== latestQueueParamRef.current) {
+          return
+        }
+        const loadedQuestions = results
+          .filter((result): result is PromiseFulfilledResult<Question> => result.status === 'fulfilled')
+          .map(result => result.value)
+        if (loadedQuestions.length === 0) {
+          return
+        }
+        setScopedQuestions(currentQuestions => {
+          const currentIds = new Set(currentQuestions.map(question => question.id))
+          return [
+            ...currentQuestions,
+            ...loadedQuestions.filter(question => !currentIds.has(question.id)),
+          ]
+        })
+        rememberQuestions(loadedQuestions)
+      })
+      .finally(() => {
+        if (requestQueueParam === latestQueueParamRef.current) {
+          setIsLoadingScope(false)
+        }
+      })
+  }, [missingScopedQuestionIds, queueParam, rememberQuestions])
 
   useEffect(() => {
     setAppliedFocusId(null)
@@ -274,7 +365,7 @@ export default function Practice() {
   if (!current || !currentState) {
     return (
       <div className="practice-empty-page">
-        {isLoadingSeeds || isLoadingFocus ? (
+        {isLoadingSeeds || isLoadingScope || isLoadingFocus ? (
           <div className="practice-empty-loading">
             <Spin />
             <span>正在准备热门训练题</span>
