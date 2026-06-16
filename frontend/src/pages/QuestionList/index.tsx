@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Select, Pagination, Skeleton, Empty, Alert, Button } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeftOutlined, FilterOutlined, PlayCircleOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined, FilterOutlined, PlayCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { getQuestions } from '../../api/question'
 import { getCategoryById } from '../../api/category'
 import StudyActionButtons from '../../components/StudyActionButtons'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
+import { summarizeQuestionSetProgress } from '../../utils/studyProgress'
 import type { Question, Category } from '../../types'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
@@ -20,27 +21,41 @@ export default function QuestionList() {
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
   const [difficulty, setDifficulty] = useState<string>()
+  const requestSeq = useRef(0)
   const navigate = useNavigate()
-  const { getState, rememberQuestions, setInPlan, setStatus } = useStudyProgress()
+  const { getState, progress, rememberQuestions, addDailyPlanQuestions, setInPlan, setStatus } = useStudyProgress()
 
   const fetch = () => {
+    const requestId = requestSeq.current + 1
+    requestSeq.current = requestId
     if (!id) {
+      setLoading(false)
       return
     }
     setLoading(true)
     setError(false)
     Promise.all([
-      getCategoryById(Number(id)).then(setCategory).catch(() => undefined),
-      getQuestions({ category: Number(id), difficulty, page: page - 1, size: 20 })
-        .then(res => {
-          setQuestions(res.content)
-          setTotal(res.total)
-          rememberQuestions(res.content)
-        }),
-    ]).catch(() => {
+      getCategoryById(Number(id)).catch(() => undefined),
+      getQuestions({ category: Number(id), difficulty, page: page - 1, size: 20 }),
+    ]).then(([nextCategory, res]) => {
+      if (requestId !== requestSeq.current) {
+        return
+      }
+      if (nextCategory) {
+        setCategory(nextCategory)
+      }
+      setQuestions(res.content)
+      setTotal(res.total)
+      rememberQuestions(res.content)
+    }).catch(() => {
+      if (requestId !== requestSeq.current) {
+        return
+      }
       setError(true)
     }).finally(() => {
-      setLoading(false)
+      if (requestId === requestSeq.current) {
+        setLoading(false)
+      }
     })
   }
 
@@ -59,10 +74,19 @@ export default function QuestionList() {
     )
   }
 
-  const trackedOnPage = questions.filter(question => {
-    const state = getState(question.id)
-    return state.status !== 'new' || state.addedToPlan
-  }).length
+  const pageQuestionIds = questions.map(question => question.id)
+  const pageProgress = summarizeQuestionSetProgress(progress, pageQuestionIds)
+  const trackedOnPage = pageProgress.tracked
+  const hasPageQuestions = pageProgress.hasQuestions
+  const canAddPageToPlan = hasPageQuestions && !pageProgress.allPlanned
+  const addPageButtonText = pageProgress.allPlanned ? '本页已加入' : '本页入计划'
+
+  const addCurrentPageToPlan = () => {
+    if (!canAddPageToPlan) {
+      return
+    }
+    addDailyPlanQuestions(pageQuestionIds)
+  }
 
   return (
     <div className="question-list-page">
@@ -113,6 +137,11 @@ export default function QuestionList() {
               { value: 'HARD', label: '困难' },
             ]}
           />
+          {hasPageQuestions && (
+            <Button icon={<PlusOutlined />} disabled={!canAddPageToPlan} onClick={addCurrentPageToPlan}>
+              {addPageButtonText}
+            </Button>
+          )}
           <Button icon={<PlayCircleOutlined />} type="primary" ghost onClick={() => navigate('/practice')}>
             开始训练
           </Button>

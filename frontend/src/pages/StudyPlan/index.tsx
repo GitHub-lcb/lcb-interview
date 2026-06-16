@@ -1,10 +1,20 @@
+import { useEffect, useMemo, useState } from 'react'
 import { Button, Empty, InputNumber, Progress, Select } from 'antd'
-import { ArrowRightOutlined, BookOutlined, FireOutlined, PlayCircleOutlined, SettingOutlined } from '@ant-design/icons'
+import {
+  ArrowRightOutlined,
+  BookOutlined,
+  FireOutlined,
+  PlayCircleOutlined,
+  SettingOutlined,
+  ThunderboltOutlined,
+} from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import StudyActionButtons from '../../components/StudyActionButtons'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
-import { buildReviewQueue, resolvePlanQuestions, summarizeProgress } from '../../utils/studyProgress'
+import { getHotQuestions } from '../../api/question'
+import type { Question } from '../../types'
+import { buildDailyPlan, buildReviewQueue, resolvePlanQuestions, summarizeProgress } from '../../utils/studyProgress'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
 const roleOptions = [
@@ -17,11 +27,60 @@ const roleOptions = [
 
 export default function StudyPlan() {
   const navigate = useNavigate()
-  const { getState, progress, setInPlan, setStatus, updateSettings } = useStudyProgress()
+  const {
+    getState,
+    progress,
+    rememberQuestions,
+    setDailyPlan,
+    setInPlan,
+    setStatus,
+    updateSettings,
+  } = useStudyProgress()
+  const [hotQuestions, setHotQuestions] = useState<Question[]>([])
+  const [isLoadingSeeds, setIsLoadingSeeds] = useState(true)
   const summary = summarizeProgress(progress)
-  const planQuestions = resolvePlanQuestions(progress, [], 8)
+  const generatedPlanIds = useMemo(
+    () => buildDailyPlan(progress, hotQuestions, Math.max(progress.dailyPlan.length, 8)),
+    [hotQuestions, progress],
+  )
+  const planQuestions = useMemo(() => resolvePlanQuestions(progress, hotQuestions, 8), [hotQuestions, progress])
   const reviewQueue = buildReviewQueue(progress, 12)
   const trackedCount = Object.keys(progress.questionStates).length
+  const canGeneratePlan = generatedPlanIds.length > 0
+
+  useEffect(() => {
+    let ignore = false
+
+    getHotQuestions(12)
+      .then(questions => {
+        if (ignore) {
+          return
+        }
+        setHotQuestions(questions)
+        rememberQuestions(questions)
+      })
+      .catch(() => {
+        if (!ignore) {
+          setHotQuestions([])
+        }
+      })
+      .finally(() => {
+        if (!ignore) {
+          setIsLoadingSeeds(false)
+        }
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [rememberQuestions])
+
+  const handleGeneratePlan = () => {
+    if (!canGeneratePlan) {
+      return
+    }
+    setDailyPlan(generatedPlanIds)
+  }
 
   return (
     <div>
@@ -32,6 +91,14 @@ export default function StudyPlan() {
           <p>从薄弱题开始复盘，再推进今日计划。这里的数据保存在本机。</p>
         </div>
         <div className="study-plan-header-actions">
+          <Button
+            icon={<ThunderboltOutlined />}
+            loading={isLoadingSeeds}
+            disabled={!canGeneratePlan}
+            onClick={handleGeneratePlan}
+          >
+            生成今日计划
+          </Button>
           <Button type="primary" icon={<PlayCircleOutlined />} onClick={() => navigate('/practice')}>
             开始训练
           </Button>
@@ -104,7 +171,15 @@ export default function StudyPlan() {
           </div>
           {planQuestions.length === 0 ? (
             <Empty description="还没有加入今日计划的题目">
-              <Button type="primary" ghost onClick={() => navigate('/')}>从热门题开始</Button>
+              <Button
+                type="primary"
+                ghost
+                loading={isLoadingSeeds}
+                disabled={!canGeneratePlan}
+                onClick={handleGeneratePlan}
+              >
+                自动生成计划
+              </Button>
             </Empty>
           ) : (
             <div className="study-question-stack">

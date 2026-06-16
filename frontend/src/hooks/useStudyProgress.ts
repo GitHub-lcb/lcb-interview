@@ -2,10 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { InterviewAttempt, Question, StudyProgress, StudyQuestionStatus } from '../types'
 import {
   STUDY_PROGRESS_EVENT,
+  appendDailyPlanQuestions,
   getQuestionState,
   rememberQuestions as rememberQuestionsInProgress,
   readStudyProgress,
   recordInterviewAttempt as recordInterviewAttemptInProgress,
+  replaceDailyPlan,
   toggleQuestionInPlan,
   updateStudySettings,
   updateQuestionStatus,
@@ -38,6 +40,14 @@ export function useStudyProgress() {
     save(toggleQuestionInPlan(readStudyProgress(), questionId, added))
   }, [save])
 
+  const setDailyPlan = useCallback((questionIds: number[]) => {
+    save(replaceDailyPlan(readStudyProgress(), questionIds))
+  }, [save])
+
+  const addDailyPlanQuestions = useCallback((questionIds: number[]) => {
+    save(appendDailyPlanQuestions(readStudyProgress(), questionIds))
+  }, [save])
+
   const updateSettings = useCallback((patch: { targetRole?: string; sprintDays?: number | null }) => {
     save(updateStudySettings(readStudyProgress(), patch))
   }, [save])
@@ -62,9 +72,11 @@ export function useStudyProgress() {
     getState: (questionId: number) => getQuestionState(progress, questionId),
     setStatus,
     setInPlan,
+    setDailyPlan,
+    addDailyPlanQuestions,
     updateSettings,
     rememberQuestion,
     rememberQuestions,
     recordInterviewAttempt,
-  }), [progress, rememberQuestion, rememberQuestions, recordInterviewAttempt, setInPlan, setStatus, updateSettings])
+  }), [addDailyPlanQuestions, progress, rememberQuestion, rememberQuestions, recordInterviewAttempt, setDailyPlan, setInPlan, setStatus, updateSettings])
 }

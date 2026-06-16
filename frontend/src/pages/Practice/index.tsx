@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Empty, Input, Progress } from 'antd'
+import { Button, Empty, Input, Progress, Spin } from 'antd'
 import {
   ArrowRightOutlined,
   BookOutlined,
@@ -9,13 +9,14 @@ import {
   SendOutlined,
   WarningOutlined,
 } from '@ant-design/icons'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { evaluateInterviewAnswerRemote } from '../../api/interview'
-import type { InterviewFeedback, PracticeQueueItem } from '../../types'
+import { getHotQuestions, getQuestionById } from '../../api/question'
+import type { InterviewFeedback, PracticeQueueItem, Question } from '../../types'
 import { evaluateInterviewAnswer } from '../../utils/interviewCoach'
-import { buildPracticeQueue, summarizeProgress } from '../../utils/studyProgress'
+import { buildFocusedPracticeQueue, summarizeProgress } from '../../utils/studyProgress'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
 const sourceLabels: Record<PracticeQueueItem['source'], string> = {
@@ -64,13 +65,113 @@ function resolveScoreHint(score?: number) {
 
 export default function Practice() {
   const navigate = useNavigate()
-  const { getState, progress, recordInterviewAttempt, setInPlan, setStatus } = useStudyProgress()
+  const [searchParams] = useSearchParams()
+  const {
+    getState,
+    progress,
+    recordInterviewAttempt,
+    rememberQuestion,
+    rememberQuestions,
+    setInPlan,
+    setStatus,
+  } = useStudyProgress()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answerDraft, setAnswerDraft] = useState('')
   const [feedback, setFeedback] = useState<InterviewFeedback | null>(null)
   const [isEvaluating, setIsEvaluating] = useState(false)
-  const queue = useMemo(() => buildPracticeQueue(progress, [], 12), [progress])
+  const [hotQuestions, setHotQuestions] = useState<Question[]>([])
+  const [focusedQuestion, setFocusedQuestion] = useState<Question | null>(null)
+  const [appliedFocusId, setAppliedFocusId] = useState<number | null>(null)
+  const [isLoadingSeeds, setIsLoadingSeeds] = useState(true)
+  const [isLoadingFocus, setIsLoadingFocus] = useState(false)
+  const focusQuestionId = useMemo(() => {
+    const value = Number(searchParams.get('question'))
+    return Number.isFinite(value) && value > 0 ? value : null
+  }, [searchParams])
+  const candidateQuestions = useMemo(() => {
+    if (!focusedQuestion) {
+      return hotQuestions
+    }
+    return [focusedQuestion, ...hotQuestions.filter(question => question.id !== focusedQuestion.id)]
+  }, [focusedQuestion, hotQuestions])
+  const queue = useMemo(
+    () => buildFocusedPracticeQueue(progress, candidateQuestions, focusQuestionId, 12),
+    [candidateQuestions, focusQuestionId, progress],
+  )
   const summary = useMemo(() => summarizeProgress(progress), [progress])
+
+  useEffect(() => {
+    let ignore = false
+
+    getHotQuestions(12)
+      .then(questions => {
+        if (ignore) {
+          return
+        }
+        setHotQuestions(questions)
+        rememberQuestions(questions)
+      })
+      .catch(() => {
+        if (!ignore) {
+          setHotQuestions([])
+        }
+      })
+      .finally(() => {
+        if (!ignore) {
+          setIsLoadingSeeds(false)
+        }
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [rememberQuestions])
+
+  useEffect(() => {
+    setAppliedFocusId(null)
+    setFocusedQuestion(null)
+    setIsLoadingFocus(false)
+  }, [focusQuestionId])
+
+  useEffect(() => {
+    if (!focusQuestionId || progress.questionSnapshots[focusQuestionId]) {
+      return
+    }
+
+    let ignore = false
+    setIsLoadingFocus(true)
+
+    getQuestionById(focusQuestionId)
+      .then(question => {
+        if (ignore) {
+          return
+        }
+        setFocusedQuestion(question)
+        rememberQuestion(question)
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (!ignore) {
+          setIsLoadingFocus(false)
+        }
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [focusQuestionId, progress.questionSnapshots, rememberQuestion])
+
+  useEffect(() => {
+    if (!focusQuestionId || appliedFocusId === focusQuestionId || queue.length === 0) {
+      return
+    }
+
+    const targetIndex = queue.findIndex(item => item.id === focusQuestionId)
+    if (targetIndex >= 0) {
+      setCurrentIndex(targetIndex)
+      setAppliedFocusId(focusQuestionId)
+    }
+  }, [appliedFocusId, focusQuestionId, queue])
 
   useEffect(() => {
     if (queue.length === 0 && currentIndex !== 0) {
@@ -155,11 +256,18 @@ export default function Practice() {
   if (!current || !currentState) {
     return (
       <div className="practice-empty-page">
-        <Empty description="还没有可训练题目">
-          <Button type="primary" icon={<BookOutlined />} onClick={() => navigate('/')}>
-            先浏览题目
-          </Button>
-        </Empty>
+        {isLoadingSeeds || isLoadingFocus ? (
+          <div className="practice-empty-loading">
+            <Spin />
+            <span>正在准备热门训练题</span>
+          </div>
+        ) : (
+          <Empty description="还没有可训练题目">
+            <Button type="primary" icon={<BookOutlined />} onClick={() => navigate('/')}>
+              先浏览题目
+            </Button>
+          </Empty>
+        )}
       </div>
     )
   }
@@ -203,7 +311,7 @@ export default function Practice() {
         <article className="practice-question">
           <div className="practice-question-top">
             <div className={`practice-source source-${current.source}`}>{sourceLabels[current.source]}</div>
-            <span>Q{currentIndex + 1}</span>
+            <span>{focusQuestionId === current.id ? '当前题' : `Q${currentIndex + 1}`}</span>
           </div>
           <h2>{current.title}</h2>
           <div className="practice-meta">

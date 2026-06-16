@@ -3,14 +3,14 @@ import {
   CalendarOutlined,
   FireOutlined,
   PlayCircleOutlined,
-  PlusOutlined,
   RadarChartOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Question } from '../types'
 import { useStudyProgress } from '../hooks/useStudyProgress'
-import { resolvePlanQuestions, summarizeProgress, weakAreasFromQuestions } from '../utils/studyProgress'
+import { buildDailyPlan, resolvePlanQuestions, summarizeProgress, weakAreasFromQuestions } from '../utils/studyProgress'
 
 interface Props {
   hotQuestions: Question[]
@@ -18,12 +18,25 @@ interface Props {
 
 export default function StudyDashboard({ hotQuestions }: Props) {
   const navigate = useNavigate()
-  const { progress, setInPlan } = useStudyProgress()
+  const { getState, progress, setDailyPlan } = useStudyProgress()
   const summary = summarizeProgress(progress)
+  const generatedPlanIds = useMemo(
+    () => buildDailyPlan(progress, hotQuestions, Math.max(progress.dailyPlan.length, 5)),
+    [hotQuestions, progress],
+  )
   const planQuestions = useMemo(() => resolvePlanQuestions(progress, hotQuestions, 5), [hotQuestions, progress])
   const weakAreas = useMemo(() => weakAreasFromQuestions(progress, hotQuestions), [hotQuestions, progress])
   const planCount = progress.dailyPlan.length
   const nextQuestion = planQuestions[0] ?? hotQuestions[0]
+  const canGeneratePlan = generatedPlanIds.length > 0
+  const planActionText = planCount > 0 ? '补齐今日计划' : '生成今日计划'
+
+  const handleGeneratePlan = () => {
+    if (!canGeneratePlan) {
+      return
+    }
+    setDailyPlan(generatedPlanIds)
+  }
 
   return (
     <section className="study-dashboard">
@@ -38,6 +51,9 @@ export default function StudyDashboard({ hotQuestions }: Props) {
             </Button>
             <Button icon={<CalendarOutlined />} onClick={() => navigate('/study')}>
               打开学习计划
+            </Button>
+            <Button icon={<ThunderboltOutlined />} disabled={!canGeneratePlan} onClick={handleGeneratePlan}>
+              {planActionText}
             </Button>
           </div>
           <div className="study-hero-metrics" aria-label="学习状态摘要">
@@ -71,7 +87,7 @@ export default function StudyDashboard({ hotQuestions }: Props) {
           <div className="dashboard-card-title-row">
             <div>
               <span className="dashboard-card-title">今日计划</span>
-              <small>{planQuestions.length > 0 ? '按优先级执行' : '从热门题开始建立计划'}</small>
+              <small>{planCount > 0 ? `${planCount} 道已加入` : `${planQuestions.length} 道推荐`}</small>
             </div>
             {nextQuestion && (
               <Button size="small" type="primary" ghost icon={<PlayCircleOutlined />} onClick={() => navigate('/practice')}>
@@ -83,20 +99,25 @@ export default function StudyDashboard({ hotQuestions }: Props) {
             <p className="dashboard-empty">先浏览题目并标记薄弱或加入计划，系统会开始推荐。</p>
           ) : (
             <div className="daily-plan-list">
-              {planQuestions.map((q, index) => (
-                <button key={q.id} onClick={() => navigate(`/question/${q.id}`)}>
-                  <span>{index + 1}</span>
-                  <div className="daily-plan-content">
-                    <b>{q.title}</b>
-                    <small>{q.categoryName} · {q.difficulty}</small>
-                  </div>
-                </button>
-              ))}
+              {planQuestions.map((q, index) => {
+                const state = getState(q.id)
+                const isPlanned = state.addedToPlan || progress.dailyPlan.includes(q.id)
+                return (
+                  <button key={q.id} onClick={() => navigate(`/question/${q.id}`)}>
+                    <span>{index + 1}</span>
+                    <div className="daily-plan-content">
+                      <b>{q.title}</b>
+                      <small>{q.categoryName} · {q.difficulty}</small>
+                    </div>
+                    <em className={isPlanned ? 'planned' : 'suggested'}>{isPlanned ? '计划内' : '推荐'}</em>
+                  </button>
+                )
+              })}
             </div>
           )}
-          {hotQuestions[0] && (
-            <Button icon={<PlusOutlined />} onClick={() => setInPlan(hotQuestions[0].id, true)} size="small">
-              把热门第一题加入计划
+          {planQuestions.length > 0 && (
+            <Button icon={<ThunderboltOutlined />} onClick={handleGeneratePlan} disabled={!canGeneratePlan} size="small">
+              {planActionText}
             </Button>
           )}
         </div>

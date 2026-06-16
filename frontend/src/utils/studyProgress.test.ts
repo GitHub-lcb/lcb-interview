@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewFeedback, Question } from '../types'
 import {
+  appendDailyPlanQuestions,
   buildDailyPlan,
+  buildFocusedPracticeQueue,
   buildPracticeQueue,
   buildReviewQueue,
   createDefaultProgress,
@@ -9,7 +11,9 @@ import {
   parseStudyProgress,
   rememberQuestions,
   recordInterviewAttempt,
+  replaceDailyPlan,
   resolvePlanQuestions,
+  summarizeQuestionSetProgress,
   summarizeProgress,
   toggleQuestionInPlan,
   updateStudySettings,
@@ -84,6 +88,58 @@ describe('studyProgress', () => {
     expect(addedAgain.questionStates[10].addedToPlan).toBe(true)
     expect(removed.dailyPlan).toEqual([])
     expect(removed.questionStates[10].addedToPlan).toBe(false)
+  })
+
+  it('replaces the daily plan and keeps study states in sync', () => {
+    let progress = createDefaultProgress()
+    progress = toggleQuestionInPlan(progress, 10, true, '2026-06-15T10:00:00')
+    progress = updateQuestionStatus(progress, 11, 'weak', '2026-06-15T10:01:00')
+
+    const next = replaceDailyPlan(progress, [11, 12, 12], '2026-06-15T10:02:00')
+
+    expect(next.dailyPlan).toEqual([11, 12])
+    expect(next.questionStates[10].addedToPlan).toBe(false)
+    expect(next.questionStates[11]).toMatchObject({ status: 'weak', addedToPlan: true })
+    expect(next.questionStates[12]).toMatchObject({ status: 'learning', addedToPlan: true })
+    expect(next.updatedAt).toBe('2026-06-15T10:02:00')
+  })
+
+  it('does not downgrade mastered questions when replacing the daily plan', () => {
+    let progress = createDefaultProgress()
+    progress = updateQuestionStatus(progress, 20, 'mastered', '2026-06-15T10:00:00')
+
+    const next = replaceDailyPlan(progress, [20], '2026-06-15T10:01:00')
+
+    expect(next.questionStates[20]).toMatchObject({
+      status: 'mastered',
+      addedToPlan: true,
+    })
+  })
+
+  it('appends page questions to the daily plan with a shared coverage summary', () => {
+    let progress = createDefaultProgress()
+    progress = updateQuestionStatus(progress, 10, 'weak', '2026-06-15T10:00:00')
+    progress = toggleQuestionInPlan(progress, 11, true, '2026-06-15T10:01:00')
+
+    const summary = summarizeQuestionSetProgress(progress, [10, 11, 12, 12])
+    const next = appendDailyPlanQuestions(progress, [10, 12, 12], '2026-06-15T10:02:00')
+    const nextSummary = summarizeQuestionSetProgress(next, [10, 11, 12])
+
+    expect(summary).toEqual({
+      total: 3,
+      tracked: 2,
+      planned: 1,
+      hasQuestions: true,
+      allPlanned: false,
+    })
+    expect(next.dailyPlan).toEqual([11, 10, 12])
+    expect(nextSummary).toEqual({
+      total: 3,
+      tracked: 3,
+      planned: 3,
+      hasQuestions: true,
+      allPlanned: true,
+    })
   })
 
   it('builds a daily plan with weak questions first', () => {
@@ -212,6 +268,35 @@ describe('studyProgress', () => {
 
     expect(queue.map(item => item.id)).toEqual([10, 11])
     expect(queue.map(item => item.source)).toEqual(['new', 'new'])
+  })
+
+  it('moves a focused practice question to the front of the queue', () => {
+    let progress = createDefaultProgress()
+    const candidates = [
+      baseQuestion(30, 'Redis'),
+      baseQuestion(31, 'MySQL'),
+      baseQuestion(32, 'JVM'),
+    ]
+    progress = rememberQuestions(progress, candidates)
+
+    const queue = buildFocusedPracticeQueue(progress, candidates, 32, 3)
+
+    expect(queue.map(item => item.id)).toEqual([32, 30, 31])
+  })
+
+  it('keeps a mastered focused question available for direct practice', () => {
+    let progress = createDefaultProgress()
+    progress = rememberQuestions(progress, [baseQuestion(40, 'Redis')])
+    progress = updateQuestionStatus(progress, 40, 'mastered', '2026-06-15T10:00:00')
+
+    const queue = buildFocusedPracticeQueue(progress, [], 40, 2)
+
+    expect(queue).toHaveLength(1)
+    expect(queue[0]).toMatchObject({
+      id: 40,
+      status: 'mastered',
+      source: 'new',
+    })
   })
 
   it('records interview attempts newest first and keeps five per question', () => {

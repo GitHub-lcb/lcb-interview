@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Input, Select, Pagination, Skeleton, Empty, Alert, Button } from 'antd'
-import { FilterOutlined, PlayCircleOutlined, SearchOutlined } from '@ant-design/icons'
+import { FilterOutlined, PlayCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { getQuestions } from '../../api/question'
 import StudyActionButtons from '../../components/StudyActionButtons'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
+import { summarizeQuestionSetProgress } from '../../utils/studyProgress'
 import type { Question } from '../../types'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
@@ -29,26 +30,39 @@ export default function SearchResult() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
+  const requestSeq = useRef(0)
   const navigate = useNavigate()
-  const { getState, rememberQuestions, setInPlan, setStatus } = useStudyProgress()
+  const { getState, progress, rememberQuestions, addDailyPlanQuestions, setInPlan, setStatus } = useStudyProgress()
 
   const doSearch = () => {
+    const requestId = requestSeq.current + 1
+    requestSeq.current = requestId
     if (!keyword) {
       setQuestions([])
       setTotal(0)
+      setLoading(false)
+      setError(false)
       return
     }
     setLoading(true)
     setError(false)
     getQuestions({ keyword, difficulty, page: page - 1, size: 20 })
       .then(res => {
+        if (requestId !== requestSeq.current) {
+          return
+        }
         setQuestions(res.content)
         setTotal(res.total)
         rememberQuestions(res.content)
-        setLoading(false)
       }).catch(() => {
+        if (requestId !== requestSeq.current) {
+          return
+        }
         setError(true)
-        setLoading(false)
+      }).finally(() => {
+        if (requestId === requestSeq.current) {
+          setLoading(false)
+        }
       })
   }
 
@@ -68,10 +82,19 @@ export default function SearchResult() {
     }
   }
 
-  const trackedOnPage = questions.filter(question => {
-    const state = getState(question.id)
-    return state.status !== 'new' || state.addedToPlan
-  }).length
+  const pageQuestionIds = questions.map(question => question.id)
+  const pageProgress = summarizeQuestionSetProgress(progress, pageQuestionIds)
+  const trackedOnPage = pageProgress.tracked
+  const hasPageQuestions = pageProgress.hasQuestions
+  const canAddPageToPlan = hasPageQuestions && !pageProgress.allPlanned
+  const addPageButtonText = pageProgress.allPlanned ? '本页已加入' : '本页入计划'
+
+  const addCurrentPageToPlan = () => {
+    if (!canAddPageToPlan) {
+      return
+    }
+    addDailyPlanQuestions(pageQuestionIds)
+  }
 
   return (
     <div className="search-page">
@@ -122,6 +145,11 @@ export default function SearchResult() {
               { value: 'HARD', label: '困难' },
             ]}
           />
+          {hasPageQuestions && (
+            <Button icon={<PlusOutlined />} disabled={!canAddPageToPlan} onClick={addCurrentPageToPlan}>
+              {addPageButtonText}
+            </Button>
+          )}
           <Button icon={<PlayCircleOutlined />} type="primary" ghost onClick={() => navigate('/practice')}>
             开始训练
           </Button>

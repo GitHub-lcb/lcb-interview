@@ -104,7 +104,7 @@ export default function QuestionDetail() {
               <Button
                 type="primary"
                 icon={<PlayCircleOutlined />}
-                onClick={() => navigate('/practice')}
+                onClick={() => navigate(`/practice?question=${q.id}`)}
               >
                 模拟面试
               </Button>

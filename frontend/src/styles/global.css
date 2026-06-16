@@ -471,6 +471,8 @@ p {
 
 .question-list-toolbar-actions {
   display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 8px;
   align-items: center;
   flex-shrink: 0;
@@ -1019,7 +1021,7 @@ p {
 
 .daily-plan-list button {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
+  grid-template-columns: 28px minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
   width: 100%;
@@ -1066,6 +1068,27 @@ p {
   color: #71717A;
   font-size: 12px;
   margin-top: 2px;
+}
+
+.daily-plan-list em {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: #EFF6FF;
+  color: #2563EB;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.daily-plan-list em.planned {
+  background: #ECFDF5;
+  color: #059669;
 }
 
 .weak-area-list {
@@ -1493,6 +1516,8 @@ p {
 
 .search-toolbar-actions {
   display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 8px;
   align-items: center;
   flex-shrink: 0;
@@ -2350,6 +2375,15 @@ p {
   padding: 24px;
 }
 
+.practice-empty-loading {
+  display: inline-grid;
+  gap: 12px;
+  justify-items: center;
+  color: #64748B;
+  font-size: 14px;
+  font-weight: 700;
+}
+
 @media (max-width: 760px) {
   .study-dashboard-top,
   .study-dashboard-grid,
@@ -2397,15 +2431,17 @@ p {
   .search-toolbar-actions,
   .question-list-toolbar-actions {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     width: 100%;
   }
 
   .question-list-toolbar-actions .ant-select {
+    grid-column: 1 / -1;
     width: 100% !important;
   }
 
   .search-toolbar-actions .ant-select {
+    grid-column: 1 / -1;
     width: 100% !important;
   }
 

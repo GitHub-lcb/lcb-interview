@@ -20,6 +20,14 @@ const MIN_SPRINT_DAYS = 7
 const MAX_SPRINT_DAYS = 60
 const MAX_ATTEMPTS_PER_QUESTION = 5
 
+export interface QuestionSetProgressSummary {
+  total: number
+  tracked: number
+  planned: number
+  hasQuestions: boolean
+  allPlanned: boolean
+}
+
 export function createDefaultProgress(now = new Date().toISOString()): StudyProgress {
   return {
     targetRole: DEFAULT_ROLE,
@@ -124,6 +132,61 @@ export function toggleQuestionInPlan(
       },
     },
     updatedAt: now,
+  }
+}
+
+export function replaceDailyPlan(
+  progress: StudyProgress,
+  questionIds: number[],
+  now = new Date().toISOString(),
+): StudyProgress {
+  const dailyPlan = [...new Set(questionIds.filter(id => typeof id === 'number'))]
+  const planIds = new Set(dailyPlan)
+  const affectedIds = new Set([...progress.dailyPlan, ...dailyPlan])
+  const questionStates = { ...progress.questionStates }
+
+  for (const questionId of affectedIds) {
+    const current = getQuestionState(progress, questionId)
+    const addedToPlan = planIds.has(questionId)
+    questionStates[questionId] = {
+      ...current,
+      addedToPlan,
+      status: current.status === 'new' && addedToPlan ? 'learning' : current.status,
+    }
+  }
+
+  return {
+    ...progress,
+    dailyPlan,
+    questionStates,
+    updatedAt: now,
+  }
+}
+
+export function appendDailyPlanQuestions(
+  progress: StudyProgress,
+  questionIds: number[],
+  now = new Date().toISOString(),
+): StudyProgress {
+  return replaceDailyPlan(progress, [...progress.dailyPlan, ...questionIds], now)
+}
+
+export function summarizeQuestionSetProgress(
+  progress: StudyProgress,
+  questionIds: number[],
+): QuestionSetProgressSummary {
+  const uniqueIds = [...new Set(questionIds.filter(id => typeof id === 'number'))]
+  const states = uniqueIds.map(questionId => getQuestionState(progress, questionId))
+  const planned = states.filter(state => state.addedToPlan).length
+  const tracked = states.filter(state => state.status !== 'new' || state.addedToPlan).length
+  const total = uniqueIds.length
+
+  return {
+    total,
+    tracked,
+    planned,
+    hasQuestions: total > 0,
+    allPlanned: total > 0 && planned === total,
   }
 }
 
@@ -305,6 +368,46 @@ export function buildPracticeQueue(
   }
 
   return queue.slice(0, limit)
+}
+
+export function buildFocusedPracticeQueue(
+  progress: StudyProgress,
+  candidates: Question[],
+  focusQuestionId: number | null,
+  limit = 10,
+): PracticeQueueItem[] {
+  const queue = buildPracticeQueue(progress, candidates, limit)
+  if (!focusQuestionId) {
+    return queue
+  }
+
+  const existingIndex = queue.findIndex(item => item.id === focusQuestionId)
+  if (existingIndex >= 0) {
+    const focused = queue[existingIndex]
+    return [
+      focused,
+      ...queue.filter(item => item.id !== focusQuestionId),
+    ].slice(0, limit)
+  }
+
+  const focusedQuestion = candidates.find(question => question.id === focusQuestionId)
+  const snapshot = focusedQuestion
+    ? toQuestionSnapshot(focusedQuestion)
+    : progress.questionSnapshots[focusQuestionId]
+  if (!snapshot) {
+    return queue
+  }
+
+  const state = getQuestionState(progress, focusQuestionId)
+  const source: PracticeQueueItem['source'] = state.addedToPlan ? 'plan' : 'new'
+  return [
+    {
+      ...snapshot,
+      status: state.status,
+      source,
+    },
+    ...queue.filter(item => item.id !== focusQuestionId),
+  ].slice(0, limit)
 }
 
 function pushPracticeItem(
