@@ -6,6 +6,7 @@ import {
   buildFocusedPracticeQueue,
   buildPracticeQueue,
   buildReviewQueue,
+  buildScopedPracticeQueue,
   createDefaultProgress,
   getQuestionState,
   parseStudyProgress,
@@ -268,6 +269,39 @@ describe('studyProgress', () => {
 
     expect(queue.map(item => item.id)).toEqual([10, 11])
     expect(queue.map(item => item.source)).toEqual(['new', 'new'])
+  })
+
+  it('prioritizes scoped page questions for direct practice', () => {
+    let progress = createDefaultProgress()
+    const candidates = [
+      baseQuestion(50, 'Redis'),
+      baseQuestion(51, 'MySQL'),
+      baseQuestion(52, 'JVM'),
+      baseQuestion(53, 'Spring'),
+    ]
+    progress = rememberQuestions(progress, candidates)
+    progress = toggleQuestionInPlan(progress, 52, true, '2026-06-15T11:00:00')
+    progress = updateQuestionStatus(progress, 53, 'weak', '2026-06-15T12:00:00')
+
+    const queue = buildScopedPracticeQueue(progress, candidates, [51, 52, 51], null, 4)
+
+    expect(queue.map(item => item.id)).toEqual([51, 52, 53, 50])
+    expect(queue.map(item => item.source)).toEqual(['page', 'page', 'review', 'new'])
+  })
+
+  it('keeps a focused question first inside a scoped practice queue', () => {
+    let progress = createDefaultProgress()
+    const candidates = [
+      baseQuestion(60, 'Redis'),
+      baseQuestion(61, 'MySQL'),
+      baseQuestion(62, 'JVM'),
+    ]
+    progress = rememberQuestions(progress, candidates)
+
+    const queue = buildScopedPracticeQueue(progress, candidates, [60, 61, 62], 62, 3)
+
+    expect(queue.map(item => item.id)).toEqual([62, 60, 61])
+    expect(queue[0].source).toBe('page')
   })
 
   it('moves a focused practice question to the front of the queue', () => {

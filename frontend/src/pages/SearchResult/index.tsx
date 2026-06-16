@@ -96,6 +96,14 @@ export default function SearchResult() {
     addDailyPlanQuestions(pageQuestionIds)
   }
 
+  const startPagePractice = () => {
+    if (pageQuestionIds.length === 0) {
+      navigate('/practice')
+      return
+    }
+    navigate(`/practice?queue=${pageQuestionIds.join(',')}`)
+  }
+
   return (
     <div className="search-page">
       <header className="search-hero">
@@ -150,8 +158,8 @@ export default function SearchResult() {
               {addPageButtonText}
             </Button>
           )}
-          <Button icon={<PlayCircleOutlined />} type="primary" ghost onClick={() => navigate('/practice')}>
-            开始训练
+          <Button icon={<PlayCircleOutlined />} type="primary" ghost onClick={startPagePractice}>
+            {hasPageQuestions ? '练本页' : '开始训练'}
           </Button>
         </div>
       </div>

@@ -1968,6 +1968,11 @@ p {
   color: #2563EB;
 }
 
+.practice-source.source-page {
+  background: #FFFBEB;
+  color: #B45309;
+}
+
 .practice-source.source-new {
   background: #ECFDF5;
   color: #059669;
@@ -2340,6 +2345,10 @@ p {
 
 .practice-queue-panel button > span.source-plan {
   color: #2563EB;
+}
+
+.practice-queue-panel button > span.source-page {
+  color: #B45309;
 }
 
 .practice-queue-panel button > span.source-new {

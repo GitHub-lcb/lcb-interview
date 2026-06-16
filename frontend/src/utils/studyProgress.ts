@@ -410,6 +410,59 @@ export function buildFocusedPracticeQueue(
   ].slice(0, limit)
 }
 
+export function buildScopedPracticeQueue(
+  progress: StudyProgress,
+  candidates: Question[],
+  scopedQuestionIds: number[],
+  focusQuestionId: number | null,
+  limit = 10,
+): PracticeQueueItem[] {
+  const baseQueue = buildFocusedPracticeQueue(progress, candidates, focusQuestionId, limit)
+  const scopedIds = [...new Set(scopedQuestionIds.filter(id => typeof id === 'number'))]
+  if (scopedIds.length === 0) {
+    return baseQueue
+  }
+
+  const candidateSnapshots = Object.fromEntries(
+    candidates.map(question => [question.id, toQuestionSnapshot(question)]),
+  ) as Record<number, QuestionSnapshot>
+  const snapshots = {
+    ...progress.questionSnapshots,
+    ...candidateSnapshots,
+  }
+  const scopedItems = scopedIds
+    .map(id => snapshots[id])
+    .filter((question): question is QuestionSnapshot => Boolean(question))
+    .map(question => ({
+      ...question,
+      status: getQuestionState(progress, question.id).status,
+      source: 'page' as const,
+    }))
+
+  if (scopedItems.length === 0) {
+    return baseQueue
+  }
+
+  const scopedSet = new Set(scopedItems.map(item => item.id))
+  const queue = [
+    ...scopedItems,
+    ...baseQueue.filter(item => !scopedSet.has(item.id)),
+  ]
+
+  if (focusQuestionId) {
+    const focusIndex = queue.findIndex(item => item.id === focusQuestionId)
+    if (focusIndex > 0) {
+      const focused = queue[focusIndex]
+      return [
+        focused,
+        ...queue.filter(item => item.id !== focusQuestionId),
+      ].slice(0, limit)
+    }
+  }
+
+  return queue.slice(0, limit)
+}
+
 function pushPracticeItem(
   queue: PracticeQueueItem[],
   used: Set<number>,

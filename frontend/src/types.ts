@@ -142,7 +142,7 @@ export interface ReviewQueueItem extends QuestionSnapshot {
   reason: string
 }
 
-export type PracticeQueueSource = 'review' | 'plan' | 'new'
+export type PracticeQueueSource = 'review' | 'plan' | 'page' | 'new'
 
 export interface PracticeQueueItem extends QuestionSnapshot {
   status: StudyQuestionStatus

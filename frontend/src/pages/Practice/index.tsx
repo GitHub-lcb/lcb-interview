@@ -16,12 +16,13 @@ import { evaluateInterviewAnswerRemote } from '../../api/interview'
 import { getHotQuestions, getQuestionById } from '../../api/question'
 import type { InterviewFeedback, PracticeQueueItem, Question } from '../../types'
 import { evaluateInterviewAnswer } from '../../utils/interviewCoach'
-import { buildFocusedPracticeQueue, summarizeProgress } from '../../utils/studyProgress'
+import { buildScopedPracticeQueue, summarizeProgress } from '../../utils/studyProgress'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
 const sourceLabels: Record<PracticeQueueItem['source'], string> = {
   review: '复习优先',
   plan: '今日计划',
+  page: '当前筛选',
   new: '新题训练',
 }
 
@@ -84,10 +85,23 @@ export default function Practice() {
   const [appliedFocusId, setAppliedFocusId] = useState<number | null>(null)
   const [isLoadingSeeds, setIsLoadingSeeds] = useState(true)
   const [isLoadingFocus, setIsLoadingFocus] = useState(false)
+  const searchParamKey = searchParams.toString()
+  const focusQuestionParam = searchParams.get('question')
+  const queueParam = searchParams.get('queue')
   const focusQuestionId = useMemo(() => {
-    const value = Number(searchParams.get('question'))
+    const value = Number(focusQuestionParam)
     return Number.isFinite(value) && value > 0 ? value : null
-  }, [searchParams])
+  }, [focusQuestionParam])
+  const scopedQuestionIds = useMemo(() => {
+    if (!queueParam) {
+      return []
+    }
+    return queueParam
+      .split(',')
+      .map(value => Number(value))
+      .filter(value => Number.isFinite(value) && value > 0)
+      .slice(0, 30)
+  }, [queueParam])
   const candidateQuestions = useMemo(() => {
     if (!focusedQuestion) {
       return hotQuestions
@@ -95,8 +109,8 @@ export default function Practice() {
     return [focusedQuestion, ...hotQuestions.filter(question => question.id !== focusedQuestion.id)]
   }, [focusedQuestion, hotQuestions])
   const queue = useMemo(
-    () => buildFocusedPracticeQueue(progress, candidateQuestions, focusQuestionId, 12),
-    [candidateQuestions, focusQuestionId, progress],
+    () => buildScopedPracticeQueue(progress, candidateQuestions, scopedQuestionIds, focusQuestionId, 12),
+    [candidateQuestions, focusQuestionId, progress, scopedQuestionIds],
   )
   const summary = useMemo(() => summarizeProgress(progress), [progress])
 
@@ -132,6 +146,10 @@ export default function Practice() {
     setFocusedQuestion(null)
     setIsLoadingFocus(false)
   }, [focusQuestionId])
+
+  useEffect(() => {
+    setCurrentIndex(0)
+  }, [searchParamKey])
 
   useEffect(() => {
     if (!focusQuestionId || progress.questionSnapshots[focusQuestionId]) {

@@ -88,6 +88,14 @@ export default function QuestionList() {
     addDailyPlanQuestions(pageQuestionIds)
   }
 
+  const startPagePractice = () => {
+    if (pageQuestionIds.length === 0) {
+      navigate('/practice')
+      return
+    }
+    navigate(`/practice?queue=${pageQuestionIds.join(',')}`)
+  }
+
   return (
     <div className="question-list-page">
       <button
@@ -142,8 +150,8 @@ export default function QuestionList() {
               {addPageButtonText}
             </Button>
           )}
-          <Button icon={<PlayCircleOutlined />} type="primary" ghost onClick={() => navigate('/practice')}>
-            开始训练
+          <Button icon={<PlayCircleOutlined />} type="primary" ghost onClick={startPagePractice}>
+            {hasPageQuestions ? '练本页' : '开始训练'}
           </Button>
         </div>
       </div>
