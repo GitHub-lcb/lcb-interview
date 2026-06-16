@@ -6,6 +6,7 @@ import com.lcbinterview.dto.InterviewEvaluateRequest;
 import com.lcbinterview.dto.InterviewFeedbackVO;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -21,6 +22,21 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * DeepSeek 面试评分客户端测试，验证 OpenAI 兼容响应解析、鉴权头和失败处理。
  */
 class DeepSeekInterviewClientTest {
+
+    @Test
+    void springContextCreatesDeepSeekInterviewClientBean() {
+        new ApplicationContextRunner()
+                .withBean(ObjectMapper.class)
+                .withBean(DeepSeekInterviewClient.class)
+                .withPropertyValues(
+                        "ai.deepseek.api-key=test-key",
+                        "ai.deepseek.model=test-model",
+                        "ai.deepseek.url=http://localhost/v1/chat/completions",
+                        "ai.interview.enabled=true",
+                        "ai.interview.timeout-ms=5000"
+                )
+                .run(context -> assertThat(context).hasSingleBean(DeepSeekInterviewClient.class));
+    }
 
     @Test
     void evaluateParsesOpenAiCompatibleJsonResponse() throws IOException {

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Layout, Menu, Drawer, Button, Grid } from 'antd'
-import { Outlet, useNavigate, useLocation } from 'react-router-dom'
+import { Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import {
   DashboardOutlined, RobotOutlined, FileSearchOutlined, MenuOutlined
 } from '@ant-design/icons'
@@ -21,12 +21,10 @@ export default function AdminLayout() {
   const isMobile = !screens.lg
   const [drawerOpen, setDrawerOpen] = useState(false)
 
-  useEffect(() => {
-    const token = localStorage.getItem('adminToken')
-    if (!token) {
-      navigate('/admin/login')
-    }
-  }, [navigate])
+  const token = localStorage.getItem('adminToken')
+  if (!token) {
+    return <Navigate to="/admin/login" replace state={{ from: location.pathname }} />
+  }
 
   const menuComponent = (
     <Menu

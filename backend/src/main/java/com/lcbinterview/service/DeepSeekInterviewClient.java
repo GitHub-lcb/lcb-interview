@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lcbinterview.dto.InterviewCriterionVO;
 import com.lcbinterview.dto.InterviewEvaluateRequest;
 import com.lcbinterview.dto.InterviewFeedbackVO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -51,6 +52,7 @@ public class DeepSeekInterviewClient implements AiInterviewClient {
      * @param enabled      是否启用 AI 评分
      * @param timeoutMs    请求超时时间，毫秒
      */
+    @Autowired
     public DeepSeekInterviewClient(
             ObjectMapper objectMapper,
             @Value("${ai.deepseek.api-key:}") String apiKey,
