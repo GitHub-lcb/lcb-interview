@@ -1173,6 +1173,79 @@ p {
   line-height: 1.7;
 }
 
+.prep-route-progress {
+  display: grid;
+  gap: 7px;
+  padding: 10px 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+}
+
+.prep-route-progress > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.prep-route-progress strong {
+  color: #18181B;
+  font-size: 13px;
+}
+
+.prep-route-progress span {
+  color: #047857;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.prep-route-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.prep-route-metrics > div {
+  min-width: 0;
+  padding: 9px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+}
+
+.prep-route-metrics > div.weak {
+  background: #FEF2F2;
+  border-color: #FECACA;
+}
+
+.prep-route-metrics span {
+  display: block;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.prep-route-metrics strong {
+  display: block;
+  color: #18181B;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.prep-route-metrics .weak strong {
+  color: #DC2626;
+}
+
+.prep-route-card-alert {
+  padding: 9px 11px;
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: 8px;
+  color: #92400E;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .prep-route-section {
   display: grid;
   gap: 8px;
@@ -2897,7 +2970,8 @@ p {
   .study-plan-metrics,
   .study-plan-grid,
   .study-question-item,
-  .command-factor-grid {
+  .command-factor-grid,
+  .prep-route-metrics {
     grid-template-columns: 1fr;
   }
 

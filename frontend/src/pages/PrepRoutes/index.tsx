@@ -1,10 +1,14 @@
-import { Button } from 'antd'
+import { Button, Progress } from 'antd'
 import { ArrowRightOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { prepRoutes } from '../../data/freeSuperiority'
+import { useStudyProgress } from '../../hooks/useStudyProgress'
+import { buildRouteProgressList } from '../../utils/routeProgress'
 
 export default function PrepRoutes() {
   const navigate = useNavigate()
+  const { addDailyPlanQuestions, progress } = useStudyProgress()
+  const routeProgressList = buildRouteProgressList(prepRoutes, progress)
 
   return (
     <div className="prep-page">
@@ -23,8 +27,12 @@ export default function PrepRoutes() {
       </section>
 
       <section className="prep-route-grid" aria-label="备考路线">
-        {prepRoutes.map(route => (
-          <article key={route.id} className="prep-route-card">
+        {routeProgressList.map(routeProgress => {
+          const route = routeProgress.route
+          const canPlanRoute = routeProgress.nextQuestionIds.length > 0
+
+          return (
+            <article key={route.id} className="prep-route-card">
             <div className="prep-route-card-head">
               <div>
                 <span>{route.role}</span>
@@ -33,6 +41,39 @@ export default function PrepRoutes() {
               <em>{route.duration}</em>
             </div>
             <p>{route.summary}</p>
+
+            <div className="prep-route-progress">
+              <div>
+                <strong>路线完成度</strong>
+                <span>{routeProgress.completionRate}%</span>
+              </div>
+              <Progress percent={routeProgress.completionRate} showInfo={false} strokeColor="#059669" />
+            </div>
+
+            <div className="prep-route-metrics" aria-label={`${route.title} 学习进度`}>
+              <div>
+                <span>记忆题</span>
+                <strong>{routeProgress.totalRemembered}</strong>
+              </div>
+              <div>
+                <span>已跟踪</span>
+                <strong>{routeProgress.tracked}</strong>
+              </div>
+              <div>
+                <span>计划内</span>
+                <strong>{routeProgress.planned}</strong>
+              </div>
+              <div className={routeProgress.weak > 0 ? 'weak' : ''}>
+                <span>薄弱题</span>
+                <strong>{routeProgress.weak}</strong>
+              </div>
+            </div>
+
+            {routeProgress.totalRemembered === 0 && (
+              <div className="prep-route-card-alert">
+                这条路线还没有本地题目轨迹，先搜索并打开几道题后会自动生成个人进度。
+              </div>
+            )}
 
             <div className="prep-route-section">
               <strong>推进阶段</strong>
@@ -54,10 +95,27 @@ export default function PrepRoutes() {
             </div>
 
             <div className="prep-action-row">
+              {canPlanRoute && (
+                <>
+                  <Button
+                    type="primary"
+                    icon={<CheckCircleOutlined />}
+                    onClick={() => addDailyPlanQuestions(routeProgress.nextQuestionIds.slice(0, 8))}
+                  >
+                    加入今日计划
+                  </Button>
+                  <Button
+                    icon={<ArrowRightOutlined />}
+                    onClick={() => navigate(`/practice?queue=${routeProgress.nextQuestionIds.slice(0, 12).join(',')}`)}
+                  >
+                    路线训练
+                  </Button>
+                </>
+              )}
               {route.actions.map(action => (
                 <Button
                   key={action.to}
-                  type={action.to === '/practice' ? 'primary' : 'default'}
+                  type={!canPlanRoute && action.to === '/practice' ? 'primary' : 'default'}
                   icon={<ArrowRightOutlined />}
                   onClick={() => navigate(action.to)}
                 >
@@ -65,8 +123,9 @@ export default function PrepRoutes() {
                 </Button>
               ))}
             </div>
-          </article>
-        ))}
+            </article>
+          )
+        })}
       </section>
     </div>
   )
