@@ -1,5 +1,6 @@
 import type { PrepRoute } from '../data/freeSuperiority'
 import type {
+  AbilityMapItem,
   DailyMissionPlan,
   DailyPlanBrief,
   DailyPlanCompletion,
@@ -16,6 +17,7 @@ import type {
   PrepHealthReport,
   StudyProgress,
 } from '../types'
+import { buildAbilityMap } from './abilityMap'
 import { buildDailyMissionPlan } from './dailyMission'
 import { buildDailyPlanBrief } from './dailyPlanBrief'
 import { buildDailyPlanCompletion } from './dailyPlanCompletion'
@@ -43,6 +45,7 @@ export function buildSprintReportMarkdown(
   const health = buildPrepHealthReport(routes, progress, now)
   const brief = buildInterviewBrief(routes, progress, now)
   const completion = buildDailyPlanCompletion(progress, now)
+  const abilityMap = buildAbilityMap(routes, progress)
   const dailyMission = buildDailyMissionPlan(routes, progress, now)
   const dailyBrief = buildDailyPlanBrief(progress, [], now)
   const mistakeLedger = buildInterviewMistakeLedger(progress)
@@ -66,6 +69,7 @@ export function buildSprintReportMarkdown(
     renderLastMinuteBriefSection(lastMinuteBrief),
     renderMaterialVaultSection(materialVault),
     renderFollowUpDefenseSection(followUpDefense),
+    renderAbilityMapSection(abilityMap),
     renderHealthSection(health),
     renderDimensionsSection(health.dimensions),
     renderDailyCompletionSection(completion),
@@ -76,7 +80,7 @@ export function buildSprintReportMarkdown(
     renderMistakeLedgerSection(mistakeLedger),
     renderRecoveryPlanSection(recoveryPlan),
     renderRecoveryAcceptanceSection(recoveryAcceptance),
-    renderActionSection(health, brief, completion, recoveryPlan, materialVault, followUpDefense, recoveryAcceptance, dailyMission),
+    renderActionSection(health, brief, completion, recoveryPlan, materialVault, followUpDefense, recoveryAcceptance, dailyMission, abilityMap),
   ].join('\n')
 }
 
@@ -198,6 +202,31 @@ function renderFollowUpDefenseSection(defense: InterviewFollowUpDefense): string
     `- 摘要：${defense.summary}`,
     ...defense.metrics.map(metric => `- ${metric.label}：${metric.value}，${metric.detail}`),
     ...itemLines,
+    '',
+  ].join('\n')
+}
+
+function renderAbilityMapSection(items: AbilityMapItem[]): string {
+  const focus = items.find(item => item.nextQuestionIds.length > 0)
+  const first = items[0]
+  const summary = focus
+    ? `当前最需要补强 ${focus.title}，准备度 ${focus.readinessScore} 分。`
+    : first && first.remembered > 0
+      ? `当前没有未掌握训练队列，${first.title} 准备度 ${first.readinessScore} 分，可进入模拟面试加压。`
+      : '还没有岗位能力轨迹，先从目标路线进入题目建立样本。'
+  const lines = items.length > 0
+    ? items.slice(0, 5).map(item => {
+      const to = item.nextQuestionIds.length > 0
+        ? `/practice?queue=${item.nextQuestionIds.join(',')}`
+        : '/routes'
+      return `- ${item.title}｜${item.role}：准备度 ${item.readinessScore} 分，薄弱 ${item.weak} 道，学习中 ${item.learning} 道，已掌握 ${item.mastered} 道，已记录 ${item.remembered} 道；${item.summary}；入口：${to}`
+    })
+    : ['- 暂无路线配置，先进入备考路线确认目标岗位。']
+
+  return [
+    '## 岗位能力地图',
+    `- 总览：${summary}`,
+    ...lines,
     '',
   ].join('\n')
 }
@@ -327,8 +356,9 @@ function renderActionSection(
   followUpDefense: InterviewFollowUpDefense,
   recoveryAcceptance: InterviewRecoveryAcceptance,
   dailyMission: DailyMissionPlan,
+  abilityMap: AbilityMapItem[],
 ): string {
-  // 报告被复制到外部文档后仍要能指导下一步，所以保留今日任务、健康、表达、今日闭环、错题恢复、高分素材、追问防线和错题验收行动线。
+  // 报告被复制到外部文档后仍要能指导下一步，所以保留今日任务、能力地图、健康、表达、今日闭环、错题恢复、高分素材、追问防线和错题验收行动线。
   const primaryMission = dailyMission.missions[0]
   const missionLine = primaryMission
     ? `- 今日任务：${primaryMission.title} - ${primaryMission.description}（${primaryMission.to}）`
@@ -337,6 +367,7 @@ function renderActionSection(
   return [
     '## 下一步行动',
     missionLine,
+    buildAbilityActionLine(abilityMap),
     `- 健康雷达：${health.primaryAction.label} - ${health.primaryAction.description}（${health.primaryAction.to}）`,
     `- 面试简报：${brief.primaryAction.label} - ${brief.primaryAction.description}（${brief.primaryAction.to}）`,
     `- 今日闭环：${completion.primaryAction.label} - ${completion.primaryAction.description}（${completion.primaryAction.to}）`,
@@ -346,6 +377,18 @@ function renderActionSection(
     `- 错题验收：${recoveryAcceptance.primaryAction.label} - ${recoveryAcceptance.primaryAction.description}（${recoveryAcceptance.primaryAction.to}）`,
     '',
   ].join('\n')
+}
+
+function buildAbilityActionLine(items: AbilityMapItem[]): string {
+  const focus = items.find(item => item.nextQuestionIds.length > 0)
+  if (focus) {
+    return `- 能力地图：训练 ${focus.title} - 先补 ${focus.nextQuestionIds.length} 道未掌握题，把岗位能力短板拉回学习中。（/practice?queue=${focus.nextQuestionIds.join(',')}）`
+  }
+  const first = items[0]
+  if (first && first.remembered > 0) {
+    return `- 能力地图：进入模拟面试 - ${first.title} 暂无未掌握队列，改用模拟面试检验表达稳定性。（/practice）`
+  }
+  return '- 能力地图：打开备考路线 - 先建立岗位能力样本，系统才会生成路线级短板。（/routes）'
 }
 
 function formatQuestionIds(questionIds: number[]): string {
