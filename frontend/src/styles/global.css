@@ -5200,7 +5200,16 @@ p {
   font-size: 13px;
 }
 
-.practice-feedback-closure-head > span {
+.practice-feedback-closure-head-actions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  align-items: center;
+}
+
+.practice-feedback-closure-head-actions > span {
   flex: 0 0 auto;
   padding: 5px 8px;
   border-radius: 6px;

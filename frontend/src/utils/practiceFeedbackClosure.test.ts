@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewFeedback, PracticeQueueItem } from '../types'
-import { buildPracticeFeedbackClosure } from './practiceFeedbackClosure'
+import { buildPracticeFeedbackClosure, buildPracticeFeedbackClosureMarkdown } from './practiceFeedbackClosure'
 
 function question(overrides: Partial<PracticeQueueItem> = {}): PracticeQueueItem {
   return {
@@ -103,5 +103,45 @@ describe('buildPracticeFeedbackClosure', () => {
     expect(closure.actions[0]).toMatchObject({ kind: 'rewrite' })
     expect(closure.actions[0].description).toContain('项目场景')
     expect(closure.metrics.some(metric => metric.label === '答案长度' && metric.detail === '信息量偏少')).toBe(true)
+  })
+
+  it('exports low-score closure as portable markdown', () => {
+    const markdown = buildPracticeFeedbackClosureMarkdown(
+      question(),
+      'HashMap 在多线程下 put 和 resize 都可能出现覆盖、丢数据和结构异常，所以不能直接并发写。',
+      feedback(52, {
+        criteria: [
+          { key: 'coverage', label: '覆盖度', score: 62, summary: '覆盖一般' },
+          { key: 'structure', label: '结构化', score: 42, summary: '结构不足' },
+          { key: 'specificity', label: '场景细节', score: 55, summary: '场景不足' },
+          { key: 'risk', label: '风险意识', score: 58, summary: '风险不足' },
+        ],
+      }),
+      '2026-06-17T00:00:00.000Z',
+    )
+
+    expect(markdown).toContain('# HashMap 为什么线程不安全？ 单题评分闭环')
+    expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 闭环摘要')
+    expect(markdown).toContain('先修复最低分维度')
+    expect(markdown).toContain('结构化')
+    expect(markdown).toContain('重答结构化')
+    expect(markdown).toContain('标记薄弱')
+    expect(markdown).toContain('## 原始回答')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps short-answer closure export actionable', () => {
+    const markdown = buildPracticeFeedbackClosureMarkdown(
+      question(),
+      '线程不安全。',
+      feedback(76),
+      '2026-06-17T00:00:00.000Z',
+    )
+
+    expect(markdown).toContain('补场景后重答')
+    expect(markdown).toContain('项目场景')
+    expect(markdown).toContain('## 行动清单')
+    expect(markdown).not.toContain('undefined')
   })
 })

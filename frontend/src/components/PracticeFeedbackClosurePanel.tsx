@@ -1,13 +1,14 @@
 import {
   ArrowRightOutlined,
   CheckCircleOutlined,
+  CopyOutlined,
   EditOutlined,
   ExclamationCircleOutlined,
   FileTextOutlined,
   ForwardOutlined,
   QuestionCircleOutlined,
 } from '@ant-design/icons'
-import { Button } from 'antd'
+import { Button, message } from 'antd'
 import { useMemo } from 'react'
 import type {
   InterviewFeedback,
@@ -15,7 +16,7 @@ import type {
   PracticeQueueItem,
   QuestionSnapshot,
 } from '../types'
-import { buildPracticeFeedbackClosure } from '../utils/practiceFeedbackClosure'
+import { buildPracticeFeedbackClosure, buildPracticeFeedbackClosureMarkdown } from '../utils/practiceFeedbackClosure'
 
 interface PracticeFeedbackClosurePanelProps {
   question: PracticeQueueItem | QuestionSnapshot
@@ -74,6 +75,19 @@ export default function PracticeFeedbackClosurePanel({
     }
   }
 
+  const handleCopyReport = async () => {
+    const markdown = buildPracticeFeedbackClosureMarkdown(question, answer, feedback)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('单题评分闭环已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFileName(question.title))
+    message.warning('剪贴板不可用，已下载 Markdown 闭环')
+  }
+
   return (
     <section className={`practice-feedback-closure-panel level-${closure.level}`} aria-label="面试后闭环教练">
       <div className="practice-feedback-closure-head">
@@ -82,7 +96,12 @@ export default function PracticeFeedbackClosurePanel({
           <h2>{closure.title}</h2>
           <p>{closure.summary}</p>
         </div>
-        <span>{closure.primaryAction.label}</span>
+        <div className="practice-feedback-closure-head-actions">
+          <span>{closure.primaryAction.label}</span>
+          <Button size="small" icon={<CopyOutlined />} onClick={handleCopyReport}>
+            复制闭环
+          </Button>
+        </div>
       </div>
 
       <div className="practice-feedback-closure-metrics">
@@ -111,4 +130,32 @@ export default function PracticeFeedbackClosurePanel({
       </div>
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+function buildFileName(title: string): string {
+  const safeTitle = title.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeTitle || '题目'}-单题评分闭环.md`
 }

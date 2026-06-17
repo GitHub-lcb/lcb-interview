@@ -1,8 +1,10 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { InterviewFeedback, PracticeQueueItem } from '../types'
 import PracticeFeedbackClosurePanel from './PracticeFeedbackClosurePanel'
+
+afterEach(() => cleanup())
 
 function question(): PracticeQueueItem {
   return {
@@ -58,5 +60,32 @@ describe('PracticeFeedbackClosurePanel', () => {
 
     expect(onUsePrompt).toHaveBeenCalledTimes(1)
     expect(onUsePrompt.mock.calls[0][0]).toContain('结构化')
+  })
+
+  it('copies the single-question closure markdown', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    })
+
+    render(
+      <PracticeFeedbackClosurePanel
+        question={question()}
+        answer="HashMap 在多线程下 put 和 resize 都可能出现覆盖、丢数据和结构异常，所以不能直接并发写。"
+        feedback={feedback()}
+        onUsePrompt={vi.fn()}
+        onMarkWeak={vi.fn()}
+        onMarkMastered={vi.fn()}
+        onOpenAnswer={vi.fn()}
+        onNext={vi.fn()}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /复制闭环/ }))
+
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1))
+    expect(writeText.mock.calls[0][0]).toContain('# HashMap 为什么线程不安全？ 单题评分闭环')
+    expect(writeText.mock.calls[0][0]).toContain('重答结构化')
   })
 })

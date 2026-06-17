@@ -39,6 +39,91 @@ export function buildPracticeFeedbackClosure(
   }
 }
 
+export function buildPracticeFeedbackClosureMarkdown(
+  question: PracticeQueueItem | QuestionSnapshot,
+  answer: string,
+  feedback: InterviewFeedback,
+  now = new Date().toISOString(),
+): string {
+  const closure = buildPracticeFeedbackClosure(question, answer, feedback)
+
+  return [
+    `# ${question.title} 单题评分闭环`,
+    '',
+    `生成时间：${formatDate(now)}`,
+    `分类：${question.categoryName}`,
+    `难度：${question.difficulty}`,
+    '',
+    renderClosureSummary(closure, feedback),
+    renderCriteria(feedback.criteria),
+    renderClosureMetrics(closure.metrics),
+    renderClosureActions(closure.actions),
+    renderOriginalAnswer(answer),
+  ].join('\n')
+}
+
+function renderClosureSummary(closure: PracticeFeedbackClosure, feedback: InterviewFeedback): string {
+  return [
+    '## 闭环摘要',
+    `- 本轮得分：${feedback.score} 分`,
+    `- 闭环等级：${closure.level}`,
+    `- 闭环判断：${closure.title}`,
+    `- 下一步：${closure.primaryAction?.label ?? '继续复盘'}`,
+    `- 说明：${closure.summary}`,
+    '',
+  ].join('\n')
+}
+
+function renderCriteria(criteria: InterviewCriterion[]): string {
+  const lines = criteria.length > 0
+    ? criteria.map(criterion => `- ${criterion.label}：${criterion.score} 分，${criterion.summary}`)
+    : ['- 暂无评分维度，先完成一次回答再校准。']
+
+  return [
+    '## 评分维度',
+    ...lines,
+    '',
+  ].join('\n')
+}
+
+function renderClosureMetrics(metrics: PracticeFeedbackClosureMetric[]): string {
+  const lines = metrics.length > 0
+    ? metrics.map(metric => `- ${metric.label}：${metric.value}，${metric.detail}`)
+    : ['- 暂无闭环指标。']
+
+  return [
+    '## 闭环指标',
+    ...lines,
+    '',
+  ].join('\n')
+}
+
+function renderClosureActions(actions: PracticeFeedbackClosureAction[]): string {
+  const lines = actions.length > 0
+    ? actions.flatMap((action, index) => {
+      const item = [`${index + 1}. ${action.label}：${action.description}`]
+      if (action.prompt) {
+        item.push(`   Prompt：${action.prompt}`)
+      }
+      return item
+    })
+    : ['1. 重新完成本题回答：先说结论，再补原理、场景、风险和落地。']
+
+  return [
+    '## 行动清单',
+    ...lines,
+    '',
+  ].join('\n')
+}
+
+function renderOriginalAnswer(answer: string): string {
+  return [
+    '## 原始回答',
+    answer.trim() || '暂无回答',
+    '',
+  ].join('\n')
+}
+
 function buildActions(input: {
   question: PracticeQueueItem | QuestionSnapshot
   feedback: InterviewFeedback
@@ -262,4 +347,12 @@ function dedupeActions(actions: PracticeFeedbackClosureAction[]): PracticeFeedba
   }
 
   return result
+}
+
+function formatDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+  return date.toISOString().slice(0, 10)
 }
