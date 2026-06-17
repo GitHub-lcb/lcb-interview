@@ -1,14 +1,27 @@
-import { Button, Progress } from 'antd'
-import { ArrowRightOutlined, CheckCircleOutlined } from '@ant-design/icons'
+import { Button, message, Progress } from 'antd'
+import { ArrowRightOutlined, CheckCircleOutlined, CopyOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { prepRoutes } from '../../data/freeSuperiority'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
-import { buildRouteProgressList } from '../../utils/routeProgress'
+import { buildRoutePlaybookMarkdown, buildRouteProgressList } from '../../utils/routeProgress'
 
 export default function PrepRoutes() {
   const navigate = useNavigate()
   const { addDailyPlanQuestions, progress } = useStudyProgress()
   const routeProgressList = buildRouteProgressList(prepRoutes, progress)
+
+  const handleCopyRoutePlaybook = async () => {
+    const markdown = buildRoutePlaybookMarkdown(prepRoutes, progress)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('备考路线战术包已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildRoutePlaybookFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 路线包')
+  }
 
   return (
     <div className="prep-page">
@@ -19,6 +32,11 @@ export default function PrepRoutes() {
           <p>
             每条路线都把题库、学习计划和模拟面试串起来。题目、答案、追问和评分全部免费开放。
           </p>
+          <div className="prep-hero-actions">
+            <Button icon={<CopyOutlined />} onClick={handleCopyRoutePlaybook}>
+              复制路线包
+            </Button>
+          </div>
         </div>
         <div className="prep-hero-stat">
           <strong>{prepRoutes.length}</strong>
@@ -129,4 +147,34 @@ export default function PrepRoutes() {
       </section>
     </div>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
+function buildRoutePlaybookFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '岗位'}-备考路线战术包.md`
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { PrepRoute } from '../data/freeSuperiority'
 import { createDefaultProgress, rememberQuestions, toggleQuestionInPlan, updateQuestionStatus } from './studyProgress'
-import { buildRouteProgress, buildRouteProgressList } from './routeProgress'
+import { buildRoutePlaybookMarkdown, buildRouteProgress, buildRouteProgressList } from './routeProgress'
 import type { Question } from '../types'
 
 const javaRoute: PrepRoute = {
@@ -107,5 +107,40 @@ describe('routeProgress', () => {
     expect(routeProgress.totalRemembered).toBe(0)
     expect(routeProgress.completionRate).toBe(0)
     expect(routeProgress.nextQuestionIds).toEqual([])
+  })
+
+  it('exports route playbook markdown with personalized route progress and next steps', () => {
+    let progress = createDefaultProgress('2026-06-18T00:00:00.000Z')
+    progress = rememberQuestions(progress, [
+      question(1, 'Java 基础'),
+      question(2, 'Java 并发'),
+    ])
+    progress = updateQuestionStatus(progress, 1, 'mastered')
+    progress = updateQuestionStatus(progress, 2, 'weak')
+    progress = toggleQuestionInPlan(progress, 2, true)
+
+    const markdown = buildRoutePlaybookMarkdown([javaRoute, aiRoute], progress, '2026-06-18T09:00:00.000Z')
+
+    expect(markdown).toContain('# Java 后端 备考路线战术包')
+    expect(markdown).toContain('生成时间：2026-06-18')
+    expect(markdown).toContain('## 路线总览')
+    expect(markdown).toContain('今日优先：Java 路线')
+    expect(markdown).toContain('## 路线战术')
+    expect(markdown).toContain('1. Java 路线')
+    expect(markdown).toContain('路线完成度：50%')
+    expect(markdown).toContain('推进阶段：基础、并发')
+    expect(markdown).toContain('覆盖方向：Java 基础、Java 并发')
+    expect(markdown).toContain('下一组训练：/practice?queue=2')
+    expect(markdown).toContain('兜底入口：/search?q=Java')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps empty route playbook export actionable', () => {
+    const markdown = buildRoutePlaybookMarkdown([javaRoute], createDefaultProgress(), '2026-06-18T09:00:00.000Z')
+
+    expect(markdown).toContain('# Java 后端 备考路线战术包')
+    expect(markdown).toContain('先搜索并打开几道题建立本地轨迹')
+    expect(markdown).toContain('兜底入口：/search?q=Java')
+    expect(markdown).not.toContain('undefined')
   })
 })

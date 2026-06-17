@@ -1826,6 +1826,19 @@ p {
   margin: 8px 0 0 0;
 }
 
+.prep-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.prep-hero-actions .ant-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .prep-hero-stat {
   display: grid;
   justify-items: start;
