@@ -264,6 +264,11 @@ function renderDailyCompletionSection(completion: DailyPlanCompletion): string {
   const todoLines = completion.todos.length > 0
     ? completion.todos.map(todo => `- 待办：${todo.title} - ${todo.description}（${todo.to}）`)
     : ['- 待办：暂无额外待办。']
+  const scoreImpactLines = completion.statusImpacts.length > 0
+    ? completion.statusImpacts.map(impact => (
+      `- 评分影响：${impact.title}，${impact.score} 分，${impact.message}（题目 ID：${impact.questionId}）`
+    ))
+    : ['- 评分影响：今日还没有计划内模拟面试评分，完成评分后会自动解释计划变化。']
 
   return [
     '## 今日计划闭环',
@@ -274,6 +279,7 @@ function renderDailyCompletionSection(completion: DailyPlanCompletion): string {
     `- 复习债：${completion.reviewDebtCount} 道`,
     `- 薄弱题：${completion.weakCount} 道`,
     `- 今日面试：${completion.interviewTodayCount} 次`,
+    ...scoreImpactLines,
     ...todoLines,
     '',
   ].join('\n')
