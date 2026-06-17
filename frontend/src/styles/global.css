@@ -5443,17 +5443,24 @@ p {
   margin: 0;
 }
 
-.practice-answer-readiness-main > div > small {
-  display: inline-flex;
-  margin-top: 6px;
-  color: #18181B;
-  font-weight: 800;
-}
-
 .practice-answer-readiness-items {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
+}
+
+.practice-answer-readiness-next {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.practice-answer-readiness-next > small {
+  color: #18181B;
+  font-weight: 800;
 }
 
 .practice-answer-readiness-items > div {
@@ -6634,6 +6641,14 @@ p {
 
   .practice-answer-scaffold-actions .ant-btn {
     flex: 1 1 136px;
+  }
+
+  .practice-answer-readiness-next {
+    align-items: stretch;
+  }
+
+  .practice-answer-readiness-next .ant-btn {
+    flex: 1 1 140px;
   }
 
   .practice-answer-actions {

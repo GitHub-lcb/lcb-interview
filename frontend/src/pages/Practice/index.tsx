@@ -387,6 +387,11 @@ export default function Practice() {
     setFeedback(null)
   }
 
+  const useRepairTemplate = (template: string) => {
+    setAnswerDraft(template)
+    setFeedback(null)
+  }
+
   if (!current || !currentState) {
     return (
       <div className="practice-empty-page">
@@ -486,7 +491,11 @@ export default function Practice() {
             maxLength={1600}
             showCount
           />
-          <PracticeAnswerReadinessPanel question={current} answer={answerDraft} />
+          <PracticeAnswerReadinessPanel
+            question={current}
+            answer={answerDraft}
+            onUseRepairTemplate={useRepairTemplate}
+          />
           <div className="practice-answer-actions">
             <Button
               type="primary"

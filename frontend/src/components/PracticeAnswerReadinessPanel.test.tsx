@@ -1,4 +1,5 @@
 import { cleanup, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PracticeQueueItem } from '../types'
@@ -62,5 +63,24 @@ describe('PracticeAnswerReadinessPanel', () => {
 
     expect(screen.getByText('100')).toBeInTheDocument()
     expect(screen.getByText('可以提交评分')).toBeInTheDocument()
+  })
+
+  it('passes the repair template back to the answer box', async () => {
+    const onUseRepairTemplate = vi.fn()
+    const answer = '结论：HashMap 多线程不安全。机制：扩容和 put 时可能发生覆盖写和结构异常。'
+
+    render(
+      <PracticeAnswerReadinessPanel
+        question={question()}
+        answer={answer}
+        onUseRepairTemplate={onUseRepairTemplate}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /补项目场景/ }))
+
+    expect(onUseRepairTemplate).toHaveBeenCalledTimes(1)
+    expect(onUseRepairTemplate.mock.calls[0][0]).toContain(answer)
+    expect(onUseRepairTemplate.mock.calls[0][0]).toContain('HashMap 为什么线程不安全')
   })
 })
