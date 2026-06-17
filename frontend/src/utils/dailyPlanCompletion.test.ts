@@ -33,19 +33,19 @@ function markQuestion(
   }
 }
 
-function interviewAttempt(questionId: number, createdAt = NOW): InterviewAttempt {
+function interviewAttempt(questionId: number, createdAt = NOW, score = 82): InterviewAttempt {
   return {
     questionId,
     answer: '模拟回答',
     createdAt,
     feedback: {
-      score: 82,
-      level: 'strong',
+      score,
+      level: score >= 80 ? 'strong' : score >= 70 ? 'pass' : 'needs-work',
       criteria: [
-        { key: 'coverage', label: '知识覆盖', score: 82, summary: '覆盖情况' },
-        { key: 'structure', label: '表达结构', score: 82, summary: '结构情况' },
-        { key: 'specificity', label: '场景细节', score: 82, summary: '场景情况' },
-        { key: 'risk', label: '边界风险', score: 82, summary: '风险情况' },
+        { key: 'coverage', label: '知识覆盖', score, summary: '覆盖情况' },
+        { key: 'structure', label: '表达结构', score, summary: '结构情况' },
+        { key: 'specificity', label: '场景细节', score, summary: '场景情况' },
+        { key: 'risk', label: '边界风险', score, summary: '风险情况' },
       ],
       advice: [],
       followUps: [],
@@ -133,6 +133,107 @@ describe('buildDailyPlanCompletion', () => {
     expect(completion.primaryAction.label).toBe('查看冲刺报告')
   })
 
+  it('explains today score impacts for planned questions only', () => {
+    let progress = progressWithPlan([1, 2])
+    progress = markQuestion(progress, 1, 'weak', NOW, 2)
+    progress = markQuestion(progress, 2, 'mastered', NOW, 4)
+    progress = {
+      ...progress,
+      questionSnapshots: {
+        1: {
+          id: 1,
+          title: 'HashMap 为什么线程不安全',
+          difficulty: '中等',
+          categoryName: 'Java 集合',
+          tags: ['Java'],
+          viewCount: 120,
+        },
+        2: {
+          id: 2,
+          title: 'Redis 缓存穿透怎么处理',
+          difficulty: '中等',
+          categoryName: 'Redis',
+          tags: ['缓存'],
+          viewCount: 96,
+        },
+      },
+      interviewAttempts: {
+        1: [
+          interviewAttempt(1, '2026-06-16T08:00:00.000Z', 86),
+          interviewAttempt(1, '2026-06-17T08:00:00.000Z', 55),
+        ],
+        2: [interviewAttempt(2, '2026-06-17T08:30:00.000Z', 86)],
+        3: [interviewAttempt(3, '2026-06-17T08:45:00.000Z', 88)],
+      },
+    }
+
+    const completion = buildDailyPlanCompletion(progress, NOW)
+
+    expect(completion.statusImpacts.map(impact => impact.questionId)).toEqual([2, 1])
+    expect(completion.statusImpacts[0]).toMatchObject({
+      title: 'Redis 缓存穿透怎么处理',
+      score: 86,
+      status: 'mastered',
+      message: '已同步为已掌握，计入今日完成。',
+    })
+    expect(completion.statusImpacts[1]).toMatchObject({
+      title: 'HashMap 为什么线程不安全',
+      score: 55,
+      status: 'weak',
+      message: '已自动标记薄弱，并留在今日计划继续补强。',
+    })
+  })
+
+  it('keeps only the latest score impact for the same planned question today', () => {
+    let progress = progressWithPlan([1])
+    progress = markQuestion(progress, 1, 'mastered', NOW, 4)
+    progress = {
+      ...progress,
+      interviewAttempts: {
+        1: [
+          interviewAttempt(1, '2026-06-17T07:30:00.000Z', 55),
+          interviewAttempt(1, '2026-06-17T08:30:00.000Z', 86),
+        ],
+      },
+    }
+
+    const completion = buildDailyPlanCompletion(progress, NOW)
+
+    expect(completion.statusImpacts).toHaveLength(1)
+    expect(completion.statusImpacts[0]).toMatchObject({
+      questionId: 1,
+      score: 86,
+      status: 'mastered',
+    })
+  })
+
+  it('exports score impacts in daily completion markdown', () => {
+    let progress = progressWithPlan([1])
+    progress = {
+      ...progress,
+      targetRole: 'Java 后端',
+      questionSnapshots: {
+        1: {
+          id: 1,
+          title: 'HashMap 为什么线程不安全',
+          difficulty: '中等',
+          categoryName: 'Java 集合',
+          tags: ['Java'],
+          viewCount: 120,
+        },
+      },
+      interviewAttempts: {
+        1: [interviewAttempt(1, '2026-06-17T08:30:00.000Z', 86)],
+      },
+    }
+
+    const markdown = buildDailyPlanCompletionMarkdown(progress, NOW)
+
+    expect(markdown).toContain('## 评分影响')
+    expect(markdown).toContain('HashMap 为什么线程不安全：86 分，已同步为已掌握，计入今日完成。')
+    expect(markdown).not.toContain('undefined')
+  })
+
   it('exports risky daily completion as portable markdown', () => {
     let progress = progressWithPlan([1, 2])
     progress = {
@@ -149,6 +250,8 @@ describe('buildDailyPlanCompletion', () => {
     expect(markdown).toContain('## 验收概览')
     expect(markdown).toContain('今日闭环还有风险')
     expect(markdown).toContain('## 指标')
+    expect(markdown).toContain('## 评分影响')
+    expect(markdown).toContain('今日还没有计划内模拟面试评分')
     expect(markdown).toContain('## 待办验收')
     expect(markdown).toContain('## 主行动')
     expect(markdown).toContain('入口：/practice?queue=1')

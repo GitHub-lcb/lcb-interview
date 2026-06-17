@@ -3344,6 +3344,93 @@ p {
   line-height: 1.55;
 }
 
+.daily-plan-completion-impacts {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px;
+  background: #F8FAFC;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+}
+
+.daily-plan-completion-impacts-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.daily-plan-completion-impacts-head strong {
+  color: #18181B;
+  font-size: 14px;
+}
+
+.daily-plan-completion-impacts-head span,
+.daily-plan-completion-impacts p {
+  margin: 0;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.daily-plan-completion-impact-list {
+  display: grid;
+  gap: 8px;
+}
+
+.daily-plan-completion-impact-list article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  min-width: 0;
+  padding: 10px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 3px 0 0 #64748B;
+}
+
+.daily-plan-completion-impact-list article.status-weak {
+  background: #FFFBEB;
+  border-color: #FDE68A;
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.daily-plan-completion-impact-list article.status-learning {
+  background: #EFF6FF;
+  border-color: #BFDBFE;
+  box-shadow: inset 3px 0 0 #2563EB;
+}
+
+.daily-plan-completion-impact-list article.status-mastered {
+  background: #ECFDF5;
+  border-color: #A7F3D0;
+  box-shadow: inset 3px 0 0 #059669;
+}
+
+.daily-plan-completion-impact-list strong {
+  overflow: hidden;
+  color: #18181B;
+  font-size: 13px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.daily-plan-completion-impact-list em {
+  color: #0F172A;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.daily-plan-completion-impact-list span {
+  grid-column: 1 / -1;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .daily-plan-completion-todos {
   display: grid;
   gap: 8px;
@@ -7030,6 +7117,7 @@ p {
   .daily-plan-brief-metrics,
   .daily-plan-completion-body,
   .daily-plan-completion-metrics,
+  .daily-plan-completion-impact-list article,
   .interview-emergency-kit-body,
   .interview-emergency-kit-metrics,
   .interview-last-minute-brief-body,

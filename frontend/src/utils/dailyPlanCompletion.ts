@@ -1,13 +1,16 @@
 import type {
   DailyPlanCompletion,
   DailyPlanCompletionAction,
+  DailyPlanCompletionImpact,
   DailyPlanCompletionLevel,
   DailyPlanCompletionMetric,
   DailyPlanCompletionTodo,
+  InterviewAttempt,
   StudyProgress,
+  StudyQuestionStatus,
 } from '../types'
 import { buildScheduledReviewQueue } from './reviewSchedule'
-import { getQuestionState } from './studyProgress'
+import { describeInterviewStatusSync, getQuestionState } from './studyProgress'
 import { buildDailyPracticePath } from './practiceRoute'
 
 export function buildDailyPlanCompletion(
@@ -24,6 +27,7 @@ export function buildDailyPlanCompletion(
     .filter(item => planIdSet.has(item.id) && item.dueStatus !== 'upcoming')
     .map(item => item.id)
   const interviewTodayCount = countTodayInterviewAttempts(progress, planIdSet, now)
+  const statusImpacts = buildScoreImpacts(progress, planIdSet, now)
   const remainingCount = Math.max(0, totalCount - masteredCount)
   const completionRate = totalCount === 0 ? 0 : Math.round((masteredCount / totalCount) * 100)
   const level = resolveLevel({
@@ -47,6 +51,7 @@ export function buildDailyPlanCompletion(
     reviewDebtCount: reviewDebtIds.length,
     interviewTodayCount,
     metrics: buildMetrics(completionRate, masteredCount, totalCount, reviewDebtIds.length, weakIds.length, interviewTodayCount),
+    statusImpacts,
     todos: buildTodos(level, planIds, reviewDebtIds, weakIds, remainingCount, interviewTodayCount),
     primaryAction,
   }
@@ -72,6 +77,7 @@ export function buildDailyPlanCompletionMarkdown(
     '',
     renderDailyCompletionOverview(completion),
     renderDailyCompletionMetrics(completion.metrics),
+    renderDailyCompletionScoreImpacts(completion.statusImpacts),
     renderDailyCompletionTodos(completion.todos),
     renderDailyCompletionPrimaryAction(completion.primaryAction),
   ].join('\n').trimEnd()
@@ -91,6 +97,22 @@ function renderDailyCompletionMetrics(metrics: DailyPlanCompletionMetric[]): str
   return [
     '## 指标',
     ...metrics.map(metric => `- ${metric.label}：${metric.value}，${metric.detail}`),
+    '',
+  ].join('\n')
+}
+
+function renderDailyCompletionScoreImpacts(impacts: DailyPlanCompletionImpact[]): string {
+  if (impacts.length === 0) {
+    return [
+      '## 评分影响',
+      '- 今日还没有计划内模拟面试评分，完成评分后会自动解释计划变化。',
+      '',
+    ].join('\n')
+  }
+
+  return [
+    '## 评分影响',
+    ...impacts.map(impact => `- ${impact.title}：${impact.score} 分，${impact.message}`),
     '',
   ].join('\n')
 }
@@ -239,6 +261,41 @@ function buildMetrics(
   ]
 }
 
+function buildScoreImpacts(
+  progress: StudyProgress,
+  planIdSet: Set<number>,
+  now: string,
+): DailyPlanCompletionImpact[] {
+  const todayKey = dateKey(now)
+
+  return Object.entries(progress.interviewAttempts)
+    .flatMap(([questionIdText, attempts]) => {
+      const questionId = Number(questionIdText)
+      if (!planIdSet.has(questionId) || !Array.isArray(attempts)) {
+        return []
+      }
+
+      const latestAttempt = attempts
+        .filter(attempt => dateKey(attempt.createdAt) === todayKey)
+        .sort(compareAttemptCreatedAtDesc)[0]
+
+      if (!latestAttempt) {
+        return []
+      }
+
+      const status = describeInterviewStatusSync(latestAttempt.feedback.score).status
+      return [{
+        questionId,
+        title: resolveQuestionTitle(progress, questionId),
+        score: latestAttempt.feedback.score,
+        status,
+        message: scoreImpactMessage(status),
+        createdAt: latestAttempt.createdAt,
+      }]
+    })
+    .sort((left, right) => compareCreatedAtDesc(left.createdAt, right.createdAt))
+}
+
 function buildTodos(
   level: DailyPlanCompletionLevel,
   planIds: number[],
@@ -347,6 +404,18 @@ function summaryForLevel(
   return `今日 ${totalCount} 道计划题已掌握，并完成 ${interviewTodayCount} 次模拟面试样本。`
 }
 
+function compareAttemptCreatedAtDesc(left: InterviewAttempt, right: InterviewAttempt): number {
+  return compareCreatedAtDesc(left.createdAt, right.createdAt)
+}
+
+function compareCreatedAtDesc(left: string, right: string): number {
+  const timeDiff = toTimestamp(right) - toTimestamp(left)
+  if (timeDiff !== 0) {
+    return timeDiff
+  }
+  return right.localeCompare(left)
+}
+
 function countTodayInterviewAttempts(
   progress: StudyProgress,
   planIdSet: Set<number>,
@@ -360,6 +429,21 @@ function countTodayInterviewAttempts(
     .length
 }
 
+function resolveQuestionTitle(progress: StudyProgress, questionId: number): string {
+  const title = progress.questionSnapshots[questionId]?.title?.trim()
+  return title || `题目 ${questionId}`
+}
+
+function scoreImpactMessage(status: StudyQuestionStatus): string {
+  if (status === 'weak') {
+    return '已自动标记薄弱，并留在今日计划继续补强。'
+  }
+  if (status === 'learning') {
+    return '已同步为学习中，继续复盘到 80 分以上。'
+  }
+  return '已同步为已掌握，计入今日完成。'
+}
+
 function dateKey(value: string): string {
   const normalized = /(?:Z|[+-]\d{2}:\d{2})$/.test(value) ? value : `${value}Z`
   const date = new Date(normalized)
@@ -367,6 +451,12 @@ function dateKey(value: string): string {
     return value.slice(0, 10)
   }
   return date.toISOString().slice(0, 10)
+}
+
+function toTimestamp(value: string): number {
+  const normalized = /(?:Z|[+-]\d{2}:\d{2})$/.test(value) ? value : `${value}Z`
+  const time = new Date(normalized).getTime()
+  return Number.isNaN(time) ? 0 : time
 }
 
 function uniquePositiveIds(questionIds: number[]): number[] {

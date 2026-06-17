@@ -33,6 +33,16 @@ function completedProgress(): StudyProgress {
   return {
     ...createDefaultProgress(NOW),
     dailyPlan: [1],
+    questionSnapshots: {
+      1: {
+        id: 1,
+        title: 'HashMap 为什么线程不安全',
+        difficulty: '中等',
+        categoryName: 'Java 集合',
+        tags: ['Java'],
+        viewCount: 120,
+      },
+    },
     questionStates: {
       1: {
         status: 'mastered',
@@ -81,6 +91,19 @@ describe('DailyPlanCompletionPanel', () => {
     expect(screen.getByRole('button', { name: /查看冲刺报告/ })).toBeInTheDocument()
   })
 
+  it('renders score impact explanations', () => {
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <DailyPlanCompletionPanel progress={completedProgress()} now={NOW} />
+      </MemoryRouter>
+    )
+
+    expect(screen.getByText('评分影响')).toBeInTheDocument()
+    expect(screen.getByText('HashMap 为什么线程不安全')).toBeInTheDocument()
+    expect(screen.getByText('88 分')).toBeInTheDocument()
+    expect(screen.getByText('已同步为已掌握，计入今日完成。')).toBeInTheDocument()
+  })
+
   it('copies daily completion markdown', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.defineProperty(navigator, 'clipboard', {
@@ -99,5 +122,7 @@ describe('DailyPlanCompletionPanel', () => {
     await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1))
     expect(writeText.mock.calls[0][0]).toContain('# Java 后端 今日闭环验收')
     expect(writeText.mock.calls[0][0]).toContain('今日闭环已加强')
+    expect(writeText.mock.calls[0][0]).toContain('## 评分影响')
+    expect(writeText.mock.calls[0][0]).toContain('HashMap 为什么线程不安全：88 分，已同步为已掌握，计入今日完成。')
   })
 })

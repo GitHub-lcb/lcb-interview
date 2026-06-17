@@ -73,6 +73,26 @@ export default function DailyPlanCompletionPanel({
         </div>
       </div>
 
+      <div className="daily-plan-completion-impacts" aria-label="评分影响">
+        <div className="daily-plan-completion-impacts-head">
+          <strong>评分影响</strong>
+          <span>解释今日计划为什么变化</span>
+        </div>
+        {completion.statusImpacts.length > 0 ? (
+          <div className="daily-plan-completion-impact-list">
+            {completion.statusImpacts.map(impact => (
+              <article key={`${impact.questionId}-${impact.createdAt}`} className={`status-${impact.status}`}>
+                <strong>{impact.title}</strong>
+                <em>{impact.score} 分</em>
+                <span>{impact.message}</span>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p>今日还没有计划内模拟面试评分，完成评分后会自动解释计划变化。</p>
+        )}
+      </div>
+
       <div className="daily-plan-completion-todos">
         {completion.todos.map(todo => (
           <button key={todo.id} type="button" className={`tone-${todo.tone}`} onClick={() => navigate(todo.to)}>

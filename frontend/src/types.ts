@@ -445,6 +445,15 @@ export interface DailyPlanCompletionTodo {
   to: string
 }
 
+export interface DailyPlanCompletionImpact {
+  questionId: number
+  title: string
+  score: number
+  status: StudyQuestionStatus
+  message: string
+  createdAt: string
+}
+
 export interface DailyPlanCompletion {
   level: DailyPlanCompletionLevel
   title: string
@@ -457,6 +466,7 @@ export interface DailyPlanCompletion {
   reviewDebtCount: number
   interviewTodayCount: number
   metrics: DailyPlanCompletionMetric[]
+  statusImpacts: DailyPlanCompletionImpact[]
   todos: DailyPlanCompletionTodo[]
   primaryAction: DailyPlanCompletionAction
 }
