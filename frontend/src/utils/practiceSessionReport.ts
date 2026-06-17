@@ -80,6 +80,71 @@ export function buildPracticeSessionReport(
   }
 }
 
+export function buildPracticeSessionReportMarkdown(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): string {
+  const report = buildPracticeSessionReport(queue, progress)
+
+  return [
+    `# ${progress.targetRole} 本轮模拟面试战报`,
+    '',
+    `生成时间：${formatDate(now)}`,
+    `队列题数：${queue.length}`,
+    '',
+    renderSessionSummary(report),
+    renderSessionMetrics(report.metrics),
+    renderSessionQueue(queue, progress),
+    renderSessionAction(report.primaryAction),
+  ].join('\n')
+}
+
+function renderSessionSummary(report: PracticeSessionReport): string {
+  return [
+    '## 本轮摘要',
+    `- 状态：${report.title}`,
+    `- 说明：${report.summary}`,
+    `- 已答：${report.answeredCount}/${report.totalCount}`,
+    `- 平均分：${report.averageScore}`,
+    `- 通过数：${report.passCount}`,
+    `- 低分/薄弱题：${formatQuestionIds(report.weakQuestionIds)}`,
+    '',
+  ].join('\n')
+}
+
+function renderSessionMetrics(metrics: PracticeSessionReportMetric[]): string {
+  return [
+    '## 核心指标',
+    ...metrics.map(metric => `- ${metric.label}：${metric.value}，${metric.detail}`),
+    '',
+  ].join('\n')
+}
+
+function renderSessionQueue(queue: PracticeQueueItem[], progress: StudyProgress): string {
+  const lines = queue.length > 0
+    ? queue.map((item, index) => {
+      const latestScore = latestAttemptForQuestion(progress, item.id)?.feedback.score
+      const status = progress.questionStates[item.id]?.status ?? item.status
+      return `- ${index + 1}. ${item.title}：${item.categoryName}，${item.difficulty}，来源 ${item.source}，状态 ${status}，最近评分 ${formatScore(latestScore)}`
+    })
+    : ['- 暂无题目，先从学习计划、弱题或题库进入模拟面试。']
+
+  return [
+    '## 题目队列',
+    ...lines,
+    '',
+  ].join('\n')
+}
+
+function renderSessionAction(action: PracticeSessionReportAction): string {
+  return [
+    '## 下一步行动',
+    `- ${action.label}：${action.description}（${action.to}）`,
+    '',
+  ].join('\n')
+}
+
 function buildEmptyReport(totalCount: number): PracticeSessionReport {
   return {
     level: 'empty',
@@ -281,4 +346,20 @@ function buildMetrics(input: {
       detail: input.weakestCriterion?.summary ?? '完成评分后自动定位',
     },
   ]
+}
+
+function formatQuestionIds(questionIds: number[]): string {
+  return questionIds.length > 0 ? questionIds.join(', ') : '暂无'
+}
+
+function formatScore(score?: number): string {
+  return typeof score === 'number' ? `${score} 分` : '暂无'
+}
+
+function formatDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+  return date.toISOString().slice(0, 10)
 }

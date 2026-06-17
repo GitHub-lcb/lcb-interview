@@ -5719,7 +5719,14 @@ p {
   line-height: 1.6;
 }
 
-.practice-session-report-head > span {
+.practice-session-report-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.practice-session-report-head-actions > span {
   padding: 5px 8px;
   border-radius: 6px;
   background: #F8FAFC;

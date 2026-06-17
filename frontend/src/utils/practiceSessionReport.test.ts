@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewAttempt, InterviewCriterionKey, InterviewFeedback, PracticeQueueItem, StudyProgress } from '../types'
-import { buildPracticeSessionReport } from './practiceSessionReport'
+import { buildPracticeSessionReport, buildPracticeSessionReportMarkdown } from './practiceSessionReport'
 
 const NOW = '2026-06-17T08:00:00.000Z'
 
@@ -131,5 +131,43 @@ describe('buildPracticeSessionReport', () => {
     expect(report.passCount).toBe(2)
     expect(report.weakQuestionIds).toEqual([])
     expect(report.primaryAction).toMatchObject({ kind: 'review', to: '/study' })
+  })
+
+  it('exports a portable markdown report for the current practice session', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1), question(2), question(3, { status: 'weak' })],
+      progress({
+        questionStates: {
+          3: { status: 'weak', addedToPlan: true, reviewCount: 2 },
+        },
+        interviewAttempts: {
+          1: [attempt(1, 62, { structure: 60 })],
+          2: [attempt(2, 55, { structure: 45 })],
+        },
+      }),
+      NOW,
+    )
+
+    expect(markdown).toContain('# Java 后端 本轮模拟面试战报')
+    expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 本轮摘要')
+    expect(markdown).toContain('状态：本轮优先补弱')
+    expect(markdown).toContain('低分/薄弱题：1, 2, 3')
+    expect(markdown).toContain('## 核心指标')
+    expect(markdown).toContain('最弱项：结构化')
+    expect(markdown).toContain('## 题目队列')
+    expect(markdown).toContain('Java 面试题 2')
+    expect(markdown).toContain('最近评分 55 分')
+    expect(markdown).toContain('## 下一步行动')
+    expect(markdown).toContain('/practice?queue=1,2,3')
+  })
+
+  it('keeps empty session markdown actionable', () => {
+    const markdown = buildPracticeSessionReportMarkdown([], progress(), NOW)
+
+    expect(markdown).toContain('先选择一组面试题')
+    expect(markdown).toContain('当前还没有练习队列')
+    expect(markdown).toContain('暂无题目')
+    expect(markdown).not.toContain('undefined')
   })
 })

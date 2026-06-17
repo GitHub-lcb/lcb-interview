@@ -2,10 +2,11 @@ import {
   ArrowRightOutlined,
   BarChartOutlined,
   CheckCircleOutlined,
+  CopyOutlined,
   PlayCircleOutlined,
   ReloadOutlined,
 } from '@ant-design/icons'
-import { Button } from 'antd'
+import { Button, message } from 'antd'
 import { useMemo } from 'react'
 import type {
   PracticeQueueItem,
@@ -13,7 +14,7 @@ import type {
   PracticeSessionReportAction,
   StudyProgress,
 } from '../types'
-import { buildPracticeSessionReport } from '../utils/practiceSessionReport'
+import { buildPracticeSessionReport, buildPracticeSessionReportMarkdown } from '../utils/practiceSessionReport'
 
 interface PracticeSessionReportPanelProps {
   queue: PracticeQueueItem[]
@@ -45,6 +46,19 @@ export default function PracticeSessionReportPanel({
     [progress, queue],
   )
 
+  const handleCopyReport = async () => {
+    const markdown = buildPracticeSessionReportMarkdown(queue, progress)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('本轮模拟面试战报已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 战报')
+  }
+
   return (
     <section className={`practice-session-report-panel level-${report.level}`} aria-label="本轮模拟面试战报">
       <div className="practice-session-report-head">
@@ -56,7 +70,12 @@ export default function PracticeSessionReportPanel({
           <h3>{report.title}</h3>
           <p>{report.summary}</p>
         </div>
-        <span>{levelLabels[report.level]}</span>
+        <div className="practice-session-report-head-actions">
+          <span>{levelLabels[report.level]}</span>
+          <Button size="small" icon={<CopyOutlined />} onClick={handleCopyReport}>
+            复制战报
+          </Button>
+        </div>
       </div>
 
       <div className="practice-session-report-metrics">
@@ -81,4 +100,32 @@ export default function PracticeSessionReportPanel({
       </Button>
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+function buildFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '面试'}-本轮模拟面试战报.md`
 }

@@ -57,6 +57,11 @@ function progress(): StudyProgress {
 describe('PracticeSessionReportPanel', () => {
   it('renders session metrics and navigates with the primary action', async () => {
     const onNavigate = vi.fn()
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    })
 
     render(
       <PracticeSessionReportPanel
@@ -70,6 +75,11 @@ describe('PracticeSessionReportPanel', () => {
     expect(screen.getByText('本轮正在推进')).toBeInTheDocument()
     expect(screen.getByText('1 / 2')).toBeInTheDocument()
     expect(screen.getByText('76 分')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: /复制战报/ }))
+
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('# Java 后端 本轮模拟面试战报'))
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('本轮正在推进'))
 
     await userEvent.click(screen.getByRole('button', { name: /继续未答题/ }))
 
