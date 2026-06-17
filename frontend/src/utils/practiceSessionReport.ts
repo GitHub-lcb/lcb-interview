@@ -7,6 +7,7 @@ import type {
   PracticeSessionReportAction,
   PracticeSessionReportLevel,
   PracticeSessionReportMetric,
+  PracticeSessionQueueProfile,
   PracticeSessionRepairAction,
   StudyProgress,
 } from '../types'
@@ -60,9 +61,10 @@ export function buildPracticeSessionReport(
   const answeredCount = answeredItems.length
   const weakQuestionIds = resolveWeakQuestionIds(sessionItems, progress)
   const repairActions = buildRepairActions(sessionItems, progress)
+  const queueProfile = buildQueueProfile(queue, progress, weakQuestionIds)
 
   if (totalCount === 0 || answeredCount === 0) {
-    return buildEmptyReport(totalCount, repairActions, weakQuestionIds)
+    return buildEmptyReport(totalCount, repairActions, weakQuestionIds, queueProfile)
   }
 
   const averageScore = Math.round(
@@ -99,6 +101,7 @@ export function buildPracticeSessionReport(
       unansweredCount: unansweredIds.length,
     }),
     repairActions,
+    queueProfile,
     primaryAction,
   }
 }
@@ -118,7 +121,7 @@ export function buildPracticeSessionReportMarkdown(
     '',
     renderSessionSummary(report),
     renderSessionMetrics(report.metrics),
-    renderSessionQueueProfile(queue, progress, report),
+    renderSessionQueueProfile(report.queueProfile),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
     renderSessionAction(report.primaryAction),
@@ -164,12 +167,8 @@ function renderSessionMetrics(metrics: PracticeSessionReportMetric[]): string {
   ].join('\n')
 }
 
-function renderSessionQueueProfile(
-  queue: PracticeQueueItem[],
-  progress: StudyProgress,
-  report: PracticeSessionReport,
-): string {
-  if (queue.length === 0) {
+function renderSessionQueueProfile(profile: PracticeSessionQueueProfile): string {
+  if (profile.isEmpty) {
     return [
       '## 队列画像',
       '- 暂无队列画像。先从学习计划、薄弱题或题库进入模拟面试。',
@@ -177,19 +176,13 @@ function renderSessionQueueProfile(
     ].join('\n')
   }
 
-  const unansweredIds = resolveUnansweredQuestionIds(queue, progress)
-  const nextQuestion = queue.find(item => unansweredIds.includes(item.id))
-    ?? queue.find(item => report.weakQuestionIds.includes(item.id))
-    ?? queue[0]
-  const nextScore = latestAttemptForQuestion(progress, nextQuestion.id)?.feedback.score
-
   return [
     '## 队列画像',
-    `- 来源构成：${summarizeQueueSources(queue)}`,
-    `- 下一题：${nextQuestion.title}（${nextQuestion.categoryName}，${formatScore(nextScore)}）`,
-    `- 未答题：${formatQuestionIds(unansweredIds)}`,
-    `- 低分/薄弱题：${formatQuestionIds(report.weakQuestionIds)}`,
-    `- 队列入口：${buildQueuePath(queue.map(item => item.id))}`,
+    `- 来源构成：${profile.sourceSummary}`,
+    `- 下一题：${profile.nextQuestionTitle}（${profile.nextQuestionMeta}）`,
+    `- 未答题：${formatQuestionIds(profile.unansweredQuestionIds)}`,
+    `- 低分/薄弱题：${formatQuestionIds(profile.weakQuestionIds)}`,
+    `- 队列入口：${profile.queuePath}`,
     '',
   ].join('\n')
 }
@@ -247,8 +240,9 @@ function renderSessionAction(action: PracticeSessionReportAction): string {
 
 function buildEmptyReport(
   totalCount: number,
-  repairActions: PracticeSessionRepairAction[] = [],
-  weakQuestionIds: number[] = [],
+  repairActions: PracticeSessionRepairAction[],
+  weakQuestionIds: number[],
+  queueProfile: PracticeSessionQueueProfile,
 ): PracticeSessionReport {
   const hasRepairActions = repairActions.length > 0
 
@@ -277,6 +271,7 @@ function buildEmptyReport(
       unansweredCount: totalCount,
     }),
     repairActions,
+    queueProfile,
     primaryAction: hasRepairActions
       ? {
         kind: 'repair',
@@ -462,6 +457,41 @@ function buildQueuePath(questionIds: number[]): string {
     return '/practice'
   }
   return `/practice?queue=${questionIds.join(',')}`
+}
+
+function buildQueueProfile(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  weakQuestionIds: number[],
+): PracticeSessionQueueProfile {
+  if (queue.length === 0) {
+    return {
+      isEmpty: true,
+      sourceSummary: '暂无来源',
+      nextQuestionTitle: '暂无下一题',
+      nextQuestionMeta: '先从学习计划、薄弱题或题库进入模拟面试。',
+      unansweredQuestionIds: [],
+      weakQuestionIds,
+      queuePath: '/practice',
+    }
+  }
+
+  const unansweredQuestionIds = resolveUnansweredQuestionIds(queue, progress)
+  const nextQuestion = queue.find(item => unansweredQuestionIds.includes(item.id))
+    ?? queue.find(item => weakQuestionIds.includes(item.id))
+    ?? queue[0]
+  const nextScore = latestAttemptForQuestion(progress, nextQuestion.id)?.feedback.score
+  const nextStatus = progress.questionStates[nextQuestion.id]?.status ?? nextQuestion.status
+
+  return {
+    isEmpty: false,
+    sourceSummary: summarizeQueueSources(queue),
+    nextQuestionTitle: nextQuestion.title,
+    nextQuestionMeta: `${nextQuestion.categoryName}，${formatStatus(nextStatus)}，${formatScore(nextScore)}`,
+    unansweredQuestionIds,
+    weakQuestionIds,
+    queuePath: buildQueuePath(queue.map(item => item.id)),
+  }
 }
 
 function resolveUnansweredQuestionIds(queue: PracticeQueueItem[], progress: StudyProgress): number[] {

@@ -721,6 +721,16 @@ export interface PracticeSessionRepairAction {
   to: string
 }
 
+export interface PracticeSessionQueueProfile {
+  isEmpty: boolean
+  sourceSummary: string
+  nextQuestionTitle: string
+  nextQuestionMeta: string
+  unansweredQuestionIds: number[]
+  weakQuestionIds: number[]
+  queuePath: string
+}
+
 export interface PracticeSessionReport {
   level: PracticeSessionReportLevel
   title: string
@@ -732,6 +742,7 @@ export interface PracticeSessionReport {
   weakQuestionIds: number[]
   metrics: PracticeSessionReportMetric[]
   repairActions: PracticeSessionRepairAction[]
+  queueProfile: PracticeSessionQueueProfile
   primaryAction: PracticeSessionReportAction
 }
 

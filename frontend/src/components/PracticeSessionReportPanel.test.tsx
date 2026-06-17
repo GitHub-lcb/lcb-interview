@@ -81,15 +81,35 @@ describe('PracticeSessionReportPanel', () => {
     expect(screen.getByText('本轮正在推进')).toBeInTheDocument()
     expect(screen.getByText('1 / 2')).toBeInTheDocument()
     expect(screen.getByText('76 分')).toBeInTheDocument()
+    expect(screen.getByText('队列画像')).toBeInTheDocument()
+    expect(screen.getByText('今日计划 2 道')).toBeInTheDocument()
+    expect(screen.getByText('Java 面试题 2')).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: /复制战报/ }))
 
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('# Java 后端 本轮模拟面试战报'))
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('本轮正在推进'))
 
+    await userEvent.click(screen.getByRole('button', { name: /进入队列/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+
     await userEvent.click(screen.getByRole('button', { name: /继续未答题/ }))
 
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=2')
+  })
+
+  it('keeps the queue profile actionable for empty sessions', () => {
+    render(
+      <PracticeSessionReportPanel
+        queue={[]}
+        progress={progress()}
+        onNavigate={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText('队列画像')).toBeInTheDocument()
+    expect(screen.getByText(/暂无队列画像/)).toBeInTheDocument()
   })
 
   it('renders repair actions for weak practice sessions', async () => {

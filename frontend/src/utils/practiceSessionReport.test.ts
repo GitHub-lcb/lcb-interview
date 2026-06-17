@@ -94,6 +94,12 @@ describe('buildPracticeSessionReport', () => {
     expect(report.averageScore).toBe(72)
     expect(report.primaryAction).toMatchObject({ kind: 'continue', to: '/practice?queue=2,3' })
     expect(report.metrics[0]).toMatchObject({ key: 'answered', value: '1 / 3' })
+    expect(report.queueProfile).toMatchObject({
+      sourceSummary: '今日计划 3 道',
+      nextQuestionTitle: 'Java 面试题 2',
+      queuePath: '/practice?queue=1,2,3',
+    })
+    expect(report.queueProfile.unansweredQuestionIds).toEqual([2, 3])
   })
 
   it('prioritizes low score and weak questions for repair', () => {

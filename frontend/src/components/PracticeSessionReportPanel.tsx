@@ -99,6 +99,41 @@ export default function PracticeSessionReportPanel({
         ))}
       </div>
 
+      <div className="practice-session-report-profile" aria-label="队列画像">
+        <div className="practice-session-report-profile-head">
+          <span>队列画像</span>
+          <small>{report.queueProfile.isEmpty ? '待建立' : '本轮入口'}</small>
+        </div>
+        {report.queueProfile.isEmpty ? (
+          <p>暂无队列画像。先从学习计划、薄弱题或题库进入模拟面试。</p>
+        ) : (
+          <>
+            <div className="practice-session-report-profile-main">
+              <span>来源构成</span>
+              <strong>{report.queueProfile.sourceSummary}</strong>
+            </div>
+            <div className="practice-session-report-profile-next">
+              <span>下一题</span>
+              <strong>{report.queueProfile.nextQuestionTitle}</strong>
+              <small>{report.queueProfile.nextQuestionMeta}</small>
+            </div>
+            <div className="practice-session-report-profile-metrics">
+              <div>
+                <span>未答</span>
+                <strong>{report.queueProfile.unansweredQuestionIds.length}</strong>
+              </div>
+              <div>
+                <span>薄弱</span>
+                <strong>{report.queueProfile.weakQuestionIds.length}</strong>
+              </div>
+            </div>
+          </>
+        )}
+        <Button size="small" icon={<ArrowRightOutlined />} onClick={() => onNavigate(report.queueProfile.queuePath)}>
+          进入队列
+        </Button>
+      </div>
+
       {report.repairActions.length > 0 && (
         <div className="practice-session-report-repairs" aria-label="本轮补弱动作">
           <div className="practice-session-report-repairs-head">

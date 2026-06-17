@@ -7150,6 +7150,109 @@ p {
   white-space: nowrap;
 }
 
+.practice-session-report-profile {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+}
+
+.practice-session-report-profile-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.practice-session-report-profile-head span {
+  color: #0F172A;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-profile-head small {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.practice-session-report-profile p {
+  margin: 0;
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.practice-session-report-profile-main,
+.practice-session-report-profile-next {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-profile-main span,
+.practice-session-report-profile-next span {
+  color: #64748B;
+  font-size: 12px;
+}
+
+.practice-session-report-profile-main strong,
+.practice-session-report-profile-next strong {
+  overflow: hidden;
+  color: #18181B;
+  font-size: 13px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-profile-next small {
+  overflow: hidden;
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-profile-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.practice-session-report-profile-metrics div {
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+}
+
+.practice-session-report-profile-metrics span,
+.practice-session-report-profile-metrics strong {
+  display: block;
+}
+
+.practice-session-report-profile-metrics span {
+  color: #64748B;
+  font-size: 12px;
+}
+
+.practice-session-report-profile-metrics strong {
+  color: #0F172A;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.practice-session-report-profile .ant-btn {
+  justify-content: center;
+  width: 100%;
+}
+
 .practice-session-report-repairs {
   display: grid;
   gap: 8px;
