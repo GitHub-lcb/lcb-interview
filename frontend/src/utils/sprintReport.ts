@@ -4,6 +4,8 @@ import type {
   DailyPlanCompletion,
   InterviewBriefItem,
   InterviewBriefReport,
+  InterviewMistakeLedger,
+  InterviewRecoveryPlan,
   PrepHealthDimension,
   PrepHealthReport,
   StudyProgress,
@@ -11,7 +13,15 @@ import type {
 import { buildDailyPlanBrief } from './dailyPlanBrief'
 import { buildDailyPlanCompletion } from './dailyPlanCompletion'
 import { buildInterviewBrief } from './interviewBrief'
+import { buildInterviewMistakeLedger } from './interviewMistakeLedger'
+import { buildInterviewRecoveryPlan } from './interviewRecoveryPlan'
 import { buildPrepHealthReport } from './prepHealth'
+
+const recoveryModeLabels: Record<InterviewRecoveryPlan['mode'], string> = {
+  empty: '待建立样本',
+  repair: '错因修复',
+  advanced: '稳定加压',
+}
 
 export function buildSprintReportMarkdown(
   routes: PrepRoute[],
@@ -22,6 +32,8 @@ export function buildSprintReportMarkdown(
   const brief = buildInterviewBrief(routes, progress, now)
   const completion = buildDailyPlanCompletion(progress, now)
   const dailyBrief = buildDailyPlanBrief(progress, [], now)
+  const mistakeLedger = buildInterviewMistakeLedger(progress)
+  const recoveryPlan = buildInterviewRecoveryPlan(mistakeLedger)
   const generatedDate = formatDate(now)
 
   return [
@@ -37,7 +49,9 @@ export function buildSprintReportMarkdown(
     renderBriefSection('可主动表达', brief.strengths),
     renderBriefSection('必须规避', brief.risks),
     renderBriefSection('开口热身题', brief.warmups),
-    renderActionSection(health, brief, completion),
+    renderMistakeLedgerSection(mistakeLedger),
+    renderRecoveryPlanSection(recoveryPlan),
+    renderActionSection(health, brief, completion, recoveryPlan),
   ].join('\n')
 }
 
@@ -119,17 +133,54 @@ function renderDailyPlanBriefSection(brief: DailyPlanBrief): string {
   ].join('\n')
 }
 
+function renderMistakeLedgerSection(ledger: InterviewMistakeLedger): string {
+  const itemLines = ledger.items.length > 0
+    ? ledger.items.slice(0, 5).map(item => {
+      const questionIds = item.affectedQuestionIds.length > 0 ? item.affectedQuestionIds.join(', ') : '暂无'
+      return `- ${item.label}：${item.summary}；平均分：${item.averageScore}；次数：${item.attempts}；题目 ID：${questionIds}；入口：${item.to || '/practice'}`
+    })
+    : ['- 暂无历史错因，先完成一次模拟面试来建立样本。']
+
+  return [
+    '## 面试错题账本',
+    `- 状态：${ledger.title}`,
+    `- 摘要：${ledger.summary}`,
+    `- 问题总数：${ledger.totalProblems}`,
+    ...itemLines,
+    '',
+  ].join('\n')
+}
+
+function renderRecoveryPlanSection(plan: InterviewRecoveryPlan): string {
+  return [
+    '## 错题恢复计划',
+    `- 模式：${recoveryModeLabels[plan.mode]}`,
+    `- 标题：${plan.title}`,
+    `- 说明：${plan.summary}`,
+    `- 预计耗时：${plan.totalMinutes} 分钟`,
+    ...plan.steps.slice(0, 4).flatMap((step, index) => [
+      `- 步骤 ${index + 1}：${step.title}`,
+      `  - 动作：${step.description}`,
+      `  - 原因：${step.reason}`,
+      `  - 入口：${step.to || '/practice'}`,
+    ]),
+    '',
+  ].join('\n')
+}
+
 function renderActionSection(
   health: PrepHealthReport,
   brief: InterviewBriefReport,
   completion: DailyPlanCompletion,
+  recoveryPlan: InterviewRecoveryPlan,
 ): string {
-  // 报告被复制到外部文档后仍要能指导下一步，所以保留健康、表达和今日闭环三条行动线。
+  // 报告被复制到外部文档后仍要能指导下一步，所以保留健康、表达、今日闭环和错题恢复行动线。
   return [
     '## 下一步行动',
     `- 健康雷达：${health.primaryAction.label} - ${health.primaryAction.description}（${health.primaryAction.to}）`,
     `- 面试简报：${brief.primaryAction.label} - ${brief.primaryAction.description}（${brief.primaryAction.to}）`,
     `- 今日闭环：${completion.primaryAction.label} - ${completion.primaryAction.description}（${completion.primaryAction.to}）`,
+    `- 错题恢复：${recoveryPlan.primaryAction.label} - ${recoveryPlan.primaryAction.description}（${recoveryPlan.primaryAction.to || '/practice'}）`,
     '',
   ].join('\n')
 }
