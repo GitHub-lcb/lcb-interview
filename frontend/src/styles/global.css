@@ -6304,6 +6304,11 @@ p {
   font-size: 12px;
 }
 
+.practice-interviewer-script-meta .ant-btn {
+  justify-content: center;
+  width: 100%;
+}
+
 .practice-interviewer-script-steps {
   display: grid;
   gap: 8px;

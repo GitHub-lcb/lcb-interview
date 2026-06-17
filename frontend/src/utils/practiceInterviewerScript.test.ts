@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewAttempt, InterviewCriterion, PracticeQueueItem } from '../types'
-import { buildPracticeInterviewerScript } from './practiceInterviewerScript'
+import {
+  buildPracticeInterviewerScript,
+  buildPracticeInterviewerScriptMarkdown,
+} from './practiceInterviewerScript'
 
 const NOW = '2026-06-18T08:00:00.000Z'
 
@@ -98,5 +101,24 @@ describe('practiceInterviewerScript', () => {
     expect(script.steps[0].criterionKey).toBe('specificity')
     expect(script.steps[0].prompt).toContain('场景细节')
     expect(JSON.stringify(script)).not.toContain('undefined')
+  })
+
+  it('exports the interviewer script as portable markdown', () => {
+    const markdown = buildPracticeInterviewerScriptMarkdown(question(), [
+      attempt(86, { coverage: 88, structure: 84, specificity: 82, risk: 86 }),
+    ], NOW)
+
+    expect(markdown).toContain('# HashMap 为什么线程不安全？扩容时会发生什么？ 本题面试官脚本')
+    expect(markdown).toContain('生成时间：2026-06-18')
+    expect(markdown).toContain('## 脚本概览')
+    expect(markdown).toContain('## 追问步骤')
+    expect(markdown).toContain('方案对比')
+  })
+
+  it('exports warmup markdown without undefined placeholders', () => {
+    const markdown = buildPracticeInterviewerScriptMarkdown(question(), [], NOW)
+
+    expect(markdown).toContain('首次回答预热')
+    expect(markdown).not.toContain('undefined')
   })
 })

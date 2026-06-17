@@ -98,6 +98,25 @@ export function buildPracticeInterviewerScript(
   )
 }
 
+export function buildPracticeInterviewerScriptMarkdown(
+  question: PracticeQueueItem | QuestionSnapshot,
+  attempts: InterviewAttempt[],
+  now = new Date().toISOString(),
+): string {
+  const script = buildPracticeInterviewerScript(question, attempts)
+
+  return [
+    `# ${question.title} 本题面试官脚本`,
+    '',
+    `生成时间：${formatMarkdownDate(now)}`,
+    `分类：${question.categoryName || '未分类'}`,
+    `难度：${question.difficulty || '未知'}`,
+    '',
+    renderScriptOverview(script),
+    renderScriptSteps(script.steps),
+  ].join('\n').trimEnd()
+}
+
 function buildScript(
   level: PracticeInterviewerScriptLevel,
   title: string,
@@ -112,6 +131,38 @@ function buildScript(
     steps,
     primaryPrompt: steps[0]?.prompt ?? '',
   }
+}
+
+function renderScriptOverview(script: PracticeInterviewerScript): string {
+  return [
+    '## 脚本概览',
+    `- 状态：${script.title}`,
+    `- 等级：${script.level}`,
+    `- 总时长：${formatDuration(script.totalSeconds)}`,
+    `- 说明：${script.summary}`,
+    '',
+  ].join('\n')
+}
+
+function renderScriptSteps(steps: PracticeInterviewerScriptStep[]): string {
+  if (steps.length === 0) {
+    return [
+      '## 追问步骤',
+      '- 暂无追问步骤，请先完成一次模拟面试评分。',
+    ].join('\n')
+  }
+
+  return [
+    '## 追问步骤',
+    ...steps.map((item, index) => [
+      `${index + 1}. ${item.title}`,
+      `   - 问题：${item.prompt}`,
+      `   - 维度：${item.criterionLabel}`,
+      `   - 时长：${item.durationSeconds} 秒`,
+      `   - 压力点：${item.pressurePoint}`,
+      `   - 回答提示：${item.answerHint}`,
+    ].join('\n')),
+  ].join('\n')
 }
 
 function buildWarmupSteps(question: PracticeQueueItem | QuestionSnapshot): PracticeInterviewerScriptStep[] {
@@ -371,6 +422,19 @@ function answerHintFor(key: FollowUpDrillCriterionKey): string {
 function timestampOf(value: string): number {
   const timestamp = Date.parse(value)
   return Number.isNaN(timestamp) ? 0 : timestamp
+}
+
+function formatMarkdownDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 10)
+  }
+  return date.toISOString().slice(0, 10)
+}
+
+function formatDuration(totalSeconds: number): string {
+  const minutes = Math.max(1, Math.ceil(totalSeconds / 60))
+  return `${minutes} 分钟`
 }
 
 function hashText(value: string): string {

@@ -101,4 +101,26 @@ describe('PracticeInterviewerScriptPanel', () => {
     expect(onUsePrompt).toHaveBeenCalledTimes(1)
     expect(onUsePrompt.mock.calls[0][0]).toContain('HashMap 为什么线程不安全')
   })
+
+  it('copies the interviewer script markdown', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+
+    render(
+      <PracticeInterviewerScriptPanel
+        question={question()}
+        attempts={[attempt(86, '2026-06-18T08:00:00.000Z')]}
+        onUsePrompt={vi.fn()}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /复制脚本/ }))
+
+    expect(writeText).toHaveBeenCalledTimes(1)
+    expect(writeText.mock.calls[0][0]).toContain('本题面试官脚本')
+    expect(writeText.mock.calls[0][0]).toContain('HashMap 为什么线程不安全')
+  })
 })
