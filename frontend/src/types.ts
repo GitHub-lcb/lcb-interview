@@ -236,6 +236,40 @@ export interface InterviewBriefReport {
   warmups: InterviewBriefItem[]
 }
 
+export type InterviewMistakeLedgerLevel = 'empty' | 'risk' | 'watch' | 'stable'
+
+export type InterviewMistakeLedgerItemType = 'criterion' | 'weak-unspoken' | 'advanced'
+
+export interface InterviewMistakeLedgerAction {
+  label: string
+  description: string
+  to: string
+}
+
+export interface InterviewMistakeLedgerItem {
+  id: string
+  type: InterviewMistakeLedgerItemType
+  criterionKey?: InterviewCriterionKey
+  label: string
+  summary: string
+  averageScore: number
+  attempts: number
+  affectedQuestionIds: number[]
+  latestQuestionTitle: string
+  priority: number
+  to: string
+  actionLabel: string
+}
+
+export interface InterviewMistakeLedger {
+  level: InterviewMistakeLedgerLevel
+  title: string
+  summary: string
+  totalProblems: number
+  items: InterviewMistakeLedgerItem[]
+  primaryAction: InterviewMistakeLedgerAction
+}
+
 export interface WeakArea {
   categoryId?: number
   categoryName: string

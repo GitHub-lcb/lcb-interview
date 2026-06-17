@@ -2991,6 +2991,187 @@ p {
   font-size: 13px;
 }
 
+.interview-mistake-panel {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  margin-bottom: 18px;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #D97706;
+}
+
+.interview-mistake-panel.level-risk {
+  box-shadow: inset 4px 0 0 #DC2626;
+}
+
+.interview-mistake-panel.level-stable {
+  box-shadow: inset 4px 0 0 #059669;
+}
+
+.interview-mistake-panel.level-watch {
+  box-shadow: inset 4px 0 0 #2563EB;
+}
+
+.interview-mistake-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.interview-mistake-heading h2 {
+  margin: 0;
+  color: #18181B;
+  font-size: 24px;
+}
+
+.interview-mistake-heading p {
+  max-width: 780px;
+  margin: 6px 0 0 0;
+  color: #52525B;
+}
+
+.interview-mistake-heading .ant-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+}
+
+.interview-mistake-action {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  flex: 0 0 320px;
+  min-width: 0;
+}
+
+.interview-mistake-action span {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.55;
+  text-align: right;
+}
+
+.interview-mistake-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.interview-mistake-card {
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  min-width: 0;
+  padding: 12px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.interview-mistake-card.type-advanced {
+  background: #F0FDF4;
+  border-color: #BBF7D0;
+  box-shadow: inset 3px 0 0 #059669;
+}
+
+.interview-mistake-card.type-weak-unspoken,
+.interview-mistake-card.criterion-risk {
+  background: #FEF2F2;
+  border-color: #FECACA;
+  box-shadow: inset 3px 0 0 #DC2626;
+}
+
+.interview-mistake-card.criterion-coverage {
+  box-shadow: inset 3px 0 0 #2563EB;
+}
+
+.interview-mistake-card.criterion-structure {
+  box-shadow: inset 3px 0 0 #7C3AED;
+}
+
+.interview-mistake-card.criterion-specificity {
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.interview-mistake-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.interview-mistake-card-top span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #FFFFFF;
+  color: #D97706;
+  font-size: 14px;
+}
+
+.interview-mistake-card.type-advanced .interview-mistake-card-top span {
+  color: #059669;
+}
+
+.interview-mistake-card.type-weak-unspoken .interview-mistake-card-top span,
+.interview-mistake-card.criterion-risk .interview-mistake-card-top span {
+  color: #DC2626;
+}
+
+.interview-mistake-card-top em {
+  overflow: hidden;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #FFFFFF;
+  color: #475569;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.interview-mistake-card h3 {
+  margin: 0;
+  color: #18181B;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.interview-mistake-card p {
+  margin: 0;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.interview-mistake-score {
+  display: grid;
+  gap: 4px;
+}
+
+.interview-mistake-score small {
+  overflow: hidden;
+  color: #64748B;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.interview-mistake-card .ant-btn {
+  justify-self: start;
+}
+
 .study-sprint-input {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 28px;
@@ -4149,6 +4330,7 @@ p {
   .daily-mission-grid,
   .prep-health-grid,
   .interview-brief-grid,
+  .interview-mistake-grid,
   .ability-map-grid,
   .prep-route-metrics {
     grid-template-columns: 1fr;
@@ -4198,6 +4380,20 @@ p {
 
   .interview-brief-head {
     display: grid;
+  }
+
+  .interview-mistake-heading {
+    display: grid;
+  }
+
+  .interview-mistake-action {
+    justify-items: start;
+    width: 100%;
+    max-width: none;
+  }
+
+  .interview-mistake-action span {
+    text-align: left;
   }
 
   .interview-brief-action-note {

@@ -11,6 +11,7 @@ import {
 import { useNavigate } from 'react-router-dom'
 import StudyActionButtons from '../../components/StudyActionButtons'
 import InterviewBriefPanel from '../../components/InterviewBriefPanel'
+import InterviewMistakeLedgerPanel from '../../components/InterviewMistakeLedgerPanel'
 import SprintReportActions from '../../components/SprintReportActions'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
@@ -163,6 +164,7 @@ export default function StudyPlan() {
       </section>
 
       <InterviewBriefPanel progress={progress} />
+      <InterviewMistakeLedgerPanel progress={progress} />
 
       <div className="study-plan-metrics">
         <div>
