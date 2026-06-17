@@ -1,11 +1,13 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { InterviewAttempt, StudyProgress } from '../types'
 import InterviewMaterialVaultPanel from './InterviewMaterialVaultPanel'
 
 const NOW = '2026-06-17T10:30:00.000Z'
+
+afterEach(() => cleanup())
 
 function attempt(questionId: number): InterviewAttempt {
   return {
@@ -76,5 +78,21 @@ describe('InterviewMaterialVaultPanel', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /如何设计秒杀库存扣减/ }))
     expect(onNavigate).toHaveBeenCalledWith('/question/1')
+  })
+
+  it('copies high-score material vault markdown', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    })
+
+    render(<InterviewMaterialVaultPanel progress={progress()} onNavigate={vi.fn()} />)
+
+    await userEvent.click(screen.getByRole('button', { name: /复制素材/ }))
+
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1))
+    expect(writeText.mock.calls[0][0]).toContain('# Java 后端 高分表达素材库')
+    expect(writeText.mock.calls[0][0]).toContain('如何设计秒杀库存扣减？')
   })
 })

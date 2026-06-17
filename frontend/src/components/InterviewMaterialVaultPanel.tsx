@@ -1,8 +1,8 @@
-import { ArrowRightOutlined, HighlightOutlined, StarOutlined } from '@ant-design/icons'
-import { Button } from 'antd'
+import { ArrowRightOutlined, CopyOutlined, HighlightOutlined, StarOutlined } from '@ant-design/icons'
+import { Button, message } from 'antd'
 import { useMemo } from 'react'
 import type { InterviewMaterialSnippet, InterviewMaterialVault, StudyProgress } from '../types'
-import { buildInterviewMaterialVault } from '../utils/interviewMaterialVault'
+import { buildInterviewMaterialVault, buildInterviewMaterialVaultMarkdown } from '../utils/interviewMaterialVault'
 
 interface InterviewMaterialVaultPanelProps {
   progress: StudyProgress
@@ -27,6 +27,19 @@ export default function InterviewMaterialVaultPanel({
 }: InterviewMaterialVaultPanelProps) {
   const vault = useMemo(() => buildInterviewMaterialVault(progress), [progress])
 
+  const handleCopyMaterials = async () => {
+    const markdown = buildInterviewMaterialVaultMarkdown(progress)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('高分素材库已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 素材库')
+  }
+
   return (
     <section className={`interview-material-vault-panel level-${vault.level}`} aria-label="高分表达素材库">
       <div className="interview-material-vault-head">
@@ -40,6 +53,9 @@ export default function InterviewMaterialVaultPanel({
         </div>
         <div className="interview-material-vault-action">
           <span>{levelLabels[vault.level]}</span>
+          <Button size="small" icon={<CopyOutlined />} onClick={handleCopyMaterials}>
+            复制素材
+          </Button>
           <Button type="primary" icon={<HighlightOutlined />} onClick={() => onNavigate(vault.primaryAction.to)}>
             {vault.primaryAction.label}
             <ArrowRightOutlined />
@@ -83,4 +99,32 @@ export default function InterviewMaterialVaultPanel({
       )}
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+function buildFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '岗位'}-高分表达素材库.md`
 }

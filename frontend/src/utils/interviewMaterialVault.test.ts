@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewAttempt, QuestionSnapshot, StudyProgress } from '../types'
-import { buildInterviewMaterialVault } from './interviewMaterialVault'
+import { buildInterviewMaterialVault, buildInterviewMaterialVaultMarkdown } from './interviewMaterialVault'
 
 const NOW = '2026-06-17T10:00:00.000Z'
 
@@ -114,5 +114,37 @@ describe('buildInterviewMaterialVault', () => {
     expect(vault.averageScore).toBe(89)
     expect(vault.primaryAction).toMatchObject({ label: '复盘高分素材', to: '/study' })
     expect(vault.metrics.find(metric => metric.key === 'categories')?.value).toBe('3')
+  })
+
+  it('exports ready material vault as portable markdown', () => {
+    const markdown = buildInterviewMaterialVaultMarkdown(progress({
+      questionSnapshots: {
+        1: snapshot(1, '系统设计'),
+        2: snapshot(2, 'Redis'),
+      },
+      interviewAttempts: {
+        1: [attempt(1, 88, '项目场景是订单高峰期并发扣库存，我们先做限流削峰，再用监控和补偿任务兜底。')],
+        2: [attempt(2, 90, '风险边界是缓存击穿和数据库回滚不一致，必须准备降级开关、监控告警和兜底数据源。')],
+      },
+    }), NOW)
+
+    expect(markdown).toContain('# Java 后端 高分表达素材库')
+    expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 素材概览')
+    expect(markdown).toContain('高分样本')
+    expect(markdown).toContain('Java 面试题 1')
+    expect(markdown).toContain('项目场景')
+    expect(markdown).toContain('入口：/question/1')
+    expect(markdown).toContain('下一步：复盘高分素材')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps empty material vault export actionable', () => {
+    const markdown = buildInterviewMaterialVaultMarkdown(progress(), NOW)
+
+    expect(markdown).toContain('高分表达素材待沉淀')
+    expect(markdown).toContain('暂无高分素材')
+    expect(markdown).toContain('先做一题模拟')
+    expect(markdown).not.toContain('undefined')
   })
 })

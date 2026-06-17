@@ -54,6 +54,66 @@ export function buildInterviewMaterialVault(progress: StudyProgress): InterviewM
   }
 }
 
+export function buildInterviewMaterialVaultMarkdown(
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): string {
+  const vault = buildInterviewMaterialVault(progress)
+
+  return [
+    `# ${progress.targetRole} 高分表达素材库`,
+    '',
+    `生成时间：${formatDate(now)}`,
+    '',
+    renderVaultOverview(vault),
+    renderVaultMetrics(vault.metrics),
+    renderVaultSnippets(vault.snippets),
+  ].join('\n')
+}
+
+function renderVaultOverview(vault: InterviewMaterialVault): string {
+  return [
+    '## 素材概览',
+    `- 状态：${vault.title}`,
+    `- 摘要：${vault.summary}`,
+    `- 下一步：${vault.primaryAction.label}，${vault.primaryAction.to}`,
+    `- 说明：${vault.primaryAction.description}`,
+    '',
+  ].join('\n')
+}
+
+function renderVaultMetrics(metrics: InterviewMaterialVaultMetric[]): string {
+  return [
+    '## 指标',
+    ...metrics.map(metric => `- ${metric.label}：${metric.value}，${metric.detail}`),
+    '',
+  ].join('\n')
+}
+
+function renderVaultSnippets(snippets: InterviewMaterialSnippet[]): string {
+  if (snippets.length === 0) {
+    return [
+      '## 素材清单',
+      '- 暂无高分素材。先完成一次 80 分以上模拟回答，再沉淀可复述话术。',
+      '',
+    ].join('\n')
+  }
+
+  return [
+    '## 素材清单',
+    ...snippets.flatMap((snippet, index) => [
+      `${index + 1}. ${snippet.title}`,
+      `   - 分类：${snippet.categoryName}`,
+      `   - 类型：${snippet.label}`,
+      `   - 得分：${snippet.score} 分`,
+      `   - 片段：${snippet.content}`,
+      `   - 沉淀原因：${snippet.reason}`,
+      `   - 入口：${snippet.to}`,
+    ]),
+    '',
+  ].join('\n')
+}
+
 function buildSnippetForQuestion(
   questionId: number,
   attempts: InterviewAttempt[],
@@ -258,4 +318,12 @@ function fallbackSnapshot(questionId: number): QuestionSnapshot {
     tags: [],
     viewCount: 0,
   }
+}
+
+function formatDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+  return date.toISOString().slice(0, 10)
 }
