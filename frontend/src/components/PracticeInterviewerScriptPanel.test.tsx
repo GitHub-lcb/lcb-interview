@@ -1,6 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
+import { message } from 'antd'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { InterviewAttempt, InterviewCriterion, PracticeQueueItem } from '../types'
 import PracticeInterviewerScriptPanel from './PracticeInterviewerScriptPanel'
@@ -50,6 +51,21 @@ function attempt(score: number, createdAt: string): InterviewAttempt {
   }
 }
 
+function followUpAttempt(prompt: string, body: string, createdAt: string, score = 82): InterviewAttempt {
+  return {
+    ...attempt(score, createdAt),
+    answer: `追问：${prompt}\n\n我的回答：${body}`,
+  }
+}
+
+function passedBody(): string {
+  return [
+    '结论：HashMap 在并发写入时不安全，因为扩容迁移机制可能造成结构异常。',
+    '在线上项目中我会用错误率、吞吐和扩容耗时指标验证。',
+    '面试官追问时，我会补充风险边界和 ConcurrentHashMap 替代方案。',
+  ].join('\n')
+}
+
 describe('PracticeInterviewerScriptPanel', () => {
   beforeEach(() => {
     Object.defineProperty(window, 'matchMedia', {
@@ -68,6 +84,7 @@ describe('PracticeInterviewerScriptPanel', () => {
   })
 
   afterEach(() => {
+    message.destroy()
     cleanup()
   })
 
@@ -122,5 +139,36 @@ describe('PracticeInterviewerScriptPanel', () => {
     expect(writeText).toHaveBeenCalledTimes(1)
     expect(writeText.mock.calls[0][0]).toContain('本题面试官脚本')
     expect(writeText.mock.calls[0][0]).toContain('HashMap 为什么线程不安全')
+  })
+
+  it('renders script progress and passed state for completed follow-up steps', () => {
+    const warmupPrompt = '请用 30 秒回答「HashMap 为什么线程不安全？扩容时会发生什么？」：先给结论，再补一句核心原因。'
+
+    render(
+      <PracticeInterviewerScriptPanel
+        question={question()}
+        attempts={[followUpAttempt(warmupPrompt, passedBody(), '2026-06-18T08:00:00.000Z')]}
+        onUsePrompt={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('脚本进度 1 / 3')).toBeInTheDocument()
+    expect(screen.getByText('已通过')).toBeInTheDocument()
+    expect(screen.getByText(/下一问/)).toBeInTheDocument()
+  })
+
+  it('shows a repair action when a follow-up step was attempted but not passed', () => {
+    const warmupPrompt = '请用 30 秒回答「HashMap 为什么线程不安全？扩容时会发生什么？」：先给结论，再补一句核心原因。'
+
+    render(
+      <PracticeInterviewerScriptPanel
+        question={question()}
+        attempts={[followUpAttempt(warmupPrompt, '结论：HashMap 多线程不安全。', '2026-06-18T08:00:00.000Z', 65)]}
+        onUsePrompt={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('修复中')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /继续修复/ })).toBeInTheDocument()
   })
 })

@@ -6459,6 +6459,38 @@ p {
   width: 100%;
 }
 
+.practice-interviewer-script-progress {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+}
+
+.practice-interviewer-script-progress-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.practice-interviewer-script-progress-top span {
+  flex: 0 0 auto;
+  color: #18181B;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+.practice-interviewer-script-progress-top small {
+  min-width: 0;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: right;
+}
+
 .practice-interviewer-script-steps {
   display: grid;
   gap: 8px;
@@ -6472,6 +6504,16 @@ p {
   border-radius: 8px;
 }
 
+.practice-interviewer-script-step.status-passed {
+  background: #F0FDF4;
+  border-color: #BBF7D0;
+}
+
+.practice-interviewer-script-step.status-attempted {
+  background: #FFFBEB;
+  border-color: #FED7AA;
+}
+
 .practice-interviewer-script-step-top {
   display: flex;
   justify-content: space-between;
@@ -6480,12 +6522,46 @@ p {
   margin-bottom: 8px;
 }
 
+.practice-interviewer-script-step-badges {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 6px;
+  align-items: center;
+}
+
 .practice-interviewer-script-step-top span,
 .practice-interviewer-script-step-top em {
   color: #64748B;
   font-size: 12px;
   font-style: normal;
   font-weight: 800;
+}
+
+.practice-interviewer-script-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 3px 7px;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1;
+  background: #F4F4F5;
+  border-radius: 6px;
+}
+
+.practice-interviewer-script-status.status-pending {
+  color: #1D4ED8;
+  background: #EFF6FF;
+}
+
+.practice-interviewer-script-status.status-attempted {
+  color: #B45309;
+  background: #FEF3C7;
+}
+
+.practice-interviewer-script-status.status-passed {
+  color: #047857;
+  background: #DCFCE7;
 }
 
 .practice-interviewer-script-step h4 {

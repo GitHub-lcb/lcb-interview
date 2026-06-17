@@ -1,12 +1,13 @@
 import { ClockCircleOutlined, CopyOutlined, ThunderboltOutlined } from '@ant-design/icons'
-import { Button, message } from 'antd'
+import { Button, message, Progress } from 'antd'
 import { useMemo } from 'react'
 import type { InterviewAttempt, PracticeQueueItem } from '../types'
 import type { PracticeInterviewerScriptLevel } from '../utils/practiceInterviewerScript'
+import { buildPracticeInterviewerScriptMarkdown } from '../utils/practiceInterviewerScript'
 import {
-  buildPracticeInterviewerScript,
-  buildPracticeInterviewerScriptMarkdown,
-} from '../utils/practiceInterviewerScript'
+  buildPracticeInterviewerScriptProgress,
+  type PracticeInterviewerScriptStepStatus,
+} from '../utils/practiceInterviewerScriptProgress'
 
 interface PracticeInterviewerScriptPanelProps {
   question: PracticeQueueItem
@@ -22,15 +23,28 @@ const levelLabels: Record<PracticeInterviewerScriptLevel, string> = {
   regression: '回落',
 }
 
+const stepStatusLabels: Record<PracticeInterviewerScriptStepStatus, string> = {
+  pending: '待练',
+  attempted: '修复中',
+  passed: '已通过',
+}
+
+const stepActionLabels: Record<PracticeInterviewerScriptStepStatus, string> = {
+  pending: '带入回答框',
+  attempted: '继续修复',
+  passed: '重练这一问',
+}
+
 export default function PracticeInterviewerScriptPanel({
   question,
   attempts,
   onUsePrompt,
 }: PracticeInterviewerScriptPanelProps) {
-  const script = useMemo(
-    () => buildPracticeInterviewerScript(question, attempts),
+  const scriptProgress = useMemo(
+    () => buildPracticeInterviewerScriptProgress(question, attempts),
     [attempts, question],
   )
+  const { script } = scriptProgress
 
   const handleCopyScript = async () => {
     const markdown = buildPracticeInterviewerScriptMarkdown(question, attempts)
@@ -71,22 +85,45 @@ export default function PracticeInterviewerScriptPanel({
         </div>
       </div>
 
+      <div className="practice-interviewer-script-progress">
+        <div className="practice-interviewer-script-progress-top">
+          <span>
+            脚本进度 {scriptProgress.passedCount} / {scriptProgress.totalSteps}
+          </span>
+          <small>{scriptProgress.summary}</small>
+        </div>
+        <Progress percent={scriptProgress.progressPercent} showInfo={false} />
+      </div>
+
       <div className="practice-interviewer-script-steps">
-        {script.steps.map((item, index) => (
-          <article key={item.id} className={`practice-interviewer-script-step criterion-${item.criterionKey}`}>
-            <div className="practice-interviewer-script-step-top">
-              <span>第 {index + 1} 问</span>
-              <em>{item.durationSeconds} 秒</em>
-            </div>
-            <h4>{item.title}</h4>
-            <p>{item.prompt}</p>
-            <small>{item.pressurePoint}</small>
-            <div className="practice-interviewer-script-hint">{item.answerHint}</div>
-            <Button size="small" type={index === 0 ? 'primary' : 'default'} onClick={() => onUsePrompt(item.prompt)}>
-              带入回答框
-            </Button>
-          </article>
-        ))}
+        {scriptProgress.steps.map((progressItem, index) => {
+          const item = progressItem.step
+          const buttonType = progressItem.status === 'pending' && index === 0 ? 'primary' : 'default'
+
+          return (
+            <article
+              key={item.id}
+              className={`practice-interviewer-script-step criterion-${item.criterionKey} status-${progressItem.status}`}
+            >
+              <div className="practice-interviewer-script-step-top">
+                <span>第 {index + 1} 问</span>
+                <div className="practice-interviewer-script-step-badges">
+                  <strong className={`practice-interviewer-script-status status-${progressItem.status}`}>
+                    {stepStatusLabels[progressItem.status]}
+                  </strong>
+                  <em>{item.durationSeconds} 秒</em>
+                </div>
+              </div>
+              <h4>{item.title}</h4>
+              <p>{item.prompt}</p>
+              <small>{item.pressurePoint}</small>
+              <div className="practice-interviewer-script-hint">{item.answerHint}</div>
+              <Button size="small" type={buttonType} onClick={() => onUsePrompt(item.prompt)}>
+                {stepActionLabels[progressItem.status]}
+              </Button>
+            </article>
+          )
+        })}
       </div>
     </section>
   )
