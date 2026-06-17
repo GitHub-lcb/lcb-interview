@@ -28,6 +28,11 @@ function progress(): StudyProgress {
       2: { status: 'learning', addedToPlan: true, reviewCount: 1 },
       3: { status: 'weak', addedToPlan: true, reviewCount: 2 },
     },
+    questionSnapshots: {
+      1: { id: 1, title: 'JVM 调优题', difficulty: 'MEDIUM', categoryName: 'JVM', tags: ['JVM'], viewCount: 120 },
+      2: { id: 2, title: 'MySQL 索引题', difficulty: 'MEDIUM', categoryName: 'MySQL', tags: ['MySQL'], viewCount: 99 },
+      3: { id: 3, title: 'Java 并发题', difficulty: 'HARD', categoryName: 'Java 并发', tags: ['并发'], viewCount: 88 },
+    },
     dailyPlan: [2, 3],
     interviewAttempts: {
       1: [{ questionId: 1, answer: '结构化回答', feedback: attempt(86), createdAt: '2026-06-18T00:00:00.000Z' }],
@@ -58,6 +63,19 @@ describe('StudyCommandCenter', () => {
     window.localStorage.clear()
   })
 
+  it('renders next training queue inside the command center', () => {
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <StudyCommandCenter />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('heading', { name: '下一轮训练' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /开始下一轮训练/ })).toBeInTheDocument()
+    expect(screen.getByText('Java 并发题')).toBeInTheDocument()
+    expect(screen.getByText(/薄弱题/)).toBeInTheDocument()
+  })
+
   it('copies study command center markdown', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.defineProperty(navigator, 'clipboard', {
@@ -77,6 +95,7 @@ describe('StudyCommandCenter', () => {
     expect(writeText.mock.calls[0][0]).toContain('# Java 后端 备考指挥中心')
     expect(writeText.mock.calls[0][0]).toContain('## 指挥概览')
     expect(writeText.mock.calls[0][0]).toContain('## 就绪因子')
+    expect(writeText.mock.calls[0][0]).toContain('## 下一轮训练队列')
     expect(writeText.mock.calls[0][0]).toContain('## 下一步行动')
   })
 })

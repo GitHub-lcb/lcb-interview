@@ -1066,6 +1066,96 @@ p {
   line-height: 1.45;
 }
 
+.command-next-training {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px 0;
+  border-top: 1px solid #E4E4E7;
+  border-bottom: 1px solid #E4E4E7;
+}
+
+.command-next-training-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.command-next-training-head h3 {
+  margin: 0;
+  color: #18181B;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.command-next-training-head p,
+.command-next-training-empty {
+  margin: 4px 0 0 0;
+  color: #64748B;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.command-next-training-head .ant-btn {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+}
+
+.command-next-training-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.command-next-training-list button {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  box-shadow: inset 3px 0 0 #2563EB;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.command-next-training-list button:hover {
+  border-color: #CBD5E1;
+  transform: translateY(-1px);
+}
+
+.command-next-training-list strong {
+  overflow: hidden;
+  color: #18181B;
+  font-size: 13px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.command-next-training-list span {
+  overflow: hidden;
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.command-next-training-list small {
+  color: #2563EB;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
 .command-action-row {
   display: flex;
   flex-wrap: wrap;
@@ -7275,6 +7365,20 @@ p {
     padding-left: 0;
     border-top: 1px solid #E4E4E7;
     border-left: none;
+  }
+
+  .command-next-training-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .command-next-training-head .ant-btn {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .command-next-training-list {
+    grid-template-columns: 1fr;
   }
 
   .bank-hero-stats,

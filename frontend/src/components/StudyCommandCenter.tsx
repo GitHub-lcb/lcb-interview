@@ -9,6 +9,7 @@ import {
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStudyProgress } from '../hooks/useStudyProgress'
+import { buildNextTrainingQueue, formatNextTrainingQueueItemMeta } from '../utils/nextTrainingQueue'
 import { buildStudyCommandMarkdown, buildStudyStrategy } from '../utils/studyStrategy'
 import type { StudyStrategyAction } from '../types'
 
@@ -20,6 +21,7 @@ export default function StudyCommandCenter() {
   const navigate = useNavigate()
   const { progress } = useStudyProgress()
   const strategy = useMemo(() => buildStudyStrategy(progress), [progress])
+  const nextTrainingQueue = useMemo(() => buildNextTrainingQueue(progress, new Date().toISOString(), 3), [progress])
 
   const handleCopyCommand = async () => {
     const markdown = buildStudyCommandMarkdown(progress)
@@ -72,6 +74,40 @@ export default function StudyCommandCenter() {
               <small>{factor.detail}</small>
             </div>
           ))}
+        </div>
+
+        <div className="command-next-training" aria-label="下一轮训练">
+          <div className="command-next-training-head">
+            <div>
+              <h3>下一轮训练</h3>
+              <p>{nextTrainingQueue.summary}</p>
+            </div>
+            <Button
+              size="small"
+              type="primary"
+              icon={<FieldTimeOutlined />}
+              onClick={() => navigate(nextTrainingQueue.primaryAction.to)}
+            >
+              {nextTrainingQueue.primaryAction.label}
+              <ArrowRightOutlined />
+            </Button>
+          </div>
+
+          {nextTrainingQueue.items.length > 0 ? (
+            <div className="command-next-training-list">
+              {nextTrainingQueue.items.map(item => (
+                <button key={item.id} type="button" onClick={() => navigate(item.to)}>
+                  <strong>{item.title}</strong>
+                  <span>{formatNextTrainingQueueItemMeta(item)}</span>
+                  <small>{item.actionLabel}</small>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="command-next-training-empty">
+              暂无下一轮训练题。先完成一次模拟面试或生成今日计划，系统会自动拼出下一轮队列。
+            </p>
+          )}
         </div>
 
         <div className="command-action-row">

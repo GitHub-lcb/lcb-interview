@@ -5,7 +5,9 @@ import type {
   StudyStrategyAction,
   StudyStrategyFactor,
   StudyStrategyRisk,
+  NextTrainingQueue,
 } from '../types'
+import { buildNextTrainingQueue } from './nextTrainingQueue'
 
 interface ProgressStats {
   totalTracked: number
@@ -47,6 +49,7 @@ export function buildStudyCommandMarkdown(
   now = new Date().toISOString(),
 ): string {
   const strategy = buildStudyStrategy(progress)
+  const nextTrainingQueue = buildNextTrainingQueue(progress, now, 5)
 
   return [
     `# ${progress.targetRole} 备考指挥中心`,
@@ -55,6 +58,7 @@ export function buildStudyCommandMarkdown(
     '',
     renderCommandOverview(progress, strategy),
     renderCommandFactors(strategy.factors),
+    renderCommandNextTrainingQueue(nextTrainingQueue),
     renderCommandActions(strategy.actions),
   ].join('\n').trimEnd()
 }
@@ -245,6 +249,26 @@ function renderCommandFactors(factors: StudyStrategyFactor[]): string {
       `   - 分值：${factor.score}`,
       `   - 说明：${factor.detail}`,
     ].join('\n')),
+    '',
+  ].join('\n')
+}
+
+function renderCommandNextTrainingQueue(queue: NextTrainingQueue): string {
+  const itemLines = queue.items.length > 0
+    ? queue.items.slice(0, 5).flatMap((item, index) => [
+      `${index + 1}. ${item.title}`,
+      `   - 来源：${item.sourceLabel}`,
+      `   - 行动：${item.actionLabel}，入口：${item.to}`,
+      `   - 原因：${item.reason}`,
+    ])
+    : ['- 暂无下一轮训练题。先做一次模拟面试或生成今日计划，系统会自动拼出下一轮队列。']
+
+  return [
+    '## 下一轮训练队列',
+    `- 状态：${queue.title}`,
+    `- 摘要：${queue.summary}`,
+    `- 主行动：${queue.primaryAction.label}，${queue.primaryAction.to}`,
+    ...itemLines,
     '',
   ].join('\n')
 }

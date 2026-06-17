@@ -83,6 +83,11 @@ describe('buildStudyStrategy', () => {
         2: { status: 'learning', addedToPlan: true, reviewCount: 1 },
         3: { status: 'weak', addedToPlan: true, reviewCount: 2 },
       },
+      questionSnapshots: {
+        1: { id: 1, title: 'JVM 调优题', difficulty: 'MEDIUM', categoryName: 'JVM', tags: ['JVM'], viewCount: 120 },
+        2: { id: 2, title: 'MySQL 索引题', difficulty: 'MEDIUM', categoryName: 'MySQL', tags: ['MySQL'], viewCount: 99 },
+        3: { id: 3, title: 'Java 并发题', difficulty: 'HARD', categoryName: 'Java 并发', tags: ['并发'], viewCount: 88 },
+      },
       dailyPlan: [2, 3],
       interviewAttempts: {
         1: [{ questionId: 1, answer: '结构化回答', feedback: attempt(86), createdAt: '2026-06-18T00:00:00.000Z' }],
@@ -95,6 +100,11 @@ describe('buildStudyStrategy', () => {
     expect(markdown).toContain('生成时间：2026-06-18')
     expect(markdown).toContain('## 指挥概览')
     expect(markdown).toContain('## 就绪因子')
+    expect(markdown).toContain('## 下一轮训练队列')
+    expect(markdown).toContain('状态：下一轮训练队列')
+    expect(markdown).toContain('主行动：开始下一轮训练')
+    expect(markdown).toContain('Java 并发题')
+    expect(markdown).toContain('来源：面试错因')
     expect(markdown).toContain('## 下一步行动')
     expect(markdown).toContain('路径：')
     expect(markdown).not.toContain('undefined')
@@ -107,6 +117,8 @@ describe('buildStudyStrategy', () => {
     )
 
     expect(markdown).toContain('还没有形成备考轨迹')
+    expect(markdown).toContain('## 下一轮训练队列')
+    expect(markdown).toContain('暂无下一轮训练题')
     expect(markdown).toContain('进入题库')
     expect(markdown).not.toContain('undefined')
   })
