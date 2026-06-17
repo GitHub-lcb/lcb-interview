@@ -586,6 +586,49 @@ export interface InterviewMaterialVault {
   primaryAction: InterviewMaterialVaultAction
 }
 
+export type InterviewFollowUpDefenseLevel = 'empty' | 'risk' | 'pressure' | 'ready'
+
+export interface InterviewFollowUpDefenseAction {
+  label: string
+  description: string
+  to: string
+}
+
+export interface InterviewFollowUpDefenseMetric {
+  key: 'items' | 'average' | 'risk' | 'categories'
+  label: string
+  value: string
+  detail: string
+}
+
+export interface InterviewFollowUpDefenseItem {
+  id: string
+  questionId: number
+  title: string
+  categoryName: string
+  score: number
+  criterionKey: FollowUpDrillCriterionKey
+  criterionLabel: string
+  prompt: string
+  pressurePoint: string
+  answerGuide: string
+  to: string
+  priority: number
+  createdAt: string
+}
+
+export interface InterviewFollowUpDefense {
+  level: InterviewFollowUpDefenseLevel
+  title: string
+  summary: string
+  averageScore: number
+  riskCount: number
+  categoryCount: number
+  metrics: InterviewFollowUpDefenseMetric[]
+  items: InterviewFollowUpDefenseItem[]
+  primaryAction: InterviewFollowUpDefenseAction
+}
+
 export type PracticeQueueSource = 'review' | 'plan' | 'page' | 'new'
 
 export interface PracticeQueueItem extends QuestionSnapshot {
