@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import StudyActionButtons from '../../components/StudyActionButtons'
+import InterviewBriefPanel from '../../components/InterviewBriefPanel'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { getHotQuestions } from '../../api/question'
@@ -158,6 +159,8 @@ export default function StudyPlan() {
           </label>
         </div>
       </section>
+
+      <InterviewBriefPanel progress={progress} />
 
       <div className="study-plan-metrics">
         <div>

@@ -209,6 +209,33 @@ export interface PrepHealthReport {
   primaryAction: PrepHealthAction
 }
 
+export type InterviewBriefLevel = 'empty' | 'risk' | 'warmup' | 'ready'
+
+export interface InterviewBriefItem {
+  id: string
+  title: string
+  description: string
+  metric: string
+  questionId?: number
+  to?: string
+}
+
+export interface InterviewBriefAction {
+  label: string
+  description: string
+  to: string
+}
+
+export interface InterviewBriefReport {
+  level: InterviewBriefLevel
+  title: string
+  summary: string
+  primaryAction: InterviewBriefAction
+  strengths: InterviewBriefItem[]
+  risks: InterviewBriefItem[]
+  warmups: InterviewBriefItem[]
+}
+
 export interface WeakArea {
   categoryId?: number
   categoryName: string
