@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewAttempt, StudyProgress, StudyQuestionStatus } from '../types'
 import { createDefaultProgress } from './studyProgress'
-import { buildDailyPlanCompletion } from './dailyPlanCompletion'
+import { buildDailyPlanCompletion, buildDailyPlanCompletionMarkdown } from './dailyPlanCompletion'
 
 const NOW = '2026-06-17T09:00:00.000Z'
 
@@ -131,5 +131,35 @@ describe('buildDailyPlanCompletion', () => {
     expect(completion.level).toBe('excellent')
     expect(completion.interviewTodayCount).toBe(1)
     expect(completion.primaryAction.label).toBe('查看冲刺报告')
+  })
+
+  it('exports risky daily completion as portable markdown', () => {
+    let progress = progressWithPlan([1, 2])
+    progress = {
+      ...progress,
+      targetRole: 'Java 后端',
+    }
+    progress = markQuestion(progress, 1, 'learning', '2026-06-15T09:00:00.000Z', 1)
+    progress = markQuestion(progress, 2, 'weak', NOW, 1)
+
+    const markdown = buildDailyPlanCompletionMarkdown(progress, NOW)
+
+    expect(markdown).toContain('# Java 后端 今日闭环验收')
+    expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 验收概览')
+    expect(markdown).toContain('今日闭环还有风险')
+    expect(markdown).toContain('## 指标')
+    expect(markdown).toContain('## 待办验收')
+    expect(markdown).toContain('## 主行动')
+    expect(markdown).toContain('入口：/practice?queue=1')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps empty daily completion export actionable', () => {
+    const markdown = buildDailyPlanCompletionMarkdown(createDefaultProgress(NOW), NOW)
+
+    expect(markdown).toContain('今日计划待验收')
+    expect(markdown).toContain('今日计划还没生成')
+    expect(markdown).not.toContain('undefined')
   })
 })

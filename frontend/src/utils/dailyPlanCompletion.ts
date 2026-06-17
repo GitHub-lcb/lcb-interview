@@ -52,6 +52,87 @@ export function buildDailyPlanCompletion(
   }
 }
 
+/**
+ * 构建今日闭环验收 Markdown，便于用户把当天完成率、风险和下一步行动带走复盘。
+ *
+ * @param progress 本地学习进度
+ * @param now 当前时间，用于生成稳定日期和判断今日面试样本
+ * @returns 可复制或下载的 Markdown 验收报告
+ */
+export function buildDailyPlanCompletionMarkdown(
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): string {
+  const completion = buildDailyPlanCompletion(progress, now)
+
+  return [
+    `# ${progress.targetRole} 今日闭环验收`,
+    '',
+    `生成时间：${formatMarkdownDate(now)}`,
+    '',
+    renderDailyCompletionOverview(completion),
+    renderDailyCompletionMetrics(completion.metrics),
+    renderDailyCompletionTodos(completion.todos),
+    renderDailyCompletionPrimaryAction(completion.primaryAction),
+  ].join('\n').trimEnd()
+}
+
+function renderDailyCompletionOverview(completion: DailyPlanCompletion): string {
+  return [
+    '## 验收概览',
+    `- 状态：${completion.title}`,
+    `- 摘要：${completion.summary}`,
+    `- 完成率：${completion.completionRate}%`,
+    '',
+  ].join('\n')
+}
+
+function renderDailyCompletionMetrics(metrics: DailyPlanCompletionMetric[]): string {
+  return [
+    '## 指标',
+    ...metrics.map(metric => `- ${metric.label}：${metric.value}，${metric.detail}`),
+    '',
+  ].join('\n')
+}
+
+function renderDailyCompletionTodos(todos: DailyPlanCompletionTodo[]): string {
+  if (todos.length === 0) {
+    return [
+      '## 待办验收',
+      '- 暂无待办验收。可以沉淀今日复盘，再进入下一轮训练。',
+      '',
+    ].join('\n')
+  }
+
+  const lines = ['## 待办验收']
+  todos.forEach((todo, index) => {
+    lines.push(
+      `${index + 1}. ${todo.title}`,
+      `   - 说明：${todo.description}`,
+      `   - 入口：${todo.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderDailyCompletionPrimaryAction(action: DailyPlanCompletionAction): string {
+  return [
+    '## 主行动',
+    `- 动作：${action.label}`,
+    `- 说明：${action.description}`,
+    `- 入口：${action.to}`,
+  ].join('\n')
+}
+
+function formatMarkdownDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 10)
+  }
+  return date.toISOString().slice(0, 10)
+}
+
 function resolveLevel(input: {
   totalCount: number
   remainingCount: number

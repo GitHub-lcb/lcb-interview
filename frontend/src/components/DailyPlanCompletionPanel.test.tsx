@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import type { InterviewAttempt, StudyProgress } from '../types'
 import { createDefaultProgress } from '../utils/studyProgress'
@@ -47,6 +48,10 @@ function completedProgress(): StudyProgress {
 }
 
 describe('DailyPlanCompletionPanel', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
@@ -74,5 +79,25 @@ describe('DailyPlanCompletionPanel', () => {
     expect(screen.getAllByText('100%').length).toBeGreaterThan(0)
     expect(screen.getByText('今日闭环已加强')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /查看冲刺报告/ })).toBeInTheDocument()
+  })
+
+  it('copies daily completion markdown', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    })
+
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <DailyPlanCompletionPanel progress={completedProgress()} now={NOW} />
+      </MemoryRouter>
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /复制验收/ }))
+
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1))
+    expect(writeText.mock.calls[0][0]).toContain('# Java 后端 今日闭环验收')
+    expect(writeText.mock.calls[0][0]).toContain('今日闭环已加强')
   })
 })

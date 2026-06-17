@@ -3179,6 +3179,7 @@ p {
 .daily-plan-completion-score {
   display: grid;
   justify-items: end;
+  gap: 4px;
   flex: 0 0 auto;
 }
 
@@ -3188,11 +3189,15 @@ p {
   line-height: 1;
 }
 
-.daily-plan-completion-score span {
+.daily-plan-completion-score > span {
   margin-top: 4px;
   color: #64748B;
   font-size: 12px;
   font-weight: 800;
+}
+
+.daily-plan-completion-score .ant-btn {
+  margin-top: 4px;
 }
 
 .daily-plan-completion-body {

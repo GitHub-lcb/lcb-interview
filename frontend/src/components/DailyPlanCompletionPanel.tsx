@@ -1,9 +1,9 @@
-import { ArrowRightOutlined, CheckCircleOutlined, SafetyCertificateOutlined } from '@ant-design/icons'
-import { Button } from 'antd'
+import { ArrowRightOutlined, CheckCircleOutlined, CopyOutlined, SafetyCertificateOutlined } from '@ant-design/icons'
+import { Button, message } from 'antd'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { StudyProgress } from '../types'
-import { buildDailyPlanCompletion } from '../utils/dailyPlanCompletion'
+import { buildDailyPlanCompletion, buildDailyPlanCompletionMarkdown } from '../utils/dailyPlanCompletion'
 
 interface DailyPlanCompletionPanelProps {
   progress: StudyProgress
@@ -20,6 +20,19 @@ export default function DailyPlanCompletionPanel({
     [now, progress],
   )
 
+  const handleCopyCompletion = async () => {
+    const markdown = buildDailyPlanCompletionMarkdown(progress, now)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('今日闭环验收已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 验收')
+  }
+
   return (
     <section className={`daily-plan-completion-panel level-${completion.level}`} aria-label="今日闭环验收">
       <div className="daily-plan-completion-head">
@@ -34,6 +47,9 @@ export default function DailyPlanCompletionPanel({
         <div className="daily-plan-completion-score">
           <strong>{completion.completionRate}%</strong>
           <span>完成率</span>
+          <Button size="small" icon={<CopyOutlined />} onClick={handleCopyCompletion}>
+            复制验收
+          </Button>
         </div>
       </div>
 
@@ -70,4 +86,34 @@ export default function DailyPlanCompletionPanel({
       </div>
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
+function buildFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '岗位'}-今日闭环验收.md`
 }
