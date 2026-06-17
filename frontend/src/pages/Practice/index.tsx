@@ -17,6 +17,7 @@ import PracticeAnswerReadinessPanel from '../../components/PracticeAnswerReadine
 import PracticeAnswerScaffoldPanel from '../../components/PracticeAnswerScaffoldPanel'
 import PracticeAttemptDeltaPanel from '../../components/PracticeAttemptDeltaPanel'
 import PracticeFeedbackClosurePanel from '../../components/PracticeFeedbackClosurePanel'
+import PracticeInterviewerScriptPanel from '../../components/PracticeInterviewerScriptPanel'
 import PracticeSessionReportPanel from '../../components/PracticeSessionReportPanel'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
@@ -399,6 +400,11 @@ export default function Practice() {
     setFeedback(null)
   }
 
+  const startInterviewerScriptAnswer = (prompt: string) => {
+    setAnswerDraft(`追问：${prompt}\n\n我的回答：`)
+    setFeedback(null)
+  }
+
   if (!current || !currentState) {
     return (
       <div className="practice-empty-page">
@@ -622,6 +628,11 @@ export default function Practice() {
           question={current}
           attempts={currentAttempts}
           onUsePrompt={startAttemptDeltaAnswer}
+        />
+        <PracticeInterviewerScriptPanel
+          question={current}
+          attempts={currentAttempts}
+          onUsePrompt={startInterviewerScriptAnswer}
         />
         <PracticeSessionReportPanel queue={queue} progress={progress} onNavigate={navigate} />
         <InterviewReviewPanel progress={progress} compact />
