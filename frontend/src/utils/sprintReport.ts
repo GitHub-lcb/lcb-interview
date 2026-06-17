@@ -9,6 +9,7 @@ import type {
   InterviewFollowUpDefense,
   InterviewMaterialVault,
   InterviewMistakeLedger,
+  InterviewRecoveryAcceptance,
   InterviewRecoveryPlan,
   PrepHealthDimension,
   PrepHealthReport,
@@ -22,6 +23,7 @@ import { buildInterviewFollowUpDefense } from './interviewFollowUpDefense'
 import { buildInterviewLastMinuteBrief } from './interviewLastMinuteBrief'
 import { buildInterviewMaterialVault } from './interviewMaterialVault'
 import { buildInterviewMistakeLedger } from './interviewMistakeLedger'
+import { buildInterviewRecoveryAcceptance } from './interviewRecoveryAcceptance'
 import { buildInterviewRecoveryPlan } from './interviewRecoveryPlan'
 import { buildPrepHealthReport } from './prepHealth'
 
@@ -42,6 +44,7 @@ export function buildSprintReportMarkdown(
   const dailyBrief = buildDailyPlanBrief(progress, [], now)
   const mistakeLedger = buildInterviewMistakeLedger(progress)
   const recoveryPlan = buildInterviewRecoveryPlan(mistakeLedger)
+  const recoveryAcceptance = buildInterviewRecoveryAcceptance(progress, mistakeLedger)
   const emergencyKit = buildInterviewEmergencyKit(progress, now)
   const lastMinuteBrief = buildInterviewLastMinuteBrief(progress, now)
   const materialVault = buildInterviewMaterialVault(progress)
@@ -68,7 +71,8 @@ export function buildSprintReportMarkdown(
     renderBriefSection('开口热身题', brief.warmups),
     renderMistakeLedgerSection(mistakeLedger),
     renderRecoveryPlanSection(recoveryPlan),
-    renderActionSection(health, brief, completion, recoveryPlan, materialVault, followUpDefense),
+    renderRecoveryAcceptanceSection(recoveryAcceptance),
+    renderActionSection(health, brief, completion, recoveryPlan, materialVault, followUpDefense, recoveryAcceptance),
   ].join('\n')
 }
 
@@ -280,6 +284,20 @@ function renderRecoveryPlanSection(plan: InterviewRecoveryPlan): string {
   ].join('\n')
 }
 
+function renderRecoveryAcceptanceSection(acceptance: InterviewRecoveryAcceptance): string {
+  return [
+    '## 错题恢复验收',
+    `- 状态：${acceptance.title}`,
+    `- 摘要：${acceptance.summary}`,
+    `- 已验收：${acceptance.passedCount}/${acceptance.totalCount}`,
+    `- 已过线题目：${formatQuestionIds(acceptance.passedQuestionIds)}`,
+    `- 未过线题目：${formatQuestionIds(acceptance.failedQuestionIds)}`,
+    `- 待复测题目：${formatQuestionIds(acceptance.pendingQuestionIds)}`,
+    `- 行动：${acceptance.primaryAction.label} - ${acceptance.primaryAction.description}（${acceptance.primaryAction.to}）`,
+    '',
+  ].join('\n')
+}
+
 function renderActionSection(
   health: PrepHealthReport,
   brief: InterviewBriefReport,
@@ -287,8 +305,9 @@ function renderActionSection(
   recoveryPlan: InterviewRecoveryPlan,
   materialVault: InterviewMaterialVault,
   followUpDefense: InterviewFollowUpDefense,
+  recoveryAcceptance: InterviewRecoveryAcceptance,
 ): string {
-  // 报告被复制到外部文档后仍要能指导下一步，所以保留健康、表达、今日闭环、错题恢复、高分素材和追问防线行动线。
+  // 报告被复制到外部文档后仍要能指导下一步，所以保留健康、表达、今日闭环、错题恢复、高分素材、追问防线和错题验收行动线。
   return [
     '## 下一步行动',
     `- 健康雷达：${health.primaryAction.label} - ${health.primaryAction.description}（${health.primaryAction.to}）`,
@@ -297,8 +316,13 @@ function renderActionSection(
     `- 错题恢复：${recoveryPlan.primaryAction.label} - ${recoveryPlan.primaryAction.description}（${recoveryPlan.primaryAction.to || '/practice'}）`,
     `- 高分素材：${materialVault.primaryAction.label} - ${materialVault.primaryAction.description}（${materialVault.primaryAction.to}）`,
     `- 追问防线：${followUpDefense.primaryAction.label} - ${followUpDefense.primaryAction.description}（${followUpDefense.primaryAction.to}）`,
+    `- 错题验收：${recoveryAcceptance.primaryAction.label} - ${recoveryAcceptance.primaryAction.description}（${recoveryAcceptance.primaryAction.to}）`,
     '',
   ].join('\n')
+}
+
+function formatQuestionIds(questionIds: number[]): string {
+  return questionIds.length > 0 ? questionIds.join(', ') : '暂无'
 }
 
 function formatDate(value: string): string {
