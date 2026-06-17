@@ -343,6 +343,24 @@ export interface InterviewReviewSummary {
   recommendation: string
 }
 
+export type FollowUpDrillCriterionKey = InterviewCriterionKey | 'advanced'
+
+export interface FollowUpDrillItem {
+  id: string
+  criterionKey: FollowUpDrillCriterionKey
+  criterionLabel: string
+  prompt: string
+  pressurePoint: string
+  answerGuide: string
+  priority: number
+}
+
+export interface FollowUpDrillPack {
+  title: string
+  summary: string
+  items: FollowUpDrillItem[]
+}
+
 export interface AnswerQualityResult {
   score: number
   level: 'excellent' | 'good' | 'needs-work'

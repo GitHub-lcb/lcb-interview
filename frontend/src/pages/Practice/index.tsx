@@ -10,6 +10,7 @@ import {
   WarningOutlined,
 } from '@ant-design/icons'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import FollowUpDrillPanel from '../../components/FollowUpDrillPanel'
 import InterviewReviewPanel from '../../components/InterviewReviewPanel'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
@@ -363,6 +364,11 @@ export default function Practice() {
     })
   }
 
+  const startFollowUpAnswer = (prompt: string) => {
+    setAnswerDraft(`追问：${prompt}\n\n我的回答：`)
+    setFeedback(null)
+  }
+
   if (!current || !currentState) {
     return (
       <div className="practice-empty-page">
@@ -470,42 +476,50 @@ export default function Practice() {
         </section>
 
         {feedback && (
-          <section className={`practice-feedback-panel level-${feedback.level}`}>
-            <div className={`practice-feedback-score score-${resolveScoreTone(feedback.score)}`}>
-              <span>面试官评分</span>
-              <strong>{feedback.score}</strong>
-              <small>{feedbackLevelLabels[feedback.level]}</small>
-              {feedback.source && (
-                <em>{feedbackSourceLabels[feedback.source]}</em>
-              )}
-            </div>
-            <div className="practice-feedback-body">
-              <div className="practice-criteria-grid">
-                {feedback.criteria.map(item => (
-                  <div key={item.key} className={`score-${resolveScoreTone(item.score)}`}>
-                    <div>
-                      <span>{item.label}</span>
-                      <strong>{item.score}</strong>
-                    </div>
-                    <Progress percent={item.score} showInfo={false} strokeColor={item.score >= 70 ? '#059669' : '#D97706'} />
-                    <small>{item.summary}</small>
-                  </div>
-                ))}
-              </div>
-              <div className="practice-feedback-lists">
-                {feedback.advice.length > 0 && (
-                  <div className="practice-feedback-list">
-                    <span>改进点</span>
-                    {feedback.advice.map(item => <p key={item}>{item}</p>)}
-                  </div>
+          <>
+            <section className={`practice-feedback-panel level-${feedback.level}`}>
+              <div className={`practice-feedback-score score-${resolveScoreTone(feedback.score)}`}>
+                <span>面试官评分</span>
+                <strong>{feedback.score}</strong>
+                <small>{feedbackLevelLabels[feedback.level]}</small>
+                {feedback.source && (
+                  <em>{feedbackSourceLabels[feedback.source]}</em>
                 )}
-                <div className="practice-feedback-list">
-                  <span>追问</span>
-                  {feedback.followUps.map(item => <p key={item}>{item}</p>)}
+              </div>
+              <div className="practice-feedback-body">
+                <div className="practice-criteria-grid">
+                  {feedback.criteria.map(item => (
+                    <div key={item.key} className={`score-${resolveScoreTone(item.score)}`}>
+                      <div>
+                        <span>{item.label}</span>
+                        <strong>{item.score}</strong>
+                      </div>
+                      <Progress percent={item.score} showInfo={false} strokeColor={item.score >= 70 ? '#059669' : '#D97706'} />
+                      <small>{item.summary}</small>
+                    </div>
+                  ))}
+                </div>
+                <div className="practice-feedback-lists">
+                  {feedback.advice.length > 0 && (
+                    <div className="practice-feedback-list">
+                      <span>改进点</span>
+                      {feedback.advice.map(item => <p key={item}>{item}</p>)}
+                    </div>
+                  )}
+                  <div className="practice-feedback-list">
+                    <span>追问</span>
+                    {feedback.followUps.map(item => <p key={item}>{item}</p>)}
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
+            <FollowUpDrillPanel
+              question={current}
+              answer={answerDraft}
+              feedback={feedback}
+              onPickPrompt={startFollowUpAnswer}
+            />
+          </>
         )}
 
         <div className="practice-actions">

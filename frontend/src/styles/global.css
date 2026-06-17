@@ -3636,6 +3636,115 @@ p {
   line-height: 1.7;
 }
 
+.follow-up-drill-panel {
+  display: grid;
+  gap: 12px;
+  margin: 0 20px 20px 20px;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #7C3AED;
+}
+
+.follow-up-drill-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.follow-up-drill-head h2 {
+  margin: 0;
+  color: #18181B;
+  font-size: 22px;
+}
+
+.follow-up-drill-head p {
+  max-width: 780px;
+  margin: 6px 0 0 0;
+  color: #52525B;
+  font-size: 13px;
+}
+
+.follow-up-drill-head > svg {
+  color: #7C3AED;
+  font-size: 22px;
+}
+
+.follow-up-drill-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.follow-up-drill-card {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+  padding: 12px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 3px 0 0 #7C3AED;
+}
+
+.follow-up-drill-card.criterion-risk {
+  box-shadow: inset 3px 0 0 #DC2626;
+}
+
+.follow-up-drill-card.criterion-specificity {
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.follow-up-drill-card.criterion-structure {
+  box-shadow: inset 3px 0 0 #2563EB;
+}
+
+.follow-up-drill-card.criterion-coverage {
+  box-shadow: inset 3px 0 0 #059669;
+}
+
+.follow-up-drill-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.follow-up-drill-card-top span,
+.follow-up-drill-card-top em {
+  color: #64748B;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.follow-up-drill-card-top em {
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #FFFFFF;
+}
+
+.follow-up-drill-card h3 {
+  margin: 0;
+  color: #18181B;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.follow-up-drill-card p,
+.follow-up-drill-card small {
+  margin: 0;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.follow-up-drill-card .ant-btn {
+  justify-self: start;
+}
+
 .practice-side {
   display: grid;
   gap: 12px;
@@ -4062,6 +4171,7 @@ p {
   }
 
   .practice-feedback-panel,
+  .follow-up-drill-grid,
   .practice-criteria-grid {
     grid-template-columns: 1fr;
   }
