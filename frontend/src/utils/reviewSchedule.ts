@@ -58,6 +58,34 @@ export function summarizeReviewSchedule(items: ScheduledReviewItem[]): ReviewSch
   }
 }
 
+/**
+ * 构建智能复习队列 Markdown，便于用户把到期复习债复制到外部计划或打卡文档。
+ *
+ * @param progress 本地学习进度
+ * @param now      生成时间，默认取当前时间
+ * @param limit    导出的队列上限，默认与页面展示保持一致
+ * @returns 可复制或下载的 Markdown 复习队列
+ */
+export function buildReviewScheduleMarkdown(
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+  limit = 12,
+): string {
+  const queue = buildScheduledReviewQueue(progress, now, limit)
+  const summary = summarizeReviewSchedule(queue)
+  return [
+    `# ${sanitizeMarkdownValue(progress.targetRole, '岗位')} 智能复习队列`,
+    '',
+    `生成时间：${formatMarkdownDate(now)}`,
+    '',
+    '## 排期概览',
+    renderScheduleOverview(summary),
+    '',
+    '## 复习队列',
+    renderReviewQueue(queue),
+  ].join('\n')
+}
+
 function reviewIntervalDays(status: StudyQuestionStatus, reviewCount: number): number {
   if (status === 'weak') {
     // 薄弱题固定 1 天复习一次，用高频暴露压住遗忘曲线，直到用户主动标记为掌握。
@@ -178,6 +206,50 @@ function startOfUtcDay(date: Date): Date {
 
 function daysBetween(start: Date, end: Date): number {
   return Math.round((end.getTime() - start.getTime()) / DAY_MS)
+}
+
+function renderScheduleOverview(summary: ReviewScheduleSummary): string {
+  return [
+    `- 已逾期：${summary.overdue} 道`,
+    `- 今日到期：${summary.dueToday} 道`,
+    `- 即将到期：${summary.upcoming} 道`,
+    `- 下次复习：${formatMarkdownDate(summary.nextReviewAt)}`,
+  ].join('\n')
+}
+
+function renderReviewQueue(items: ScheduledReviewItem[]): string {
+  if (items.length === 0) {
+    return [
+      '1. 暂无到期复习题',
+      '   - 下一步：先把薄弱题标记为“薄弱”或加入今日计划，再回来生成队列。',
+      '   - 入口：/banks',
+    ].join('\n')
+  }
+
+  return items
+    .map((item, index) => [
+      `${index + 1}. ${sanitizeMarkdownValue(item.title, `题目 #${item.id}`)}`,
+      `   - 状态：${dueStatusLabel(item.dueStatus)}`,
+      `   - 分类：${sanitizeMarkdownValue(item.categoryName, '未分组')}`,
+      `   - 复习次数：${item.reviewCount} 次`,
+      `   - 下次复习：${formatMarkdownDate(item.nextReviewAt)}`,
+      `   - 原因：${sanitizeMarkdownValue(item.scheduleReason, '按当前掌握状态进入复习队列。')}`,
+      `   - 入口：/question/${item.id}`,
+    ].join('\n'))
+    .join('\n\n')
+}
+
+function formatMarkdownDate(value?: string): string {
+  const date = parseReviewDate(value)
+  if (!date) {
+    return '暂无'
+  }
+  return date.toISOString().slice(0, 10)
+}
+
+function sanitizeMarkdownValue(value: string | undefined, fallback: string): string {
+  const normalized = value?.trim()
+  return normalized ? normalized : fallback
 }
 
 function fallbackSnapshot(questionId: number): QuestionSnapshot {

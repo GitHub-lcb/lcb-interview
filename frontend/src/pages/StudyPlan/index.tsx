@@ -3,6 +3,7 @@ import { Button, Empty, InputNumber, message, Progress, Select } from 'antd'
 import {
   ArrowRightOutlined,
   BookOutlined,
+  CopyOutlined,
   FireOutlined,
   PlayCircleOutlined,
   SettingOutlined,
@@ -24,7 +25,7 @@ import InterviewFollowUpDefensePanel from '../../components/InterviewFollowUpDef
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { getHotQuestions } from '../../api/question'
 import type { Question, ReviewDueStatus } from '../../types'
-import { buildScheduledReviewQueue, summarizeReviewSchedule } from '../../utils/reviewSchedule'
+import { buildReviewScheduleMarkdown, buildScheduledReviewQueue, summarizeReviewSchedule } from '../../utils/reviewSchedule'
 import { buildDailyPlan, resolvePlanQuestions, summarizeProgress } from '../../utils/studyProgress'
 import { buildPaceFilledDailyPlan } from '../../utils/studyPacePlan'
 import { buildDailyPracticePath } from '../../utils/practiceRoute'
@@ -130,6 +131,19 @@ export default function StudyPlan() {
 
     setDailyPlan(nextPlanIds)
     message.success(`已按配速补齐到 ${nextPlanIds.length} 道今日计划`)
+  }
+
+  const handleCopyReviewSchedule = async () => {
+    const markdown = buildReviewScheduleMarkdown(progress)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('智能复习队列已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildReviewScheduleFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 队列')
   }
 
   return (
@@ -306,9 +320,14 @@ export default function StudyPlan() {
         </section>
 
         <section className="study-plan-section">
-          <div className="study-plan-section-title">
-            <span>智能复习队列</span>
-            <small>{reviewQueue.length} 道</small>
+          <div className="study-plan-section-title with-actions">
+            <div>
+              <span>智能复习队列</span>
+              <small>{reviewQueue.length} 道</small>
+            </div>
+            <Button size="small" icon={<CopyOutlined />} onClick={handleCopyReviewSchedule}>
+              复制队列
+            </Button>
           </div>
           {reviewQueue.length === 0 ? (
             <div className="study-empty-panel">
@@ -339,4 +358,34 @@ export default function StudyPlan() {
       </div>
     </div>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
+function buildReviewScheduleFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '岗位'}-智能复习队列.md`
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Question } from '../types'
 import { createDefaultProgress, rememberQuestions } from './studyProgress'
-import { buildScheduledReviewQueue, summarizeReviewSchedule } from './reviewSchedule'
+import { buildReviewScheduleMarkdown, buildScheduledReviewQueue, summarizeReviewSchedule } from './reviewSchedule'
 
 const today = '2026-06-17T09:00:00'
 
@@ -117,5 +117,44 @@ describe('reviewSchedule', () => {
       upcoming: 1,
       nextReviewAt: '2026-06-19T09:00:00.000Z',
     })
+  })
+
+  it('exports review schedule markdown with due status, reasons, and links', () => {
+    let progress = createDefaultProgress()
+    progress = rememberQuestions(progress, [question(1), question(2), question(3)])
+    progress = {
+      ...progress,
+      questionStates: {
+        1: { status: 'learning', addedToPlan: true, reviewCount: 1, lastReviewedAt: '2026-06-15T09:00:00' },
+        2: { status: 'weak', addedToPlan: true, reviewCount: 2, lastReviewedAt: '2026-06-16T09:00:00' },
+        3: { status: 'learning', addedToPlan: false, reviewCount: 2, lastReviewedAt: '2026-06-16T09:00:00' },
+      },
+    }
+
+    const markdown = buildReviewScheduleMarkdown(progress, today)
+
+    expect(markdown).toContain('# Java 后端 智能复习队列')
+    expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 排期概览')
+    expect(markdown).toContain('- 已逾期：1 道')
+    expect(markdown).toContain('- 今日到期：1 道')
+    expect(markdown).toContain('- 即将到期：1 道')
+    expect(markdown).toContain('## 复习队列')
+    expect(markdown).toContain('1. Question 1')
+    expect(markdown).toContain('状态：已逾期')
+    expect(markdown).toContain('原因：学习中题 1 天后复习，先建立第一轮记忆。')
+    expect(markdown).toContain('入口：/question/1')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('exports actionable markdown when review queue is empty', () => {
+    const markdown = buildReviewScheduleMarkdown(createDefaultProgress(), today)
+
+    expect(markdown).toContain('# Java 后端 智能复习队列')
+    expect(markdown).toContain('## 复习队列')
+    expect(markdown).toContain('暂无到期复习题')
+    expect(markdown).toContain('先把薄弱题标记为“薄弱”或加入今日计划')
+    expect(markdown).toContain('入口：/banks')
+    expect(markdown).not.toContain('undefined')
   })
 })

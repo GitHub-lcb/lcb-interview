@@ -4846,6 +4846,24 @@ p {
   margin-bottom: 12px;
 }
 
+.study-plan-section-title.with-actions {
+  align-items: center;
+  gap: 12px;
+}
+
+.study-plan-section-title.with-actions > div {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.study-plan-section-title.with-actions .ant-btn {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+}
+
 .study-plan-section-title span {
   color: #18181B;
   font-weight: 800;
