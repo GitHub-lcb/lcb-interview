@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Question } from '../types'
 import {
+  buildAnswerQualityMarkdown,
   calculateAnswerQuality,
   generateFollowUps,
   getMistakeHint,
@@ -57,5 +58,35 @@ describe('answerQuality', () => {
   it('uses risk as the mistake hint before generic fallback', () => {
     expect(getMistakeHint(question({ risk: '不要只背死循环。' }))).toBe('不要只背死循环。')
     expect(getMistakeHint(question({ risk: undefined }))).toContain('不要只背结论')
+  })
+
+  it('exports answer quality as portable markdown', () => {
+    const markdown = buildAnswerQualityMarkdown(question({
+      title: 'HashMap 为什么线程不安全？',
+      categoryName: 'Java 集合',
+      summary: 'HashMap 线程不安全主要来自并发扩容和覆盖写。',
+      principle: '并发修改会破坏桶和链表结构。',
+      risk: '不要只说没有加锁，要说明边界。',
+    }), '2026-06-18T00:00:00.000Z')
+
+    expect(markdown).toContain('# HashMap 为什么线程不安全？ 答案质量卡')
+    expect(markdown).toContain('生成时间：2026-06-18')
+    expect(markdown).toContain('## 质量概览')
+    expect(markdown).toContain('## 已覆盖模块')
+    expect(markdown).toContain('## 可补强模块')
+    expect(markdown).toContain('## 面试官追问')
+    expect(markdown).toContain('## 误区提醒')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps incomplete answer quality export actionable', () => {
+    const markdown = buildAnswerQualityMarkdown(
+      question({ summary: undefined, risk: undefined }),
+      '2026-06-18T00:00:00.000Z',
+    )
+
+    expect(markdown).toContain('可补强模块')
+    expect(markdown).toContain('不要只背结论')
+    expect(markdown).not.toContain('undefined')
   })
 })

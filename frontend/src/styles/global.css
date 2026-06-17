@@ -746,6 +746,20 @@ p {
   color: #FFFFFF;
 }
 
+.quality-score-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.quality-score-card-head .ant-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .panel-kicker,
 .panel-muted {
   color: #94A3B8;
