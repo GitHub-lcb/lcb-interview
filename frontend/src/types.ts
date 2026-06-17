@@ -158,6 +158,25 @@ export interface StudyStrategy {
   actions: StudyStrategyAction[]
 }
 
+export type DailyMissionKind = 'review' | 'ability' | 'interview' | 'plan'
+
+export interface DailyMissionItem {
+  id: string
+  kind: DailyMissionKind
+  title: string
+  description: string
+  reason: string
+  to: string
+  priority: number
+  metric: string
+}
+
+export interface DailyMissionPlan {
+  title: string
+  summary: string
+  missions: DailyMissionItem[]
+}
+
 export interface WeakArea {
   categoryId?: number
   categoryName: string

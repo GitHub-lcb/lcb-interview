@@ -3,6 +3,7 @@ import { Alert } from 'antd'
 import CategoryGrid from './CategoryGrid'
 import HotQuestions from './HotQuestions'
 import AbilityMapPanel from '../../components/AbilityMapPanel'
+import DailyMissionPanel from '../../components/DailyMissionPanel'
 import InterviewReviewPanel from '../../components/InterviewReviewPanel'
 import StudyCommandCenter from '../../components/StudyCommandCenter'
 import StudyDashboard from '../../components/StudyDashboard'
@@ -41,6 +42,8 @@ export default function Home() {
       <StudyDashboard hotQuestions={hotQuestions} />
 
       <StudyCommandCenter />
+
+      <DailyMissionPanel />
 
       <InterviewReviewPanel progress={progress} />
 

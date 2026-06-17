@@ -1049,6 +1049,140 @@ p {
   gap: 5px;
 }
 
+.daily-mission-panel {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #DC2626;
+}
+
+.daily-mission-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.daily-mission-heading h2 {
+  margin: 0;
+  color: #18181B;
+  font-size: 24px;
+}
+
+.daily-mission-heading p {
+  max-width: 780px;
+  margin: 6px 0 0 0;
+  color: #52525B;
+}
+
+.daily-mission-heading > strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: #FEF2F2;
+  color: #DC2626;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.daily-mission-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.daily-mission-card {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 3px 0 0 #64748B;
+}
+
+.daily-mission-card.kind-review {
+  box-shadow: inset 3px 0 0 #DC2626;
+}
+
+.daily-mission-card.kind-ability {
+  box-shadow: inset 3px 0 0 #7C3AED;
+}
+
+.daily-mission-card.kind-interview {
+  box-shadow: inset 3px 0 0 #2563EB;
+}
+
+.daily-mission-card.kind-plan {
+  box-shadow: inset 3px 0 0 #059669;
+}
+
+.daily-mission-card-top {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.daily-mission-rank,
+.daily-mission-kind {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: #FFFFFF;
+  color: #18181B;
+  font-weight: 800;
+}
+
+.daily-mission-kind {
+  color: #2563EB;
+}
+
+.daily-mission-card-top em {
+  margin-left: auto;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #FFFFFF;
+  color: #64748B;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.daily-mission-card h3 {
+  margin: 0;
+  color: #18181B;
+  font-size: 17px;
+}
+
+.daily-mission-card p {
+  margin: 0;
+  color: #52525B;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.daily-mission-card small {
+  color: #64748B;
+  font-size: 12px;
+}
+
+.daily-mission-card .ant-btn {
+  justify-self: start;
+}
+
 .interview-review-panel {
   display: grid;
   gap: 14px;
@@ -3403,6 +3537,7 @@ p {
   .study-plan-grid,
   .study-question-item,
   .command-factor-grid,
+  .daily-mission-grid,
   .ability-map-grid,
   .prep-route-metrics {
     grid-template-columns: 1fr;
@@ -3447,6 +3582,10 @@ p {
   }
 
   .command-main-header {
+    display: grid;
+  }
+
+  .daily-mission-heading {
     display: grid;
   }
 
