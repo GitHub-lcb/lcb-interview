@@ -3186,6 +3186,17 @@ p {
   border-color: #BBF7D0;
 }
 
+.interview-recovery-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.interview-recovery-head .ant-btn {
+  flex: 0 0 auto;
+}
+
 .interview-recovery-head span {
   display: block;
   color: #2563EB;
@@ -4500,6 +4511,14 @@ p {
 
   .interview-mistake-action span {
     text-align: left;
+  }
+
+  .interview-recovery-head {
+    display: grid;
+  }
+
+  .interview-recovery-head .ant-btn {
+    justify-self: start;
   }
 
   .interview-brief-action-note {

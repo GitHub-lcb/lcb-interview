@@ -1,7 +1,8 @@
-import { Button, Progress } from 'antd'
+import { Button, message, Progress } from 'antd'
 import {
   ArrowRightOutlined,
   BookOutlined,
+  CopyOutlined,
   FireOutlined,
   PlayCircleOutlined,
   WarningOutlined,
@@ -16,6 +17,7 @@ import type {
 } from '../types'
 import { buildInterviewMistakeLedger } from '../utils/interviewMistakeLedger'
 import { buildInterviewRecoveryPlan } from '../utils/interviewRecoveryPlan'
+import { buildInterviewRecoveryMarkdown } from '../utils/interviewRecoveryReport'
 
 interface InterviewMistakeLedgerPanelProps {
   progress: StudyProgress
@@ -47,6 +49,7 @@ function metricText(item: InterviewMistakeLedgerItem): string {
 function renderRecoveryPlan(
   plan: InterviewRecoveryPlan,
   onNavigate: (to: string) => void,
+  onCopy: () => void,
 ) {
   return (
     <div className={`interview-recovery-plan mode-${plan.mode}`}>
@@ -56,6 +59,9 @@ function renderRecoveryPlan(
           <h3>{plan.title}</h3>
           <p>{plan.summary}</p>
         </div>
+        <Button icon={<CopyOutlined />} onClick={onCopy}>
+          复制计划
+        </Button>
       </div>
       <div className="interview-recovery-steps">
         {plan.steps.map((step, index) => (
@@ -83,6 +89,18 @@ export default function InterviewMistakeLedgerPanel({ progress }: InterviewMista
   const navigate = useNavigate()
   const ledger = useMemo(() => buildInterviewMistakeLedger(progress), [progress])
   const recoveryPlan = useMemo(() => buildInterviewRecoveryPlan(ledger), [ledger])
+  const handleCopyRecoveryPlan = async () => {
+    const markdown = buildInterviewRecoveryMarkdown(ledger, recoveryPlan, progress.targetRole)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('错因修复计划已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildRecoveryFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 计划')
+  }
 
   if (ledger.level === 'empty') {
     return (
@@ -98,7 +116,7 @@ export default function InterviewMistakeLedgerPanel({ progress }: InterviewMista
             <ArrowRightOutlined />
           </Button>
         </div>
-        {renderRecoveryPlan(recoveryPlan, navigate)}
+        {renderRecoveryPlan(recoveryPlan, navigate, handleCopyRecoveryPlan)}
       </section>
     )
   }
@@ -146,7 +164,35 @@ export default function InterviewMistakeLedgerPanel({ progress }: InterviewMista
         ))}
       </div>
 
-      {renderRecoveryPlan(recoveryPlan, navigate)}
+      {renderRecoveryPlan(recoveryPlan, navigate, handleCopyRecoveryPlan)}
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+function buildRecoveryFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '面试'}-错因修复计划.md`
 }
