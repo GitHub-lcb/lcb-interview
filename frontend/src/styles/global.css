@@ -3523,6 +3523,221 @@ p {
   color: #A1A1AA;
 }
 
+.next-training-queue-panel {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  margin-bottom: 18px;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #7C3AED;
+}
+
+.next-training-queue-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.next-training-queue-head h2 {
+  margin: 0;
+  color: #18181B;
+  font-size: 24px;
+}
+
+.next-training-queue-head p {
+  max-width: 780px;
+  margin: 6px 0 0 0;
+  color: #52525B;
+}
+
+.next-training-queue-total {
+  display: grid;
+  justify-items: end;
+  flex: 0 0 auto;
+}
+
+.next-training-queue-total strong {
+  color: #0F172A;
+  font-size: 42px;
+  line-height: 1;
+}
+
+.next-training-queue-total span {
+  margin-top: 4px;
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.next-training-queue-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.next-training-queue-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.next-training-queue-metrics article {
+  min-width: 0;
+  padding: 11px;
+  background: #FAFAF9;
+  border: 1px solid #E7E5E4;
+  border-radius: 8px;
+}
+
+.next-training-queue-metrics span,
+.next-training-queue-metrics small {
+  display: block;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.next-training-queue-metrics strong {
+  display: block;
+  margin: 3px 0;
+  color: #18181B;
+  font-size: 21px;
+  line-height: 1.15;
+}
+
+.next-training-queue-action {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: #F5F3FF;
+  border: 1px solid #DDD6FE;
+  border-radius: 8px;
+}
+
+.next-training-queue-action .ant-btn {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.next-training-queue-action > span {
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.next-training-queue-list {
+  display: grid;
+  gap: 8px;
+}
+
+.next-training-queue-list button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  gap: 10px;
+  width: 100%;
+  min-height: 76px;
+  padding: 11px 12px;
+  color: inherit;
+  text-align: left;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.next-training-queue-list button:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+}
+
+.next-training-queue-list button.source-score-impact,
+.next-training-queue-list button.source-review-debt,
+.next-training-queue-list button.source-mistake {
+  box-shadow: inset 3px 0 0 #DC2626;
+}
+
+.next-training-queue-list button.source-weak {
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.next-training-queue-list button.source-learning,
+.next-training-queue-list button.source-plan {
+  box-shadow: inset 3px 0 0 #2563EB;
+}
+
+.next-training-queue-item-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.next-training-queue-item-top strong {
+  overflow: hidden;
+  color: #18181B;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.next-training-queue-item-top em {
+  flex: 0 0 auto;
+  padding: 3px 7px;
+  color: #6D28D9;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  background: #F5F3FF;
+  border-radius: 6px;
+}
+
+.next-training-queue-list span,
+.next-training-queue-list small {
+  display: block;
+  margin-top: 4px;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.next-training-queue-list small {
+  color: #64748B;
+}
+
+.next-training-queue-list svg {
+  align-self: center;
+  color: #A1A1AA;
+}
+
+.next-training-queue-empty {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  background: #FAFAF9;
+  border: 1px dashed #D6D3D1;
+  border-radius: 8px;
+}
+
+.next-training-queue-empty strong {
+  color: #18181B;
+  font-size: 14px;
+}
+
+.next-training-queue-empty span {
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .interview-emergency-kit-panel {
   display: grid;
   gap: 12px;
@@ -7140,6 +7355,9 @@ p {
   .daily-plan-completion-body,
   .daily-plan-completion-metrics,
   .daily-plan-completion-impact-list button,
+  .next-training-queue-body,
+  .next-training-queue-metrics,
+  .next-training-queue-list button,
   .interview-emergency-kit-body,
   .interview-emergency-kit-metrics,
   .interview-last-minute-brief-body,
@@ -7187,6 +7405,14 @@ p {
   }
 
   .daily-plan-completion-score {
+    justify-items: start;
+  }
+
+  .next-training-queue-head {
+    display: grid;
+  }
+
+  .next-training-queue-total {
     justify-items: start;
   }
 

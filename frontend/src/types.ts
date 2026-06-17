@@ -473,6 +473,49 @@ export interface DailyPlanCompletion {
   primaryAction: DailyPlanCompletionAction
 }
 
+export type NextTrainingQueueItemSource = 'score-impact' | 'review-debt' | 'mistake' | 'weak' | 'learning' | 'plan'
+
+export interface NextTrainingQueueMetric {
+  key: 'total' | 'urgent' | 'weak' | 'interview'
+  label: string
+  value: string
+  detail: string
+}
+
+export interface NextTrainingQueueAction {
+  label: string
+  description: string
+  to: string
+}
+
+export interface NextTrainingQueueItem {
+  id: string
+  questionId: number
+  title: string
+  categoryName: string
+  status: StudyQuestionStatus
+  source: NextTrainingQueueItemSource
+  sourceLabel: string
+  reason: string
+  actionLabel: string
+  to: string
+  priority: number
+  score?: number
+  dueStatus?: ReviewDueStatus
+}
+
+export interface NextTrainingQueue {
+  title: string
+  summary: string
+  totalCount: number
+  urgentCount: number
+  weakCount: number
+  interviewRepairCount: number
+  metrics: NextTrainingQueueMetric[]
+  items: NextTrainingQueueItem[]
+  primaryAction: NextTrainingQueueAction
+}
+
 export type InterviewEmergencyKitLevel = 'empty' | 'critical' | 'focused' | 'ready'
 
 export type InterviewEmergencyKitItemKind = 'review' | 'mistake' | 'weak' | 'closure' | 'sample'

@@ -18,6 +18,7 @@ import StudyStatusBadge from '../../components/StudyStatusBadge'
 import StudyPaceCoachPanel from '../../components/StudyPaceCoachPanel'
 import DailyPlanBriefPanel from '../../components/DailyPlanBriefPanel'
 import DailyPlanCompletionPanel from '../../components/DailyPlanCompletionPanel'
+import NextTrainingQueuePanel from '../../components/NextTrainingQueuePanel'
 import InterviewEmergencyKitPanel from '../../components/InterviewEmergencyKitPanel'
 import InterviewLastMinuteBriefPanel from '../../components/InterviewLastMinuteBriefPanel'
 import InterviewMaterialVaultPanel from '../../components/InterviewMaterialVaultPanel'
@@ -217,6 +218,7 @@ export default function StudyPlan() {
       />
       <DailyPlanBriefPanel progress={progress} candidates={hotQuestions} />
       <DailyPlanCompletionPanel progress={progress} />
+      <NextTrainingQueuePanel progress={progress} />
       <InterviewEmergencyKitPanel progress={progress} />
       <InterviewLastMinuteBriefPanel progress={progress} />
       <InterviewMaterialVaultPanel progress={progress} onNavigate={navigate} />
