@@ -35,6 +35,30 @@ export function buildStudyStrategy(progress: StudyProgress): StudyStrategy {
   }
 }
 
+/**
+ * 构建备考指挥中心 Markdown，便于用户把当天总体判断、最大短板和下一步行动复制到外部复盘文档。
+ *
+ * @param progress 当前本地学习进度
+ * @param now 生成时间，用于测试时固定日期
+ * @returns 可复制或下载的 Markdown 指挥简报
+ */
+export function buildStudyCommandMarkdown(
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): string {
+  const strategy = buildStudyStrategy(progress)
+
+  return [
+    `# ${progress.targetRole} 备考指挥中心`,
+    '',
+    `生成时间：${formatMarkdownDate(now)}`,
+    '',
+    renderCommandOverview(progress, strategy),
+    renderCommandFactors(strategy.factors),
+    renderCommandActions(strategy.actions),
+  ].join('\n').trimEnd()
+}
+
 function collectProgressStats(progress: StudyProgress): ProgressStats {
   const states = Object.values(progress.questionStates)
   return {
@@ -198,4 +222,48 @@ function resolveSummary(stats: ProgressStats, risk: StudyStrategyRisk): string {
 
 function clampScore(score: number): number {
   return Math.max(0, Math.min(100, score))
+}
+
+function renderCommandOverview(progress: StudyProgress, strategy: StudyStrategy): string {
+  return [
+    '## 指挥概览',
+    `- 冲刺周期：${progress.sprintDays} 天`,
+    `- 就绪分：${strategy.readinessScore}`,
+    `- 状态：${strategy.title}`,
+    `- 最大短板：${strategy.primaryRisk.title}`,
+    `- 短板说明：${strategy.primaryRisk.description}`,
+    `- 总结：${strategy.summary}`,
+    '',
+  ].join('\n')
+}
+
+function renderCommandFactors(factors: StudyStrategyFactor[]): string {
+  return [
+    '## 就绪因子',
+    ...factors.map((factor, index) => [
+      `${index + 1}. ${factor.label}：${factor.value}`,
+      `   - 分值：${factor.score}`,
+      `   - 说明：${factor.detail}`,
+    ].join('\n')),
+    '',
+  ].join('\n')
+}
+
+function renderCommandActions(actions: StudyStrategyAction[]): string {
+  return [
+    '## 下一步行动',
+    ...actions.map((action, index) => [
+      `${index + 1}. ${action.label}`,
+      `   - 原因：${action.description}`,
+      `   - 路径：${action.to}`,
+    ].join('\n')),
+  ].join('\n')
+}
+
+function formatMarkdownDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 10)
+  }
+  return date.toISOString().slice(0, 10)
 }

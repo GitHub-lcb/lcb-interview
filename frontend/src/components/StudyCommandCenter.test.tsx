@@ -1,0 +1,82 @@
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import '@testing-library/jest-dom/vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
+import type { InterviewFeedback, StudyProgress } from '../types'
+import { createDefaultProgress, STUDY_PROGRESS_STORAGE_KEY } from '../utils/studyProgress'
+import StudyCommandCenter from './StudyCommandCenter'
+
+function attempt(score: number): InterviewFeedback {
+  return {
+    score,
+    level: score >= 80 ? 'strong' : score >= 60 ? 'pass' : 'needs-work',
+    criteria: [],
+    advice: [],
+    followUps: [],
+    source: 'LOCAL_RULE_BASED',
+  }
+}
+
+function progress(): StudyProgress {
+  return {
+    ...createDefaultProgress('2026-06-18T00:00:00.000Z'),
+    targetRole: 'Java 后端',
+    sprintDays: 21,
+    questionStates: {
+      1: { status: 'mastered', addedToPlan: false, reviewCount: 3 },
+      2: { status: 'learning', addedToPlan: true, reviewCount: 1 },
+      3: { status: 'weak', addedToPlan: true, reviewCount: 2 },
+    },
+    dailyPlan: [2, 3],
+    interviewAttempts: {
+      1: [{ questionId: 1, answer: '结构化回答', feedback: attempt(86), createdAt: '2026-06-18T00:00:00.000Z' }],
+    },
+  }
+}
+
+describe('StudyCommandCenter', () => {
+  beforeEach(() => {
+    window.localStorage.setItem(STUDY_PROGRESS_STORAGE_KEY, JSON.stringify(progress()))
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation(query => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    })
+  })
+
+  afterEach(() => {
+    cleanup()
+    window.localStorage.clear()
+  })
+
+  it('copies study command center markdown', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    })
+
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <StudyCommandCenter />
+      </MemoryRouter>,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /复制指挥/ }))
+
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1))
+    expect(writeText.mock.calls[0][0]).toContain('# Java 后端 备考指挥中心')
+    expect(writeText.mock.calls[0][0]).toContain('## 指挥概览')
+    expect(writeText.mock.calls[0][0]).toContain('## 就绪因子')
+    expect(writeText.mock.calls[0][0]).toContain('## 下一步行动')
+  })
+})

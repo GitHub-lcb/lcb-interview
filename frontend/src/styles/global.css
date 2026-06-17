@@ -1004,6 +1004,21 @@ p {
   color: #52525B;
 }
 
+.command-main-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  align-items: center;
+}
+
+.command-main-actions .ant-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .command-risk-badge {
   display: inline-flex;
   gap: 6px;
@@ -6198,6 +6213,10 @@ p {
 
   .command-main-header {
     display: grid;
+  }
+
+  .command-main-actions {
+    justify-content: flex-start;
   }
 
   .interview-brief-head {

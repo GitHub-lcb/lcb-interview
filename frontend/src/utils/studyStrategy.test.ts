@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewFeedback, StudyProgress } from '../types'
 import { createDefaultProgress } from './studyProgress'
-import { buildStudyStrategy } from './studyStrategy'
+import { buildStudyCommandMarkdown, buildStudyStrategy } from './studyStrategy'
 
 const allowedRoutes = ['/banks', '/study', '/practice', '/routes', '/experiences', '/search']
 
@@ -71,5 +71,43 @@ describe('buildStudyStrategy', () => {
 
     expect(strategy.actions.length).toBeGreaterThanOrEqual(3)
     expect(strategy.actions.every(action => allowedRoutes.some(route => action.to.startsWith(route)))).toBe(true)
+  })
+
+  it('exports study command center as portable markdown', () => {
+    const progress: StudyProgress = {
+      ...createDefaultProgress(),
+      targetRole: 'Java 后端',
+      sprintDays: 21,
+      questionStates: {
+        1: { status: 'mastered', addedToPlan: false, reviewCount: 3 },
+        2: { status: 'learning', addedToPlan: true, reviewCount: 1 },
+        3: { status: 'weak', addedToPlan: true, reviewCount: 2 },
+      },
+      dailyPlan: [2, 3],
+      interviewAttempts: {
+        1: [{ questionId: 1, answer: '结构化回答', feedback: attempt(86), createdAt: '2026-06-18T00:00:00.000Z' }],
+      },
+    }
+
+    const markdown = buildStudyCommandMarkdown(progress, '2026-06-18T00:00:00.000Z')
+
+    expect(markdown).toContain('# Java 后端 备考指挥中心')
+    expect(markdown).toContain('生成时间：2026-06-18')
+    expect(markdown).toContain('## 指挥概览')
+    expect(markdown).toContain('## 就绪因子')
+    expect(markdown).toContain('## 下一步行动')
+    expect(markdown).toContain('路径：')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps empty command export actionable', () => {
+    const markdown = buildStudyCommandMarkdown(
+      createDefaultProgress('2026-06-18T00:00:00.000Z'),
+      '2026-06-18T00:00:00.000Z',
+    )
+
+    expect(markdown).toContain('还没有形成备考轨迹')
+    expect(markdown).toContain('进入题库')
+    expect(markdown).not.toContain('undefined')
   })
 })

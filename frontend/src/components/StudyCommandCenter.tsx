@@ -1,14 +1,15 @@
-import { Button, Progress } from 'antd'
+import { Button, message, Progress } from 'antd'
 import {
   ArrowRightOutlined,
   CompassOutlined,
+  CopyOutlined,
   ExclamationCircleOutlined,
   FieldTimeOutlined,
 } from '@ant-design/icons'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStudyProgress } from '../hooks/useStudyProgress'
-import { buildStudyStrategy } from '../utils/studyStrategy'
+import { buildStudyCommandMarkdown, buildStudyStrategy } from '../utils/studyStrategy'
 import type { StudyStrategyAction } from '../types'
 
 function buttonType(action: StudyStrategyAction) {
@@ -19,6 +20,19 @@ export default function StudyCommandCenter() {
   const navigate = useNavigate()
   const { progress } = useStudyProgress()
   const strategy = useMemo(() => buildStudyStrategy(progress), [progress])
+
+  const handleCopyCommand = async () => {
+    const markdown = buildStudyCommandMarkdown(progress)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('备考指挥中心已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 指挥中心')
+  }
 
   return (
     <section className={`study-command-center level-${strategy.level}`} aria-label="备考指挥中心">
@@ -39,9 +53,14 @@ export default function StudyCommandCenter() {
             <h2>{strategy.primaryRisk.title}</h2>
             <p>{strategy.summary}</p>
           </div>
-          <div className="command-risk-badge">
-            <ExclamationCircleOutlined />
-            最大短板
+          <div className="command-main-actions">
+            <div className="command-risk-badge">
+              <ExclamationCircleOutlined />
+              最大短板
+            </div>
+            <Button size="small" icon={<CopyOutlined />} onClick={handleCopyCommand}>
+              复制指挥
+            </Button>
           </div>
         </div>
 
@@ -72,4 +91,34 @@ export default function StudyCommandCenter() {
       </div>
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
+function buildFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '岗位'}-备考指挥中心.md`
 }
