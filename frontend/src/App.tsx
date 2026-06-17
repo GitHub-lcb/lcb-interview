@@ -10,6 +10,8 @@ const QuestionDetail = lazy(() => import('./pages/QuestionDetail'))
 const SearchResult = lazy(() => import('./pages/SearchResult'))
 const StudyPlan = lazy(() => import('./pages/StudyPlan'))
 const Practice = lazy(() => import('./pages/Practice'))
+const PrepRoutes = lazy(() => import('./pages/PrepRoutes'))
+const Experiences = lazy(() => import('./pages/Experiences'))
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'))
 const AdminLogin = lazy(() => import('./pages/admin/Login'))
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'))
@@ -34,6 +36,8 @@ export default function App() {
           <Route path="/bank/:id" element={<QuestionList />} />
           <Route path="/question/:id" element={<QuestionDetail />} />
           <Route path="/search" element={<SearchResult />} />
+          <Route path="/routes" element={<PrepRoutes />} />
+          <Route path="/experiences" element={<Experiences />} />
           <Route path="/study" element={<StudyPlan />} />
           <Route path="/practice" element={<Practice />} />
         </Route>

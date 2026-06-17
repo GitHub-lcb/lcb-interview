@@ -109,6 +109,7 @@ export default function QuestionDetail() {
                 模拟面试
               </Button>
             </div>
+            <div className="detail-free-cue">本题答案、追问、质量评分和模拟面试均免费开放。</div>
           </header>
 
           <div className="content-card">

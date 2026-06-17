@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react'
 import { Layout, Input } from 'antd'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { SearchOutlined, FireOutlined, BookOutlined, CalendarOutlined, PlayCircleOutlined } from '@ant-design/icons'
+import {
+  BookOutlined,
+  CalendarOutlined,
+  FireOutlined,
+  PlayCircleOutlined,
+  ReadOutlined,
+  SearchOutlined,
+  SolutionOutlined,
+} from '@ant-design/icons'
 
 const { Header } = Layout
 const { Search } = Input
@@ -9,6 +17,8 @@ const { Search } = Input
 const navItems = [
   { path: '/', label: '热门', icon: <FireOutlined /> },
   { path: '/banks', label: '题库', icon: <BookOutlined /> },
+  { path: '/routes', label: '路线', icon: <ReadOutlined /> },
+  { path: '/experiences', label: '面经', icon: <SolutionOutlined /> },
   { path: '/study', label: '计划', icon: <CalendarOutlined /> },
   { path: '/practice', label: '训练', icon: <PlayCircleOutlined /> },
 ]

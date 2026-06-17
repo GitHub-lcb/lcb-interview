@@ -4,6 +4,7 @@ import CategoryGrid from './CategoryGrid'
 import HotQuestions from './HotQuestions'
 import StudyDashboard from '../../components/StudyDashboard'
 import { getHotQuestions } from '../../api/question'
+import { freePromiseItems } from '../../data/freeSuperiority'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import type { Question } from '../../types'
 
@@ -35,6 +36,16 @@ export default function Home() {
   return (
     <div className="home-page">
       <StudyDashboard hotQuestions={hotQuestions} />
+
+      <section className="free-promise-band" aria-label="免费承诺">
+        {freePromiseItems.map(item => (
+          <div key={item.title}>
+            <strong>{item.metric}</strong>
+            <span>{item.title}</span>
+            <p>{item.description}</p>
+          </div>
+        ))}
+      </section>
 
       <section className="home-section">
         <div className="home-section-header">
