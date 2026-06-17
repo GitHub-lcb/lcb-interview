@@ -87,6 +87,11 @@ describe('buildSprintReportMarkdown', () => {
 
     expect(markdown).toContain('# Java 后端 面试冲刺报告')
     expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 一页作战摘要')
+    expect(markdown).toContain('总分：')
+    expect(markdown).toContain('今日闭环：今日闭环还有风险')
+    expect(markdown).toContain('错题恢复：')
+    expect(markdown).toContain('先做健康动作：')
     expect(markdown).toContain('## 备考健康度')
     expect(markdown).toContain('最大风险：')
     expect(markdown).toContain('## 四维诊断')
@@ -117,6 +122,9 @@ describe('buildSprintReportMarkdown', () => {
     const markdown = buildSprintReportMarkdown(routes, emptyProgress(), NOW)
 
     expect(markdown).toContain('# Java 后端 面试冲刺报告')
+    expect(markdown).toContain('## 一页作战摘要')
+    expect(markdown).toContain('今日闭环：今日计划待验收')
+    expect(markdown).toContain('先建立面试样本')
     expect(markdown).toContain('先建立轨迹')
     expect(markdown).toContain('还没有学习轨迹')
     expect(markdown).toContain('## 今日计划闭环')

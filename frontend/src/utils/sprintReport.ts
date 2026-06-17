@@ -42,6 +42,7 @@ export function buildSprintReportMarkdown(
     `生成时间：${generatedDate}`,
     `目标周期：${progress.sprintDays} 天`,
     '',
+    renderExecutiveSummarySection(health, completion, mistakeLedger, recoveryPlan),
     renderHealthSection(health),
     renderDimensionsSection(health.dimensions),
     renderDailyCompletionSection(completion),
@@ -62,6 +63,26 @@ function renderHealthSection(health: PrepHealthReport): string {
     `- 状态：${health.title}`,
     `- 最大风险：${health.primaryDimension.label}`,
     `- 说明：${health.summary}`,
+    '',
+  ].join('\n')
+}
+
+function renderExecutiveSummarySection(
+  health: PrepHealthReport,
+  completion: DailyPlanCompletion,
+  ledger: InterviewMistakeLedger,
+  recoveryPlan: InterviewRecoveryPlan,
+): string {
+  const recoveryTo = recoveryPlan.primaryAction.to || '/practice'
+
+  return [
+    '## 一页作战摘要',
+    `- 总分：${health.score}，最大风险：${health.primaryDimension.label}`,
+    `- 今日闭环：${completion.title}，完成率 ${completion.completionRate}%`,
+    `- 错题恢复：${ledger.title}，${recoveryPlan.title}`,
+    `- 先做健康动作：${health.primaryAction.label} - ${health.primaryAction.description}（${health.primaryAction.to}）`,
+    `- 再做今日动作：${completion.primaryAction.label} - ${completion.primaryAction.description}（${completion.primaryAction.to}）`,
+    `- 最后做恢复动作：${recoveryPlan.primaryAction.label} - ${recoveryPlan.primaryAction.description}（${recoveryTo}）`,
     '',
   ].join('\n')
 }
