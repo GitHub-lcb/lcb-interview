@@ -126,6 +126,38 @@ export interface StudySummary {
   masteryRate: number
 }
 
+export interface StudyStrategyFactor {
+  key: 'mastery' | 'weakness' | 'interview' | 'plan'
+  label: string
+  value: string
+  score: number
+  detail: string
+}
+
+export interface StudyStrategyAction {
+  key: string
+  label: string
+  description: string
+  to: string
+  tone: 'primary' | 'default' | 'warning'
+}
+
+export interface StudyStrategyRisk {
+  key: 'start-tracking' | 'empty-plan' | 'weak-review' | 'interview-practice' | 'continue-route'
+  title: string
+  description: string
+}
+
+export interface StudyStrategy {
+  readinessScore: number
+  level: 'start' | 'building' | 'ready' | 'sharp'
+  title: string
+  summary: string
+  primaryRisk: StudyStrategyRisk
+  factors: StudyStrategyFactor[]
+  actions: StudyStrategyAction[]
+}
+
 export interface WeakArea {
   categoryId?: number
   categoryName: string
