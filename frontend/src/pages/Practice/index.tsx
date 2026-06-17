@@ -13,6 +13,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import AnswerGapPanel from '../../components/AnswerGapPanel'
 import FollowUpDrillPanel from '../../components/FollowUpDrillPanel'
 import InterviewReviewPanel from '../../components/InterviewReviewPanel'
+import PracticeAnswerScaffoldPanel from '../../components/PracticeAnswerScaffoldPanel'
 import PracticeFeedbackClosurePanel from '../../components/PracticeFeedbackClosurePanel'
 import PracticeSessionReportPanel from '../../components/PracticeSessionReportPanel'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
@@ -380,6 +381,11 @@ export default function Practice() {
     setFeedback(null)
   }
 
+  const useAnswerScaffold = (template: string) => {
+    setAnswerDraft(template)
+    setFeedback(null)
+  }
+
   if (!current || !currentState) {
     return (
       <div className="practice-empty-page">
@@ -454,6 +460,12 @@ export default function Practice() {
             </div>
           )}
         </article>
+
+        <PracticeAnswerScaffoldPanel
+          question={current}
+          targetRole={progress.targetRole}
+          onUseTemplate={useAnswerScaffold}
+        />
 
         <section className="practice-answer-panel">
           <div className="practice-answer-title">

@@ -5193,6 +5193,129 @@ p {
   border-top: 1px solid #E4E4E7;
 }
 
+.practice-answer-scaffold-panel {
+  display: grid;
+  gap: 14px;
+  margin: 18px 20px 0 20px;
+  padding: 16px;
+  border: 1px solid #C7D2FE;
+  border-radius: 8px;
+  background: #FFFFFF;
+  box-shadow: inset 4px 0 0 #4F46E5;
+}
+
+.practice-answer-scaffold-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.practice-answer-scaffold-title {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.practice-answer-scaffold-title > .anticon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #EEF2FF;
+  color: #4F46E5;
+}
+
+.practice-answer-scaffold-title h2 {
+  margin: 2px 0 4px 0;
+  color: #18181B;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.practice-answer-scaffold-title p {
+  margin: 0;
+  color: #52525B;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.practice-answer-scaffold-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.practice-answer-scaffold-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.practice-answer-scaffold-card {
+  display: grid;
+  grid-template-rows: auto auto minmax(42px, auto) 1fr;
+  gap: 7px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  background: #FAFAF9;
+}
+
+.practice-answer-scaffold-card > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #EEF2FF;
+  color: #4338CA;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.practice-answer-scaffold-card h3 {
+  margin: 0;
+  color: #18181B;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.practice-answer-scaffold-card p,
+.practice-answer-scaffold-card small {
+  margin: 0;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.practice-answer-scaffold-card small {
+  color: #71717A;
+}
+
+.practice-answer-scaffold-card.scaffold-mechanism > span {
+  background: #ECFDF5;
+  color: #047857;
+}
+
+.practice-answer-scaffold-card.scaffold-scenario > span {
+  background: #FFFBEB;
+  color: #B45309;
+}
+
+.practice-answer-scaffold-card.scaffold-risk > span {
+  background: #FEF2F2;
+  color: #B91C1C;
+}
+
 .practice-answer-panel {
   display: grid;
   gap: 12px;
@@ -6360,6 +6483,7 @@ p {
   }
 
   .practice-session-strip,
+  .practice-answer-scaffold-grid,
   .free-promise-band,
   .practice-feedback-lists {
     grid-template-columns: 1fr;
@@ -6375,6 +6499,18 @@ p {
 
   .practice-question h2 {
     font-size: 22px;
+  }
+
+  .practice-answer-scaffold-head {
+    display: grid;
+  }
+
+  .practice-answer-scaffold-actions {
+    justify-content: stretch;
+  }
+
+  .practice-answer-scaffold-actions .ant-btn {
+    flex: 1 1 136px;
   }
 
   .practice-answer-actions {
