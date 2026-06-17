@@ -1,6 +1,7 @@
-import { Button, Progress } from 'antd'
+import { Button, message, Progress } from 'antd'
 import {
   CalendarOutlined,
+  CopyOutlined,
   FireOutlined,
   PlayCircleOutlined,
   RadarChartOutlined,
@@ -11,6 +12,7 @@ import { useNavigate } from 'react-router-dom'
 import type { Question } from '../types'
 import { useStudyProgress } from '../hooks/useStudyProgress'
 import { buildDailyPlan, resolvePlanQuestions, summarizeProgress, weakAreasFromQuestions } from '../utils/studyProgress'
+import { buildStudyDashboardMarkdown } from '../utils/studyDashboardReport'
 
 interface Props {
   hotQuestions: Question[]
@@ -38,6 +40,19 @@ export default function StudyDashboard({ hotQuestions }: Props) {
     setDailyPlan(generatedPlanIds)
   }
 
+  const handleCopyDashboard = async () => {
+    const markdown = buildStudyDashboardMarkdown(progress, hotQuestions)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('备考工作台日报已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 工作台日报')
+  }
+
   return (
     <section className="study-dashboard">
       <div className="study-dashboard-top">
@@ -51,6 +66,9 @@ export default function StudyDashboard({ hotQuestions }: Props) {
             </Button>
             <Button icon={<CalendarOutlined />} onClick={() => navigate('/study')}>
               打开学习计划
+            </Button>
+            <Button icon={<CopyOutlined />} onClick={handleCopyDashboard}>
+              复制日报
             </Button>
             <Button icon={<ThunderboltOutlined />} disabled={!canGeneratePlan} onClick={handleGeneratePlan}>
               {planActionText}
@@ -149,4 +167,34 @@ export default function StudyDashboard({ hotQuestions }: Props) {
       </div>
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
+function buildFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '岗位'}-备考工作台日报.md`
 }
