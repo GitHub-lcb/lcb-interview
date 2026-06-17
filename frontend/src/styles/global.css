@@ -5295,6 +5295,99 @@ p {
   margin-top: 12px;
 }
 
+.practice-session-report-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #2563EB;
+}
+
+.practice-session-report-panel.level-risk {
+  box-shadow: inset 4px 0 0 #DC2626;
+}
+
+.practice-session-report-panel.level-passed {
+  box-shadow: inset 4px 0 0 #059669;
+}
+
+.practice-session-report-panel.level-empty {
+  box-shadow: inset 4px 0 0 #71717A;
+}
+
+.practice-session-report-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+}
+
+.practice-session-report-head h3 {
+  margin: 4px 0 0 0;
+  color: #18181B;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.practice-session-report-head p {
+  margin: 6px 0 0 0;
+  color: #52525B;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.practice-session-report-head > span {
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #F8FAFC;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.practice-session-report-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.practice-session-report-metrics article {
+  min-width: 0;
+  padding: 10px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+}
+
+.practice-session-report-metrics span,
+.practice-session-report-metrics small {
+  display: block;
+  overflow: hidden;
+  color: #64748B;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-metrics strong {
+  display: block;
+  overflow: hidden;
+  margin: 3px 0;
+  color: #0F172A;
+  font-size: 19px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-action {
+  justify-content: center;
+  width: 100%;
+}
+
 .practice-queue-panel {
   display: grid;
   gap: 8px;

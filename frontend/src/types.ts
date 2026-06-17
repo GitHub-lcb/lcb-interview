@@ -549,6 +549,37 @@ export interface PracticeQueueItem extends QuestionSnapshot {
   source: PracticeQueueSource
 }
 
+export type PracticeSessionReportLevel = 'empty' | 'in-progress' | 'risk' | 'passed'
+
+export type PracticeSessionReportActionKind = 'start' | 'repair' | 'continue' | 'review'
+
+export interface PracticeSessionReportMetric {
+  key: 'answered' | 'average' | 'pass' | 'weakest'
+  label: string
+  value: string
+  detail: string
+}
+
+export interface PracticeSessionReportAction {
+  kind: PracticeSessionReportActionKind
+  label: string
+  description: string
+  to: string
+}
+
+export interface PracticeSessionReport {
+  level: PracticeSessionReportLevel
+  title: string
+  summary: string
+  answeredCount: number
+  totalCount: number
+  averageScore: number
+  passCount: number
+  weakQuestionIds: number[]
+  metrics: PracticeSessionReportMetric[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export type InterviewCriterionKey = 'coverage' | 'structure' | 'specificity' | 'risk'
 
 export interface InterviewCriterion {

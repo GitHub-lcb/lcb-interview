@@ -14,6 +14,7 @@ import AnswerGapPanel from '../../components/AnswerGapPanel'
 import FollowUpDrillPanel from '../../components/FollowUpDrillPanel'
 import InterviewReviewPanel from '../../components/InterviewReviewPanel'
 import PracticeFeedbackClosurePanel from '../../components/PracticeFeedbackClosurePanel'
+import PracticeSessionReportPanel from '../../components/PracticeSessionReportPanel'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { evaluateInterviewAnswerRemote } from '../../api/interview'
@@ -587,6 +588,7 @@ export default function Practice() {
           </div>
           {latestAttempt && <small className="practice-side-footnote">本题最近评分 {latestAttempt.feedback.score}</small>}
         </div>
+        <PracticeSessionReportPanel queue={queue} progress={progress} onNavigate={navigate} />
         <InterviewReviewPanel progress={progress} compact />
         <div className="practice-queue-panel">
           <div className="practice-side-title-row">
