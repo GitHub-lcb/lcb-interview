@@ -1,8 +1,8 @@
-import { Progress } from 'antd'
-import { AuditOutlined } from '@ant-design/icons'
+import { Button, Progress, message } from 'antd'
+import { AuditOutlined, CopyOutlined } from '@ant-design/icons'
 import { useMemo } from 'react'
 import type { Question } from '../types'
-import { buildAnswerGapReport } from '../utils/answerGap'
+import { buildAnswerGapMarkdown, buildAnswerGapReport } from '../utils/answerGap'
 
 interface AnswerGapPanelProps {
   question: Question
@@ -12,6 +12,19 @@ interface AnswerGapPanelProps {
 export default function AnswerGapPanel({ question, answer }: AnswerGapPanelProps) {
   const report = useMemo(() => buildAnswerGapReport(question, answer), [answer, question])
 
+  const handleCopyReport = async () => {
+    const markdown = buildAnswerGapMarkdown(question, answer)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('答案差距校准已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFileName(question.title))
+    message.warning('剪贴板不可用，已下载 Markdown 校准')
+  }
+
   return (
     <section className={`answer-gap-panel level-${report.level}`} aria-label="答案差距校准">
       <div className="answer-gap-head">
@@ -20,9 +33,14 @@ export default function AnswerGapPanel({ question, answer }: AnswerGapPanelProps
           <h2>{report.title}</h2>
           <p>{report.summary}</p>
         </div>
-        <div className="answer-gap-score">
-          <AuditOutlined />
-          <strong>{report.score}</strong>
+        <div className="answer-gap-head-actions">
+          <div className="answer-gap-score">
+            <AuditOutlined />
+            <strong>{report.score}</strong>
+          </div>
+          <Button size="small" icon={<CopyOutlined />} onClick={handleCopyReport}>
+            复制校准
+          </Button>
         </div>
       </div>
 
@@ -49,4 +67,32 @@ export default function AnswerGapPanel({ question, answer }: AnswerGapPanelProps
       </div>
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+function buildFileName(title: string): string {
+  const safeTitle = title.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeTitle || '题目'}-答案差距校准.md`
 }

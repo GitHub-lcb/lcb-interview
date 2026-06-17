@@ -69,6 +69,67 @@ export function buildAnswerGapReport(question: Question, rawAnswer: string): Ans
   }
 }
 
+export function buildAnswerGapMarkdown(
+  question: Question,
+  rawAnswer: string,
+  now = new Date().toISOString(),
+): string {
+  const report = buildAnswerGapReport(question, rawAnswer)
+
+  return [
+    `# ${question.title} 答案差距校准`,
+    '',
+    `生成时间：${formatDate(now)}`,
+    `分类：${question.categoryName}`,
+    `难度：${question.difficulty}`,
+    '',
+    renderSummary(report),
+    renderModules(report.modules),
+    renderPriorityModules(report.missingModules),
+    renderRewriteOutline(report.rewriteOutline),
+  ].join('\n')
+}
+
+function renderSummary(report: AnswerGapReport): string {
+  return [
+    '## 校准摘要',
+    `- 分数：${report.score}`,
+    `- 状态：${report.title}`,
+    `- 说明：${report.summary}`,
+    '',
+  ].join('\n')
+}
+
+function renderModules(modules: AnswerGapModule[]): string {
+  return [
+    '## 模块明细',
+    ...modules.map(module => (
+      `- ${module.label}：${module.score} 分，${module.status}，${module.evidence}；${module.guidance}`
+    )),
+    '',
+  ].join('\n')
+}
+
+function renderPriorityModules(modules: AnswerGapModule[]): string {
+  const lines = modules.length > 0
+    ? modules.map(module => `- ${module.label}：${module.guidance}`)
+    : ['- 暂无缺失模块，继续压缩表达并补项目例子。']
+
+  return [
+    '## 优先补齐',
+    ...lines,
+    '',
+  ].join('\n')
+}
+
+function renderRewriteOutline(outline: string[]): string {
+  return [
+    '## 重写提纲',
+    ...outline.map((item, index) => `${index + 1}. ${item}`),
+    '',
+  ].join('\n')
+}
+
 function availableModules(question: Question): Array<GapModuleConfig & { text: string }> {
   return MODULES
     .map(module => ({
@@ -187,4 +248,12 @@ function stripMarkdown(value: string): string {
     .replace(/```[\s\S]*?```/g, ' ')
     .replace(/[#>*_`~|[\](){}-]/g, ' ')
     .trim()
+}
+
+function formatDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+  return date.toISOString().slice(0, 10)
 }

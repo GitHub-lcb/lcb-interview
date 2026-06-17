@@ -5513,6 +5513,13 @@ p {
   align-items: flex-start;
 }
 
+.answer-gap-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .answer-gap-head h2 {
   margin: 0;
   color: #18181B;

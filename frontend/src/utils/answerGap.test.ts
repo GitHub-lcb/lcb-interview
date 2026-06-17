@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Question } from '../types'
-import { buildAnswerGapReport } from './answerGap'
+import { buildAnswerGapMarkdown, buildAnswerGapReport } from './answerGap'
 
 function question(patch: Partial<Question> = {}): Question {
   return {
@@ -74,5 +74,29 @@ describe('buildAnswerGapReport', () => {
     expect(report.modules.map(item => item.label)).not.toContain('对比分析')
     expect(report.modules.map(item => item.label)).not.toContain('项目落地')
   })
-})
 
+  it('exports answer gap calibration as portable markdown', () => {
+    const markdown = buildAnswerGapMarkdown(
+      question(),
+      'HashMap 多线程不安全，因为 put 和 resize 没有同步保护，可以用 ConcurrentHashMap。',
+      '2026-06-17T00:00:00.000Z',
+    )
+
+    expect(markdown).toContain('# HashMap 为什么线程不安全？ 答案差距校准')
+    expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 校准摘要')
+    expect(markdown).toContain('风险误区')
+    expect(markdown).toContain('项目落地')
+    expect(markdown).toContain('## 模块明细')
+    expect(markdown).toContain('## 重写提纲')
+  })
+
+  it('keeps blank answer markdown actionable', () => {
+    const markdown = buildAnswerGapMarkdown(question(), ' ', '2026-06-17T00:00:00.000Z')
+
+    expect(markdown).toContain('分数：0')
+    expect(markdown).toContain('先完成基础回答')
+    expect(markdown).toContain('回答为空')
+    expect(markdown).not.toContain('undefined')
+  })
+})
