@@ -270,6 +270,29 @@ export interface InterviewMistakeLedger {
   primaryAction: InterviewMistakeLedgerAction
 }
 
+export type InterviewRecoveryPlanMode = 'empty' | 'repair' | 'advanced'
+
+export interface InterviewRecoveryStep {
+  id: string
+  title: string
+  description: string
+  reason: string
+  durationMinutes: number
+  questionIds: number[]
+  to: string
+  actionLabel: string
+  priority: number
+}
+
+export interface InterviewRecoveryPlan {
+  mode: InterviewRecoveryPlanMode
+  title: string
+  summary: string
+  totalMinutes: number
+  steps: InterviewRecoveryStep[]
+  primaryAction: InterviewMistakeLedgerAction
+}
+
 export interface WeakArea {
   categoryId?: number
   categoryName: string

@@ -3172,6 +3172,111 @@ p {
   justify-self: start;
 }
 
+.interview-recovery-plan {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+}
+
+.interview-recovery-plan.mode-advanced {
+  background: #F0FDF4;
+  border-color: #BBF7D0;
+}
+
+.interview-recovery-head span {
+  display: block;
+  color: #2563EB;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.interview-recovery-head h3 {
+  margin: 2px 0 4px 0;
+  color: #18181B;
+  font-size: 18px;
+}
+
+.interview-recovery-head p {
+  margin: 0;
+  color: #52525B;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.interview-recovery-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.interview-recovery-step {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+  padding: 10px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+}
+
+.interview-recovery-step-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #EFF6FF;
+  color: #2563EB;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.interview-recovery-step-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.interview-recovery-step-top strong {
+  overflow: hidden;
+  color: #18181B;
+  font-size: 13px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.interview-recovery-step-top em {
+  flex: 0 0 auto;
+  color: #64748B;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.interview-recovery-step p,
+.interview-recovery-step small {
+  display: block;
+  margin: 5px 0 0 0;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.interview-recovery-step small {
+  color: #64748B;
+}
+
+.interview-recovery-step .ant-btn {
+  margin-top: 8px;
+}
+
 .study-sprint-input {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 28px;
@@ -4331,6 +4436,7 @@ p {
   .prep-health-grid,
   .interview-brief-grid,
   .interview-mistake-grid,
+  .interview-recovery-steps,
   .ability-map-grid,
   .prep-route-metrics {
     grid-template-columns: 1fr;

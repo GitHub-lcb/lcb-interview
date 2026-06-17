@@ -11,9 +11,11 @@ import { useNavigate } from 'react-router-dom'
 import type {
   InterviewMistakeLedgerItem,
   InterviewMistakeLedgerItemType,
+  InterviewRecoveryPlan,
   StudyProgress,
 } from '../types'
 import { buildInterviewMistakeLedger } from '../utils/interviewMistakeLedger'
+import { buildInterviewRecoveryPlan } from '../utils/interviewRecoveryPlan'
 
 interface InterviewMistakeLedgerPanelProps {
   progress: StudyProgress
@@ -42,9 +44,45 @@ function metricText(item: InterviewMistakeLedgerItem): string {
   return `${item.averageScore} 平均分`
 }
 
+function renderRecoveryPlan(
+  plan: InterviewRecoveryPlan,
+  onNavigate: (to: string) => void,
+) {
+  return (
+    <div className={`interview-recovery-plan mode-${plan.mode}`}>
+      <div className="interview-recovery-head">
+        <div>
+          <span>{plan.totalMinutes} 分钟闭环</span>
+          <h3>{plan.title}</h3>
+          <p>{plan.summary}</p>
+        </div>
+      </div>
+      <div className="interview-recovery-steps">
+        {plan.steps.map((step, index) => (
+          <article key={step.id} className="interview-recovery-step">
+            <div className="interview-recovery-step-index">{index + 1}</div>
+            <div>
+              <div className="interview-recovery-step-top">
+                <strong>{step.title}</strong>
+                <em>{step.durationMinutes} 分钟</em>
+              </div>
+              <p>{step.description}</p>
+              <small>{step.reason}</small>
+              <Button type={index === 0 ? 'primary' : 'default'} size="small" onClick={() => onNavigate(step.to)}>
+                {step.actionLabel}
+              </Button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function InterviewMistakeLedgerPanel({ progress }: InterviewMistakeLedgerPanelProps) {
   const navigate = useNavigate()
   const ledger = useMemo(() => buildInterviewMistakeLedger(progress), [progress])
+  const recoveryPlan = useMemo(() => buildInterviewRecoveryPlan(ledger), [ledger])
 
   if (ledger.level === 'empty') {
     return (
@@ -60,6 +98,7 @@ export default function InterviewMistakeLedgerPanel({ progress }: InterviewMista
             <ArrowRightOutlined />
           </Button>
         </div>
+        {renderRecoveryPlan(recoveryPlan, navigate)}
       </section>
     )
   }
@@ -106,6 +145,8 @@ export default function InterviewMistakeLedgerPanel({ progress }: InterviewMista
           </article>
         ))}
       </div>
+
+      {renderRecoveryPlan(recoveryPlan, navigate)}
     </section>
   )
 }
