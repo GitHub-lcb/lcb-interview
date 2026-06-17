@@ -151,6 +151,8 @@ function renderSessionRepairActions(actions: PracticeSessionRepairAction[]): str
       `   - 原因：${action.reason}`,
       `   - 动作：${action.action}`,
       `   - 入口：${action.to}`,
+      '   - 重答模板：',
+      indentRepairDraft(buildPracticeSessionRepairDraft(action)),
     ].join('\n'))
     : ['- 暂无补弱动作，先完成本轮评分后自动生成。']
 
@@ -159,6 +161,13 @@ function renderSessionRepairActions(actions: PracticeSessionRepairAction[]): str
     ...lines,
     '',
   ].join('\n')
+}
+
+function indentRepairDraft(draft: string): string {
+  return draft
+    .split('\n')
+    .map(line => `     ${line}`)
+    .join('\n')
 }
 
 function renderSessionQueue(queue: PracticeQueueItem[], progress: StudyProgress): string {
