@@ -333,6 +333,65 @@ describe('studyProgress', () => {
     })
   })
 
+  it('marks low score interview attempts as weak and adds them to the daily plan', () => {
+    const progress = createDefaultProgress('2026-06-15T00:00:00')
+
+    const next = recordInterviewAttempt(progress, {
+      questionId: 70,
+      answer: '回答缺少场景和风险。',
+      feedback: feedback(55),
+      createdAt: '2026-06-15T11:00:00',
+    })
+
+    expect(next.questionStates[70]).toMatchObject({
+      status: 'weak',
+      addedToPlan: true,
+      lastReviewedAt: '2026-06-15T11:00:00',
+      reviewCount: 1,
+    })
+    expect(next.dailyPlan).toEqual([70])
+  })
+
+  it('moves a passed weak question back to learning without forcing plan membership', () => {
+    let progress = createDefaultProgress('2026-06-15T00:00:00')
+    progress = updateQuestionStatus(progress, 71, 'weak', '2026-06-15T10:00:00')
+
+    const next = recordInterviewAttempt(progress, {
+      questionId: 71,
+      answer: '回答已经覆盖结论和核心机制。',
+      feedback: feedback(72),
+      createdAt: '2026-06-15T11:00:00',
+    })
+
+    expect(next.questionStates[71]).toMatchObject({
+      status: 'learning',
+      addedToPlan: false,
+      lastReviewedAt: '2026-06-15T11:00:00',
+      reviewCount: 2,
+    })
+    expect(next.dailyPlan).toEqual([])
+  })
+
+  it('marks strong interview attempts as mastered', () => {
+    let progress = createDefaultProgress('2026-06-15T00:00:00')
+    progress = toggleQuestionInPlan(progress, 72, true, '2026-06-15T10:00:00')
+
+    const next = recordInterviewAttempt(progress, {
+      questionId: 72,
+      answer: '回答有结论、机制、项目指标和风险边界。',
+      feedback: feedback(86),
+      createdAt: '2026-06-15T11:00:00',
+    })
+
+    expect(next.questionStates[72]).toMatchObject({
+      status: 'mastered',
+      addedToPlan: true,
+      lastReviewedAt: '2026-06-15T11:00:00',
+      reviewCount: 1,
+    })
+    expect(next.dailyPlan).toEqual([72])
+  })
+
   it('records interview attempts newest first and keeps five per question', () => {
     let progress = createDefaultProgress('2026-06-15T00:00:00')
     for (let index = 1; index <= 6; index += 1) {

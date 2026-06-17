@@ -19,6 +19,8 @@ const DEFAULT_SPRINT_DAYS = 21
 const MIN_SPRINT_DAYS = 7
 const MAX_SPRINT_DAYS = 60
 const MAX_ATTEMPTS_PER_QUESTION = 5
+const INTERVIEW_PASS_SCORE = 70
+const INTERVIEW_MASTERED_SCORE = 80
 
 export interface QuestionSetProgressSummary {
   total: number
@@ -195,12 +197,30 @@ export function recordInterviewAttempt(
   attempt: InterviewAttempt,
 ): StudyProgress {
   const currentAttempts = progress.interviewAttempts[attempt.questionId] ?? []
+  const currentState = getQuestionState(progress, attempt.questionId)
+  const nextStatus = statusFromInterviewScore(attempt.feedback.score)
+  const addedToPlan = nextStatus === 'weak' ? true : currentState.addedToPlan
+  const dailyPlan = addedToPlan
+    ? [...new Set([...progress.dailyPlan, attempt.questionId])]
+    : progress.dailyPlan
+
   return {
     ...progress,
     interviewAttempts: {
       ...progress.interviewAttempts,
       [attempt.questionId]: [attempt, ...currentAttempts].slice(0, MAX_ATTEMPTS_PER_QUESTION),
     },
+    questionStates: {
+      ...progress.questionStates,
+      [attempt.questionId]: {
+        ...currentState,
+        status: nextStatus,
+        addedToPlan,
+        lastReviewedAt: attempt.createdAt,
+        reviewCount: currentState.reviewCount + 1,
+      },
+    },
+    dailyPlan,
     updatedAt: attempt.createdAt,
   }
 }
@@ -225,6 +245,16 @@ export function updateStudySettings(
 function clampSprintDays(value: number): number {
   const rounded = Math.round(value)
   return Math.min(MAX_SPRINT_DAYS, Math.max(MIN_SPRINT_DAYS, rounded))
+}
+
+function statusFromInterviewScore(score: number): StudyQuestionStatus {
+  if (score >= INTERVIEW_MASTERED_SCORE) {
+    return 'mastered'
+  }
+  if (score >= INTERVIEW_PASS_SCORE) {
+    return 'learning'
+  }
+  return 'weak'
 }
 
 export function toQuestionSnapshot(question: Question): QuestionSnapshot {
