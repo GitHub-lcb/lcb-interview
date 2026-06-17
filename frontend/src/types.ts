@@ -177,6 +177,38 @@ export interface DailyMissionPlan {
   missions: DailyMissionItem[]
 }
 
+export type PrepHealthDimensionKey = 'review' | 'ability' | 'interview' | 'pace'
+
+export type PrepHealthDimensionStatus = 'empty' | 'danger' | 'warning' | 'stable'
+
+export type PrepHealthLevel = 'empty' | 'risk' | 'watch' | 'healthy'
+
+export interface PrepHealthDimension {
+  key: PrepHealthDimensionKey
+  label: string
+  score: number
+  status: PrepHealthDimensionStatus
+  metric: string
+  description: string
+  detail: string
+}
+
+export interface PrepHealthAction {
+  label: string
+  description: string
+  to: string
+}
+
+export interface PrepHealthReport {
+  score: number
+  level: PrepHealthLevel
+  title: string
+  summary: string
+  dimensions: PrepHealthDimension[]
+  primaryDimension: PrepHealthDimension
+  primaryAction: PrepHealthAction
+}
+
 export interface WeakArea {
   categoryId?: number
   categoryName: string

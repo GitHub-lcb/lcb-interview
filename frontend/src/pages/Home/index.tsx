@@ -5,6 +5,7 @@ import HotQuestions from './HotQuestions'
 import AbilityMapPanel from '../../components/AbilityMapPanel'
 import DailyMissionPanel from '../../components/DailyMissionPanel'
 import InterviewReviewPanel from '../../components/InterviewReviewPanel'
+import PrepHealthRadarPanel from '../../components/PrepHealthRadarPanel'
 import StudyCommandCenter from '../../components/StudyCommandCenter'
 import StudyDashboard from '../../components/StudyDashboard'
 import { getHotQuestions } from '../../api/question'
@@ -44,6 +45,8 @@ export default function Home() {
       <StudyCommandCenter />
 
       <DailyMissionPanel />
+
+      <PrepHealthRadarPanel />
 
       <InterviewReviewPanel progress={progress} />
 

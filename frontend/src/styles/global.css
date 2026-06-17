@@ -1183,6 +1183,199 @@ p {
   justify-self: start;
 }
 
+.prep-health-panel {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #2563EB;
+}
+
+.prep-health-panel.level-empty {
+  box-shadow: inset 4px 0 0 #D97706;
+}
+
+.prep-health-panel.level-risk {
+  box-shadow: inset 4px 0 0 #DC2626;
+}
+
+.prep-health-panel.level-healthy {
+  box-shadow: inset 4px 0 0 #059669;
+}
+
+.prep-health-main {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.prep-health-kicker {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.prep-health-kicker svg {
+  color: #2563EB;
+}
+
+.prep-health-score-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.prep-health-score-row > strong {
+  color: #0F172A;
+  font-size: 52px;
+  line-height: 1;
+}
+
+.prep-health-score-row span {
+  display: block;
+  margin-bottom: 4px;
+  color: #18181B;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.prep-health-main h2 {
+  margin: 0;
+  color: #18181B;
+  font-size: 24px;
+}
+
+.prep-health-main p {
+  margin: 0;
+  color: #52525B;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.prep-health-action {
+  display: grid;
+  gap: 10px;
+  align-items: start;
+}
+
+.prep-health-action span {
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.prep-health-action .ant-btn {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.prep-health-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.prep-health-dimension {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+  padding: 12px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 3px 0 0 #94A3B8;
+}
+
+.prep-health-dimension.status-danger {
+  background: #FEF2F2;
+  border-color: #FECACA;
+  box-shadow: inset 3px 0 0 #DC2626;
+}
+
+.prep-health-dimension.status-warning,
+.prep-health-dimension.status-empty {
+  background: #FFFBEB;
+  border-color: #FDE68A;
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.prep-health-dimension.status-stable {
+  background: #ECFDF5;
+  border-color: #BBF7D0;
+  box-shadow: inset 3px 0 0 #059669;
+}
+
+.prep-health-dimension-top {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.prep-health-dimension-top span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  background: #FFFFFF;
+  color: #2563EB;
+}
+
+.prep-health-dimension-top em {
+  overflow: hidden;
+  color: #64748B;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prep-health-dimension-score {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.prep-health-dimension-score strong {
+  color: #0F172A;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.prep-health-dimension-score small {
+  color: #18181B;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.prep-health-dimension p {
+  margin: 0;
+  color: #334155;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.prep-health-dimension > small {
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .interview-review-panel {
   display: grid;
   gap: 14px;
@@ -3434,6 +3627,7 @@ p {
   .prep-route-grid,
   .experience-grid,
   .study-command-center,
+  .prep-health-panel,
   .practice-shell {
     grid-template-columns: 1fr;
   }
@@ -3538,6 +3732,7 @@ p {
   .study-question-item,
   .command-factor-grid,
   .daily-mission-grid,
+  .prep-health-grid,
   .ability-map-grid,
   .prep-route-metrics {
     grid-template-columns: 1fr;
