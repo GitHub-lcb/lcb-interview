@@ -24,8 +24,9 @@ import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { evaluateInterviewAnswerRemote } from '../../api/interview'
 import { getHotQuestions, getQuestionById } from '../../api/question'
-import type { InterviewFeedback, PracticeQueueItem, Question } from '../../types'
+import type { InterviewFeedback, PracticeQueueItem, PracticeSessionRepairAction, Question } from '../../types'
 import { evaluateInterviewAnswer } from '../../utils/interviewCoach'
+import { buildPracticeSessionRepairDraft } from '../../utils/practiceSessionReport'
 import { buildScopedPracticeQueue, summarizeProgress } from '../../utils/studyProgress'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
@@ -115,6 +116,7 @@ export default function Practice() {
   const [isLoadingFocus, setIsLoadingFocus] = useState(false)
   const scopedRequestIdsRef = useRef<Set<number>>(new Set())
   const latestQueueParamRef = useRef<string | null>(null)
+  const pendingSessionRepairDraftRef = useRef<{ questionId: number; draft: string } | null>(null)
   const searchParamKey = searchParams.toString()
   const focusQuestionParam = searchParams.get('question')
   const queueParam = searchParams.get('queue')
@@ -315,7 +317,13 @@ export default function Practice() {
   const latestScoreText = latestScore === undefined ? '待评分' : `${latestScore} 分`
 
   useEffect(() => {
-    setAnswerDraft('')
+    const pendingDraft = pendingSessionRepairDraftRef.current
+    if (current?.id && pendingDraft?.questionId === current.id) {
+      setAnswerDraft(pendingDraft.draft)
+      pendingSessionRepairDraftRef.current = null
+    } else {
+      setAnswerDraft('')
+    }
     setFeedback(null)
   }, [current?.id])
 
@@ -404,6 +412,25 @@ export default function Practice() {
   const startInterviewerScriptAnswer = (prompt: string) => {
     setAnswerDraft(`追问：${prompt}\n\n我的回答：`)
     setFeedback(null)
+  }
+
+  const startSessionRepairAnswer = (action: PracticeSessionRepairAction) => {
+    const draft = buildPracticeSessionRepairDraft(action)
+    const targetIndex = queue.findIndex(item => item.id === action.questionId)
+    pendingSessionRepairDraftRef.current = { questionId: action.questionId, draft }
+    setFeedback(null)
+
+    if (targetIndex >= 0) {
+      if (targetIndex === currentIndex) {
+        setAnswerDraft(draft)
+        pendingSessionRepairDraftRef.current = null
+        return
+      }
+      setCurrentIndex(targetIndex)
+      return
+    }
+
+    navigate(action.to)
   }
 
   if (!current || !currentState) {
@@ -641,7 +668,12 @@ export default function Practice() {
           attempts={currentAttempts}
           onUsePrompt={startInterviewerScriptAnswer}
         />
-        <PracticeSessionReportPanel queue={queue} progress={progress} onNavigate={navigate} />
+        <PracticeSessionReportPanel
+          queue={queue}
+          progress={progress}
+          onNavigate={navigate}
+          onUseRepairAction={startSessionRepairAnswer}
+        />
         <InterviewReviewPanel progress={progress} compact />
         <div className="practice-queue-panel">
           <div className="practice-side-title-row">

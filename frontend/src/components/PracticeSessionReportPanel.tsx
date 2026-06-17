@@ -12,6 +12,7 @@ import type {
   PracticeQueueItem,
   PracticeSessionReport,
   PracticeSessionReportAction,
+  PracticeSessionRepairAction,
   StudyProgress,
 } from '../types'
 import { buildPracticeSessionReport, buildPracticeSessionReportMarkdown } from '../utils/practiceSessionReport'
@@ -20,6 +21,7 @@ interface PracticeSessionReportPanelProps {
   queue: PracticeQueueItem[]
   progress: StudyProgress
   onNavigate: (to: string) => void
+  onUseRepairAction?: (action: PracticeSessionRepairAction) => void
 }
 
 const levelLabels: Record<PracticeSessionReport['level'], string> = {
@@ -40,6 +42,7 @@ export default function PracticeSessionReportPanel({
   queue,
   progress,
   onNavigate,
+  onUseRepairAction,
 }: PracticeSessionReportPanelProps) {
   const report = useMemo(
     () => buildPracticeSessionReport(queue, progress),
@@ -57,6 +60,14 @@ export default function PracticeSessionReportPanel({
 
     downloadMarkdown(markdown, buildFileName(progress.targetRole))
     message.warning('剪贴板不可用，已下载 Markdown 战报')
+  }
+
+  const handleRepairAction = (action: PracticeSessionRepairAction) => {
+    if (onUseRepairAction) {
+      onUseRepairAction(action)
+      return
+    }
+    onNavigate(action.to)
   }
 
   return (
@@ -102,7 +113,7 @@ export default function PracticeSessionReportPanel({
               </div>
               <p>{action.reason}</p>
               <small>{action.action}</small>
-              <Button size="small" icon={<ReloadOutlined />} onClick={() => onNavigate(action.to)}>
+              <Button size="small" icon={<ReloadOutlined />} onClick={() => handleRepairAction(action)}>
                 去补弱
               </Button>
             </article>

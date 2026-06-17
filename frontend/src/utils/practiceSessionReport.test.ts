@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewAttempt, InterviewCriterionKey, InterviewFeedback, PracticeQueueItem, StudyProgress } from '../types'
-import { buildPracticeSessionReport, buildPracticeSessionReportMarkdown } from './practiceSessionReport'
+import {
+  buildPracticeSessionRepairDraft,
+  buildPracticeSessionReport,
+  buildPracticeSessionReportMarkdown,
+} from './practiceSessionReport'
 
 const NOW = '2026-06-17T08:00:00.000Z'
 
@@ -182,5 +186,48 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('当前还没有练习队列')
     expect(markdown).toContain('暂无题目')
     expect(markdown).not.toContain('undefined')
+  })
+})
+
+describe('buildPracticeSessionRepairDraft', () => {
+  it('builds a structured retry draft from the weakest criterion', () => {
+    const report = buildPracticeSessionReport(
+      [question(1)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 56, { structure: 38 })],
+        },
+      }),
+    )
+
+    const draft = buildPracticeSessionRepairDraft(report.repairActions[0])
+
+    expect(draft).toContain('补弱题目：Java 面试题 1')
+    expect(draft).toContain('补弱维度：结构化')
+    expect(draft).toContain('本次目标：先按')
+    expect(draft).toContain('我的重答：')
+    expect(draft).toContain('结论：')
+    expect(draft).toContain('原因：')
+    expect(draft).toContain('场景：')
+    expect(draft).toContain('边界：')
+  })
+
+  it('keeps an unscored weak question repair draft actionable', () => {
+    const report = buildPracticeSessionReport(
+      [question(3, { status: 'weak' })],
+      progress({
+        questionStates: {
+          3: { status: 'weak', addedToPlan: true, reviewCount: 2 },
+        },
+      }),
+    )
+
+    const draft = buildPracticeSessionRepairDraft(report.repairActions[0])
+
+    expect(draft).toContain('补弱题目：Java 面试题 3')
+    expect(draft).toContain('补弱维度：未评分')
+    expect(draft).toContain('先完成一次模拟评分')
+    expect(draft).toContain('我的重答：')
+    expect(draft).not.toContain('undefined')
   })
 })

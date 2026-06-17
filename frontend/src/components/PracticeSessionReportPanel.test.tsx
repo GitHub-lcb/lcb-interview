@@ -94,6 +94,7 @@ describe('PracticeSessionReportPanel', () => {
 
   it('renders repair actions for weak practice sessions', async () => {
     const onNavigate = vi.fn()
+    const onUseRepairAction = vi.fn()
 
     render(
       <PracticeSessionReportPanel
@@ -108,6 +109,7 @@ describe('PracticeSessionReportPanel', () => {
           },
         }}
         onNavigate={onNavigate}
+        onUseRepairAction={onUseRepairAction}
       />
     )
 
@@ -115,6 +117,32 @@ describe('PracticeSessionReportPanel', () => {
     expect(screen.getByText(/Java 面试题 1/)).toBeInTheDocument()
     expect(screen.getAllByText(/结构化/).length).toBeGreaterThan(0)
     expect(screen.getByText(/先按/)).toBeInTheDocument()
+
+    await userEvent.click(screen.getAllByRole('button', { name: /去补弱/ })[0])
+
+    expect(onUseRepairAction).toHaveBeenCalledWith(expect.objectContaining({
+      questionId: 1,
+      criterionLabel: '结构化',
+      to: '/practice?question=1',
+    }))
+    expect(onNavigate).not.toHaveBeenCalled()
+  })
+
+  it('falls back to navigation when repair action handler is absent', async () => {
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 56, 38)],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
 
     await userEvent.click(screen.getAllByRole('button', { name: /去补弱/ })[0])
 

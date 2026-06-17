@@ -38,16 +38,17 @@ export function buildPracticeSessionReport(
   const answeredItems = sessionItems.filter(item => Boolean(item.attempt))
   const totalCount = queue.length
   const answeredCount = answeredItems.length
+  const weakQuestionIds = resolveWeakQuestionIds(sessionItems, progress)
+  const repairActions = buildRepairActions(sessionItems, progress)
 
   if (totalCount === 0 || answeredCount === 0) {
-    return buildEmptyReport(totalCount)
+    return buildEmptyReport(totalCount, repairActions, weakQuestionIds)
   }
 
   const averageScore = Math.round(
     answeredItems.reduce((sum, item) => sum + (item.attempt?.feedback.score ?? 0), 0) / answeredCount,
   )
   const passCount = answeredItems.filter(item => (item.attempt?.feedback.score ?? 0) >= PASSING_SCORE).length
-  const weakQuestionIds = resolveWeakQuestionIds(sessionItems, progress)
   const weakestCriterion = summarizeWeakestCriterion(answeredItems)
   const unansweredIds = sessionItems
     .filter(item => !item.attempt)
@@ -77,7 +78,7 @@ export function buildPracticeSessionReport(
       weakestCriterion,
       unansweredCount: unansweredIds.length,
     }),
-    repairActions: buildRepairActions(sessionItems, progress),
+    repairActions,
     primaryAction,
   }
 }
@@ -100,6 +101,24 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
     renderSessionAction(report.primaryAction),
+  ].join('\n')
+}
+
+export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
+  const hints = repairDraftHints(action.criterionKey)
+  const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
+
+  return [
+    `补弱题目：${action.title}`,
+    `补弱维度：${action.criterionLabel}${criterionScore}`,
+    `补弱原因：${action.reason}`,
+    `本次目标：${action.action}`,
+    '',
+    '我的重答：',
+    `结论：${hints.conclusion}`,
+    `原因：${hints.reason}`,
+    `场景：${hints.scenario}`,
+    `边界：${hints.boundary}`,
   ].join('\n')
 }
 
@@ -166,18 +185,30 @@ function renderSessionAction(action: PracticeSessionReportAction): string {
   ].join('\n')
 }
 
-function buildEmptyReport(totalCount: number): PracticeSessionReport {
+function buildEmptyReport(
+  totalCount: number,
+  repairActions: PracticeSessionRepairAction[] = [],
+  weakQuestionIds: number[] = [],
+): PracticeSessionReport {
+  const hasRepairActions = repairActions.length > 0
+
   return {
-    level: 'empty',
-    title: totalCount > 0 ? '等待开始本轮练习' : '先选择一组面试题',
-    summary: totalCount > 0
-      ? `本轮已有 ${totalCount} 道题，完成第一道评分后会生成整体战报。`
-      : '当前还没有练习队列，先从学习计划、弱题或题库中选择题目进入模拟面试。',
+    level: hasRepairActions ? 'risk' : 'empty',
+    title: hasRepairActions
+      ? '本轮优先补弱'
+      : totalCount > 0
+        ? '等待开始本轮练习'
+        : '先选择一组面试题',
+    summary: hasRepairActions
+      ? `本轮已有 ${totalCount} 道题，${repairActions.length} 道已标记薄弱；先按补弱模板完成评分。`
+      : totalCount > 0
+        ? `本轮已有 ${totalCount} 道题，完成第一道评分后会生成整体战报。`
+        : '当前还没有练习队列，先从学习计划、弱题或题库中选择题目进入模拟面试。',
     answeredCount: 0,
     totalCount,
     averageScore: 0,
     passCount: 0,
-    weakQuestionIds: [],
+    weakQuestionIds,
     metrics: buildMetrics({
       answeredCount: 0,
       totalCount,
@@ -185,13 +216,20 @@ function buildEmptyReport(totalCount: number): PracticeSessionReport {
       passCount: 0,
       unansweredCount: totalCount,
     }),
-    repairActions: [],
-    primaryAction: {
-      kind: 'start',
-      label: '开始本轮练习',
-      description: '进入模拟面试并完成第一道题评分。',
-      to: '/practice',
-    },
+    repairActions,
+    primaryAction: hasRepairActions
+      ? {
+        kind: 'repair',
+        label: '补弱重练',
+        description: '先回到已标记薄弱的题目，完成评分并按最低维度补弱。',
+        to: buildQueuePath(repairActions.map(action => action.questionId)),
+      }
+      : {
+        kind: 'start',
+        label: '开始本轮练习',
+        description: '进入模拟面试并完成第一道题评分。',
+        to: '/practice',
+      },
   }
 }
 
@@ -448,6 +486,52 @@ function actionForCriterion(key: InterviewCriterionKey): string {
     return '补一个项目场景、触发条件和可验证指标。'
   }
   return '补失败边界、误区和兜底方案。'
+}
+
+function repairDraftHints(key?: InterviewCriterionKey): {
+  conclusion: string
+  reason: string
+  scenario: string
+  boundary: string
+} {
+  if (key === 'coverage') {
+    return {
+      conclusion: '先一句话给出定义和适用边界。',
+      reason: '补核心机制、关键步骤和替代方案差异。',
+      scenario: '补一个真实项目触发场景和选择依据。',
+      boundary: '补不适用场景、常见误区和兜底方案。',
+    }
+  }
+  if (key === 'structure') {
+    return {
+      conclusion: '先给明确结论。',
+      reason: '按 2-3 点展开原因。',
+      scenario: '补项目场景、规模、指标或数据。',
+      boundary: '补风险、边界条件和落地方案。',
+    }
+  }
+  if (key === 'specificity') {
+    return {
+      conclusion: '先把结论落到具体业务场景。',
+      reason: '说明触发条件、约束和为什么这样选。',
+      scenario: '补项目规模、流量、数据量、排查过程或指标。',
+      boundary: '补验证方式、监控指标和回滚方案。',
+    }
+  }
+  if (key === 'risk') {
+    return {
+      conclusion: '先说明核心方案和主要风险。',
+      reason: '解释风险来源、影响范围和取舍。',
+      scenario: '补线上异常、容量、并发或数据一致性场景。',
+      boundary: '补兜底、降级、监控和恢复策略。',
+    }
+  }
+  return {
+    conclusion: '先给出可以评分的明确结论。',
+    reason: '补核心原理、关键步骤和取舍依据。',
+    scenario: '补一个项目场景、触发条件和验证指标。',
+    boundary: '补风险边界、常见误区和兜底方案。',
+  }
 }
 
 function formatQuestionIds(questionIds: number[]): string {
