@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewFeedback, PracticeQueueItem } from '../types'
-import { buildFollowUpDrillPack } from './followUpDrill'
+import { buildFollowUpDrillMarkdown, buildFollowUpDrillPack } from './followUpDrill'
 
 const question: PracticeQueueItem = {
   id: 101,
@@ -88,5 +88,35 @@ describe('buildFollowUpDrillPack', () => {
     expect(new Set(prompts).size).toBe(prompts.length)
     expect(pack.items.length).toBeLessThanOrEqual(5)
   })
-})
 
+  it('exports follow-up drill pack as portable markdown', () => {
+    const markdown = buildFollowUpDrillMarkdown(
+      question,
+      'HashMap 多线程下扩容会出现覆盖写和结构异常。',
+      feedback(),
+      '2026-06-18T00:00:00.000Z',
+    )
+
+    expect(markdown).toContain('# HashMap 为什么线程不安全？扩容时会发生什么？ 追问加压训练')
+    expect(markdown).toContain('生成时间：2026-06-18')
+    expect(markdown).toContain('## 题目上下文')
+    expect(markdown).toContain('## 训练概览')
+    expect(markdown).toContain('## 加压题单')
+    expect(markdown).toContain('维度：场景细节')
+    expect(markdown).toContain('答题引导：')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps follow-up drill export actionable without a prior answer', () => {
+    const markdown = buildFollowUpDrillMarkdown(
+      question,
+      ' ',
+      feedback(),
+      '2026-06-18T00:00:00.000Z',
+    )
+
+    expect(markdown).toContain('当前回答摘要：未填写本轮回答')
+    expect(markdown).toContain('## 加压题单')
+    expect(markdown).not.toContain('undefined')
+  })
+})

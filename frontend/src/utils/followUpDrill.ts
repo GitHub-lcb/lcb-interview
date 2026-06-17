@@ -47,6 +47,40 @@ export function buildFollowUpDrillPack(
   }
 }
 
+/**
+ * 构建单题追问加压训练 Markdown，便于用户把本轮模拟面试追问沉淀到离线复盘材料。
+ *
+ * @param question 当前训练题目
+ * @param answer 用户本轮原始回答
+ * @param feedback 本轮面试评分反馈
+ * @param now 生成时间，用于测试时固定日期
+ * @returns 可复制或下载的 Markdown 追问训练包
+ */
+export function buildFollowUpDrillMarkdown(
+  question: PracticeQueueItem | QuestionSnapshot,
+  answer: string,
+  feedback: InterviewFeedback,
+  now = new Date().toISOString(),
+): string {
+  const pack = buildFollowUpDrillPack(question, answer, feedback)
+
+  return [
+    `# ${question.title} 追问加压训练`,
+    '',
+    `生成时间：${formatMarkdownDate(now)}`,
+    '',
+    renderQuestionContext(question, answer, feedback),
+    [
+      '## 训练概览',
+      pack.title,
+      '',
+      pack.summary,
+      '',
+    ].join('\n'),
+    renderDrillItems(pack.items),
+  ].join('\n').trimEnd()
+}
+
 function drillFromPrompt(
   prompt: string,
   criteria: InterviewCriterion[],
@@ -244,6 +278,71 @@ function dedupeDrills(items: FollowUpDrillItem[]): FollowUpDrillItem[] {
   }
 
   return result
+}
+
+function renderQuestionContext(
+  question: PracticeQueueItem | QuestionSnapshot,
+  answer: string,
+  feedback: InterviewFeedback,
+): string {
+  return [
+    '## 题目上下文',
+    `- 分类：${question.categoryName || '未分类'}`,
+    `- 难度：${question.difficulty || '未知'}`,
+    `- 当前评分：${feedback.score}`,
+    `- 当前等级：${labelForFeedbackLevel(feedback.level)}`,
+    `- 当前回答摘要：${summarizeAnswer(answer)}`,
+    '',
+  ].join('\n')
+}
+
+function renderDrillItems(items: FollowUpDrillItem[]): string {
+  if (items.length === 0) {
+    return [
+      '## 加压题单',
+      '- 暂无追问题单，请先完成一次模拟回答以生成个性化追问。',
+    ].join('\n')
+  }
+
+  return [
+    '## 加压题单',
+    ...items.map((item, index) => [
+      `${index + 1}. ${item.prompt}`,
+      `   - 维度：${item.criterionLabel}`,
+      `   - 优先级：${item.priority}`,
+      `   - 压力点：${item.pressurePoint}`,
+      `   - 答题引导：${item.answerGuide}`,
+    ].join('\n')),
+  ].join('\n')
+}
+
+function labelForFeedbackLevel(level: InterviewFeedback['level']): string {
+  if (level === 'strong') {
+    return '表现强'
+  }
+  if (level === 'pass') {
+    return '可通过'
+  }
+  return '需要补强'
+}
+
+function summarizeAnswer(answer: string): string {
+  const normalized = answer.replace(/\s+/g, ' ').trim()
+  if (!normalized) {
+    return '未填写本轮回答'
+  }
+  if (normalized.length <= 120) {
+    return normalized
+  }
+  return `${normalized.slice(0, 120)}...`
+}
+
+function formatMarkdownDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 10)
+  }
+  return date.toISOString().slice(0, 10)
 }
 
 function normalize(value: string): string {

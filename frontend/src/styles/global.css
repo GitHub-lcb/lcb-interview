@@ -5495,9 +5495,25 @@ p {
   font-size: 13px;
 }
 
-.follow-up-drill-head > svg {
+.follow-up-drill-head > svg,
+.follow-up-drill-head-actions > svg {
   color: #7C3AED;
   font-size: 22px;
+}
+
+.follow-up-drill-head-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  align-items: center;
+}
+
+.follow-up-drill-head-actions .ant-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .follow-up-drill-grid {
@@ -6197,6 +6213,14 @@ p {
   }
 
   .interview-review-heading-actions {
+    justify-content: flex-start;
+  }
+
+  .follow-up-drill-head {
+    display: grid;
+  }
+
+  .follow-up-drill-head-actions {
     justify-content: flex-start;
   }
 
