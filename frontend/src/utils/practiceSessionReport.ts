@@ -14,6 +14,26 @@ import type {
 const PASSING_SCORE = 70
 const STRONG_SESSION_SCORE = 80
 
+const queueSourceLabels: Record<PracticeQueueItem['source'], string> = {
+  review: '复习优先',
+  plan: '今日计划',
+  page: '当前筛选',
+  new: '新题训练',
+}
+
+const statusLabels: Record<PracticeQueueItem['status'], string> = {
+  new: '新题',
+  learning: '学习中',
+  mastered: '已掌握',
+  weak: '薄弱',
+}
+
+const difficultyLabels: Record<string, string> = {
+  EASY: '简单',
+  MEDIUM: '中等',
+  HARD: '困难',
+}
+
 interface SessionAttemptItem {
   question: PracticeQueueItem
   attempt?: InterviewAttempt
@@ -98,6 +118,7 @@ export function buildPracticeSessionReportMarkdown(
     '',
     renderSessionSummary(report),
     renderSessionMetrics(report.metrics),
+    renderSessionQueueProfile(queue, progress, report),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
     renderSessionAction(report.primaryAction),
@@ -143,6 +164,36 @@ function renderSessionMetrics(metrics: PracticeSessionReportMetric[]): string {
   ].join('\n')
 }
 
+function renderSessionQueueProfile(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  report: PracticeSessionReport,
+): string {
+  if (queue.length === 0) {
+    return [
+      '## 队列画像',
+      '- 暂无队列画像。先从学习计划、薄弱题或题库进入模拟面试。',
+      '',
+    ].join('\n')
+  }
+
+  const unansweredIds = resolveUnansweredQuestionIds(queue, progress)
+  const nextQuestion = queue.find(item => unansweredIds.includes(item.id))
+    ?? queue.find(item => report.weakQuestionIds.includes(item.id))
+    ?? queue[0]
+  const nextScore = latestAttemptForQuestion(progress, nextQuestion.id)?.feedback.score
+
+  return [
+    '## 队列画像',
+    `- 来源构成：${summarizeQueueSources(queue)}`,
+    `- 下一题：${nextQuestion.title}（${nextQuestion.categoryName}，${formatScore(nextScore)}）`,
+    `- 未答题：${formatQuestionIds(unansweredIds)}`,
+    `- 低分/薄弱题：${formatQuestionIds(report.weakQuestionIds)}`,
+    `- 队列入口：${buildQueuePath(queue.map(item => item.id))}`,
+    '',
+  ].join('\n')
+}
+
 function renderSessionRepairActions(actions: PracticeSessionRepairAction[]): string {
   const lines = actions.length > 0
     ? actions.map((action, index) => [
@@ -175,7 +226,7 @@ function renderSessionQueue(queue: PracticeQueueItem[], progress: StudyProgress)
     ? queue.map((item, index) => {
       const latestScore = latestAttemptForQuestion(progress, item.id)?.feedback.score
       const status = progress.questionStates[item.id]?.status ?? item.status
-      return `- ${index + 1}. ${item.title}：${item.categoryName}，${item.difficulty}，来源 ${item.source}，状态 ${status}，最近评分 ${formatScore(latestScore)}`
+      return `- ${index + 1}. ${item.title}：${item.categoryName}，${formatDifficulty(item.difficulty)}，来源 ${formatQueueSource(item.source)}，状态 ${formatStatus(status)}，最近评分 ${formatScore(latestScore)}`
     })
     : ['- 暂无题目，先从学习计划、弱题或题库进入模拟面试。']
 
@@ -411,6 +462,35 @@ function buildQueuePath(questionIds: number[]): string {
     return '/practice'
   }
   return `/practice?queue=${questionIds.join(',')}`
+}
+
+function resolveUnansweredQuestionIds(queue: PracticeQueueItem[], progress: StudyProgress): number[] {
+  return queue
+    .filter(item => !latestAttemptForQuestion(progress, item.id))
+    .map(item => item.id)
+}
+
+function summarizeQueueSources(queue: PracticeQueueItem[]): string {
+  const counts = queue.reduce((accumulator, item) => {
+    accumulator.set(item.source, (accumulator.get(item.source) ?? 0) + 1)
+    return accumulator
+  }, new Map<PracticeQueueItem['source'], number>())
+
+  return [...counts.entries()]
+    .map(([source, count]) => `${formatQueueSource(source)} ${count} 道`)
+    .join('、') || '暂无来源'
+}
+
+function formatQueueSource(source: PracticeQueueItem['source']): string {
+  return queueSourceLabels[source] ?? source
+}
+
+function formatStatus(status: PracticeQueueItem['status']): string {
+  return statusLabels[status] ?? status
+}
+
+function formatDifficulty(difficulty: string): string {
+  return difficultyLabels[difficulty] ?? difficulty
 }
 
 function buildQuestionPath(questionId: number): string {

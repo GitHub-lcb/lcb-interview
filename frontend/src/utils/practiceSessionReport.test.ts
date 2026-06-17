@@ -168,6 +168,10 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('低分/薄弱题：1, 2, 3')
     expect(markdown).toContain('## 核心指标')
     expect(markdown).toContain('最弱项：结构化')
+    expect(markdown).toContain('## 队列画像')
+    expect(markdown).toContain('来源构成：今日计划')
+    expect(markdown).toContain('下一题：Java 面试题 3')
+    expect(markdown).toContain('队列入口：/practice?queue=1,2,3')
     expect(markdown).toContain('## 补弱动作清单')
     expect(markdown).toContain('Java 面试题 2')
     expect(markdown).toContain('结构化')
@@ -190,6 +194,7 @@ describe('buildPracticeSessionReport', () => {
 
     expect(markdown).toContain('先选择一组面试题')
     expect(markdown).toContain('当前还没有练习队列')
+    expect(markdown).toContain('暂无队列画像')
     expect(markdown).toContain('暂无题目')
     expect(markdown).not.toContain('undefined')
   })
