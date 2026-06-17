@@ -3745,6 +3745,131 @@ p {
   justify-self: start;
 }
 
+.answer-gap-panel {
+  display: grid;
+  gap: 12px;
+  margin: 0 20px 20px 20px;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #D97706;
+}
+
+.answer-gap-panel.level-aligned {
+  box-shadow: inset 4px 0 0 #059669;
+}
+
+.answer-gap-panel.level-high-risk {
+  box-shadow: inset 4px 0 0 #DC2626;
+}
+
+.answer-gap-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.answer-gap-head h2 {
+  margin: 0;
+  color: #18181B;
+  font-size: 22px;
+}
+
+.answer-gap-head p {
+  max-width: 780px;
+  margin: 6px 0 0 0;
+  color: #52525B;
+  font-size: 13px;
+}
+
+.answer-gap-score {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #FFFBEB;
+  color: #B45309;
+}
+
+.answer-gap-score strong {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.answer-gap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.answer-gap-module {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding: 10px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.answer-gap-module.status-covered {
+  background: #ECFDF5;
+  border-color: #BBF7D0;
+  box-shadow: inset 3px 0 0 #059669;
+}
+
+.answer-gap-module.status-missing {
+  background: #FEF2F2;
+  border-color: #FECACA;
+  box-shadow: inset 3px 0 0 #DC2626;
+}
+
+.answer-gap-module > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.answer-gap-module span,
+.answer-gap-outline span {
+  color: #18181B;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.answer-gap-module strong {
+  color: #0F172A;
+}
+
+.answer-gap-module p,
+.answer-gap-module small,
+.answer-gap-outline li {
+  margin: 0;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.answer-gap-outline {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+}
+
+.answer-gap-outline ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
 .practice-side {
   display: grid;
   gap: 12px;
@@ -4172,6 +4297,7 @@ p {
 
   .practice-feedback-panel,
   .follow-up-drill-grid,
+  .answer-gap-grid,
   .practice-criteria-grid {
     grid-template-columns: 1fr;
   }

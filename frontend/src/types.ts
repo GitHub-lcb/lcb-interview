@@ -361,6 +361,30 @@ export interface FollowUpDrillPack {
   items: FollowUpDrillItem[]
 }
 
+export type AnswerGapModuleStatus = 'covered' | 'partial' | 'missing'
+
+export type AnswerGapLevel = 'empty' | 'high-risk' | 'partial' | 'aligned'
+
+export interface AnswerGapModule {
+  key: string
+  label: string
+  score: number
+  status: AnswerGapModuleStatus
+  evidence: string
+  guidance: string
+}
+
+export interface AnswerGapReport {
+  score: number
+  level: AnswerGapLevel
+  title: string
+  summary: string
+  modules: AnswerGapModule[]
+  coveredModules: AnswerGapModule[]
+  missingModules: AnswerGapModule[]
+  rewriteOutline: string[]
+}
+
 export interface AnswerQualityResult {
   score: number
   level: 'excellent' | 'good' | 'needs-work'

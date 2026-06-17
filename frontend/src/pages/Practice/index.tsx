@@ -10,6 +10,7 @@ import {
   WarningOutlined,
 } from '@ant-design/icons'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import AnswerGapPanel from '../../components/AnswerGapPanel'
 import FollowUpDrillPanel from '../../components/FollowUpDrillPanel'
 import InterviewReviewPanel from '../../components/InterviewReviewPanel'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
@@ -294,6 +295,9 @@ export default function Practice() {
   }, [currentIndex, queue.length])
 
   const current = queue[currentIndex]
+  const currentQuestionDetail = current
+    ? candidateQuestions.find(question => question.id === current.id)
+    : undefined
   const currentState = current ? getState(current.id) : null
   const latestAttempt = current ? progress.interviewAttempts[current.id]?.[0] : undefined
   const progressPercent = queue.length === 0 ? 0 : Math.round(((currentIndex + 1) / queue.length) * 100)
@@ -519,6 +523,9 @@ export default function Practice() {
               feedback={feedback}
               onPickPrompt={startFollowUpAnswer}
             />
+            {currentQuestionDetail && (
+              <AnswerGapPanel question={currentQuestionDetail} answer={answerDraft} />
+            )}
           </>
         )}
 
