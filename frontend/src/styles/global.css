@@ -7253,6 +7253,91 @@ p {
   width: 100%;
 }
 
+.practice-session-report-daily-closure {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+}
+
+.practice-session-report-daily-closure-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.practice-session-report-daily-closure-head > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-daily-closure-head span {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-daily-closure-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-daily-closure-head small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-daily-closure-head .ant-btn {
+  flex: 0 0 auto;
+  max-width: 136px;
+}
+
+.practice-session-report-daily-closure-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.practice-session-report-daily-closure-metrics div {
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+}
+
+.practice-session-report-daily-closure-metrics span,
+.practice-session-report-daily-closure-metrics strong {
+  display: block;
+}
+
+.practice-session-report-daily-closure-metrics span {
+  color: #64748B;
+  font-size: 12px;
+}
+
+.practice-session-report-daily-closure-metrics strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 18px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;

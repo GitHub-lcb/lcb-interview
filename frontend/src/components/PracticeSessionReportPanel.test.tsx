@@ -87,6 +87,8 @@ describe('PracticeSessionReportPanel', () => {
     expect(screen.getByText('队列画像')).toBeInTheDocument()
     expect(screen.getByText('今日计划 2 道')).toBeInTheDocument()
     expect(screen.getAllByText('Java 面试题 2').length).toBeGreaterThan(0)
+    expect(screen.getByText('今日闭环')).toBeInTheDocument()
+    expect(screen.getByText(/完成率/)).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: /复制战报/ }))
 

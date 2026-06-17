@@ -1,4 +1,5 @@
 import type {
+  DailyPlanCompletion,
   InterviewAttempt,
   InterviewCriterion,
   InterviewCriterionKey,
@@ -13,6 +14,7 @@ import type {
   QuestionSnapshot,
   StudyProgress,
 } from '../types'
+import { buildDailyPlanCompletion } from './dailyPlanCompletion'
 import { buildNextTrainingQueue, formatNextTrainingQueueItemMeta } from './nextTrainingQueue'
 
 const PASSING_SCORE = 70
@@ -125,6 +127,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionSummary(report),
     renderSessionMetrics(report.metrics),
     renderSessionQueueProfile(report.queueProfile),
+    renderSessionDailyClosure(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -139,6 +142,14 @@ export function buildPracticeSessionNextTrainingQueue(
   limit = 5,
 ): NextTrainingQueue {
   return buildNextTrainingQueue(buildPracticeSessionProgressContext(queue, progress), now, limit)
+}
+
+export function buildPracticeSessionDailyCompletion(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): DailyPlanCompletion {
+  return buildDailyPlanCompletion(buildPracticeSessionProgressContext(queue, progress), now)
 }
 
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
@@ -196,6 +207,32 @@ function renderSessionQueueProfile(profile: PracticeSessionQueueProfile): string
     `- 未答题：${formatQuestionIds(profile.unansweredQuestionIds)}`,
     `- 低分/薄弱题：${formatQuestionIds(profile.weakQuestionIds)}`,
     `- 队列入口：${profile.queuePath}`,
+    '',
+  ].join('\n')
+}
+
+function renderSessionDailyClosure(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const completion = buildPracticeSessionDailyCompletion(queue, progress, now)
+  const riskCount = completion.reviewDebtCount + completion.weakCount
+  const impactLines = completion.statusImpacts.length > 0
+    ? completion.statusImpacts.slice(0, 4).map(impact => (
+      `- 评分影响：${impact.title}，${impact.score} 分，${impact.message}；行动：${impact.actionLabel}；入口：${impact.to}`
+    ))
+    : ['- 评分影响：暂无计划内模拟面试评分。']
+
+  return [
+    '## 今日闭环快照',
+    `- 状态：${completion.title}`,
+    `- 摘要：${completion.summary}`,
+    `- 完成率：${completion.completionRate}%`,
+    `- 风险项：${riskCount}`,
+    `- 今日模拟：${completion.interviewTodayCount} 次`,
+    `- 主行动：${completion.primaryAction.label}，${completion.primaryAction.description}（${completion.primaryAction.to}）`,
+    ...impactLines,
     '',
   ].join('\n')
 }

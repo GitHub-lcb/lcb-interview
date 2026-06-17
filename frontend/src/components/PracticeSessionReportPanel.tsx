@@ -17,6 +17,7 @@ import type {
 } from '../types'
 import { formatNextTrainingQueueItemMeta } from '../utils/nextTrainingQueue'
 import {
+  buildPracticeSessionDailyCompletion,
   buildPracticeSessionNextTrainingQueue,
   buildPracticeSessionReport,
   buildPracticeSessionReportMarkdown,
@@ -57,6 +58,11 @@ export default function PracticeSessionReportPanel({
     () => buildPracticeSessionNextTrainingQueue(queue, progress, progress.updatedAt, 3),
     [progress, queue],
   )
+  const dailyClosure = useMemo(
+    () => buildPracticeSessionDailyCompletion(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
 
   const handleCopyReport = async () => {
     const markdown = buildPracticeSessionReportMarkdown(queue, progress)
@@ -141,6 +147,37 @@ export default function PracticeSessionReportPanel({
         <Button size="small" icon={<ArrowRightOutlined />} onClick={() => onNavigate(report.queueProfile.queuePath)}>
           进入队列
         </Button>
+      </div>
+
+      <div className="practice-session-report-daily-closure" aria-label="今日闭环">
+        <div className="practice-session-report-daily-closure-head">
+          <div>
+            <span>今日闭环</span>
+            <strong>{dailyClosure.title}</strong>
+            <small>{dailyClosure.summary}</small>
+          </div>
+          <Button
+            size="small"
+            icon={<CheckCircleOutlined />}
+            onClick={() => onNavigate(dailyClosure.primaryAction.to)}
+          >
+            {dailyClosure.primaryAction.label}
+          </Button>
+        </div>
+        <div className="practice-session-report-daily-closure-metrics">
+          <div>
+            <span>完成率</span>
+            <strong>{dailyClosure.completionRate}%</strong>
+          </div>
+          <div>
+            <span>风险</span>
+            <strong>{dailyClosureRiskCount}</strong>
+          </div>
+          <div>
+            <span>模拟</span>
+            <strong>{dailyClosure.interviewTodayCount}</strong>
+          </div>
+        </div>
       </div>
 
       <div className="practice-session-report-next-training" aria-label="下一轮训练">
