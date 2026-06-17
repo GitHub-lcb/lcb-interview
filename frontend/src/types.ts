@@ -619,6 +619,34 @@ export interface FollowUpDrillPack {
   items: FollowUpDrillItem[]
 }
 
+export type PracticeFeedbackClosureLevel = 'repair' | 'follow-up' | 'pass' | 'excellent'
+
+export type PracticeFeedbackClosureActionKind = 'rewrite' | 'follow-up' | 'weak' | 'mastered' | 'answer' | 'next'
+
+export interface PracticeFeedbackClosureMetric {
+  key: 'score' | 'weakest' | 'length' | 'followUps'
+  label: string
+  value: string
+  detail: string
+}
+
+export interface PracticeFeedbackClosureAction {
+  kind: PracticeFeedbackClosureActionKind
+  label: string
+  description: string
+  tone: 'primary' | 'danger' | 'default' | 'success'
+  prompt?: string
+}
+
+export interface PracticeFeedbackClosure {
+  level: PracticeFeedbackClosureLevel
+  title: string
+  summary: string
+  metrics: PracticeFeedbackClosureMetric[]
+  actions: PracticeFeedbackClosureAction[]
+  primaryAction: PracticeFeedbackClosureAction
+}
+
 export type AnswerGapModuleStatus = 'covered' | 'partial' | 'missing'
 
 export type AnswerGapLevel = 'empty' | 'high-risk' | 'partial' | 'aligned'

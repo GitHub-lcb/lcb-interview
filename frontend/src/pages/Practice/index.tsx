@@ -13,6 +13,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import AnswerGapPanel from '../../components/AnswerGapPanel'
 import FollowUpDrillPanel from '../../components/FollowUpDrillPanel'
 import InterviewReviewPanel from '../../components/InterviewReviewPanel'
+import PracticeFeedbackClosurePanel from '../../components/PracticeFeedbackClosurePanel'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { evaluateInterviewAnswerRemote } from '../../api/interview'
@@ -373,6 +374,11 @@ export default function Practice() {
     setFeedback(null)
   }
 
+  const startClosureAnswer = (prompt: string) => {
+    setAnswerDraft(`${prompt}\n\n我的回答：`)
+    setFeedback(null)
+  }
+
   if (!current || !currentState) {
     return (
       <div className="practice-empty-page">
@@ -517,6 +523,16 @@ export default function Practice() {
                 </div>
               </div>
             </section>
+            <PracticeFeedbackClosurePanel
+              question={current}
+              answer={answerDraft}
+              feedback={feedback}
+              onUsePrompt={startClosureAnswer}
+              onMarkWeak={markWeak}
+              onMarkMastered={markMastered}
+              onOpenAnswer={() => navigate(`/question/${current.id}`)}
+              onNext={moveNext}
+            />
             <FollowUpDrillPanel
               question={current}
               answer={answerDraft}
