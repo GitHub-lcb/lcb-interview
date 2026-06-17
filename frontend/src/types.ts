@@ -167,6 +167,22 @@ export interface WeakArea {
   masteredCount: number
 }
 
+export type AbilityReadinessLevel = 'empty' | 'weak' | 'building' | 'ready'
+
+export interface AbilityMapItem {
+  routeId: string
+  title: string
+  role: string
+  readinessScore: number
+  readinessLevel: AbilityReadinessLevel
+  remembered: number
+  mastered: number
+  weak: number
+  learning: number
+  nextQuestionIds: number[]
+  summary: string
+}
+
 export interface ReviewQueueItem extends QuestionSnapshot {
   status: StudyQuestionStatus
   lastReviewedAt?: string

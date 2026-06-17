@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Alert } from 'antd'
 import CategoryGrid from './CategoryGrid'
 import HotQuestions from './HotQuestions'
+import AbilityMapPanel from '../../components/AbilityMapPanel'
 import InterviewReviewPanel from '../../components/InterviewReviewPanel'
 import StudyCommandCenter from '../../components/StudyCommandCenter'
 import StudyDashboard from '../../components/StudyDashboard'
@@ -42,6 +43,8 @@ export default function Home() {
       <StudyCommandCenter />
 
       <InterviewReviewPanel progress={progress} />
+
+      <AbilityMapPanel />
 
       <section className="free-promise-band" aria-label="免费承诺">
         {freePromiseItems.map(item => (
