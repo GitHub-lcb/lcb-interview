@@ -3378,31 +3378,43 @@ p {
   gap: 8px;
 }
 
-.daily-plan-completion-impact-list article {
+.daily-plan-completion-impact-list button {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 4px 10px;
+  align-items: center;
+  width: 100%;
   min-width: 0;
   padding: 10px;
   background: #FFFFFF;
   border: 1px solid #E4E4E7;
   border-radius: 8px;
   box-shadow: inset 3px 0 0 #64748B;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: border-color 0.2s, transform 0.2s;
 }
 
-.daily-plan-completion-impact-list article.status-weak {
+.daily-plan-completion-impact-list button:hover {
+  border-color: #CBD5E1;
+  transform: translateY(-1px);
+}
+
+.daily-plan-completion-impact-list button.status-weak {
   background: #FFFBEB;
   border-color: #FDE68A;
   box-shadow: inset 3px 0 0 #D97706;
 }
 
-.daily-plan-completion-impact-list article.status-learning {
+.daily-plan-completion-impact-list button.status-learning {
   background: #EFF6FF;
   border-color: #BFDBFE;
   box-shadow: inset 3px 0 0 #2563EB;
 }
 
-.daily-plan-completion-impact-list article.status-mastered {
+.daily-plan-completion-impact-list button.status-mastered {
   background: #ECFDF5;
   border-color: #A7F3D0;
   box-shadow: inset 3px 0 0 #059669;
@@ -3429,6 +3441,16 @@ p {
   color: #475569;
   font-size: 12px;
   line-height: 1.45;
+}
+
+.daily-plan-completion-impact-list small {
+  display: inline-flex;
+  grid-column: 1 / -1;
+  gap: 4px;
+  align-items: center;
+  color: #2563EB;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .daily-plan-completion-todos {
@@ -7117,7 +7139,7 @@ p {
   .daily-plan-brief-metrics,
   .daily-plan-completion-body,
   .daily-plan-completion-metrics,
-  .daily-plan-completion-impact-list article,
+  .daily-plan-completion-impact-list button,
   .interview-emergency-kit-body,
   .interview-emergency-kit-metrics,
   .interview-last-minute-brief-body,

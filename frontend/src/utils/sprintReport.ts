@@ -266,7 +266,7 @@ function renderDailyCompletionSection(completion: DailyPlanCompletion): string {
     : ['- 待办：暂无额外待办。']
   const scoreImpactLines = completion.statusImpacts.length > 0
     ? completion.statusImpacts.map(impact => (
-      `- 评分影响：${impact.title}，${impact.score} 分，${impact.message}（题目 ID：${impact.questionId}）`
+      `- 评分影响：${impact.title}，${impact.score} 分，${impact.message}；行动：${impact.actionLabel}，入口：${impact.to}（题目 ID：${impact.questionId}）`
     ))
     : ['- 评分影响：今日还没有计划内模拟面试评分，完成评分后会自动解释计划变化。']
 

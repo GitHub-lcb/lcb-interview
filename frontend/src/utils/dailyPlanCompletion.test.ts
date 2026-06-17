@@ -175,12 +175,16 @@ describe('buildDailyPlanCompletion', () => {
       score: 86,
       status: 'mastered',
       message: '已同步为已掌握，计入今日完成。',
+      actionLabel: '沉淀题目',
+      to: '/question/2',
     })
     expect(completion.statusImpacts[1]).toMatchObject({
       title: 'HashMap 为什么线程不安全',
       score: 55,
       status: 'weak',
       message: '已自动标记薄弱，并留在今日计划继续补强。',
+      actionLabel: '重答补强',
+      to: '/practice?queue=1',
     })
   })
 
@@ -204,6 +208,8 @@ describe('buildDailyPlanCompletion', () => {
       questionId: 1,
       score: 86,
       status: 'mastered',
+      actionLabel: '沉淀题目',
+      to: '/question/1',
     })
   })
 
@@ -231,6 +237,7 @@ describe('buildDailyPlanCompletion', () => {
 
     expect(markdown).toContain('## 评分影响')
     expect(markdown).toContain('HashMap 为什么线程不安全：86 分，已同步为已掌握，计入今日完成。')
+    expect(markdown).toContain('行动：沉淀题目，入口：/question/1')
     expect(markdown).not.toContain('undefined')
   })
 

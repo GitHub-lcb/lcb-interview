@@ -102,6 +102,7 @@ describe('DailyPlanCompletionPanel', () => {
     expect(screen.getByText('HashMap 为什么线程不安全')).toBeInTheDocument()
     expect(screen.getByText('88 分')).toBeInTheDocument()
     expect(screen.getByText('已同步为已掌握，计入今日完成。')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /沉淀题目/ })).toBeInTheDocument()
   })
 
   it('copies daily completion markdown', async () => {

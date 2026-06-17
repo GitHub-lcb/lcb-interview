@@ -112,7 +112,9 @@ function renderDailyCompletionScoreImpacts(impacts: DailyPlanCompletionImpact[])
 
   return [
     '## 评分影响',
-    ...impacts.map(impact => `- ${impact.title}：${impact.score} 分，${impact.message}`),
+    ...impacts.map(impact => (
+      `- ${impact.title}：${impact.score} 分，${impact.message}；行动：${impact.actionLabel}，入口：${impact.to}`
+    )),
     '',
   ].join('\n')
 }
@@ -284,12 +286,15 @@ function buildScoreImpacts(
       }
 
       const status = describeInterviewStatusSync(latestAttempt.feedback.score).status
+      const action = scoreImpactAction(status, questionId)
       return [{
         questionId,
         title: resolveQuestionTitle(progress, questionId),
         score: latestAttempt.feedback.score,
         status,
         message: scoreImpactMessage(status),
+        actionLabel: action.label,
+        to: action.to,
         createdAt: latestAttempt.createdAt,
       }]
     })
@@ -442,6 +447,25 @@ function scoreImpactMessage(status: StudyQuestionStatus): string {
     return '已同步为学习中，继续复盘到 80 分以上。'
   }
   return '已同步为已掌握，计入今日完成。'
+}
+
+function scoreImpactAction(status: StudyQuestionStatus, questionId: number): { label: string; to: string } {
+  if (status === 'weak') {
+    return {
+      label: '重答补强',
+      to: buildDailyPracticePath([questionId]),
+    }
+  }
+  if (status === 'learning') {
+    return {
+      label: '继续复盘',
+      to: buildDailyPracticePath([questionId]),
+    }
+  }
+  return {
+    label: '沉淀题目',
+    to: `/question/${questionId}`,
+  }
 }
 
 function dateKey(value: string): string {

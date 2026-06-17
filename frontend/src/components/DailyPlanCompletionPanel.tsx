@@ -81,11 +81,20 @@ export default function DailyPlanCompletionPanel({
         {completion.statusImpacts.length > 0 ? (
           <div className="daily-plan-completion-impact-list">
             {completion.statusImpacts.map(impact => (
-              <article key={`${impact.questionId}-${impact.createdAt}`} className={`status-${impact.status}`}>
+              <button
+                key={`${impact.questionId}-${impact.createdAt}`}
+                type="button"
+                className={`status-${impact.status}`}
+                onClick={() => navigate(impact.to)}
+              >
                 <strong>{impact.title}</strong>
                 <em>{impact.score} 分</em>
                 <span>{impact.message}</span>
-              </article>
+                <small>
+                  {impact.actionLabel}
+                  <ArrowRightOutlined />
+                </small>
+              </button>
             ))}
           </div>
         ) : (

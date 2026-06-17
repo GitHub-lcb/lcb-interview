@@ -451,6 +451,8 @@ export interface DailyPlanCompletionImpact {
   score: number
   status: StudyQuestionStatus
   message: string
+  actionLabel: string
+  to: string
   createdAt: string
 }
 

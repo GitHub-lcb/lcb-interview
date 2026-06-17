@@ -139,6 +139,7 @@ describe('buildSprintReportMarkdown', () => {
     expect(markdown).toContain('复习债：1 道')
     expect(markdown).toContain('薄弱题：1 道')
     expect(markdown).toContain('评分影响：Java 并发 题目 1，60 分，已自动标记薄弱，并留在今日计划继续补强。')
+    expect(markdown).toContain('行动：重答补强，入口：/practice?queue=1')
     expect(markdown).not.toContain('评分影响：Java 并发 题目 2，82 分')
     expect(markdown).toContain('## 今日作战简报')
     expect(markdown).toContain('复习债')
