@@ -48,6 +48,67 @@ export function buildInterviewFollowUpDefense(progress: StudyProgress): Intervie
   }
 }
 
+export function buildInterviewFollowUpDefenseMarkdown(
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): string {
+  const defense = buildInterviewFollowUpDefense(progress)
+
+  return [
+    `# ${progress.targetRole} 面试追问防线`,
+    '',
+    `生成时间：${formatDate(now)}`,
+    '',
+    renderDefenseOverview(defense),
+    renderDefenseMetrics(defense.metrics),
+    renderDefenseItems(defense.items),
+  ].join('\n')
+}
+
+function renderDefenseOverview(defense: InterviewFollowUpDefense): string {
+  return [
+    '## 防线概览',
+    `- 状态：${defense.title}`,
+    `- 摘要：${defense.summary}`,
+    `- 下一步：${defense.primaryAction.label}，${defense.primaryAction.to}`,
+    `- 说明：${defense.primaryAction.description}`,
+    '',
+  ].join('\n')
+}
+
+function renderDefenseMetrics(metrics: InterviewFollowUpDefenseMetric[]): string {
+  return [
+    '## 指标',
+    ...metrics.map(metric => `- ${metric.label}：${metric.value}，${metric.detail}`),
+    '',
+  ].join('\n')
+}
+
+function renderDefenseItems(items: InterviewFollowUpDefenseItem[]): string {
+  if (items.length === 0) {
+    return [
+      '## 追问清单',
+      '- 暂无追问防线。先完成一次模拟面试，系统会生成可防守的追问清单。',
+      '',
+    ].join('\n')
+  }
+
+  return [
+    '## 追问清单',
+    ...items.flatMap((item, index) => [
+      `${index + 1}. ${item.title}`,
+      `   - 分类：${item.categoryName}`,
+      `   - 维度：${item.criterionLabel}`,
+      `   - 得分：${item.score} 分`,
+      `   - 追问：${item.prompt}`,
+      `   - 压力点：${item.pressurePoint}`,
+      `   - 回答引导：${item.answerGuide}`,
+      `   - 入口：${item.to}`,
+    ]),
+    '',
+  ].join('\n')
+}
+
 function buildLatestAttemptContext(
   questionId: number,
   attempts: InterviewAttempt[],
@@ -244,4 +305,12 @@ function fallbackSnapshot(questionId: number): QuestionSnapshot {
     tags: [],
     viewCount: 0,
   }
+}
+
+function formatDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+  return date.toISOString().slice(0, 10)
 }

@@ -1,11 +1,13 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { InterviewAttempt, StudyProgress } from '../types'
 import InterviewFollowUpDefensePanel from './InterviewFollowUpDefensePanel'
 
 const NOW = '2026-06-17T11:00:00.000Z'
+
+afterEach(() => cleanup())
 
 function attempt(questionId: number): InterviewAttempt {
   return {
@@ -68,5 +70,21 @@ describe('InterviewFollowUpDefensePanel', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /如果面试官追问线上场景/ }))
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1')
+  })
+
+  it('copies follow-up defense markdown', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    })
+
+    render(<InterviewFollowUpDefensePanel progress={progress()} onNavigate={vi.fn()} />)
+
+    await userEvent.click(screen.getByRole('button', { name: /复制防线/ }))
+
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1))
+    expect(writeText.mock.calls[0][0]).toContain('# Java 后端 面试追问防线')
+    expect(writeText.mock.calls[0][0]).toContain('HashMap 为什么线程不安全？')
   })
 })

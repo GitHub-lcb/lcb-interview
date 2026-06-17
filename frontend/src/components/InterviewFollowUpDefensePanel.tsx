@@ -1,8 +1,8 @@
-import { ArrowRightOutlined, QuestionCircleOutlined, ThunderboltOutlined } from '@ant-design/icons'
-import { Button } from 'antd'
+import { ArrowRightOutlined, CopyOutlined, QuestionCircleOutlined, ThunderboltOutlined } from '@ant-design/icons'
+import { Button, message } from 'antd'
 import { useMemo } from 'react'
 import type { InterviewFollowUpDefense, InterviewFollowUpDefenseItem, StudyProgress } from '../types'
-import { buildInterviewFollowUpDefense } from '../utils/interviewFollowUpDefense'
+import { buildInterviewFollowUpDefense, buildInterviewFollowUpDefenseMarkdown } from '../utils/interviewFollowUpDefense'
 
 interface InterviewFollowUpDefensePanelProps {
   progress: StudyProgress
@@ -30,6 +30,19 @@ export default function InterviewFollowUpDefensePanel({
 }: InterviewFollowUpDefensePanelProps) {
   const defense = useMemo(() => buildInterviewFollowUpDefense(progress), [progress])
 
+  const handleCopyDefense = async () => {
+    const markdown = buildInterviewFollowUpDefenseMarkdown(progress)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('追问防线已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 防线')
+  }
+
   return (
     <section className={`interview-follow-up-defense-panel level-${defense.level}`} aria-label="面试追问防线">
       <div className="interview-follow-up-defense-head">
@@ -43,6 +56,9 @@ export default function InterviewFollowUpDefensePanel({
         </div>
         <div className="interview-follow-up-defense-action">
           <span>{levelLabels[defense.level]}</span>
+          <Button size="small" icon={<CopyOutlined />} onClick={handleCopyDefense}>
+            复制防线
+          </Button>
           <Button type="primary" icon={<ThunderboltOutlined />} onClick={() => onNavigate(defense.primaryAction.to)}>
             {defense.primaryAction.label}
             <ArrowRightOutlined />
@@ -87,4 +103,32 @@ export default function InterviewFollowUpDefensePanel({
       )}
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+function buildFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '岗位'}-面试追问防线.md`
 }

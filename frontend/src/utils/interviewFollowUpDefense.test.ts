@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewAttempt, QuestionSnapshot, StudyProgress } from '../types'
-import { buildInterviewFollowUpDefense } from './interviewFollowUpDefense'
+import { buildInterviewFollowUpDefense, buildInterviewFollowUpDefenseMarkdown } from './interviewFollowUpDefense'
 
 const NOW = '2026-06-17T10:00:00.000Z'
 
@@ -118,5 +118,37 @@ describe('buildInterviewFollowUpDefense', () => {
 
     expect(report.items).toHaveLength(5)
     expect(report.metrics.find(metric => metric.key === 'categories')?.value).toBe('3')
+  })
+
+  it('exports high-risk follow-up defense as portable markdown', () => {
+    const markdown = buildInterviewFollowUpDefenseMarkdown(progress({
+      questionSnapshots: {
+        1: snapshot(1, 'Redis'),
+        2: snapshot(2, 'Java 并发'),
+      },
+      interviewAttempts: {
+        1: [attempt(1, 88, '结论是先保证一致性，再补监控和回滚。', ['请比较两种方案的权衡。'])],
+        2: [attempt(2, 62, '只说了 HashMap 线程不安全，缺少线上验证。')],
+      },
+    }), NOW)
+
+    expect(markdown).toContain('# Java 后端 面试追问防线')
+    expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 防线概览')
+    expect(markdown).toContain('防线追问')
+    expect(markdown).toContain('Java 并发 追问题 2')
+    expect(markdown).toContain('如果面试官追问线上场景')
+    expect(markdown).toContain('面试官在追项目场景')
+    expect(markdown).toContain('入口：/practice?queue=2')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps empty follow-up defense export actionable', () => {
+    const markdown = buildInterviewFollowUpDefenseMarkdown(progress(), NOW)
+
+    expect(markdown).toContain('追问防线待建立')
+    expect(markdown).toContain('暂无追问防线')
+    expect(markdown).toContain('先做一题模拟')
+    expect(markdown).not.toContain('undefined')
   })
 })
