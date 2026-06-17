@@ -177,6 +177,37 @@ export interface DailyMissionPlan {
   missions: DailyMissionItem[]
 }
 
+export type StudyPaceCoachLevel = 'empty' | 'behind' | 'balanced' | 'ahead'
+
+export type StudyPaceActionKey = 'start' | 'review' | 'plan' | 'interview' | 'practice'
+
+export interface StudyPaceAction {
+  key: StudyPaceActionKey
+  label: string
+  description: string
+  to: string
+}
+
+export interface StudyPaceMetric {
+  key: 'target' | 'planned' | 'review' | 'interview'
+  label: string
+  value: string
+  detail: string
+}
+
+export interface StudyPaceCoach {
+  level: StudyPaceCoachLevel
+  title: string
+  summary: string
+  dailyQuestionTarget: number
+  plannedCount: number
+  reviewDueCount: number
+  interviewAttemptCount: number
+  metrics: StudyPaceMetric[]
+  actions: StudyPaceAction[]
+  primaryAction: StudyPaceAction
+}
+
 export type PrepHealthDimensionKey = 'review' | 'ability' | 'interview' | 'pace'
 
 export type PrepHealthDimensionStatus = 'empty' | 'danger' | 'warning' | 'stable'

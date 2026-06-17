@@ -14,6 +14,7 @@ import InterviewBriefPanel from '../../components/InterviewBriefPanel'
 import InterviewMistakeLedgerPanel from '../../components/InterviewMistakeLedgerPanel'
 import SprintReportActions from '../../components/SprintReportActions'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
+import StudyPaceCoachPanel from '../../components/StudyPaceCoachPanel'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { getHotQuestions } from '../../api/question'
 import type { Question, ReviewDueStatus } from '../../types'
@@ -163,6 +164,7 @@ export default function StudyPlan() {
         </div>
       </section>
 
+      <StudyPaceCoachPanel progress={progress} />
       <InterviewBriefPanel progress={progress} />
       <InterviewMistakeLedgerPanel progress={progress} />
 

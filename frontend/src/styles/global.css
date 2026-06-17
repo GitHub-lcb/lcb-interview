@@ -2816,6 +2816,118 @@ p {
   width: 100%;
 }
 
+.study-pace-panel {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  margin-bottom: 18px;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #2563EB;
+}
+
+.study-pace-panel.level-empty {
+  box-shadow: inset 4px 0 0 #D97706;
+}
+
+.study-pace-panel.level-behind {
+  box-shadow: inset 4px 0 0 #DC2626;
+}
+
+.study-pace-panel.level-ahead {
+  box-shadow: inset 4px 0 0 #059669;
+}
+
+.study-pace-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.study-pace-main h2 {
+  margin: 0;
+  color: #18181B;
+  font-size: 24px;
+}
+
+.study-pace-main p {
+  max-width: 780px;
+  margin: 6px 0 0 0;
+  color: #52525B;
+}
+
+.study-pace-action {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.study-pace-action span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: #EFF6FF;
+  color: #1D4ED8;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.study-pace-panel.level-empty .study-pace-action span {
+  background: #FFFBEB;
+  color: #B45309;
+}
+
+.study-pace-panel.level-behind .study-pace-action span {
+  background: #FEF2F2;
+  color: #DC2626;
+}
+
+.study-pace-panel.level-ahead .study-pace-action span {
+  background: #ECFDF5;
+  color: #047857;
+}
+
+.study-pace-action .ant-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.study-pace-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.study-pace-metrics article {
+  min-width: 0;
+  padding: 11px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+}
+
+.study-pace-metrics span,
+.study-pace-metrics small {
+  display: block;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.study-pace-metrics strong {
+  display: block;
+  margin: 3px 0;
+  color: #18181B;
+  font-size: 22px;
+  line-height: 1.15;
+}
+
 .interview-brief-panel {
   display: grid;
   gap: 12px;
@@ -4503,6 +4615,7 @@ p {
   }
 
   .study-plan-metrics,
+  .study-pace-metrics,
   .review-schedule-band,
   .study-plan-grid,
   .study-question-item,
@@ -4561,6 +4674,14 @@ p {
 
   .interview-brief-head {
     display: grid;
+  }
+
+  .study-pace-main {
+    display: grid;
+  }
+
+  .study-pace-action {
+    justify-items: start;
   }
 
   .interview-mistake-heading {
