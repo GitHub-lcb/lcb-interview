@@ -5589,11 +5589,22 @@ p {
   margin: 4px 0 0 0;
 }
 
-.practice-script-answer-acceptance-next {
-  display: block;
+.practice-script-answer-acceptance-next-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
   margin-top: 8px;
+}
+
+.practice-script-answer-acceptance-next {
   color: #18181B;
   font-weight: 800;
+}
+
+.practice-script-answer-acceptance-next-row .ant-btn {
+  justify-content: center;
 }
 
 .practice-script-answer-acceptance-items {
@@ -7081,6 +7092,14 @@ p {
   }
 
   .practice-answer-readiness-next .ant-btn {
+    flex: 1 1 140px;
+  }
+
+  .practice-script-answer-acceptance-next-row {
+    align-items: stretch;
+  }
+
+  .practice-script-answer-acceptance-next-row .ant-btn {
     flex: 1 1 140px;
   }
 

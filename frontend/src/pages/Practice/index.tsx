@@ -514,6 +514,7 @@ export default function Practice() {
             question={current}
             attempts={currentAttempts}
             answer={answerDraft}
+            onUseRepairTemplate={useRepairTemplate}
           />
           <div className="practice-answer-actions">
             <Button

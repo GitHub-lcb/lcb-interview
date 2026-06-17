@@ -1,22 +1,29 @@
-import { CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
-import { Progress } from 'antd'
+import { CheckCircleOutlined, ExclamationCircleOutlined, ToolOutlined } from '@ant-design/icons'
+import { Button, Progress } from 'antd'
 import { useMemo } from 'react'
 import type { InterviewAttempt, PracticeQueueItem } from '../types'
 import { analyzePracticeScriptAnswerAcceptance } from '../utils/practiceScriptAnswerAcceptance'
+import { buildPracticeScriptAnswerRepairAction } from '../utils/practiceScriptAnswerRepairAction'
 
 interface PracticeScriptAnswerAcceptancePanelProps {
   question: PracticeQueueItem
   attempts: InterviewAttempt[]
   answer: string
+  onUseRepairTemplate?: (template: string) => void
 }
 
 export default function PracticeScriptAnswerAcceptancePanel({
   question,
   attempts,
   answer,
+  onUseRepairTemplate,
 }: PracticeScriptAnswerAcceptancePanelProps) {
   const acceptance = useMemo(
     () => analyzePracticeScriptAnswerAcceptance(question, attempts, answer),
+    [answer, attempts, question],
+  )
+  const repairAction = useMemo(
+    () => buildPracticeScriptAnswerRepairAction(question, attempts, answer),
     [answer, attempts, question],
   )
 
@@ -44,7 +51,19 @@ export default function PracticeScriptAnswerAcceptancePanel({
             {acceptance.criterionLabel && <span>{acceptance.criterionLabel}</span>}
           </div>
           <p>{acceptance.summary}</p>
-          <small className="practice-script-answer-acceptance-next">{acceptance.nextAction}</small>
+          <div className="practice-script-answer-acceptance-next-row">
+            <small className="practice-script-answer-acceptance-next">{acceptance.nextAction}</small>
+            {onUseRepairTemplate && (
+              <Button
+                size="small"
+                type="primary"
+                icon={<ToolOutlined />}
+                onClick={() => onUseRepairTemplate(repairAction.template)}
+              >
+                {repairAction.label}
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="practice-script-answer-acceptance-items">

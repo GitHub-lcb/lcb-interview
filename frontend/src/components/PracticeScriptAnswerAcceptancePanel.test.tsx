@@ -1,4 +1,5 @@
 import { cleanup, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { InterviewAttempt, InterviewCriterion, PracticeQueueItem } from '../types'
@@ -118,5 +119,25 @@ describe('PracticeScriptAnswerAcceptancePanel', () => {
     )
 
     expect(screen.getByText('补项目动作、指标或验证方式')).toBeInTheDocument()
+  })
+
+  it('passes a follow-up repair template back to the answer box', async () => {
+    const onUseRepairTemplate = vi.fn()
+    const prompt = buildPracticeInterviewerScript(question(), []).steps[0].prompt
+
+    render(
+      <PracticeScriptAnswerAcceptancePanel
+        question={question()}
+        attempts={[]}
+        answer={answerFor(prompt, '结论：HashMap 多线程不安全，因为并发扩容会有结构异常。')}
+        onUseRepairTemplate={onUseRepairTemplate}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /补项目证据/ }))
+
+    expect(onUseRepairTemplate).toHaveBeenCalledTimes(1)
+    expect(onUseRepairTemplate.mock.calls[0][0]).toContain(`追问：${prompt}`)
+    expect(onUseRepairTemplate.mock.calls[0][0]).toContain('项目证据：')
   })
 })
