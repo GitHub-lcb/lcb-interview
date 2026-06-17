@@ -49,6 +49,108 @@ export function buildStudyPaceCoach(
   }
 }
 
+/**
+ * 构建备考配速 Markdown，便于把当天节奏诊断复制到外部打卡或复盘文档。
+ *
+ * @param progress 本地学习进度
+ * @param now 当前时间，用于生成稳定日期和复习债判断
+ * @returns 可复制或下载的 Markdown 配速报告
+ */
+export function buildStudyPaceMarkdown(
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): string {
+  const coach = buildStudyPaceCoach(progress, now)
+  const targetRole = progress.targetRole.trim() || '岗位'
+
+  return [
+    `# ${targetRole} 备考配速报告`,
+    '',
+    `生成时间：${formatMarkdownDate(now)}`,
+    '',
+    renderPaceOverview(coach),
+    renderPaceMetrics(coach.metrics),
+    renderPaceActions(coach.actions),
+  ].join('\n').trimEnd()
+}
+
+function renderPaceOverview(coach: StudyPaceCoach): string {
+  return [
+    '## 配速概览',
+    `- 状态：${coach.title}`,
+    `- 等级：${labelForPaceLevel(coach.level)}`,
+    `- 今日目标：${coach.dailyQuestionTarget} 道`,
+    `- 已排计划：${coach.plannedCount} 道`,
+    `- 复习债：${coach.reviewDueCount} 道`,
+    `- 模拟样本：${coach.interviewAttemptCount} 次`,
+    `- 摘要：${coach.summary}`,
+    `- 主行动：${coach.primaryAction.label}`,
+    '',
+  ].join('\n')
+}
+
+function renderPaceMetrics(metrics: StudyPaceMetric[]): string {
+  if (metrics.length === 0) {
+    return [
+      '## 指标明细',
+      '- 暂无配速指标。先建立学习轨迹，再生成配速报告。',
+      '',
+    ].join('\n')
+  }
+
+  const lines = ['## 指标明细']
+  metrics.forEach((metric, index) => {
+    lines.push(
+      `${index + 1}. ${metric.label}`,
+      `   - 数值：${metric.value}`,
+      `   - 说明：${metric.detail}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderPaceActions(actions: StudyPaceAction[]): string {
+  if (actions.length === 0) {
+    return [
+      '## 行动队列',
+      '- 暂无行动建议。先进入题库建立轨迹。',
+    ].join('\n')
+  }
+
+  const lines = ['## 行动队列']
+  actions.forEach((action, index) => {
+    lines.push(
+      `${index + 1}. ${action.label}`,
+      `   - 说明：${action.description}`,
+      `   - 入口：${action.to}`,
+    )
+  })
+
+  return lines.join('\n')
+}
+
+function labelForPaceLevel(level: StudyPaceCoachLevel): string {
+  if (level === 'empty') {
+    return '待启动'
+  }
+  if (level === 'behind') {
+    return '需补齐'
+  }
+  if (level === 'ahead') {
+    return '超前'
+  }
+  return '稳定'
+}
+
+function formatMarkdownDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 10)
+  }
+  return date.toISOString().slice(0, 10)
+}
+
 function resolveDailyTarget(sprintDays: number): number {
   if (sprintDays <= 14) {
     return 8

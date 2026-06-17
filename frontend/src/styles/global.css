@@ -2912,7 +2912,14 @@ p {
   color: #047857;
 }
 
-.study-pace-action .ant-btn {
+.study-pace-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.study-pace-action-buttons .ant-btn {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -6161,6 +6168,10 @@ p {
 
   .study-pace-action {
     justify-items: start;
+  }
+
+  .study-pace-action-buttons {
+    justify-content: flex-start;
   }
 
   .interview-mistake-heading {

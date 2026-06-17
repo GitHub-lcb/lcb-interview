@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import type { InterviewAttempt, StudyProgress } from '../types'
 import StudyPaceCoachPanel from './StudyPaceCoachPanel'
@@ -59,6 +59,10 @@ function progressNeedsPlanFill(): StudyProgress {
 }
 
 describe('StudyPaceCoachPanel', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
@@ -87,5 +91,26 @@ describe('StudyPaceCoachPanel', () => {
     await userEvent.click(screen.getByRole('button', { name: /补齐今日计划/ }))
 
     expect(onFillPlan).toHaveBeenCalledTimes(1)
+  })
+
+  it('copies study pace markdown', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    })
+
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <StudyPaceCoachPanel progress={progressNeedsPlanFill()} onFillPlan={vi.fn()} />
+      </MemoryRouter>
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /复制配速/ }))
+
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1))
+    expect(writeText.mock.calls[0][0]).toContain('备考配速报告')
+    expect(writeText.mock.calls[0][0]).toContain('## 配速概览')
+    expect(writeText.mock.calls[0][0]).toContain('入口：/study')
   })
 })

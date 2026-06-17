@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewAttempt, StudyProgress, StudyQuestionStatus } from '../types'
-import { buildStudyPaceCoach } from './studyPaceCoach'
+import { buildStudyPaceCoach, buildStudyPaceMarkdown } from './studyPaceCoach'
 
 const NOW = '2026-06-17T00:00:00.000Z'
 
@@ -137,5 +137,32 @@ describe('buildStudyPaceCoach', () => {
 
     expect(coach.level).toBe('ahead')
     expect(coach.dailyQuestionTarget).toBe(4)
+  })
+
+  it('exports behind pace coach as portable markdown', () => {
+    const progress = emptyProgress()
+    progress.targetRole = 'Java 后端'
+    addQuestion(progress, 1)
+    addQuestion(progress, 2)
+    progress.dailyPlan = [1]
+    progress.interviewAttempts[1] = [interviewAttempt(1)]
+
+    const markdown = buildStudyPaceMarkdown(progress, NOW)
+
+    expect(markdown).toContain('# Java 后端 备考配速报告')
+    expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 配速概览')
+    expect(markdown).toContain('## 指标明细')
+    expect(markdown).toContain('## 行动队列')
+    expect(markdown).toContain('入口：/study')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps empty pace export actionable', () => {
+    const markdown = buildStudyPaceMarkdown(emptyProgress(), NOW)
+
+    expect(markdown).toContain('建立')
+    expect(markdown).toContain('入口：/banks')
+    expect(markdown).not.toContain('undefined')
   })
 })
