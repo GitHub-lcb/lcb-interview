@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Empty, InputNumber, Progress, Select } from 'antd'
+import { Button, Empty, InputNumber, message, Progress, Select } from 'antd'
 import {
   ArrowRightOutlined,
   BookOutlined,
@@ -20,6 +20,7 @@ import { getHotQuestions } from '../../api/question'
 import type { Question, ReviewDueStatus } from '../../types'
 import { buildScheduledReviewQueue, summarizeReviewSchedule } from '../../utils/reviewSchedule'
 import { buildDailyPlan, resolvePlanQuestions, summarizeProgress } from '../../utils/studyProgress'
+import { buildPaceFilledDailyPlan } from '../../utils/studyPacePlan'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
 const roleOptions = [
@@ -70,6 +71,7 @@ export default function StudyPlan() {
   const reviewSummary = useMemo(() => summarizeReviewSchedule(reviewQueue), [reviewQueue])
   const trackedCount = Object.keys(progress.questionStates).length
   const canGeneratePlan = generatedPlanIds.length > 0
+  const canFillPacePlan = hotQuestions.length > 0 || Object.keys(progress.questionSnapshots).length > 0
 
   useEffect(() => {
     let ignore = false
@@ -103,6 +105,24 @@ export default function StudyPlan() {
       return
     }
     setDailyPlan(generatedPlanIds)
+  }
+
+  const handleFillPacePlan = () => {
+    const nextPlanIds = buildPaceFilledDailyPlan(progress, hotQuestions)
+    const currentPlanKey = [...new Set(progress.dailyPlan)].join(',')
+    const nextPlanKey = nextPlanIds.join(',')
+
+    if (nextPlanIds.length === 0) {
+      message.warning('暂无可补齐的题目，先进入题库添加题目')
+      return
+    }
+    if (nextPlanKey === currentPlanKey) {
+      message.warning('暂无可补齐的新增题目，先进入题库补充题源')
+      return
+    }
+
+    setDailyPlan(nextPlanIds)
+    message.success(`已按配速补齐到 ${nextPlanIds.length} 道今日计划`)
   }
 
   return (
@@ -164,7 +184,12 @@ export default function StudyPlan() {
         </div>
       </section>
 
-      <StudyPaceCoachPanel progress={progress} />
+      <StudyPaceCoachPanel
+        progress={progress}
+        canFillPlan={canFillPacePlan}
+        isFillingPlan={isLoadingSeeds}
+        onFillPlan={handleFillPacePlan}
+      />
       <InterviewBriefPanel progress={progress} />
       <InterviewMistakeLedgerPanel progress={progress} />
 

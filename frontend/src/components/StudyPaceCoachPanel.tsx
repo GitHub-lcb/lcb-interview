@@ -7,6 +7,9 @@ import { buildStudyPaceCoach } from '../utils/studyPaceCoach'
 
 interface StudyPaceCoachPanelProps {
   progress: StudyProgress
+  canFillPlan?: boolean
+  isFillingPlan?: boolean
+  onFillPlan?: () => void
 }
 
 const levelLabels: Record<StudyPaceCoachLevel, string> = {
@@ -16,9 +19,23 @@ const levelLabels: Record<StudyPaceCoachLevel, string> = {
   ahead: '超前',
 }
 
-export default function StudyPaceCoachPanel({ progress }: StudyPaceCoachPanelProps) {
+export default function StudyPaceCoachPanel({
+  progress,
+  canFillPlan,
+  isFillingPlan,
+  onFillPlan,
+}: StudyPaceCoachPanelProps) {
   const navigate = useNavigate()
   const coach = useMemo(() => buildStudyPaceCoach(progress), [progress])
+  const shouldFillPlan = coach.primaryAction.key === 'plan' && Boolean(onFillPlan)
+
+  const handlePrimaryAction = () => {
+    if (shouldFillPlan) {
+      onFillPlan?.()
+      return
+    }
+    navigate(coach.primaryAction.to)
+  }
 
   return (
     <section className={`study-pace-panel level-${coach.level}`} aria-label="备考配速教练">
@@ -33,7 +50,13 @@ export default function StudyPaceCoachPanel({ progress }: StudyPaceCoachPanelPro
         </div>
         <div className="study-pace-action">
           <span>{levelLabels[coach.level]}</span>
-          <Button type="primary" icon={<ThunderboltOutlined />} onClick={() => navigate(coach.primaryAction.to)}>
+          <Button
+            type="primary"
+            icon={<ThunderboltOutlined />}
+            disabled={shouldFillPlan && canFillPlan === false}
+            loading={shouldFillPlan && isFillingPlan}
+            onClick={handlePrimaryAction}
+          >
             {coach.primaryAction.label}
             <ArrowRightOutlined />
           </Button>
