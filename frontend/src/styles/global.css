@@ -2928,6 +2928,199 @@ p {
   line-height: 1.15;
 }
 
+.daily-plan-brief-panel {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  margin-bottom: 18px;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #059669;
+}
+
+.daily-plan-brief-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.daily-plan-brief-head h2 {
+  margin: 0;
+  color: #18181B;
+  font-size: 24px;
+}
+
+.daily-plan-brief-head p {
+  max-width: 780px;
+  margin: 6px 0 0 0;
+  color: #52525B;
+}
+
+.daily-plan-brief-head > span {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  min-height: 26px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: #ECFDF5;
+  color: #047857;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.daily-plan-brief-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.daily-plan-brief-metrics article {
+  min-width: 0;
+  padding: 11px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+}
+
+.daily-plan-brief-metrics span,
+.daily-plan-brief-metrics small {
+  display: block;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.daily-plan-brief-metrics strong {
+  display: block;
+  margin: 3px 0;
+  color: #18181B;
+  font-size: 22px;
+  line-height: 1.15;
+}
+
+.daily-plan-brief-list {
+  display: grid;
+  gap: 8px;
+}
+
+.daily-plan-brief-list button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 16px;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  padding: 11px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  box-shadow: inset 3px 0 0 #94A3B8;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.daily-plan-brief-list button:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+}
+
+.daily-plan-brief-list button.source-review-debt {
+  box-shadow: inset 3px 0 0 #DC2626;
+}
+
+.daily-plan-brief-list button.source-weak {
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.daily-plan-brief-list button.source-learning {
+  box-shadow: inset 3px 0 0 #2563EB;
+}
+
+.daily-plan-brief-list button.source-new {
+  box-shadow: inset 3px 0 0 #059669;
+}
+
+.daily-plan-brief-list button > div {
+  min-width: 0;
+}
+
+.daily-plan-brief-list span {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  margin-bottom: 5px;
+  padding: 0 7px;
+  border-radius: 6px;
+  background: #F4F4F5;
+  color: #52525B;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.daily-plan-brief-list strong,
+.daily-plan-brief-list small {
+  display: block;
+  min-width: 0;
+}
+
+.daily-plan-brief-list strong {
+  overflow: hidden;
+  color: #18181B;
+  font-size: 15px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.daily-plan-brief-list small {
+  margin-top: 3px;
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.daily-plan-brief-list em {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 82px;
+  height: 28px;
+  padding: 0 9px;
+  border-radius: 6px;
+  background: #EFF6FF;
+  color: #1D4ED8;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.daily-plan-brief-list svg {
+  color: #A1A1AA;
+}
+
+.daily-plan-brief-empty {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 54px;
+  padding: 11px;
+  background: #FAFAF9;
+  border: 1px dashed #D4D4D8;
+  border-radius: 8px;
+  color: #64748B;
+}
+
+.daily-plan-brief-empty p {
+  margin: 0;
+}
+
 .interview-brief-panel {
   display: grid;
   gap: 12px;
@@ -4616,6 +4809,7 @@ p {
 
   .study-plan-metrics,
   .study-pace-metrics,
+  .daily-plan-brief-metrics,
   .review-schedule-band,
   .study-plan-grid,
   .study-question-item,
@@ -4633,6 +4827,22 @@ p {
   .hot-question-row {
     align-items: flex-start;
     padding: 12px 4px;
+  }
+
+  .daily-plan-brief-head {
+    display: grid;
+  }
+
+  .daily-plan-brief-head > span {
+    justify-self: start;
+  }
+
+  .daily-plan-brief-list button {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .daily-plan-brief-list em {
+    justify-self: start;
   }
 }
 

@@ -15,6 +15,7 @@ import InterviewMistakeLedgerPanel from '../../components/InterviewMistakeLedger
 import SprintReportActions from '../../components/SprintReportActions'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import StudyPaceCoachPanel from '../../components/StudyPaceCoachPanel'
+import DailyPlanBriefPanel from '../../components/DailyPlanBriefPanel'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { getHotQuestions } from '../../api/question'
 import type { Question, ReviewDueStatus } from '../../types'
@@ -190,6 +191,7 @@ export default function StudyPlan() {
         isFillingPlan={isLoadingSeeds}
         onFillPlan={handleFillPacePlan}
       />
+      <DailyPlanBriefPanel progress={progress} candidates={hotQuestions} />
       <InterviewBriefPanel progress={progress} />
       <InterviewMistakeLedgerPanel progress={progress} />
 

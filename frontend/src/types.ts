@@ -386,6 +386,41 @@ export interface ReviewScheduleSummary {
   nextReviewAt?: string
 }
 
+export type DailyPlanBriefItemSource = 'review-debt' | 'weak' | 'learning' | 'new' | 'mastered'
+
+export interface DailyPlanBriefMetric {
+  key: 'total' | 'reviewDebt' | 'weak' | 'new'
+  label: string
+  value: string
+  detail: string
+}
+
+export interface DailyPlanBriefItem {
+  id: string
+  questionId: number
+  title: string
+  categoryName: string
+  status: StudyQuestionStatus
+  source: DailyPlanBriefItemSource
+  sourceLabel: string
+  reason: string
+  actionLabel: string
+  to: string
+  priority: number
+  dueStatus?: ReviewDueStatus
+}
+
+export interface DailyPlanBrief {
+  title: string
+  summary: string
+  totalCount: number
+  reviewDebtCount: number
+  weakCount: number
+  newCount: number
+  metrics: DailyPlanBriefMetric[]
+  items: DailyPlanBriefItem[]
+}
+
 export type PracticeQueueSource = 'review' | 'plan' | 'page' | 'new'
 
 export interface PracticeQueueItem extends QuestionSnapshot {
