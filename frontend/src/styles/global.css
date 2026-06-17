@@ -3764,6 +3764,14 @@ p {
   color: #52525B;
 }
 
+.interview-brief-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .interview-brief-head .ant-btn {
   display: inline-flex;
   align-items: center;
@@ -6108,6 +6116,10 @@ p {
 
   .interview-brief-head {
     display: grid;
+  }
+
+  .interview-brief-head-actions {
+    justify-content: flex-start;
   }
 
   .study-pace-main {

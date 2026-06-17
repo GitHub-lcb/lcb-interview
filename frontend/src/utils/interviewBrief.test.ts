@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewAttempt, StudyProgress } from '../types'
 import type { PrepRoute } from '../data/freeSuperiority'
-import { buildInterviewBrief } from './interviewBrief'
+import { buildInterviewBrief, buildInterviewBriefMarkdown } from './interviewBrief'
 
 const NOW = '2026-06-17T00:00:00.000Z'
 
@@ -140,5 +140,33 @@ describe('buildInterviewBrief', () => {
     expect(brief.risks.some(item => item.description.includes('回落'))).toBe(true)
     expect(brief.primaryAction.to).toBe('/practice')
   })
-})
 
+  it('exports risky interview brief as portable markdown', () => {
+    const progress = emptyProgress()
+    addQuestion(progress, 1, 'weak', 'Java 并发', '2026-06-13T00:00:00.000Z')
+    addQuestion(progress, 2, 'mastered', 'MySQL')
+    progress.dailyPlan = [1, 2]
+
+    const markdown = buildInterviewBriefMarkdown(routes, progress, NOW)
+
+    expect(markdown).toContain('# Java 后端工程师 面试前冲刺简报')
+    expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 简报概览')
+    expect(markdown).toContain('面试前先控风险')
+    expect(markdown).toContain('## 可主动表达')
+    expect(markdown).toContain('## 必须规避')
+    expect(markdown).toContain('## 开口热身')
+    expect(markdown).toContain('复习逾期会拖累临场稳定性')
+    expect(markdown).toContain('入口：/study')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps empty interview brief export actionable', () => {
+    const markdown = buildInterviewBriefMarkdown(routes, emptyProgress(), NOW)
+
+    expect(markdown).toContain('面试简报待生成')
+    expect(markdown).toContain('还没有学习轨迹')
+    expect(markdown).toContain('进入题库')
+    expect(markdown).not.toContain('undefined')
+  })
+})

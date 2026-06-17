@@ -52,6 +52,74 @@ export function buildInterviewBrief(
   }
 }
 
+/**
+ * 构建面试前冲刺简报 Markdown，便于用户复制每日备考重点。
+ *
+ * @param routes 免费备考路线
+ * @param progress 本地学习进度
+ * @param now 当前时间，用于生成稳定日期和复用复习排期判断
+ * @returns 可携带的 Markdown 冲刺简报
+ */
+export function buildInterviewBriefMarkdown(
+  routes: PrepRoute[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): string {
+  const brief = buildInterviewBrief(routes, progress, now)
+
+  return [
+    `# ${progress.targetRole} 面试前冲刺简报`,
+    '',
+    `生成时间：${formatMarkdownDate(now)}`,
+    '',
+    renderBriefOverview(brief),
+    renderBriefSection('可主动表达', brief.strengths, '掌握题会自动沉淀为面试优势。'),
+    renderBriefSection('必须规避', brief.risks, '当前没有显著风险，保持节奏即可。'),
+    renderBriefSection('开口热身', brief.warmups, '加入计划或复习队列后会生成热身题。'),
+  ].join('\n').trimEnd()
+}
+
+function renderBriefOverview(brief: InterviewBriefReport): string {
+  return [
+    '## 简报概览',
+    `- 状态：${brief.title}`,
+    `- 摘要：${brief.summary}`,
+    `- 下一步：${brief.primaryAction.label}，${brief.primaryAction.to}`,
+    `- 说明：${brief.primaryAction.description}`,
+    '',
+  ].join('\n')
+}
+
+function renderBriefSection(title: string, items: InterviewBriefItem[], emptyText: string): string {
+  if (items.length === 0) {
+    return [
+      `## ${title}`,
+      `- ${emptyText}`,
+      '',
+    ].join('\n')
+  }
+
+  const lines = [`## ${title}`]
+  items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.title}`,
+      `   - 指标：${item.metric}`,
+      `   - 说明：${item.description}`,
+      `   - 入口：${item.to ?? '无'}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function formatMarkdownDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 10)
+  }
+  return date.toISOString().slice(0, 10)
+}
+
 function buildCategoryBuckets(progress: StudyProgress): CategoryBucket[] {
   const buckets = new Map<string, CategoryBucket>()
 
