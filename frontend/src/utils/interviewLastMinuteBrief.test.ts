@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewAttempt, InterviewCriterionKey, StudyProgress, StudyQuestionStatus } from '../types'
 import { createDefaultProgress } from './studyProgress'
-import { buildInterviewLastMinuteBrief } from './interviewLastMinuteBrief'
+import { buildInterviewLastMinuteBrief, buildInterviewLastMinuteBriefMarkdown } from './interviewLastMinuteBrief'
 
 const NOW = '2026-06-17T09:00:00.000Z'
 
@@ -115,5 +115,33 @@ describe('buildInterviewLastMinuteBrief', () => {
     expect(brief.confidenceScore).toBeGreaterThanOrEqual(80)
     expect(brief.items.some(item => item.kind === 'talk-track')).toBe(true)
     expect(brief.items.some(item => item.kind === 'closing')).toBe(true)
+  })
+
+  it('exports risky last-minute brief as portable markdown', () => {
+    const target = progress()
+    addQuestion(target, 1, 'weak', '2026-06-13T09:00:00.000Z')
+    addQuestion(target, 2, 'mastered', NOW)
+    target.dailyPlan = [1, 2]
+    target.interviewAttempts[2] = [attempt(2, { risk: 40 })]
+
+    const markdown = buildInterviewLastMinuteBriefMarkdown(target, NOW)
+
+    expect(markdown).toContain('# Java 后端 最后 24 小时面试简报')
+    expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 简报概览')
+    expect(markdown).toContain('最后 24 小时先压临场风险')
+    expect(markdown).toContain('## 进场动作')
+    expect(markdown).toContain('1 道复习债面试前必须回看')
+    expect(markdown).toContain('入口：/practice?queue=1')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps empty last-minute brief export actionable', () => {
+    const markdown = buildInterviewLastMinuteBriefMarkdown(progress(), NOW)
+
+    expect(markdown).toContain('先生成第一份进场简报')
+    expect(markdown).toContain('先建立一题真实开口样本')
+    expect(markdown).toContain('先做一题模拟')
+    expect(markdown).not.toContain('undefined')
   })
 })

@@ -1,12 +1,15 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import type { InterviewAttempt, StudyProgress } from '../types'
 import { createDefaultProgress } from '../utils/studyProgress'
 import InterviewLastMinuteBriefPanel from './InterviewLastMinuteBriefPanel'
 
 const NOW = '2026-06-17T09:00:00.000Z'
+
+afterEach(() => cleanup())
 
 function attempt(questionId: number): InterviewAttempt {
   return {
@@ -87,5 +90,25 @@ describe('InterviewLastMinuteBriefPanel', () => {
     expect(screen.getAllByRole('button', { name: /先复盘高风险题/ }).length).toBeGreaterThan(0)
     expect(screen.getByText('1 道复习债面试前必须回看')).toBeInTheDocument()
     expect(screen.getByText(/不要再让风险意识失分/)).toBeInTheDocument()
+  })
+
+  it('copies last-minute brief markdown', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    })
+
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <InterviewLastMinuteBriefPanel progress={riskyProgress()} now={NOW} />
+      </MemoryRouter>
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /复制简报/ }))
+
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1))
+    expect(writeText.mock.calls[0][0]).toContain('# Java 后端 最后 24 小时面试简报')
+    expect(writeText.mock.calls[0][0]).toContain('1 道复习债面试前必须回看')
   })
 })

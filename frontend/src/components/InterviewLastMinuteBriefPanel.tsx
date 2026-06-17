@@ -1,9 +1,9 @@
-import { ArrowRightOutlined, FlagOutlined, ProfileOutlined } from '@ant-design/icons'
-import { Button } from 'antd'
+import { ArrowRightOutlined, CopyOutlined, FlagOutlined, ProfileOutlined } from '@ant-design/icons'
+import { Button, message } from 'antd'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { StudyProgress } from '../types'
-import { buildInterviewLastMinuteBrief } from '../utils/interviewLastMinuteBrief'
+import { buildInterviewLastMinuteBrief, buildInterviewLastMinuteBriefMarkdown } from '../utils/interviewLastMinuteBrief'
 
 interface InterviewLastMinuteBriefPanelProps {
   progress: StudyProgress
@@ -19,6 +19,19 @@ export default function InterviewLastMinuteBriefPanel({
     () => buildInterviewLastMinuteBrief(progress, now),
     [now, progress],
   )
+
+  const handleCopyBrief = async () => {
+    const markdown = buildInterviewLastMinuteBriefMarkdown(progress, now)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('面试简报已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 简报')
+  }
 
   return (
     <section className={`interview-last-minute-brief-panel level-${brief.level}`} aria-label="最后 24 小时面试简报">
@@ -49,6 +62,9 @@ export default function InterviewLastMinuteBriefPanel({
         </div>
 
         <div className="interview-last-minute-brief-action">
+          <Button size="small" icon={<CopyOutlined />} onClick={handleCopyBrief}>
+            复制简报
+          </Button>
           <Button type="primary" icon={<FlagOutlined />} onClick={() => navigate(brief.primaryAction.to)}>
             {brief.primaryAction.label}
             <ArrowRightOutlined />
@@ -74,4 +90,32 @@ export default function InterviewLastMinuteBriefPanel({
       </div>
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+function buildFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '岗位'}-最后24小时面试简报.md`
 }

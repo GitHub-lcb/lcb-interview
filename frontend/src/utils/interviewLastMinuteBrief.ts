@@ -15,6 +15,14 @@ import { buildScheduledReviewQueue } from './reviewSchedule'
 
 const MAX_ITEMS = 5
 
+const ITEM_KIND_LABELS: Record<InterviewLastMinuteBriefItem['kind'], string> = {
+  'must-review': '必看复习',
+  'talk-track': '进场主线',
+  avoid: '失分禁忌',
+  closing: '收尾话术',
+  sample: '模拟样本',
+}
+
 /**
  * 最后 24 小时面试简报，把本地学习轨迹压缩成进场前可执行的一页清单。
  *
@@ -102,6 +110,77 @@ export function buildInterviewLastMinuteBrief(
     primaryAction: actionFromItem(items[0]),
   }
 }
+
+/**
+ * 构建最后 24 小时面试简报 Markdown，便于用户复制到面试前笔记。
+ *
+ * @param progress 本地学习进度
+ * @param now 当前时间，用于生成稳定日期和复用简报判断
+ * @returns 可携带的 Markdown 进场简报
+ */
+export function buildInterviewLastMinuteBriefMarkdown(
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): string {
+  const brief = buildInterviewLastMinuteBrief(progress, now)
+
+  return [
+    `# ${progress.targetRole} 最后 24 小时面试简报`,
+    '',
+    `生成时间：${formatMarkdownDate(now)}`,
+    '',
+    renderLastMinuteOverview(brief),
+    renderLastMinuteMetrics(brief.metrics),
+    renderLastMinuteItems(brief.items),
+  ].join('\n').trimEnd()
+}
+
+function renderLastMinuteOverview(brief: InterviewLastMinuteBrief): string {
+  return [
+    '## 简报概览',
+    `- 状态：${brief.title}`,
+    `- 摘要：${brief.summary}`,
+    `- 进场信心：${brief.confidenceScore} 分`,
+    `- 下一步：${brief.primaryAction.label}，${brief.primaryAction.to}`,
+    `- 说明：${brief.primaryAction.description}`,
+    '',
+  ].join('\n')
+}
+
+function renderLastMinuteMetrics(metrics: InterviewLastMinuteBriefMetric[]): string {
+  return [
+    '## 指标',
+    ...metrics.map(metric => `- ${metric.label}：${metric.value}，${metric.detail}`),
+    '',
+  ].join('\n')
+}
+
+function renderLastMinuteItems(items: InterviewLastMinuteBriefItem[]): string {
+  const lines = ['## 进场动作']
+
+  items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.title}`,
+      `   - 类型：${ITEM_KIND_LABELS[item.kind]}`,
+      `   - 动作：${item.actionLabel}`,
+      `   - 说明：${item.detail}`,
+      `   - 证据：${item.evidence}`,
+      `   - 题目：${item.questionIds.length > 0 ? item.questionIds.join('、') : '按入口开始'}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function formatMarkdownDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 10)
+  }
+  return date.toISOString().slice(0, 10)
+}
+
 function buildAvoidItem(
   progress: StudyProgress,
   criterionKey?: InterviewCriterionKey,
