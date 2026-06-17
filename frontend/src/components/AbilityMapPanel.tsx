@@ -1,11 +1,11 @@
-import { Button, Progress } from 'antd'
-import { ArrowRightOutlined, RadarChartOutlined } from '@ant-design/icons'
+import { Button, message, Progress } from 'antd'
+import { ArrowRightOutlined, CopyOutlined, RadarChartOutlined } from '@ant-design/icons'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { prepRoutes } from '../data/freeSuperiority'
 import { useStudyProgress } from '../hooks/useStudyProgress'
 import type { AbilityMapItem, AbilityReadinessLevel } from '../types'
-import { buildAbilityMap } from '../utils/abilityMap'
+import { buildAbilityMap, buildAbilityMapMarkdown } from '../utils/abilityMap'
 
 const levelLabels: Record<AbilityReadinessLevel, string> = {
   empty: '待建立',
@@ -32,6 +32,19 @@ export default function AbilityMapPanel() {
   const { progress } = useStudyProgress()
   const abilityItems = useMemo(() => buildAbilityMap(prepRoutes, progress), [progress])
 
+  const handleCopyAbilityMap = async () => {
+    const markdown = buildAbilityMapMarkdown(prepRoutes, progress)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('岗位能力地图已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 能力地图')
+  }
+
   const startAbilityPractice = (item: AbilityMapItem) => {
     if (item.nextQuestionIds.length === 0) {
       navigate('/routes')
@@ -48,7 +61,12 @@ export default function AbilityMapPanel() {
           <h2>按目标岗位看准备度</h2>
           <p>系统只用你已经浏览和训练过的本地记录生成画像，不拉全量题库，也不需要登录。</p>
         </div>
-        <RadarChartOutlined />
+        <div className="ability-map-heading-actions">
+          <RadarChartOutlined />
+          <Button size="small" icon={<CopyOutlined />} onClick={handleCopyAbilityMap}>
+            复制地图
+          </Button>
+        </div>
       </div>
 
       <div className="ability-map-grid">
@@ -103,4 +121,34 @@ export default function AbilityMapPanel() {
       </div>
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
+function buildFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '岗位'}-岗位能力地图.md`
 }

@@ -1624,7 +1624,14 @@ p {
   color: #52525B;
 }
 
-.ability-map-heading > svg {
+.ability-map-heading-actions {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.ability-map-heading-actions > svg {
   color: #7C3AED;
   font-size: 24px;
 }
@@ -6194,6 +6201,10 @@ p {
 
   .ability-map-heading {
     display: grid;
+  }
+
+  .ability-map-heading-actions {
+    justify-items: start;
   }
 
   .study-hero,

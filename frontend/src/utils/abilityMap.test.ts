@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { PrepRoute } from '../data/freeSuperiority'
 import type { StudyProgress } from '../types'
 import { createDefaultProgress } from './studyProgress'
-import { buildAbilityMap } from './abilityMap'
+import { buildAbilityMap, buildAbilityMapMarkdown } from './abilityMap'
 
 const routes: PrepRoute[] = [
   {
@@ -82,5 +82,30 @@ describe('abilityMap', () => {
     const items = buildAbilityMap(routes, progressWithSnapshots())
 
     expect(items.map(item => item.routeId)).toEqual(['java-backend', 'ai'])
+  })
+
+  it('exports ability map as portable markdown', () => {
+    const progress = {
+      ...progressWithSnapshots(),
+      targetRole: 'Java 后端',
+    }
+
+    const markdown = buildAbilityMapMarkdown(routes, progress, '2026-06-18T09:00:00.000Z')
+
+    expect(markdown).toContain('# Java 后端 岗位能力地图')
+    expect(markdown).toContain('生成时间：2026-06-18')
+    expect(markdown).toContain('## 总览')
+    expect(markdown).toContain('## 岗位画像')
+    expect(markdown).toContain('准备度：')
+    expect(markdown).toContain('入口：/practice?queue=2')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps empty ability map export actionable', () => {
+    const markdown = buildAbilityMapMarkdown(routes, createDefaultProgress(), '2026-06-18T09:00:00.000Z')
+
+    expect(markdown).toContain('待建立')
+    expect(markdown).toContain('入口：/routes')
+    expect(markdown).not.toContain('undefined')
   })
 })
