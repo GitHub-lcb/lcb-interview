@@ -167,6 +167,9 @@ describe('buildPracticeSessionReport', () => {
       NOW,
     )
 
+    expect(markdown).toContain('## 下一轮训练建议')
+    expect(markdown).toContain('开始下一轮训练')
+    expect(markdown).toContain('入口：/practice?queue=')
     expect(markdown).toContain('# Java 后端 本轮模拟面试战报')
     expect(markdown).toContain('生成时间：2026-06-17')
     expect(markdown).toContain('## 本轮摘要')
@@ -201,6 +204,8 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('先选择一组面试题')
     expect(markdown).toContain('当前还没有练习队列')
     expect(markdown).toContain('暂无队列画像')
+    expect(markdown).toContain('## 下一轮训练建议')
+    expect(markdown).toContain('先做一次模拟面试')
     expect(markdown).toContain('暂无题目')
     expect(markdown).not.toContain('undefined')
   })

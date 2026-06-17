@@ -77,13 +77,16 @@ describe('PracticeSessionReportPanel', () => {
       />
     )
 
+    expect(screen.getByText('下一轮训练')).toBeInTheDocument()
+    expect(screen.getByText('Java 面试题 1')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /开始下一轮训练/ })).toBeInTheDocument()
     expect(screen.getByText('本轮模拟面试战报')).toBeInTheDocument()
     expect(screen.getByText('本轮正在推进')).toBeInTheDocument()
     expect(screen.getByText('1 / 2')).toBeInTheDocument()
     expect(screen.getByText('76 分')).toBeInTheDocument()
     expect(screen.getByText('队列画像')).toBeInTheDocument()
     expect(screen.getByText('今日计划 2 道')).toBeInTheDocument()
-    expect(screen.getByText('Java 面试题 2')).toBeInTheDocument()
+    expect(screen.getAllByText('Java 面试题 2').length).toBeGreaterThan(0)
 
     await userEvent.click(screen.getByRole('button', { name: /复制战报/ }))
 
@@ -93,6 +96,10 @@ describe('PracticeSessionReportPanel', () => {
     await userEvent.click(screen.getByRole('button', { name: /进入队列/ }))
 
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+
+    await userEvent.click(screen.getByRole('button', { name: /开始下一轮训练/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith(expect.stringContaining('/practice?queue='))
 
     await userEvent.click(screen.getByRole('button', { name: /继续未答题/ }))
 
@@ -134,7 +141,7 @@ describe('PracticeSessionReportPanel', () => {
     )
 
     expect(screen.getByText('本轮补弱动作')).toBeInTheDocument()
-    expect(screen.getByText(/Java 面试题 1/)).toBeInTheDocument()
+    expect(screen.getAllByText(/Java 面试题 1/).length).toBeGreaterThan(0)
     expect(screen.getAllByText(/结构化/).length).toBeGreaterThan(0)
     expect(screen.getByText(/先按/)).toBeInTheDocument()
 

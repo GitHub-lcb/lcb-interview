@@ -2,6 +2,7 @@ import type {
   InterviewAttempt,
   InterviewCriterion,
   InterviewCriterionKey,
+  NextTrainingQueue,
   PracticeQueueItem,
   PracticeSessionReport,
   PracticeSessionReportAction,
@@ -9,8 +10,10 @@ import type {
   PracticeSessionReportMetric,
   PracticeSessionQueueProfile,
   PracticeSessionRepairAction,
+  QuestionSnapshot,
   StudyProgress,
 } from '../types'
+import { buildNextTrainingQueue, formatNextTrainingQueueItemMeta } from './nextTrainingQueue'
 
 const PASSING_SCORE = 70
 const STRONG_SESSION_SCORE = 80
@@ -122,10 +125,20 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionSummary(report),
     renderSessionMetrics(report.metrics),
     renderSessionQueueProfile(report.queueProfile),
+    renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
     renderSessionAction(report.primaryAction),
   ].join('\n')
+}
+
+export function buildPracticeSessionNextTrainingQueue(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+  limit = 5,
+): NextTrainingQueue {
+  return buildNextTrainingQueue(buildPracticeSessionProgressContext(queue, progress), now, limit)
 }
 
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
@@ -185,6 +198,43 @@ function renderSessionQueueProfile(profile: PracticeSessionQueueProfile): string
     `- 队列入口：${profile.queuePath}`,
     '',
   ].join('\n')
+}
+
+function renderSessionNextTraining(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const nextQueue = buildPracticeSessionNextTrainingQueue(queue, progress, now, 5)
+  const lines = [
+    '## 下一轮训练建议',
+    `- 状态：${nextQueue.title}`,
+    `- 摘要：${nextQueue.summary}`,
+    `- 下一步：${nextQueue.primaryAction.label}`,
+    `- 说明：${nextQueue.primaryAction.description}`,
+    `- 入口：${nextQueue.primaryAction.to}`,
+    '',
+  ]
+
+  if (nextQueue.items.length === 0) {
+    return [
+      ...lines,
+      '- 暂无下一轮训练题。先做一次模拟面试或生成今日计划后，系统会自动排下一轮。',
+      '',
+    ].join('\n')
+  }
+
+  nextQueue.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.title}`,
+      `   - 来源：${formatNextTrainingQueueItemMeta(item)}`,
+      `   - 原因：${item.reason}`,
+      `   - 行动：${item.actionLabel}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
 }
 
 function renderSessionRepairActions(actions: PracticeSessionRepairAction[]): string {
@@ -491,6 +541,51 @@ function buildQueueProfile(
     unansweredQuestionIds,
     weakQuestionIds,
     queuePath: buildQueuePath(queue.map(item => item.id)),
+  }
+}
+
+function buildPracticeSessionProgressContext(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): StudyProgress {
+  if (queue.length === 0) {
+    return progress
+  }
+
+  const sessionQuestionIds = queue
+    .map(item => item.id)
+    .filter(questionId => Number.isFinite(questionId) && questionId > 0)
+
+  // 本轮练习队列可能来自 URL 临时参数，未必已经写入今日计划；这里仅在生成战报时补齐上下文，
+  // 让下一轮训练能使用本轮评分和题目信息，不修改用户真实的本地进度。
+  const questionSnapshots = { ...progress.questionSnapshots }
+  const questionStates = { ...progress.questionStates }
+
+  for (const item of queue) {
+    questionSnapshots[item.id] = questionSnapshots[item.id] ?? snapshotFromQueueItem(item)
+    questionStates[item.id] = questionStates[item.id] ?? {
+      status: item.status,
+      addedToPlan: item.source === 'plan',
+      reviewCount: 0,
+    }
+  }
+
+  return {
+    ...progress,
+    dailyPlan: [...new Set([...progress.dailyPlan, ...sessionQuestionIds])],
+    questionSnapshots,
+    questionStates,
+  }
+}
+
+function snapshotFromQueueItem(item: PracticeQueueItem): QuestionSnapshot {
+  return {
+    id: item.id,
+    title: item.title,
+    difficulty: item.difficulty,
+    categoryName: item.categoryName,
+    tags: item.tags,
+    viewCount: item.viewCount,
   }
 }
 

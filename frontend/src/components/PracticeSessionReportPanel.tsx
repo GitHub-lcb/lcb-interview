@@ -15,7 +15,12 @@ import type {
   PracticeSessionRepairAction,
   StudyProgress,
 } from '../types'
-import { buildPracticeSessionReport, buildPracticeSessionReportMarkdown } from '../utils/practiceSessionReport'
+import { formatNextTrainingQueueItemMeta } from '../utils/nextTrainingQueue'
+import {
+  buildPracticeSessionNextTrainingQueue,
+  buildPracticeSessionReport,
+  buildPracticeSessionReportMarkdown,
+} from '../utils/practiceSessionReport'
 
 interface PracticeSessionReportPanelProps {
   queue: PracticeQueueItem[]
@@ -46,6 +51,10 @@ export default function PracticeSessionReportPanel({
 }: PracticeSessionReportPanelProps) {
   const report = useMemo(
     () => buildPracticeSessionReport(queue, progress),
+    [progress, queue],
+  )
+  const nextTrainingQueue = useMemo(
+    () => buildPracticeSessionNextTrainingQueue(queue, progress, progress.updatedAt, 3),
     [progress, queue],
   )
 
@@ -132,6 +141,36 @@ export default function PracticeSessionReportPanel({
         <Button size="small" icon={<ArrowRightOutlined />} onClick={() => onNavigate(report.queueProfile.queuePath)}>
           进入队列
         </Button>
+      </div>
+
+      <div className="practice-session-report-next-training" aria-label="下一轮训练">
+        <div className="practice-session-report-next-training-head">
+          <div>
+            <span>下一轮训练</span>
+            <small>{nextTrainingQueue.summary}</small>
+          </div>
+          <Button
+            size="small"
+            type="primary"
+            icon={<PlayCircleOutlined />}
+            onClick={() => onNavigate(nextTrainingQueue.primaryAction.to)}
+          >
+            {nextTrainingQueue.primaryAction.label}
+          </Button>
+        </div>
+        {nextTrainingQueue.items.length === 0 ? (
+          <p>暂无下一轮训练题。先做一次模拟面试或生成今日计划后，系统会自动排下一轮。</p>
+        ) : (
+          <div className="practice-session-report-next-training-list">
+            {nextTrainingQueue.items.map(item => (
+              <button key={item.id} type="button" onClick={() => onNavigate(item.to)}>
+                <strong>{item.title}</strong>
+                <span>{formatNextTrainingQueueItemMeta(item)}</span>
+                <small>{item.reason}</small>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {report.repairActions.length > 0 && (
