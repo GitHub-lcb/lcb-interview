@@ -6,6 +6,7 @@ import type {
   InterviewLastMinuteBrief,
   InterviewBriefItem,
   InterviewBriefReport,
+  InterviewMaterialVault,
   InterviewMistakeLedger,
   InterviewRecoveryPlan,
   PrepHealthDimension,
@@ -17,6 +18,7 @@ import { buildDailyPlanCompletion } from './dailyPlanCompletion'
 import { buildInterviewBrief } from './interviewBrief'
 import { buildInterviewEmergencyKit } from './interviewEmergencyKit'
 import { buildInterviewLastMinuteBrief } from './interviewLastMinuteBrief'
+import { buildInterviewMaterialVault } from './interviewMaterialVault'
 import { buildInterviewMistakeLedger } from './interviewMistakeLedger'
 import { buildInterviewRecoveryPlan } from './interviewRecoveryPlan'
 import { buildPrepHealthReport } from './prepHealth'
@@ -40,6 +42,7 @@ export function buildSprintReportMarkdown(
   const recoveryPlan = buildInterviewRecoveryPlan(mistakeLedger)
   const emergencyKit = buildInterviewEmergencyKit(progress, now)
   const lastMinuteBrief = buildInterviewLastMinuteBrief(progress, now)
+  const materialVault = buildInterviewMaterialVault(progress)
   const generatedDate = formatDate(now)
 
   return [
@@ -51,6 +54,7 @@ export function buildSprintReportMarkdown(
     renderExecutiveSummarySection(health, completion, mistakeLedger, recoveryPlan),
     renderEmergencyKitSection(emergencyKit),
     renderLastMinuteBriefSection(lastMinuteBrief),
+    renderMaterialVaultSection(materialVault),
     renderHealthSection(health),
     renderDimensionsSection(health.dimensions),
     renderDailyCompletionSection(completion),
@@ -60,7 +64,7 @@ export function buildSprintReportMarkdown(
     renderBriefSection('开口热身题', brief.warmups),
     renderMistakeLedgerSection(mistakeLedger),
     renderRecoveryPlanSection(recoveryPlan),
-    renderActionSection(health, brief, completion, recoveryPlan),
+    renderActionSection(health, brief, completion, recoveryPlan, materialVault),
   ].join('\n')
 }
 
@@ -128,6 +132,25 @@ function renderLastMinuteBriefSection(brief: InterviewLastMinuteBrief): string {
     `- 进场信心：${brief.confidenceScore} 分`,
     ...brief.metrics.map(metric => `- ${metric.label}：${metric.value}，${metric.detail}`),
     ...itemLines,
+    '',
+  ].join('\n')
+}
+
+function renderMaterialVaultSection(vault: InterviewMaterialVault): string {
+  const snippetLines = vault.snippets.length > 0
+    ? vault.snippets.slice(0, 6).map(snippet => (
+      `- ${snippet.label}：${snippet.title}（${snippet.score} 分）${snippet.content}；${snippet.reason}（${snippet.to}）`
+    ))
+    : [
+      `- 暂无高分素材，${vault.primaryAction.label}：${vault.primaryAction.description}（${vault.primaryAction.to}）`,
+    ]
+
+  return [
+    '## 高分表达素材库',
+    `- 状态：${vault.title}`,
+    `- 摘要：${vault.summary}`,
+    ...vault.metrics.map(metric => `- ${metric.label}：${metric.value}，${metric.detail}`),
+    ...snippetLines,
     '',
   ].join('\n')
 }
@@ -239,14 +262,16 @@ function renderActionSection(
   brief: InterviewBriefReport,
   completion: DailyPlanCompletion,
   recoveryPlan: InterviewRecoveryPlan,
+  materialVault: InterviewMaterialVault,
 ): string {
-  // 报告被复制到外部文档后仍要能指导下一步，所以保留健康、表达、今日闭环和错题恢复行动线。
+  // 报告被复制到外部文档后仍要能指导下一步，所以保留健康、表达、今日闭环、错题恢复和高分素材行动线。
   return [
     '## 下一步行动',
     `- 健康雷达：${health.primaryAction.label} - ${health.primaryAction.description}（${health.primaryAction.to}）`,
     `- 面试简报：${brief.primaryAction.label} - ${brief.primaryAction.description}（${brief.primaryAction.to}）`,
     `- 今日闭环：${completion.primaryAction.label} - ${completion.primaryAction.description}（${completion.primaryAction.to}）`,
     `- 错题恢复：${recoveryPlan.primaryAction.label} - ${recoveryPlan.primaryAction.description}（${recoveryPlan.primaryAction.to || '/practice'}）`,
+    `- 高分素材：${materialVault.primaryAction.label} - ${materialVault.primaryAction.description}（${materialVault.primaryAction.to}）`,
     '',
   ].join('\n')
 }

@@ -56,7 +56,7 @@ function addQuestion(
 function interviewAttempt(questionId: number, score: number): InterviewAttempt {
   return {
     questionId,
-    answer: '围绕原理、场景、风险和落地方案说明。',
+    answer: '项目场景是订单高峰期并发扣库存，我们先做限流削峰，再用监控和补偿任务兜底。',
     createdAt: NOW,
     feedback: {
       score,
@@ -96,6 +96,11 @@ describe('buildSprintReportMarkdown', () => {
     expect(markdown).toContain('面试前先压最高风险')
     expect(markdown).toContain('预计耗时：24 分钟')
     expect(markdown).toContain('先清复习债')
+    expect(markdown).toContain('## 高分表达素材库')
+    expect(markdown).toContain('继续扩充高分素材')
+    expect(markdown).toContain('项目场景')
+    expect(markdown).toContain('订单高峰期并发扣库存')
+    expect(markdown).toContain('高分素材：')
     expect(markdown).toContain('## 备考健康度')
     expect(markdown).toContain('最大风险：')
     expect(markdown).toContain('## 四维诊断')
@@ -131,6 +136,8 @@ describe('buildSprintReportMarkdown', () => {
     expect(markdown).toContain('先建立面试样本')
     expect(markdown).toContain('## 面试前急救包')
     expect(markdown).toContain('先建立临场样本')
+    expect(markdown).toContain('高分表达素材待沉淀')
+    expect(markdown).toContain('先做一题模拟')
     expect(markdown).toContain('/practice')
     expect(markdown).toContain('先建立轨迹')
     expect(markdown).toContain('还没有学习轨迹')
