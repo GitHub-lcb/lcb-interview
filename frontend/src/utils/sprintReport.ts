@@ -3,6 +3,7 @@ import type {
   DailyPlanBrief,
   DailyPlanCompletion,
   InterviewEmergencyKit,
+  InterviewLastMinuteBrief,
   InterviewBriefItem,
   InterviewBriefReport,
   InterviewMistakeLedger,
@@ -15,6 +16,7 @@ import { buildDailyPlanBrief } from './dailyPlanBrief'
 import { buildDailyPlanCompletion } from './dailyPlanCompletion'
 import { buildInterviewBrief } from './interviewBrief'
 import { buildInterviewEmergencyKit } from './interviewEmergencyKit'
+import { buildInterviewLastMinuteBrief } from './interviewLastMinuteBrief'
 import { buildInterviewMistakeLedger } from './interviewMistakeLedger'
 import { buildInterviewRecoveryPlan } from './interviewRecoveryPlan'
 import { buildPrepHealthReport } from './prepHealth'
@@ -37,6 +39,7 @@ export function buildSprintReportMarkdown(
   const mistakeLedger = buildInterviewMistakeLedger(progress)
   const recoveryPlan = buildInterviewRecoveryPlan(mistakeLedger)
   const emergencyKit = buildInterviewEmergencyKit(progress, now)
+  const lastMinuteBrief = buildInterviewLastMinuteBrief(progress, now)
   const generatedDate = formatDate(now)
 
   return [
@@ -47,6 +50,7 @@ export function buildSprintReportMarkdown(
     '',
     renderExecutiveSummarySection(health, completion, mistakeLedger, recoveryPlan),
     renderEmergencyKitSection(emergencyKit),
+    renderLastMinuteBriefSection(lastMinuteBrief),
     renderHealthSection(health),
     renderDimensionsSection(health.dimensions),
     renderDailyCompletionSection(completion),
@@ -105,6 +109,24 @@ function renderEmergencyKitSection(kit: InterviewEmergencyKit): string {
     `- 预计耗时：${kit.totalMinutes} 分钟`,
     `- 复习债：${kit.reviewDebtCount} 道`,
     `- 错因信号：${kit.mistakeCount} 个`,
+    ...itemLines,
+    '',
+  ].join('\n')
+}
+
+function renderLastMinuteBriefSection(brief: InterviewLastMinuteBrief): string {
+  const itemLines = brief.items.length > 0
+    ? brief.items.slice(0, 5).map(item => (
+      `- ${item.title}：${item.detail}；${item.evidence}（${item.actionLabel}，${item.to || '/practice'}）`
+    ))
+    : ['- 暂无最后 24 小时动作。']
+
+  return [
+    '## 最后 24 小时面试简报',
+    `- 状态：${brief.title}`,
+    `- 摘要：${brief.summary}`,
+    `- 进场信心：${brief.confidenceScore} 分`,
+    ...brief.metrics.map(metric => `- ${metric.label}：${metric.value}，${metric.detail}`),
     ...itemLines,
     '',
   ].join('\n')

@@ -3518,6 +3518,209 @@ p {
   color: #A1A1AA;
 }
 
+.interview-last-minute-brief-panel {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 18px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #2563EB;
+}
+
+.interview-last-minute-brief-panel.level-empty {
+  box-shadow: inset 4px 0 0 #64748B;
+}
+
+.interview-last-minute-brief-panel.level-risk {
+  box-shadow: inset 4px 0 0 #DC2626;
+}
+
+.interview-last-minute-brief-panel.level-ready {
+  box-shadow: inset 4px 0 0 #059669;
+}
+
+.interview-last-minute-brief-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.interview-last-minute-brief-head h2 {
+  margin: 0;
+  color: #18181B;
+  font-size: 24px;
+}
+
+.interview-last-minute-brief-head p {
+  max-width: 780px;
+  margin: 6px 0 0 0;
+  color: #52525B;
+}
+
+.interview-last-minute-brief-score {
+  display: grid;
+  justify-items: end;
+  min-width: 96px;
+}
+
+.interview-last-minute-brief-score strong {
+  color: #0F172A;
+  font-size: 42px;
+  line-height: 1;
+}
+
+.interview-last-minute-brief-score span {
+  margin-top: 4px;
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.interview-last-minute-brief-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.interview-last-minute-brief-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.interview-last-minute-brief-metrics article {
+  min-width: 0;
+  padding: 11px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+}
+
+.interview-last-minute-brief-metrics span,
+.interview-last-minute-brief-metrics small {
+  display: block;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.interview-last-minute-brief-metrics strong {
+  display: block;
+  margin: 3px 0;
+  color: #18181B;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.interview-last-minute-brief-action {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+}
+
+.interview-last-minute-brief-action .ant-btn {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.interview-last-minute-brief-action span {
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.interview-last-minute-brief-list {
+  display: grid;
+  gap: 8px;
+}
+
+.interview-last-minute-brief-list button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 11px 12px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.interview-last-minute-brief-list button:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+}
+
+.interview-last-minute-brief-list button.kind-must-review,
+.interview-last-minute-brief-list button.kind-avoid {
+  box-shadow: inset 3px 0 0 #DC2626;
+}
+
+.interview-last-minute-brief-list button.kind-talk-track {
+  box-shadow: inset 3px 0 0 #2563EB;
+}
+
+.interview-last-minute-brief-list button.kind-closing {
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.interview-last-minute-brief-list button.kind-sample {
+  box-shadow: inset 3px 0 0 #059669;
+}
+
+.interview-last-minute-brief-item-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.interview-last-minute-brief-item-top strong {
+  overflow: hidden;
+  color: #18181B;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.interview-last-minute-brief-item-top em {
+  flex: 0 0 auto;
+  color: #64748B;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.interview-last-minute-brief-list p,
+.interview-last-minute-brief-list small {
+  display: block;
+  margin: 4px 0 0 0;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.interview-last-minute-brief-list small {
+  color: #64748B;
+}
+
+.interview-last-minute-brief-list svg {
+  align-self: center;
+  color: #A1A1AA;
+}
+
 .interview-brief-panel {
   display: grid;
   gap: 12px;
@@ -5211,6 +5414,8 @@ p {
   .daily-plan-completion-metrics,
   .interview-emergency-kit-body,
   .interview-emergency-kit-metrics,
+  .interview-last-minute-brief-body,
+  .interview-last-minute-brief-metrics,
   .review-schedule-band,
   .study-plan-grid,
   .study-question-item,
@@ -5259,6 +5464,14 @@ p {
   }
 
   .interview-emergency-kit-total {
+    justify-items: start;
+  }
+
+  .interview-last-minute-brief-head {
+    display: grid;
+  }
+
+  .interview-last-minute-brief-score {
     justify-items: start;
   }
 }

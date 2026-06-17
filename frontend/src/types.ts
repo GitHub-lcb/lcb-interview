@@ -503,6 +503,45 @@ export interface InterviewEmergencyKit {
   primaryAction: InterviewEmergencyKitAction
 }
 
+export type InterviewLastMinuteBriefLevel = 'empty' | 'risk' | 'focused' | 'ready'
+
+export type InterviewLastMinuteBriefItemKind = 'must-review' | 'talk-track' | 'avoid' | 'closing' | 'sample'
+
+export interface InterviewLastMinuteBriefAction {
+  label: string
+  description: string
+  to: string
+}
+
+export interface InterviewLastMinuteBriefMetric {
+  key: 'confidence' | 'attempts' | 'review' | 'mistake' | 'average'
+  label: string
+  value: string
+  detail: string
+}
+
+export interface InterviewLastMinuteBriefItem {
+  id: string
+  kind: InterviewLastMinuteBriefItemKind
+  title: string
+  detail: string
+  evidence: string
+  to: string
+  questionIds: number[]
+  priority: number
+  actionLabel: string
+}
+
+export interface InterviewLastMinuteBrief {
+  level: InterviewLastMinuteBriefLevel
+  title: string
+  summary: string
+  confidenceScore: number
+  metrics: InterviewLastMinuteBriefMetric[]
+  items: InterviewLastMinuteBriefItem[]
+  primaryAction: InterviewLastMinuteBriefAction
+}
+
 export type PracticeQueueSource = 'review' | 'plan' | 'page' | 'new'
 
 export interface PracticeQueueItem extends QuestionSnapshot {
