@@ -13,6 +13,7 @@ import type {
   InterviewMistakeLedger,
   InterviewRecoveryAcceptance,
   InterviewRecoveryPlan,
+  NextTrainingQueue,
   PrepHealthDimension,
   PrepHealthReport,
   StudyProgress,
@@ -29,6 +30,7 @@ import { buildInterviewMaterialVault } from './interviewMaterialVault'
 import { buildInterviewMistakeLedger } from './interviewMistakeLedger'
 import { buildInterviewRecoveryAcceptance } from './interviewRecoveryAcceptance'
 import { buildInterviewRecoveryPlan } from './interviewRecoveryPlan'
+import { buildNextTrainingQueue } from './nextTrainingQueue'
 import { buildPrepHealthReport } from './prepHealth'
 
 const recoveryModeLabels: Record<InterviewRecoveryPlan['mode'], string> = {
@@ -45,6 +47,7 @@ export function buildSprintReportMarkdown(
   const health = buildPrepHealthReport(routes, progress, now)
   const brief = buildInterviewBrief(routes, progress, now)
   const completion = buildDailyPlanCompletion(progress, now)
+  const nextTrainingQueue = buildNextTrainingQueue(progress, now, 8)
   const abilityMap = buildAbilityMap(routes, progress)
   const dailyMission = buildDailyMissionPlan(routes, progress, now)
   const dailyBrief = buildDailyPlanBrief(progress, [], now)
@@ -63,7 +66,7 @@ export function buildSprintReportMarkdown(
     `生成时间：${generatedDate}`,
     `目标周期：${progress.sprintDays} 天`,
     '',
-    renderExecutiveSummarySection(health, completion, mistakeLedger, recoveryPlan),
+    renderExecutiveSummarySection(health, completion, mistakeLedger, recoveryPlan, nextTrainingQueue),
     renderDailyMissionSection(dailyMission),
     renderEmergencyKitSection(emergencyKit),
     renderLastMinuteBriefSection(lastMinuteBrief),
@@ -73,6 +76,7 @@ export function buildSprintReportMarkdown(
     renderHealthSection(health),
     renderDimensionsSection(health.dimensions),
     renderDailyCompletionSection(completion),
+    renderNextTrainingQueueSection(nextTrainingQueue),
     renderDailyPlanBriefSection(dailyBrief),
     renderBriefSection('可主动表达', brief.strengths),
     renderBriefSection('必须规避', brief.risks),
@@ -80,7 +84,7 @@ export function buildSprintReportMarkdown(
     renderMistakeLedgerSection(mistakeLedger),
     renderRecoveryPlanSection(recoveryPlan),
     renderRecoveryAcceptanceSection(recoveryAcceptance),
-    renderActionSection(health, brief, completion, recoveryPlan, materialVault, followUpDefense, recoveryAcceptance, dailyMission, abilityMap),
+    renderActionSection(health, brief, completion, recoveryPlan, materialVault, followUpDefense, recoveryAcceptance, dailyMission, abilityMap, nextTrainingQueue),
   ].join('\n')
 }
 
@@ -100,6 +104,7 @@ function renderExecutiveSummarySection(
   completion: DailyPlanCompletion,
   ledger: InterviewMistakeLedger,
   recoveryPlan: InterviewRecoveryPlan,
+  nextTrainingQueue: NextTrainingQueue,
 ): string {
   const recoveryTo = recoveryPlan.primaryAction.to || '/practice'
 
@@ -108,6 +113,7 @@ function renderExecutiveSummarySection(
     `- 总分：${health.score}，最大风险：${health.primaryDimension.label}`,
     `- 今日闭环：${completion.title}，完成率 ${completion.completionRate}%`,
     `- 错题恢复：${ledger.title}，${recoveryPlan.title}`,
+    `- 下一轮训练：${nextTrainingQueue.primaryAction.label} - ${nextTrainingQueue.primaryAction.description}（${nextTrainingQueue.primaryAction.to}）`,
     `- 先做健康动作：${health.primaryAction.label} - ${health.primaryAction.description}（${health.primaryAction.to}）`,
     `- 再做今日动作：${completion.primaryAction.label} - ${completion.primaryAction.description}（${completion.primaryAction.to}）`,
     `- 最后做恢复动作：${recoveryPlan.primaryAction.label} - ${recoveryPlan.primaryAction.description}（${recoveryTo}）`,
@@ -285,6 +291,26 @@ function renderDailyCompletionSection(completion: DailyPlanCompletion): string {
   ].join('\n')
 }
 
+function renderNextTrainingQueueSection(queue: NextTrainingQueue): string {
+  const itemLines = queue.items.length > 0
+    ? queue.items.slice(0, 8).flatMap((item, index) => [
+      `- ${index + 1}. ${item.title}`,
+      `  - 来源：${item.sourceLabel}`,
+      `  - 行动：${item.actionLabel}，入口：${item.to}`,
+      `  - 原因：${item.reason}`,
+    ])
+    : ['- 暂无下一轮训练题。先完成一次模拟面试或生成今日计划，系统会自动拼出下一轮队列。']
+
+  return [
+    '## 下一轮训练队列',
+    `- 状态：${queue.title}`,
+    `- 摘要：${queue.summary}`,
+    `- 主行动：${queue.primaryAction.label} - ${queue.primaryAction.description}（${queue.primaryAction.to}）`,
+    ...itemLines,
+    '',
+  ].join('\n')
+}
+
 function renderDailyPlanBriefSection(brief: DailyPlanBrief): string {
   if (brief.items.length === 0) {
     return [
@@ -363,8 +389,9 @@ function renderActionSection(
   recoveryAcceptance: InterviewRecoveryAcceptance,
   dailyMission: DailyMissionPlan,
   abilityMap: AbilityMapItem[],
+  nextTrainingQueue: NextTrainingQueue,
 ): string {
-  // 报告被复制到外部文档后仍要能指导下一步，所以保留今日任务、能力地图、健康、表达、今日闭环、错题恢复、高分素材、追问防线和错题验收行动线。
+  // 报告被复制到外部文档后仍要能指导下一步，所以保留今日任务、下一轮训练、能力地图、健康、表达、今日闭环、错题恢复、高分素材、追问防线和错题验收行动线。
   const primaryMission = dailyMission.missions[0]
   const missionLine = primaryMission
     ? `- 今日任务：${primaryMission.title} - ${primaryMission.description}（${primaryMission.to}）`
@@ -373,6 +400,7 @@ function renderActionSection(
   return [
     '## 下一步行动',
     missionLine,
+    `- 下一轮训练：${nextTrainingQueue.primaryAction.label} - ${nextTrainingQueue.primaryAction.description}（${nextTrainingQueue.primaryAction.to}）`,
     buildAbilityActionLine(abilityMap),
     `- 健康雷达：${health.primaryAction.label} - ${health.primaryAction.description}（${health.primaryAction.to}）`,
     `- 面试简报：${brief.primaryAction.label} - ${brief.primaryAction.description}（${brief.primaryAction.to}）`,
