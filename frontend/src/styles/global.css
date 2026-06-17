@@ -2749,6 +2749,12 @@ p {
   justify-content: flex-end;
 }
 
+.study-plan-header-actions .ant-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .study-settings-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

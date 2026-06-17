@@ -11,6 +11,7 @@ import {
 import { useNavigate } from 'react-router-dom'
 import StudyActionButtons from '../../components/StudyActionButtons'
 import InterviewBriefPanel from '../../components/InterviewBriefPanel'
+import SprintReportActions from '../../components/SprintReportActions'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { getHotQuestions } from '../../api/question'
@@ -125,6 +126,7 @@ export default function StudyPlan() {
           <Button icon={<BookOutlined />} onClick={() => navigate('/banks')}>
             继续刷题
           </Button>
+          <SprintReportActions progress={progress} />
         </div>
       </div>
 
