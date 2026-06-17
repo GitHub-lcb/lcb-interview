@@ -542,6 +542,50 @@ export interface InterviewLastMinuteBrief {
   primaryAction: InterviewLastMinuteBriefAction
 }
 
+export type InterviewMaterialVaultLevel = 'empty' | 'building' | 'ready'
+
+export type InterviewMaterialKind = 'conclusion' | 'scenario' | 'risk'
+
+export interface InterviewMaterialVaultAction {
+  label: string
+  description: string
+  to: string
+}
+
+export interface InterviewMaterialVaultMetric {
+  key: 'samples' | 'categories' | 'average' | 'ready'
+  label: string
+  value: string
+  detail: string
+}
+
+export interface InterviewMaterialSnippet {
+  id: string
+  questionId: number
+  title: string
+  categoryName: string
+  score: number
+  kind: InterviewMaterialKind
+  label: string
+  content: string
+  reason: string
+  to: string
+  priority: number
+  createdAt: string
+}
+
+export interface InterviewMaterialVault {
+  level: InterviewMaterialVaultLevel
+  title: string
+  summary: string
+  totalSamples: number
+  categoryCount: number
+  averageScore: number
+  metrics: InterviewMaterialVaultMetric[]
+  snippets: InterviewMaterialSnippet[]
+  primaryAction: InterviewMaterialVaultAction
+}
+
 export type PracticeQueueSource = 'review' | 'plan' | 'page' | 'new'
 
 export interface PracticeQueueItem extends QuestionSnapshot {

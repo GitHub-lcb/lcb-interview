@@ -19,6 +19,7 @@ import DailyPlanBriefPanel from '../../components/DailyPlanBriefPanel'
 import DailyPlanCompletionPanel from '../../components/DailyPlanCompletionPanel'
 import InterviewEmergencyKitPanel from '../../components/InterviewEmergencyKitPanel'
 import InterviewLastMinuteBriefPanel from '../../components/InterviewLastMinuteBriefPanel'
+import InterviewMaterialVaultPanel from '../../components/InterviewMaterialVaultPanel'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { getHotQuestions } from '../../api/question'
 import type { Question, ReviewDueStatus } from '../../types'
@@ -203,6 +204,7 @@ export default function StudyPlan() {
       <DailyPlanCompletionPanel progress={progress} />
       <InterviewEmergencyKitPanel progress={progress} />
       <InterviewLastMinuteBriefPanel progress={progress} />
+      <InterviewMaterialVaultPanel progress={progress} onNavigate={navigate} />
       <InterviewBriefPanel progress={progress} />
       <InterviewMistakeLedgerPanel progress={progress} />
 

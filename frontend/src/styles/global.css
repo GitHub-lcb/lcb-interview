@@ -3896,6 +3896,187 @@ p {
   font-size: 13px;
 }
 
+.interview-material-vault-panel {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  margin-bottom: 18px;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #2563EB;
+}
+
+.interview-material-vault-panel.level-empty {
+  box-shadow: inset 4px 0 0 #64748B;
+}
+
+.interview-material-vault-panel.level-ready {
+  box-shadow: inset 4px 0 0 #059669;
+}
+
+.interview-material-vault-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.interview-material-vault-head h2 {
+  margin: 0;
+  color: #18181B;
+  font-size: 24px;
+}
+
+.interview-material-vault-head p {
+  max-width: 780px;
+  margin: 6px 0 0 0;
+  color: #52525B;
+}
+
+.interview-material-vault-action {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.interview-material-vault-action > span {
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #F8FAFC;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.interview-material-vault-action .ant-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.interview-material-vault-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.interview-material-vault-metrics article {
+  min-width: 0;
+  padding: 11px;
+  background: #FAFAF9;
+  border: 1px solid #E7E5E4;
+  border-radius: 8px;
+}
+
+.interview-material-vault-metrics span,
+.interview-material-vault-metrics small {
+  display: block;
+  overflow: hidden;
+  color: #64748B;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.interview-material-vault-metrics strong {
+  display: block;
+  overflow: hidden;
+  margin: 3px 0;
+  color: #18181B;
+  font-size: 21px;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.interview-material-vault-empty {
+  margin: 0;
+  color: #64748B;
+  font-size: 13px;
+}
+
+.interview-material-vault-list {
+  display: grid;
+  gap: 8px;
+}
+
+.interview-material-vault-list button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 12px;
+  color: inherit;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.interview-material-vault-list button:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+  transform: translateY(-1px);
+}
+
+.interview-material-vault-list button.kind-conclusion {
+  box-shadow: inset 3px 0 0 #2563EB;
+}
+
+.interview-material-vault-list button.kind-scenario {
+  box-shadow: inset 3px 0 0 #059669;
+}
+
+.interview-material-vault-list button.kind-risk {
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.interview-material-vault-item-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.interview-material-vault-item-top strong {
+  overflow: hidden;
+  color: #18181B;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.interview-material-vault-item-top em {
+  flex: 0 0 auto;
+  color: #64748B;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.interview-material-vault-list p,
+.interview-material-vault-list small {
+  display: block;
+  margin: 4px 0 0 0;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.interview-material-vault-list small {
+  color: #64748B;
+}
+
+.interview-material-vault-list svg {
+  align-self: center;
+  color: #A1A1AA;
+}
+
 .interview-mistake-panel {
   display: grid;
   gap: 14px;
@@ -5604,6 +5785,7 @@ p {
   .interview-emergency-kit-metrics,
   .interview-last-minute-brief-body,
   .interview-last-minute-brief-metrics,
+  .interview-material-vault-metrics,
   .review-schedule-band,
   .study-plan-grid,
   .study-question-item,
