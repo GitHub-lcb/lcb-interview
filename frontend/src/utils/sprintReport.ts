@@ -1,5 +1,6 @@
 import type { PrepRoute } from '../data/freeSuperiority'
 import type {
+  DailyMissionPlan,
   DailyPlanBrief,
   DailyPlanCompletion,
   InterviewEmergencyKit,
@@ -15,6 +16,7 @@ import type {
   PrepHealthReport,
   StudyProgress,
 } from '../types'
+import { buildDailyMissionPlan } from './dailyMission'
 import { buildDailyPlanBrief } from './dailyPlanBrief'
 import { buildDailyPlanCompletion } from './dailyPlanCompletion'
 import { buildInterviewBrief } from './interviewBrief'
@@ -41,6 +43,7 @@ export function buildSprintReportMarkdown(
   const health = buildPrepHealthReport(routes, progress, now)
   const brief = buildInterviewBrief(routes, progress, now)
   const completion = buildDailyPlanCompletion(progress, now)
+  const dailyMission = buildDailyMissionPlan(routes, progress, now)
   const dailyBrief = buildDailyPlanBrief(progress, [], now)
   const mistakeLedger = buildInterviewMistakeLedger(progress)
   const recoveryPlan = buildInterviewRecoveryPlan(mistakeLedger)
@@ -58,6 +61,7 @@ export function buildSprintReportMarkdown(
     `目标周期：${progress.sprintDays} 天`,
     '',
     renderExecutiveSummarySection(health, completion, mistakeLedger, recoveryPlan),
+    renderDailyMissionSection(dailyMission),
     renderEmergencyKitSection(emergencyKit),
     renderLastMinuteBriefSection(lastMinuteBrief),
     renderMaterialVaultSection(materialVault),
@@ -72,7 +76,7 @@ export function buildSprintReportMarkdown(
     renderMistakeLedgerSection(mistakeLedger),
     renderRecoveryPlanSection(recoveryPlan),
     renderRecoveryAcceptanceSection(recoveryAcceptance),
-    renderActionSection(health, brief, completion, recoveryPlan, materialVault, followUpDefense, recoveryAcceptance),
+    renderActionSection(health, brief, completion, recoveryPlan, materialVault, followUpDefense, recoveryAcceptance, dailyMission),
   ].join('\n')
 }
 
@@ -103,6 +107,22 @@ function renderExecutiveSummarySection(
     `- 先做健康动作：${health.primaryAction.label} - ${health.primaryAction.description}（${health.primaryAction.to}）`,
     `- 再做今日动作：${completion.primaryAction.label} - ${completion.primaryAction.description}（${completion.primaryAction.to}）`,
     `- 最后做恢复动作：${recoveryPlan.primaryAction.label} - ${recoveryPlan.primaryAction.description}（${recoveryTo}）`,
+    '',
+  ].join('\n')
+}
+
+function renderDailyMissionSection(plan: DailyMissionPlan): string {
+  const missionLines = plan.missions.length > 0
+    ? plan.missions.map((mission, index) => (
+      `- ${index + 1}. ${mission.title}：${mission.description}；${mission.reason}；${mission.metric}；入口：${mission.to}`
+    ))
+    : ['- 暂无今日任务，先进入学习计划生成任务。']
+
+  return [
+    '## 今日冲刺任务',
+    `- 摘要：${plan.summary}`,
+    `- 任务数：${plan.missions.length}`,
+    ...missionLines,
     '',
   ].join('\n')
 }
@@ -306,10 +326,17 @@ function renderActionSection(
   materialVault: InterviewMaterialVault,
   followUpDefense: InterviewFollowUpDefense,
   recoveryAcceptance: InterviewRecoveryAcceptance,
+  dailyMission: DailyMissionPlan,
 ): string {
-  // 报告被复制到外部文档后仍要能指导下一步，所以保留健康、表达、今日闭环、错题恢复、高分素材、追问防线和错题验收行动线。
+  // 报告被复制到外部文档后仍要能指导下一步，所以保留今日任务、健康、表达、今日闭环、错题恢复、高分素材、追问防线和错题验收行动线。
+  const primaryMission = dailyMission.missions[0]
+  const missionLine = primaryMission
+    ? `- 今日任务：${primaryMission.title} - ${primaryMission.description}（${primaryMission.to}）`
+    : '- 今日任务：生成今日计划 - 先进入学习计划建立今天的任务队列。（/study）'
+
   return [
     '## 下一步行动',
+    missionLine,
     `- 健康雷达：${health.primaryAction.label} - ${health.primaryAction.description}（${health.primaryAction.to}）`,
     `- 面试简报：${brief.primaryAction.label} - ${brief.primaryAction.description}（${brief.primaryAction.to}）`,
     `- 今日闭环：${completion.primaryAction.label} - ${completion.primaryAction.description}（${completion.primaryAction.to}）`,
