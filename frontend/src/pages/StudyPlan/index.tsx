@@ -13,8 +13,9 @@ import StudyActionButtons from '../../components/StudyActionButtons'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { getHotQuestions } from '../../api/question'
-import type { Question } from '../../types'
-import { buildDailyPlan, buildReviewQueue, resolvePlanQuestions, summarizeProgress } from '../../utils/studyProgress'
+import type { Question, ReviewDueStatus } from '../../types'
+import { buildScheduledReviewQueue, summarizeReviewSchedule } from '../../utils/reviewSchedule'
+import { buildDailyPlan, resolvePlanQuestions, summarizeProgress } from '../../utils/studyProgress'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
 const roleOptions = [
@@ -24,6 +25,23 @@ const roleOptions = [
   { label: '前端工程师', value: '前端工程师' },
   { label: '系统架构师', value: '系统架构师' },
 ]
+
+const dueStatusLabels: Record<ReviewDueStatus, string> = {
+  overdue: '已逾期',
+  'due-today': '今日到期',
+  upcoming: '即将到期',
+}
+
+function formatScheduleDate(value?: string) {
+  if (!value) {
+    return '暂无'
+  }
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return '暂无'
+  }
+  return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })
+}
 
 export default function StudyPlan() {
   const navigate = useNavigate()
@@ -44,7 +62,8 @@ export default function StudyPlan() {
     [hotQuestions, progress],
   )
   const planQuestions = useMemo(() => resolvePlanQuestions(progress, hotQuestions, 8), [hotQuestions, progress])
-  const reviewQueue = buildReviewQueue(progress, 12)
+  const reviewQueue = useMemo(() => buildScheduledReviewQueue(progress, new Date().toISOString(), 12), [progress])
+  const reviewSummary = useMemo(() => summarizeReviewSchedule(reviewQueue), [reviewQueue])
   const trackedCount = Object.keys(progress.questionStates).length
   const canGeneratePlan = generatedPlanIds.length > 0
 
@@ -163,6 +182,29 @@ export default function StudyPlan() {
         </div>
       </div>
 
+      <section className="review-schedule-band" aria-label="智能复习排期">
+        <div className="overdue">
+          <span>已逾期</span>
+          <strong>{reviewSummary.overdue}</strong>
+          <small>优先补回</small>
+        </div>
+        <div className="due-today">
+          <span>今日到期</span>
+          <strong>{reviewSummary.dueToday}</strong>
+          <small>今天必须复盘</small>
+        </div>
+        <div className="upcoming">
+          <span>即将到期</span>
+          <strong>{reviewSummary.upcoming}</strong>
+          <small>后续巩固</small>
+        </div>
+        <div>
+          <span>下次复习</span>
+          <strong>{formatScheduleDate(reviewSummary.nextReviewAt)}</strong>
+          <small>按间隔重复自动计算</small>
+        </div>
+      </section>
+
       <div className="study-plan-grid">
         <section className="study-plan-section">
           <div className="study-plan-section-title">
@@ -214,7 +256,7 @@ export default function StudyPlan() {
 
         <section className="study-plan-section">
           <div className="study-plan-section-title">
-            <span>复习队列</span>
+            <span>智能复习队列</span>
             <small>{reviewQueue.length} 道</small>
           </div>
           {reviewQueue.length === 0 ? (
@@ -229,9 +271,12 @@ export default function StudyPlan() {
                 return (
                   <button key={item.id} onClick={() => navigate(`/question/${item.id}`)}>
                     <div>
-                      <span>{item.reason}</span>
+                      <div className="review-queue-item-top">
+                        <span className={`review-due-badge ${item.dueStatus}`}>{dueStatusLabels[item.dueStatus]}</span>
+                        <small>{item.categoryName} · 复习 {item.reviewCount} 次</small>
+                      </div>
                       <strong>{item.title}</strong>
-                      <small>{item.categoryName} · 复习 {item.reviewCount} 次</small>
+                      <small>{item.scheduleReason}</small>
                     </div>
                     <ArrowRightOutlined />
                   </button>

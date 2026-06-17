@@ -2396,6 +2396,52 @@ p {
   margin: 4px 0;
 }
 
+.review-schedule-band {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.review-schedule-band > div {
+  min-width: 0;
+  padding: 14px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 3px 0 0 #64748B;
+}
+
+.review-schedule-band > div.overdue {
+  box-shadow: inset 3px 0 0 #DC2626;
+}
+
+.review-schedule-band > div.due-today {
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.review-schedule-band > div.upcoming {
+  box-shadow: inset 3px 0 0 #2563EB;
+}
+
+.review-schedule-band span,
+.review-schedule-band small {
+  display: block;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.review-schedule-band strong {
+  display: block;
+  overflow: hidden;
+  margin: 4px 0;
+  color: #0F172A;
+  font-size: 28px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .study-plan-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr);
@@ -2486,6 +2532,43 @@ p {
   cursor: pointer;
   padding: 10px;
   text-align: left;
+}
+
+.review-queue-item-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.review-due-badge {
+  display: inline-flex !important;
+  align-items: center;
+  width: max-content;
+  min-height: 22px;
+  padding: 0 7px;
+  border-radius: 6px;
+  background: #F1F5F9;
+  color: #475569 !important;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.review-due-badge.overdue {
+  background: #FEF2F2;
+  color: #DC2626 !important;
+}
+
+.review-due-badge.due-today {
+  background: #FFFBEB;
+  color: #B45309 !important;
+}
+
+.review-due-badge.upcoming {
+  background: #EFF6FF;
+  color: #1D4ED8 !important;
 }
 
 .review-queue-list span {
@@ -3180,6 +3263,7 @@ p {
   }
 
   .study-plan-metrics,
+  .review-schedule-band,
   .study-plan-grid,
   .study-question-item,
   .command-factor-grid,

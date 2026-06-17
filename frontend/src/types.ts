@@ -174,6 +174,22 @@ export interface ReviewQueueItem extends QuestionSnapshot {
   reason: string
 }
 
+export type ReviewDueStatus = 'overdue' | 'due-today' | 'upcoming'
+
+export interface ScheduledReviewItem extends ReviewQueueItem {
+  dueStatus: ReviewDueStatus
+  nextReviewAt: string
+  daysUntilDue: number
+  scheduleReason: string
+}
+
+export interface ReviewScheduleSummary {
+  overdue: number
+  dueToday: number
+  upcoming: number
+  nextReviewAt?: string
+}
+
 export type PracticeQueueSource = 'review' | 'plan' | 'page' | 'new'
 
 export interface PracticeQueueItem extends QuestionSnapshot {
