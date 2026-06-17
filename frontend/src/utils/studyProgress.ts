@@ -30,6 +30,11 @@ export interface QuestionSetProgressSummary {
   allPlanned: boolean
 }
 
+export interface InterviewStatusSyncDescription {
+  status: StudyQuestionStatus
+  message: string
+}
+
 export function createDefaultProgress(now = new Date().toISOString()): StudyProgress {
   return {
     targetRole: DEFAULT_ROLE,
@@ -198,7 +203,7 @@ export function recordInterviewAttempt(
 ): StudyProgress {
   const currentAttempts = progress.interviewAttempts[attempt.questionId] ?? []
   const currentState = getQuestionState(progress, attempt.questionId)
-  const nextStatus = statusFromInterviewScore(attempt.feedback.score)
+  const nextStatus = describeInterviewStatusSync(attempt.feedback.score).status
   const addedToPlan = nextStatus === 'weak' ? true : currentState.addedToPlan
   const dailyPlan = addedToPlan
     ? [...new Set([...progress.dailyPlan, attempt.questionId])]
@@ -222,6 +227,26 @@ export function recordInterviewAttempt(
     },
     dailyPlan,
     updatedAt: attempt.createdAt,
+  }
+}
+
+export function describeInterviewStatusSync(score: number): InterviewStatusSyncDescription {
+  const status = statusFromInterviewScore(score)
+  if (status === 'weak') {
+    return {
+      status,
+      message: '已自动标记薄弱，并加入今日计划继续补强。',
+    }
+  }
+  if (status === 'learning') {
+    return {
+      status,
+      message: '已同步为学习中，建议继续复盘到 80 分以上。',
+    }
+  }
+  return {
+    status,
+    message: '已同步为已掌握，可以沉淀为面试表达素材。',
   }
 }
 

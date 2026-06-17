@@ -5824,6 +5824,30 @@ p {
   font-weight: 700;
 }
 
+.practice-feedback-status-sync {
+  margin: 6px 0 0 0;
+  padding: 7px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.practice-feedback-status-sync.status-weak {
+  background: #FFFBEB;
+  color: #92400E;
+}
+
+.practice-feedback-status-sync.status-learning {
+  background: #EFF6FF;
+  color: #1D4ED8;
+}
+
+.practice-feedback-status-sync.status-mastered {
+  background: #ECFDF5;
+  color: #047857;
+}
+
 .practice-feedback-score strong {
   color: #0F172A;
   font-size: 44px;

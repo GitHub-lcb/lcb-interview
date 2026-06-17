@@ -27,7 +27,7 @@ import { getHotQuestions, getQuestionById } from '../../api/question'
 import type { InterviewFeedback, PracticeQueueItem, PracticeSessionRepairAction, Question } from '../../types'
 import { evaluateInterviewAnswer } from '../../utils/interviewCoach'
 import { buildPracticeSessionRepairDraft } from '../../utils/practiceSessionReport'
-import { buildScopedPracticeQueue, summarizeProgress } from '../../utils/studyProgress'
+import { buildScopedPracticeQueue, describeInterviewStatusSync, summarizeProgress } from '../../utils/studyProgress'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
 const sourceLabels: Record<PracticeQueueItem['source'], string> = {
@@ -315,6 +315,7 @@ export default function Practice() {
   const latestScore = feedback?.score ?? latestAttempt?.feedback.score
   const latestScoreTone = resolveScoreTone(latestScore)
   const latestScoreText = latestScore === undefined ? '待评分' : `${latestScore} 分`
+  const feedbackStatusSync = feedback ? describeInterviewStatusSync(feedback.score) : null
 
   useEffect(() => {
     const pendingDraft = pendingSessionRepairDraftRef.current
@@ -565,6 +566,11 @@ export default function Practice() {
                 <small>{feedbackLevelLabels[feedback.level]}</small>
                 {feedback.source && (
                   <em>{feedbackSourceLabels[feedback.source]}</em>
+                )}
+                {feedbackStatusSync && (
+                  <p className={`practice-feedback-status-sync status-${feedbackStatusSync.status}`}>
+                    {feedbackStatusSync.message}
+                  </p>
                 )}
               </div>
               <div className="practice-feedback-body">

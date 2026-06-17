@@ -8,6 +8,7 @@ import {
   buildReviewQueue,
   buildScopedPracticeQueue,
   createDefaultProgress,
+  describeInterviewStatusSync,
   getQuestionState,
   parseStudyProgress,
   rememberQuestions,
@@ -390,6 +391,21 @@ describe('studyProgress', () => {
       reviewCount: 1,
     })
     expect(next.dailyPlan).toEqual([72])
+  })
+
+  it('describes interview score status synchronization for user feedback', () => {
+    expect(describeInterviewStatusSync(55)).toMatchObject({
+      status: 'weak',
+      message: '已自动标记薄弱，并加入今日计划继续补强。',
+    })
+    expect(describeInterviewStatusSync(72)).toMatchObject({
+      status: 'learning',
+      message: '已同步为学习中，建议继续复盘到 80 分以上。',
+    })
+    expect(describeInterviewStatusSync(86)).toMatchObject({
+      status: 'mastered',
+      message: '已同步为已掌握，可以沉淀为面试表达素材。',
+    })
   })
 
   it('records interview attempts newest first and keeps five per question', () => {
