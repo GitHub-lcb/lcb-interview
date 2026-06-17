@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewCriterionKey, InterviewFeedback, StudyProgress } from '../types'
 import { createDefaultProgress } from './studyProgress'
-import { buildInterviewReviewSummary } from './interviewReview'
+import { buildInterviewReviewMarkdown, buildInterviewReviewSummary } from './interviewReview'
 
 function criterion(key: InterviewCriterionKey, score: number) {
   const labels: Record<InterviewCriterionKey, string> = {
@@ -143,5 +143,47 @@ describe('interviewReview', () => {
     })
 
     expect(summary.recentAttempts[0].question?.title).toBe('题目 #99')
+  })
+
+  it('exports interview review as portable markdown', () => {
+    const progress: StudyProgress = {
+      ...createDefaultProgress('2026-06-17T00:00:00.000Z'),
+      targetRole: 'Java 后端',
+      questionSnapshots: {
+        1: {
+          id: 1,
+          title: 'HashMap 为什么线程不安全？',
+          difficulty: 'MEDIUM',
+          categoryName: 'Java 集合',
+          tags: ['Java'],
+          viewCount: 10,
+        },
+      },
+      interviewAttempts: {
+        1: [
+          attempt(1, 66, '2026-06-17T12:00:00'),
+          attempt(1, 88, '2026-06-17T11:00:00'),
+        ],
+      },
+    }
+
+    const markdown = buildInterviewReviewMarkdown(progress, '2026-06-18T00:00:00.000Z')
+
+    expect(markdown).toContain('# Java 后端 模拟面试复盘')
+    expect(markdown).toContain('生成时间：2026-06-18')
+    expect(markdown).toContain('## 复盘概览')
+    expect(markdown).toContain('## 当前短板')
+    expect(markdown).toContain('## 维度均分')
+    expect(markdown).toContain('## 最近记录')
+    expect(markdown).toContain('入口：/question/1')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps empty interview review export actionable', () => {
+    const markdown = buildInterviewReviewMarkdown(createDefaultProgress(), '2026-06-18T00:00:00.000Z')
+
+    expect(markdown).toContain('开始模拟面试')
+    expect(markdown).toContain('入口：/practice')
+    expect(markdown).not.toContain('undefined')
   })
 })

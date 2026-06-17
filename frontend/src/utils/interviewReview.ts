@@ -48,6 +48,136 @@ export function buildInterviewReviewSummary(progress: StudyProgress): InterviewR
   }
 }
 
+/**
+ * 构建模拟面试复盘 Markdown，便于用户把表达趋势和短板维度沉淀到外部复盘文档。
+ *
+ * @param progress 本地学习进度
+ * @param now 当前时间，用于生成稳定日期
+ * @returns 可复制或下载的 Markdown 复盘报告
+ */
+export function buildInterviewReviewMarkdown(
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): string {
+  const summary = buildInterviewReviewSummary(progress)
+  const targetRole = progress.targetRole.trim() || '岗位'
+
+  return [
+    `# ${targetRole} 模拟面试复盘`,
+    '',
+    `生成时间：${formatMarkdownDate(now)}`,
+    '',
+    renderReviewOverview(summary),
+    renderWeakestCriterion(summary),
+    renderCriteria(summary.criteria),
+    renderRecentAttempts(summary.recentAttempts),
+    renderReviewNextStep(summary),
+  ].join('\n').trimEnd()
+}
+
+function renderReviewOverview(summary: InterviewReviewSummary): string {
+  return [
+    '## 复盘概览',
+    `- 趋势：${labelForTrend(summary.trend)}`,
+    `- 平均分：${summary.averageScore}`,
+    `- 最高分：${summary.bestScore}`,
+    `- 最近一次：${summary.latestScore ?? '暂无'}`,
+    `- 练习次数：${summary.totalAttempts}`,
+    `- 覆盖题目：${summary.answeredQuestions}`,
+    `- 建议：${summary.recommendation}`,
+    '',
+  ].join('\n')
+}
+
+function renderWeakestCriterion(summary: InterviewReviewSummary): string {
+  if (!summary.weakestCriterion) {
+    return [
+      '## 当前短板',
+      '- 暂无短板维度。先开始模拟面试，系统会按评分维度生成复盘。',
+      '',
+    ].join('\n')
+  }
+
+  const criterion = summary.weakestCriterion
+  return [
+    '## 当前短板',
+    `- 维度：${criterion.label}`,
+    `- 平均分：${criterion.averageScore}`,
+    `- 样本数：${criterion.attempts}`,
+    `- 摘要：${criterion.summary}`,
+    '',
+  ].join('\n')
+}
+
+function renderCriteria(criteria: InterviewCriterionSummary[]): string {
+  if (criteria.length === 0) {
+    return [
+      '## 维度均分',
+      '- 暂无维度均分。完成一次模拟面试后会生成覆盖度、结构化、具体性和风险意识评分。',
+      '',
+    ].join('\n')
+  }
+
+  const lines = ['## 维度均分']
+  criteria.forEach((criterion, index) => {
+    lines.push(`${index + 1}. ${criterion.label}：${criterion.averageScore} 分，${criterion.attempts} 次`)
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderRecentAttempts(attempts: InterviewReviewAttempt[]): string {
+  if (attempts.length === 0) {
+    return [
+      '## 最近记录',
+      '- 暂无模拟面试记录。',
+      '',
+    ].join('\n')
+  }
+
+  const lines = ['## 最近记录']
+  attempts.forEach((attempt, index) => {
+    lines.push(
+      `${index + 1}. ${attempt.question?.title ?? `题目 #${attempt.questionId}`}`,
+      `   - 得分：${attempt.feedback.score}`,
+      `   - 时间：${formatMarkdownDate(attempt.createdAt)}`,
+      `   - 入口：/question/${attempt.questionId}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderReviewNextStep(summary: InterviewReviewSummary): string {
+  const action = summary.totalAttempts === 0 ? '开始模拟面试' : '继续模拟面试'
+  return [
+    '## 下一步',
+    `- 动作：${action}`,
+    '- 入口：/practice',
+  ].join('\n')
+}
+
+function labelForTrend(trend: InterviewTrend): string {
+  if (trend === 'empty') {
+    return '等待首评'
+  }
+  if (trend === 'improving') {
+    return '正在上升'
+  }
+  if (trend === 'declining') {
+    return '需要复盘'
+  }
+  return '稳定推进'
+}
+
+function formatMarkdownDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 10)
+  }
+  return date.toISOString().slice(0, 10)
+}
+
 function flattenAttempts(progress: StudyProgress): InterviewReviewAttempt[] {
   return Object.values(progress.interviewAttempts)
     .flat()

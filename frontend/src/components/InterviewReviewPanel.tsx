@@ -1,9 +1,9 @@
-import { Button, Progress } from 'antd'
-import { ArrowRightOutlined, LineChartOutlined, WarningOutlined } from '@ant-design/icons'
+import { Button, message, Progress } from 'antd'
+import { ArrowRightOutlined, CopyOutlined, LineChartOutlined, WarningOutlined } from '@ant-design/icons'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { InterviewTrend, StudyProgress } from '../types'
-import { buildInterviewReviewSummary } from '../utils/interviewReview'
+import { buildInterviewReviewMarkdown, buildInterviewReviewSummary } from '../utils/interviewReview'
 
 interface InterviewReviewPanelProps {
   progress: StudyProgress
@@ -48,6 +48,19 @@ export default function InterviewReviewPanel({ progress, compact = false }: Inte
   const summary = useMemo(() => buildInterviewReviewSummary(progress), [progress])
   const tone = trendTone(summary.trend)
 
+  const handleCopyReview = async () => {
+    const markdown = buildInterviewReviewMarkdown(progress)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('模拟面试复盘已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 复盘')
+  }
+
   if (summary.totalAttempts === 0) {
     return (
       <section className={`interview-review-panel is-empty ${compact ? 'compact' : ''}`} aria-label="模拟面试复盘">
@@ -57,7 +70,12 @@ export default function InterviewReviewPanel({ progress, compact = false }: Inte
             <h2>还没有面试表达记录</h2>
             <p>{summary.recommendation}</p>
           </div>
-          <LineChartOutlined />
+          <div className="interview-review-heading-actions">
+            <LineChartOutlined />
+            <Button size="small" icon={<CopyOutlined />} onClick={handleCopyReview}>
+              复制复盘
+            </Button>
+          </div>
         </div>
         <Button type="primary" icon={<ArrowRightOutlined />} onClick={() => navigate('/practice')}>
           开始模拟面试
@@ -74,10 +92,15 @@ export default function InterviewReviewPanel({ progress, compact = false }: Inte
           <h2>表达能力复盘</h2>
           <p>{summary.recommendation}</p>
         </div>
-        <span className={`interview-trend-badge tone-${tone}`}>
-          {summary.trend === 'declining' ? <WarningOutlined /> : <LineChartOutlined />}
-          {trendLabels[summary.trend]}
-        </span>
+        <div className="interview-review-heading-actions">
+          <span className={`interview-trend-badge tone-${tone}`}>
+            {summary.trend === 'declining' ? <WarningOutlined /> : <LineChartOutlined />}
+            {trendLabels[summary.trend]}
+          </span>
+          <Button size="small" icon={<CopyOutlined />} onClick={handleCopyReview}>
+            复制复盘
+          </Button>
+        </div>
       </div>
 
       <div className="interview-review-body">
@@ -127,4 +150,34 @@ export default function InterviewReviewPanel({ progress, compact = false }: Inte
       </div>
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
+function buildFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '岗位'}-模拟面试复盘.md`
 }

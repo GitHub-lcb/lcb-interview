@@ -1430,9 +1430,25 @@ p {
   color: #52525B;
 }
 
-.interview-review-heading > svg {
+.interview-review-heading > svg,
+.interview-review-heading-actions > svg {
   color: #64748B;
   font-size: 22px;
+}
+
+.interview-review-heading-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.interview-review-heading-actions .ant-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .interview-trend-badge {
@@ -6159,6 +6175,14 @@ p {
   }
 
   .interview-brief-head-actions {
+    justify-content: flex-start;
+  }
+
+  .interview-review-heading {
+    display: grid;
+  }
+
+  .interview-review-heading-actions {
     justify-content: flex-start;
   }
 
