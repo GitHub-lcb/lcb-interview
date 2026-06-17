@@ -3288,6 +3288,70 @@ p {
   margin-top: 8px;
 }
 
+.interview-acceptance-strip {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  background: #FFFBEB;
+  border: 1px solid #FED7AA;
+  border-radius: 8px;
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.interview-acceptance-strip.status-testing,
+.interview-acceptance-strip.status-advanced {
+  background: #EFF6FF;
+  border-color: #BFDBFE;
+  box-shadow: inset 3px 0 0 #2563EB;
+}
+
+.interview-acceptance-strip.status-passed {
+  background: #F0FDF4;
+  border-color: #BBF7D0;
+  box-shadow: inset 3px 0 0 #059669;
+}
+
+.interview-acceptance-strip.status-failed {
+  background: #FEF2F2;
+  border-color: #FECACA;
+  box-shadow: inset 3px 0 0 #DC2626;
+}
+
+.interview-acceptance-strip > div {
+  min-width: 0;
+}
+
+.interview-acceptance-strip span,
+.interview-acceptance-strip strong,
+.interview-acceptance-strip p {
+  display: block;
+}
+
+.interview-acceptance-strip span {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.interview-acceptance-strip strong {
+  margin-top: 2px;
+  color: #18181B;
+  font-size: 14px;
+}
+
+.interview-acceptance-strip p {
+  margin: 3px 0 0 0;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.interview-acceptance-strip .ant-btn {
+  flex: 0 0 auto;
+}
+
 .study-sprint-input {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 28px;
@@ -4518,6 +4582,14 @@ p {
   }
 
   .interview-recovery-head .ant-btn {
+    justify-self: start;
+  }
+
+  .interview-acceptance-strip {
+    display: grid;
+  }
+
+  .interview-acceptance-strip .ant-btn {
     justify-self: start;
   }
 

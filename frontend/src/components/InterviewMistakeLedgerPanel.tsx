@@ -12,10 +12,12 @@ import { useNavigate } from 'react-router-dom'
 import type {
   InterviewMistakeLedgerItem,
   InterviewMistakeLedgerItemType,
+  InterviewRecoveryAcceptance,
   InterviewRecoveryPlan,
   StudyProgress,
 } from '../types'
 import { buildInterviewMistakeLedger } from '../utils/interviewMistakeLedger'
+import { buildInterviewRecoveryAcceptance } from '../utils/interviewRecoveryAcceptance'
 import { buildInterviewRecoveryPlan } from '../utils/interviewRecoveryPlan'
 import { buildInterviewRecoveryMarkdown } from '../utils/interviewRecoveryReport'
 
@@ -85,10 +87,33 @@ function renderRecoveryPlan(
   )
 }
 
+function renderAcceptance(
+  acceptance: InterviewRecoveryAcceptance,
+  onNavigate: (to: string) => void,
+) {
+  return (
+    <div className={`interview-acceptance-strip status-${acceptance.status}`}>
+      <div>
+        <span>{acceptance.passedCount} / {acceptance.totalCount} 已验收</span>
+        <strong>{acceptance.title}</strong>
+        <p>{acceptance.summary}</p>
+      </div>
+      <Button
+        type={acceptance.status === 'passed' ? 'default' : 'primary'}
+        icon={<ArrowRightOutlined />}
+        onClick={() => onNavigate(acceptance.primaryAction.to)}
+      >
+        {acceptance.primaryAction.label}
+      </Button>
+    </div>
+  )
+}
+
 export default function InterviewMistakeLedgerPanel({ progress }: InterviewMistakeLedgerPanelProps) {
   const navigate = useNavigate()
   const ledger = useMemo(() => buildInterviewMistakeLedger(progress), [progress])
   const recoveryPlan = useMemo(() => buildInterviewRecoveryPlan(ledger), [ledger])
+  const acceptance = useMemo(() => buildInterviewRecoveryAcceptance(progress, ledger), [progress, ledger])
   const handleCopyRecoveryPlan = async () => {
     const markdown = buildInterviewRecoveryMarkdown(ledger, recoveryPlan, progress.targetRole)
     const copied = await copyMarkdown(markdown)
@@ -117,6 +142,7 @@ export default function InterviewMistakeLedgerPanel({ progress }: InterviewMista
           </Button>
         </div>
         {renderRecoveryPlan(recoveryPlan, navigate, handleCopyRecoveryPlan)}
+        {renderAcceptance(acceptance, navigate)}
       </section>
     )
   }
@@ -165,6 +191,7 @@ export default function InterviewMistakeLedgerPanel({ progress }: InterviewMista
       </div>
 
       {renderRecoveryPlan(recoveryPlan, navigate, handleCopyRecoveryPlan)}
+      {renderAcceptance(acceptance, navigate)}
     </section>
   )
 }

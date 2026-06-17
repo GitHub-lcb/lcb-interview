@@ -293,6 +293,20 @@ export interface InterviewRecoveryPlan {
   primaryAction: InterviewMistakeLedgerAction
 }
 
+export type InterviewRecoveryAcceptanceStatus = 'empty' | 'pending' | 'testing' | 'passed' | 'failed' | 'advanced'
+
+export interface InterviewRecoveryAcceptance {
+  status: InterviewRecoveryAcceptanceStatus
+  title: string
+  summary: string
+  passedCount: number
+  totalCount: number
+  passedQuestionIds: number[]
+  failedQuestionIds: number[]
+  pendingQuestionIds: number[]
+  primaryAction: InterviewMistakeLedgerAction
+}
+
 export interface WeakArea {
   categoryId?: number
   categoryName: string
