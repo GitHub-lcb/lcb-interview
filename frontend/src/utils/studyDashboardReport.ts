@@ -1,4 +1,4 @@
-import type { Question, QuestionSnapshot, StudyProgress, WeakArea } from '../types'
+import type { DailyPlanCompletion, Question, QuestionSnapshot, StudyProgress, WeakArea } from '../types'
 import {
   buildDailyPlan,
   getQuestionState,
@@ -6,6 +6,7 @@ import {
   summarizeProgress,
   weakAreasFromQuestions,
 } from './studyProgress'
+import { buildDailyPlanCompletion } from './dailyPlanCompletion'
 
 /**
  * 构建首页备考工作台日报 Markdown，便于用户把当天执行清单和弱点雷达带到外部打卡或复盘文档。
@@ -26,6 +27,7 @@ export function buildStudyDashboardMarkdown(
   const planQuestions = resolvePlanQuestions(progress, hotQuestions, 5)
   const nextQuestion = planQuestions[0] ?? hotQuestions[0]
   const weakAreas = weakAreasFromQuestions(progress, hotQuestions)
+  const completion = buildDailyPlanCompletion(progress, now)
 
   return [
     `# ${progress.targetRole} 备考工作台日报`,
@@ -33,6 +35,7 @@ export function buildStudyDashboardMarkdown(
     `生成时间：${formatMarkdownDate(now)}`,
     '',
     renderOverview(progress, summary),
+    renderDailyCompletion(completion),
     renderNextQuestion(nextQuestion),
     renderPlanQuestions(progress, planQuestions, generatedPlanIds),
     renderWeakAreas(weakAreas),
@@ -118,6 +121,24 @@ function renderWeakAreas(weakAreas: WeakArea[]): string {
       `${index + 1}. ${area.categoryName}：${area.score}`,
       `   - 薄弱 ${area.weakCount} 道，学习中 ${area.learningCount} 道，已掌握 ${area.masteredCount} 道`,
     ].join('\n')),
+  ].join('\n')
+}
+
+function renderDailyCompletion(completion: DailyPlanCompletion): string {
+  const impactLines = completion.statusImpacts.length > 0
+    ? completion.statusImpacts.map(impact => (
+      `- 评分影响：${impact.title}，${impact.score} 分，${impact.message}；行动：${impact.actionLabel}，入口：${impact.to}`
+    ))
+    : ['- 评分影响：今日还没有计划内模拟面试评分，完成评分后会自动解释计划变化。']
+
+  return [
+    '## 今日闭环验收',
+    `- 状态：${completion.title}`,
+    `- 说明：${completion.summary}`,
+    `- 完成率：${completion.completionRate}%`,
+    `- 主行动：${completion.primaryAction.label}，${completion.primaryAction.to}`,
+    ...impactLines,
+    '',
   ].join('\n')
 }
 
