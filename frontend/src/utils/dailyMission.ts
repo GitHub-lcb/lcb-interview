@@ -28,6 +28,85 @@ export function buildDailyMissionPlan(
   }
 }
 
+/**
+ * 构建今日冲刺任务 Markdown，便于用户把首页任务清单复制到外部待办或复盘文档。
+ *
+ * @param routes 免费备考路线配置
+ * @param progress 本地学习进度
+ * @param now 当前时间，用于生成稳定日期和复习任务
+ * @returns 可携带的 Markdown 今日任务清单
+ */
+export function buildDailyMissionMarkdown(
+  routes: PrepRoute[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): string {
+  const plan = buildDailyMissionPlan(routes, progress, now)
+
+  return [
+    `# ${progress.targetRole} 今日冲刺任务`,
+    '',
+    `生成时间：${formatMarkdownDate(now)}`,
+    '',
+    renderDailyMissionOverview(plan),
+    renderDailyMissionItems(plan.missions),
+  ].join('\n').trimEnd()
+}
+
+function renderDailyMissionOverview(plan: DailyMissionPlan): string {
+  return [
+    '## 任务概览',
+    `- 状态：${plan.title}`,
+    `- 摘要：${plan.summary}`,
+    `- 任务数：${plan.missions.length} 个`,
+    '',
+  ].join('\n')
+}
+
+function renderDailyMissionItems(missions: DailyMissionItem[]): string {
+  if (missions.length === 0) {
+    return [
+      '## 任务清单',
+      '- 暂无任务。可以先打开学习计划，建立今日训练队列。',
+    ].join('\n')
+  }
+
+  const lines = ['## 任务清单']
+  missions.forEach((mission, index) => {
+    lines.push(
+      `${index + 1}. ${mission.title}`,
+      `   - 类型：${labelForMissionKind(mission.kind)}`,
+      `   - 指标：${mission.metric}`,
+      `   - 说明：${mission.description}`,
+      `   - 原因：${mission.reason}`,
+      `   - 入口：${mission.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function labelForMissionKind(kind: DailyMissionItem['kind']): string {
+  if (kind === 'review') {
+    return '复习'
+  }
+  if (kind === 'ability') {
+    return '能力短板'
+  }
+  if (kind === 'interview') {
+    return '模拟面试'
+  }
+  return '今日计划'
+}
+
+function formatMarkdownDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 10)
+  }
+  return date.toISOString().slice(0, 10)
+}
+
 function buildReviewMission(progress: StudyProgress, now: string): DailyMissionItem | null {
   const queue = buildScheduledReviewQueue(progress, now, 12)
   const summary = summarizeReviewSchedule(queue)

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { InterviewFeedback, QuestionSnapshot, StudyProgress } from '../types'
 import { prepRoutes } from '../data/freeSuperiority'
 import { createDefaultProgress } from './studyProgress'
-import { buildDailyMissionPlan } from './dailyMission'
+import { buildDailyMissionMarkdown, buildDailyMissionPlan } from './dailyMission'
 
 const snapshot = (id: number, categoryName: string, tags: string[] = []): QuestionSnapshot => ({
   id,
@@ -104,5 +104,34 @@ describe('dailyMission', () => {
     const targets = plan.missions.map(mission => mission.to)
 
     expect(targets.length).toBe(new Set(targets).size)
+  })
+
+  it('exports daily missions as portable markdown', () => {
+    const progress: StudyProgress = {
+      ...createDefaultProgress(),
+      targetRole: 'Java 后端',
+      dailyPlan: [1],
+      questionSnapshots: { 1: snapshot(1, 'Java 并发') },
+      questionStates: {
+        1: { status: 'learning', addedToPlan: true, reviewCount: 1, lastReviewedAt: '2026-06-15T09:00:00' },
+      },
+    }
+
+    const markdown = buildDailyMissionMarkdown(prepRoutes, progress, '2026-06-17T09:00:00')
+
+    expect(markdown).toContain('# Java 后端 今日冲刺任务')
+    expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 任务概览')
+    expect(markdown).toContain('## 任务清单')
+    expect(markdown).toContain('入口：/study')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps empty daily mission export actionable', () => {
+    const markdown = buildDailyMissionMarkdown(prepRoutes, createDefaultProgress(), '2026-06-17T09:00:00')
+
+    expect(markdown).toContain('今日冲刺任务')
+    expect(markdown).toMatch(/生成今日计划|完成首次模拟面试/)
+    expect(markdown).not.toContain('undefined')
   })
 })
