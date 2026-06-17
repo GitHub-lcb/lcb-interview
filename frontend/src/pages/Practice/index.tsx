@@ -13,6 +13,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import AnswerGapPanel from '../../components/AnswerGapPanel'
 import FollowUpDrillPanel from '../../components/FollowUpDrillPanel'
 import InterviewReviewPanel from '../../components/InterviewReviewPanel'
+import PracticeAnswerReadinessPanel from '../../components/PracticeAnswerReadinessPanel'
 import PracticeAnswerScaffoldPanel from '../../components/PracticeAnswerScaffoldPanel'
 import PracticeFeedbackClosurePanel from '../../components/PracticeFeedbackClosurePanel'
 import PracticeSessionReportPanel from '../../components/PracticeSessionReportPanel'
@@ -485,6 +486,7 @@ export default function Practice() {
             maxLength={1600}
             showCount
           />
+          <PracticeAnswerReadinessPanel question={current} answer={answerDraft} />
           <div className="practice-answer-actions">
             <Button
               type="primary"
