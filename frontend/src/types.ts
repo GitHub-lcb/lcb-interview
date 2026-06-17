@@ -206,6 +206,33 @@ export interface InterviewAttempt {
   createdAt: string
 }
 
+export type InterviewTrend = 'empty' | 'improving' | 'declining' | 'stable'
+
+export interface InterviewCriterionSummary {
+  key: InterviewCriterionKey
+  label: string
+  averageScore: number
+  attempts: number
+  summary: string
+}
+
+export interface InterviewReviewAttempt extends InterviewAttempt {
+  question?: QuestionSnapshot
+}
+
+export interface InterviewReviewSummary {
+  totalAttempts: number
+  answeredQuestions: number
+  averageScore: number
+  bestScore: number
+  latestScore?: number
+  trend: InterviewTrend
+  weakestCriterion?: InterviewCriterionSummary
+  criteria: InterviewCriterionSummary[]
+  recentAttempts: InterviewReviewAttempt[]
+  recommendation: string
+}
+
 export interface AnswerQualityResult {
   score: number
   level: 'excellent' | 'good' | 'needs-work'

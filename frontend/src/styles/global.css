@@ -1049,6 +1049,218 @@ p {
   gap: 5px;
 }
 
+.interview-review-panel {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #2563EB;
+}
+
+.interview-review-panel.tone-strong {
+  box-shadow: inset 4px 0 0 #059669;
+}
+
+.interview-review-panel.tone-weak {
+  box-shadow: inset 4px 0 0 #D97706;
+}
+
+.interview-review-panel.is-empty {
+  box-shadow: inset 4px 0 0 #64748B;
+}
+
+.interview-review-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.interview-review-heading h2 {
+  margin: 0;
+  color: #18181B;
+  font-size: 24px;
+}
+
+.interview-review-heading p {
+  max-width: 780px;
+  margin: 6px 0 0 0;
+  color: #52525B;
+}
+
+.interview-review-heading > svg {
+  color: #64748B;
+  font-size: 22px;
+}
+
+.interview-trend-badge {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  flex: 0 0 auto;
+  height: 28px;
+  padding: 0 9px;
+  border-radius: 6px;
+  background: #EFF6FF;
+  color: #1D4ED8;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.interview-trend-badge.tone-strong {
+  background: #ECFDF5;
+  color: #047857;
+}
+
+.interview-trend-badge.tone-weak {
+  background: #FFFBEB;
+  color: #B45309;
+}
+
+.interview-review-body {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.interview-review-score {
+  display: grid;
+  align-content: center;
+  min-width: 0;
+  padding: 14px;
+  background: #0F172A;
+  border-radius: 8px;
+  color: #FFFFFF;
+}
+
+.interview-review-score span,
+.interview-review-score small {
+  color: #CBD5E1;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.interview-review-score strong {
+  margin: 4px 0 8px 0;
+  color: #FFFFFF;
+  font-size: 42px;
+  line-height: 1;
+}
+
+.interview-review-content {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.interview-review-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.interview-review-metrics > div,
+.interview-review-weakest,
+.interview-review-recent button {
+  min-width: 0;
+  padding: 10px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+}
+
+.interview-review-metrics span,
+.interview-review-weakest span,
+.interview-review-weakest small,
+.interview-review-recent > span,
+.interview-review-recent small {
+  display: block;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.interview-review-metrics strong,
+.interview-review-weakest strong {
+  display: block;
+  margin-top: 3px;
+  color: #18181B;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.interview-review-weakest {
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.interview-review-weakest small {
+  margin-top: 5px;
+  line-height: 1.45;
+}
+
+.interview-review-recent {
+  display: grid;
+  gap: 8px;
+}
+
+.interview-review-recent button {
+  display: grid;
+  gap: 3px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.interview-review-recent button:hover {
+  background: #F8FAFC;
+  border-color: #93C5FD;
+}
+
+.interview-review-recent strong {
+  overflow: hidden;
+  color: #18181B;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.interview-review-panel.compact {
+  padding: 16px;
+}
+
+.interview-review-panel.compact .interview-review-heading {
+  display: grid;
+  gap: 10px;
+}
+
+.interview-review-panel.compact .interview-review-heading h2 {
+  font-size: 18px;
+}
+
+.interview-review-panel.compact .interview-review-heading p {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.interview-review-panel.compact .interview-review-body {
+  grid-template-columns: 1fr;
+}
+
+.interview-review-panel.compact .interview-review-score strong {
+  font-size: 34px;
+}
+
+.interview-review-panel.compact .interview-review-metrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.interview-review-panel.compact .interview-review-metrics > div,
+.interview-review-panel.compact .interview-review-weakest {
+  padding: 9px;
+}
+
 .prep-page,
 .experience-page {
   display: grid;

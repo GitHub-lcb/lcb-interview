@@ -10,6 +10,7 @@ import {
   WarningOutlined,
 } from '@ant-design/icons'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import InterviewReviewPanel from '../../components/InterviewReviewPanel'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { evaluateInterviewAnswerRemote } from '../../api/interview'
@@ -549,6 +550,7 @@ export default function Practice() {
           </div>
           {latestAttempt && <small className="practice-side-footnote">本题最近评分 {latestAttempt.feedback.score}</small>}
         </div>
+        <InterviewReviewPanel progress={progress} compact />
         <div className="practice-queue-panel">
           <div className="practice-side-title-row">
             <div className="practice-side-title">训练队列</div>

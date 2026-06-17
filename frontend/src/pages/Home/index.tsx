@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Alert } from 'antd'
 import CategoryGrid from './CategoryGrid'
 import HotQuestions from './HotQuestions'
+import InterviewReviewPanel from '../../components/InterviewReviewPanel'
 import StudyCommandCenter from '../../components/StudyCommandCenter'
 import StudyDashboard from '../../components/StudyDashboard'
 import { getHotQuestions } from '../../api/question'
@@ -13,7 +14,7 @@ export default function Home() {
   const [hotQuestions, setHotQuestions] = useState<Question[]>([])
   const [hotLoading, setHotLoading] = useState(true)
   const [hotError, setHotError] = useState(false)
-  const { rememberQuestions } = useStudyProgress()
+  const { progress, rememberQuestions } = useStudyProgress()
 
   const fetchHotQuestions = () => {
     setHotLoading(true)
@@ -39,6 +40,8 @@ export default function Home() {
       <StudyDashboard hotQuestions={hotQuestions} />
 
       <StudyCommandCenter />
+
+      <InterviewReviewPanel progress={progress} />
 
       <section className="free-promise-band" aria-label="免费承诺">
         {freePromiseItems.map(item => (
