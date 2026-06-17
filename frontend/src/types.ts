@@ -461,6 +461,48 @@ export interface DailyPlanCompletion {
   primaryAction: DailyPlanCompletionAction
 }
 
+export type InterviewEmergencyKitLevel = 'empty' | 'critical' | 'focused' | 'ready'
+
+export type InterviewEmergencyKitItemKind = 'review' | 'mistake' | 'weak' | 'closure' | 'sample'
+
+export interface InterviewEmergencyKitAction {
+  label: string
+  description: string
+  to: string
+}
+
+export interface InterviewEmergencyKitMetric {
+  key: 'actions' | 'minutes' | 'review' | 'mistake'
+  label: string
+  value: string
+  detail: string
+}
+
+export interface InterviewEmergencyKitItem {
+  id: string
+  kind: InterviewEmergencyKitItemKind
+  title: string
+  description: string
+  reason: string
+  to: string
+  durationMinutes: number
+  priority: number
+  questionIds: number[]
+  actionLabel: string
+}
+
+export interface InterviewEmergencyKit {
+  level: InterviewEmergencyKitLevel
+  title: string
+  summary: string
+  totalMinutes: number
+  reviewDebtCount: number
+  mistakeCount: number
+  metrics: InterviewEmergencyKitMetric[]
+  items: InterviewEmergencyKitItem[]
+  primaryAction: InterviewEmergencyKitAction
+}
+
 export type PracticeQueueSource = 'review' | 'plan' | 'page' | 'new'
 
 export interface PracticeQueueItem extends QuestionSnapshot {

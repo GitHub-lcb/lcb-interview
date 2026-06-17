@@ -17,6 +17,7 @@ import StudyStatusBadge from '../../components/StudyStatusBadge'
 import StudyPaceCoachPanel from '../../components/StudyPaceCoachPanel'
 import DailyPlanBriefPanel from '../../components/DailyPlanBriefPanel'
 import DailyPlanCompletionPanel from '../../components/DailyPlanCompletionPanel'
+import InterviewEmergencyKitPanel from '../../components/InterviewEmergencyKitPanel'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { getHotQuestions } from '../../api/question'
 import type { Question, ReviewDueStatus } from '../../types'
@@ -199,6 +200,7 @@ export default function StudyPlan() {
       />
       <DailyPlanBriefPanel progress={progress} candidates={hotQuestions} />
       <DailyPlanCompletionPanel progress={progress} />
+      <InterviewEmergencyKitPanel progress={progress} />
       <InterviewBriefPanel progress={progress} />
       <InterviewMistakeLedgerPanel progress={progress} />
 

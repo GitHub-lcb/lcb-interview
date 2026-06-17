@@ -3317,6 +3317,207 @@ p {
   color: #A1A1AA;
 }
 
+.interview-emergency-kit-panel {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  margin-bottom: 18px;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #2563EB;
+}
+
+.interview-emergency-kit-panel.level-empty {
+  box-shadow: inset 4px 0 0 #64748B;
+}
+
+.interview-emergency-kit-panel.level-critical {
+  box-shadow: inset 4px 0 0 #DC2626;
+}
+
+.interview-emergency-kit-panel.level-ready {
+  box-shadow: inset 4px 0 0 #059669;
+}
+
+.interview-emergency-kit-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.interview-emergency-kit-head h2 {
+  margin: 0;
+  color: #18181B;
+  font-size: 24px;
+}
+
+.interview-emergency-kit-head p {
+  max-width: 780px;
+  margin: 6px 0 0 0;
+  color: #52525B;
+}
+
+.interview-emergency-kit-total {
+  display: grid;
+  justify-items: end;
+  flex: 0 0 auto;
+}
+
+.interview-emergency-kit-total strong {
+  color: #0F172A;
+  font-size: 42px;
+  line-height: 1;
+}
+
+.interview-emergency-kit-total span {
+  margin-top: 4px;
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.interview-emergency-kit-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.interview-emergency-kit-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.interview-emergency-kit-metrics article {
+  min-width: 0;
+  padding: 11px;
+  background: #FAFAF9;
+  border: 1px solid #E7E5E4;
+  border-radius: 8px;
+}
+
+.interview-emergency-kit-metrics span,
+.interview-emergency-kit-metrics small {
+  display: block;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.interview-emergency-kit-metrics strong {
+  display: block;
+  margin: 3px 0;
+  color: #18181B;
+  font-size: 21px;
+  line-height: 1.15;
+}
+
+.interview-emergency-kit-action {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+}
+
+.interview-emergency-kit-action .ant-btn {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.interview-emergency-kit-action span {
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.interview-emergency-kit-list {
+  display: grid;
+  gap: 8px;
+}
+
+.interview-emergency-kit-list button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 12px;
+  color: inherit;
+  text-align: left;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.interview-emergency-kit-list button:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+}
+
+.interview-emergency-kit-list button.kind-review,
+.interview-emergency-kit-list button.kind-mistake {
+  box-shadow: inset 3px 0 0 #DC2626;
+}
+
+.interview-emergency-kit-list button.kind-weak,
+.interview-emergency-kit-list button.kind-closure {
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.interview-emergency-kit-list button.kind-sample {
+  box-shadow: inset 3px 0 0 #059669;
+}
+
+.interview-emergency-kit-item-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.interview-emergency-kit-item-top strong {
+  overflow: hidden;
+  color: #18181B;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.interview-emergency-kit-item-top em {
+  flex: 0 0 auto;
+  color: #64748B;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.interview-emergency-kit-list p,
+.interview-emergency-kit-list small {
+  display: block;
+  margin: 4px 0 0 0;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.interview-emergency-kit-list small {
+  color: #64748B;
+}
+
+.interview-emergency-kit-list svg {
+  align-self: center;
+  color: #A1A1AA;
+}
+
 .interview-brief-panel {
   display: grid;
   gap: 12px;
@@ -5008,6 +5209,8 @@ p {
   .daily-plan-brief-metrics,
   .daily-plan-completion-body,
   .daily-plan-completion-metrics,
+  .interview-emergency-kit-body,
+  .interview-emergency-kit-metrics,
   .review-schedule-band,
   .study-plan-grid,
   .study-question-item,
@@ -5048,6 +5251,14 @@ p {
   }
 
   .daily-plan-completion-score {
+    justify-items: start;
+  }
+
+  .interview-emergency-kit-head {
+    display: grid;
+  }
+
+  .interview-emergency-kit-total {
     justify-items: start;
   }
 }
