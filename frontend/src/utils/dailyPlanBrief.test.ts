@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Question, StudyProgress, StudyQuestionStatus } from '../types'
 import { createDefaultProgress, rememberQuestions } from './studyProgress'
-import { buildDailyPlanBrief } from './dailyPlanBrief'
+import { buildDailyPlanBrief, buildDailyPlanBriefMarkdown } from './dailyPlanBrief'
 
 const NOW = '2026-06-17T09:00:00.000Z'
 
@@ -95,5 +95,36 @@ describe('buildDailyPlanBrief', () => {
       categoryName: 'MySQL',
     })
     expect(brief.newCount).toBe(2)
+  })
+
+  it('exports planned daily brief as portable markdown', () => {
+    let progress = createDefaultProgress(NOW)
+    progress = rememberQuestions(progress, [question(1), question(2)], NOW)
+    progress = {
+      ...progress,
+      dailyPlan: [2, 1],
+      targetRole: 'Java 后端',
+    }
+    progress = markQuestion(progress, 1, 'weak', '2026-06-10T09:00:00.000Z')
+    progress = markQuestion(progress, 2, 'new', NOW, 0)
+
+    const markdown = buildDailyPlanBriefMarkdown(progress, [], NOW)
+
+    expect(markdown).toContain('# Java 后端 今日作战简报')
+    expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 作战概览')
+    expect(markdown).toContain('今日计划已拆解')
+    expect(markdown).toContain('## 指标')
+    expect(markdown).toContain('## 今日题单')
+    expect(markdown).toContain('入口：/question/1')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps empty daily brief export actionable', () => {
+    const markdown = buildDailyPlanBriefMarkdown(createDefaultProgress(NOW), [], NOW)
+
+    expect(markdown).toContain('今日计划待生成')
+    expect(markdown).toContain('今日计划还未生成')
+    expect(markdown).not.toContain('undefined')
   })
 })

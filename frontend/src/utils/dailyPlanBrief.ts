@@ -67,6 +67,82 @@ export function buildDailyPlanBrief(
   }
 }
 
+/**
+ * 构建今日作战简报 Markdown，便于用户复制当天题单和训练原因。
+ *
+ * @param progress 本地学习进度
+ * @param candidates 候选题目，用于补全计划题快照
+ * @param now 当前时间，用于生成稳定日期和复用复习债判断
+ * @returns 可携带的 Markdown 作战简报
+ */
+export function buildDailyPlanBriefMarkdown(
+  progress: StudyProgress,
+  candidates: Question[],
+  now = new Date().toISOString(),
+): string {
+  const brief = buildDailyPlanBrief(progress, candidates, now)
+
+  return [
+    `# ${progress.targetRole} 今日作战简报`,
+    '',
+    `生成时间：${formatMarkdownDate(now)}`,
+    '',
+    renderDailyPlanOverview(brief),
+    renderDailyPlanMetrics(brief.metrics),
+    renderDailyPlanItems(brief.items),
+  ].join('\n').trimEnd()
+}
+
+function renderDailyPlanOverview(brief: DailyPlanBrief): string {
+  return [
+    '## 作战概览',
+    `- 状态：${brief.title}`,
+    `- 摘要：${brief.summary}`,
+    `- 题量：${brief.totalCount} 道`,
+    '',
+  ].join('\n')
+}
+
+function renderDailyPlanMetrics(metrics: DailyPlanBrief['metrics']): string {
+  return [
+    '## 指标',
+    ...metrics.map(metric => `- ${metric.label}：${metric.value}，${metric.detail}`),
+    '',
+  ].join('\n')
+}
+
+function renderDailyPlanItems(items: DailyPlanBriefItem[]): string {
+  if (items.length === 0) {
+    return [
+      '## 今日题单',
+      '- 今日计划还未生成。先在学习计划页生成题单，再复制作战简报。',
+    ].join('\n')
+  }
+
+  const lines = ['## 今日题单']
+  items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.title}`,
+      `   - 分类：${item.categoryName}`,
+      `   - 来源：${item.sourceLabel}`,
+      `   - 状态：${item.status}`,
+      `   - 动作：${item.actionLabel}`,
+      `   - 原因：${item.reason}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function formatMarkdownDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 10)
+  }
+  return date.toISOString().slice(0, 10)
+}
+
 function buildBriefItem(
   progress: StudyProgress,
   snapshots: Record<number, QuestionSnapshot>,

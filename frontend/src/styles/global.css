@@ -2959,7 +2959,15 @@ p {
   color: #52525B;
 }
 
-.daily-plan-brief-head > span {
+.daily-plan-brief-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.daily-plan-brief-head-actions > span {
   display: inline-flex;
   align-items: center;
   flex: 0 0 auto;
@@ -6041,8 +6049,9 @@ p {
     display: grid;
   }
 
-  .daily-plan-brief-head > span {
+  .daily-plan-brief-head-actions {
     justify-self: start;
+    justify-content: flex-start;
   }
 
   .daily-plan-brief-list button {

@@ -1,8 +1,9 @@
-import { ArrowRightOutlined, FieldTimeOutlined, ThunderboltOutlined } from '@ant-design/icons'
+import { ArrowRightOutlined, CopyOutlined, FieldTimeOutlined, ThunderboltOutlined } from '@ant-design/icons'
+import { Button, message } from 'antd'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Question, StudyProgress } from '../types'
-import { buildDailyPlanBrief } from '../utils/dailyPlanBrief'
+import { buildDailyPlanBrief, buildDailyPlanBriefMarkdown } from '../utils/dailyPlanBrief'
 
 interface DailyPlanBriefPanelProps {
   progress: StudyProgress
@@ -22,6 +23,19 @@ export default function DailyPlanBriefPanel({
   )
   const visibleItems = brief.items.slice(0, 6)
 
+  const handleCopyBrief = async () => {
+    const markdown = buildDailyPlanBriefMarkdown(progress, candidates, now)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('今日作战简报已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 简报')
+  }
+
   return (
     <section className="daily-plan-brief-panel" aria-label="今日作战简报">
       <div className="daily-plan-brief-head">
@@ -33,7 +47,12 @@ export default function DailyPlanBriefPanel({
           <h2>{brief.title}</h2>
           <p>{brief.summary}</p>
         </div>
-        <span>{brief.totalCount > 0 ? `展示 ${visibleItems.length}/${brief.totalCount}` : '待生成'}</span>
+        <div className="daily-plan-brief-head-actions">
+          <span>{brief.totalCount > 0 ? `展示 ${visibleItems.length}/${brief.totalCount}` : '待生成'}</span>
+          <Button size="small" icon={<CopyOutlined />} onClick={handleCopyBrief}>
+            复制简报
+          </Button>
+        </div>
       </div>
 
       <div className="daily-plan-brief-metrics">
@@ -73,4 +92,34 @@ export default function DailyPlanBriefPanel({
       )}
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
+function buildFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '岗位'}-今日作战简报.md`
 }
