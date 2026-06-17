@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewAttempt, StudyProgress } from '../types'
 import type { PrepRoute } from '../data/freeSuperiority'
-import { buildPrepHealthReport } from './prepHealth'
+import { buildPrepHealthMarkdown, buildPrepHealthReport } from './prepHealth'
 
 const NOW = '2026-06-17T00:00:00.000Z'
 
@@ -140,5 +140,30 @@ describe('buildPrepHealthReport', () => {
     expect(report.primaryDimension.key).toBe('pace')
     expect(report.primaryAction.to).toBe('/study')
   })
-})
 
+  it('exports risky prep health radar as portable markdown', () => {
+    const progress = emptyProgress()
+    progress.targetRole = 'Java 后端'
+    addQuestion(progress, 1, 'weak', 'Java 并发', '2026-06-13T00:00:00.000Z')
+    addQuestion(progress, 2, 'mastered', 'MySQL', '2026-06-16T00:00:00.000Z')
+    progress.dailyPlan = [1, 2]
+
+    const markdown = buildPrepHealthMarkdown([javaRoute], progress, NOW)
+
+    expect(markdown).toContain('# Java 后端 备考健康雷达')
+    expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 健康概览')
+    expect(markdown).toContain('## 维度诊断')
+    expect(markdown).toContain('## 主行动')
+    expect(markdown).toContain('入口：/study')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps empty prep health export actionable', () => {
+    const markdown = buildPrepHealthMarkdown([javaRoute], emptyProgress(), NOW)
+
+    expect(markdown).toContain('建立学习轨迹')
+    expect(markdown).toContain('入口：/study')
+    expect(markdown).not.toContain('undefined')
+  })
+})

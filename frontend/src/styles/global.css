@@ -1279,8 +1279,14 @@ p {
   line-height: 1.55;
 }
 
-.prep-health-action .ant-btn {
+.prep-health-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   justify-self: start;
+}
+
+.prep-health-action-buttons .ant-btn {
   display: inline-flex;
   align-items: center;
   gap: 5px;

@@ -1,6 +1,7 @@
-import { Button, Progress } from 'antd'
+import { Button, message, Progress } from 'antd'
 import {
   ArrowRightOutlined,
+  CopyOutlined,
   FieldTimeOutlined,
   FireOutlined,
   RadarChartOutlined,
@@ -11,7 +12,7 @@ import { useNavigate } from 'react-router-dom'
 import { prepRoutes } from '../data/freeSuperiority'
 import { useStudyProgress } from '../hooks/useStudyProgress'
 import type { PrepHealthDimensionKey, PrepHealthLevel } from '../types'
-import { buildPrepHealthReport } from '../utils/prepHealth'
+import { buildPrepHealthMarkdown, buildPrepHealthReport } from '../utils/prepHealth'
 
 const dimensionIcons: Record<PrepHealthDimensionKey, JSX.Element> = {
   review: <FireOutlined />,
@@ -45,6 +46,19 @@ export default function PrepHealthRadarPanel() {
   const { progress } = useStudyProgress()
   const report = useMemo(() => buildPrepHealthReport(prepRoutes, progress), [progress])
 
+  const handleCopyHealth = async () => {
+    const markdown = buildPrepHealthMarkdown(prepRoutes, progress)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('备考健康雷达已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 雷达')
+  }
+
   return (
     <section className={`prep-health-panel level-${report.level}`} aria-label="备考健康雷达">
       <div className="prep-health-main">
@@ -63,9 +77,14 @@ export default function PrepHealthRadarPanel() {
         <p>{report.summary}</p>
         <div className="prep-health-action">
           <span>{report.primaryAction.description}</span>
-          <Button type="primary" icon={<ArrowRightOutlined />} onClick={() => navigate(report.primaryAction.to)}>
-            {report.primaryAction.label}
-          </Button>
+          <div className="prep-health-action-buttons">
+            <Button type="primary" icon={<ArrowRightOutlined />} onClick={() => navigate(report.primaryAction.to)}>
+              {report.primaryAction.label}
+            </Button>
+            <Button icon={<CopyOutlined />} onClick={handleCopyHealth}>
+              复制雷达
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -87,4 +106,34 @@ export default function PrepHealthRadarPanel() {
       </div>
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
+function buildFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '岗位'}-备考健康雷达.md`
 }

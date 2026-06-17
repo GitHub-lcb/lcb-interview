@@ -52,6 +52,111 @@ export function buildPrepHealthReport(
   }
 }
 
+/**
+ * 构建备考健康雷达 Markdown，便于用户把健康诊断和主行动带到外部复盘文档。
+ *
+ * @param routes 免费备考路线配置
+ * @param progress 本地学习进度
+ * @param now 当前时间，用于生成稳定日期和复习诊断
+ * @returns 可复制或下载的 Markdown 健康报告
+ */
+export function buildPrepHealthMarkdown(
+  routes: PrepRoute[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): string {
+  const report = buildPrepHealthReport(routes, progress, now)
+
+  return [
+    `# ${progress.targetRole} 备考健康雷达`,
+    '',
+    `生成时间：${formatMarkdownDate(now)}`,
+    '',
+    renderPrepHealthOverview(report),
+    renderPrepHealthDimensions(report.dimensions),
+    renderPrepHealthPrimaryAction(report.primaryAction),
+  ].join('\n').trimEnd()
+}
+
+function renderPrepHealthOverview(report: PrepHealthReport): string {
+  return [
+    '## 健康概览',
+    `- 状态：${report.title}`,
+    `- 等级：${labelForHealthLevel(report.level)}`,
+    `- 健康分：${report.score}`,
+    `- 摘要：${report.summary}`,
+    `- 主风险：${report.primaryDimension.label}，${report.primaryDimension.score} 分`,
+    '',
+  ].join('\n')
+}
+
+function renderPrepHealthDimensions(dimensions: PrepHealthDimension[]): string {
+  if (dimensions.length === 0) {
+    return [
+      '## 维度诊断',
+      '- 暂无维度诊断。先建立学习轨迹，再生成健康雷达。',
+      '',
+    ].join('\n')
+  }
+
+  const lines = ['## 维度诊断']
+  dimensions.forEach((dimension, index) => {
+    lines.push(
+      `${index + 1}. ${dimension.label}`,
+      `   - 状态：${labelForDimensionStatus(dimension.status)}`,
+      `   - 分数：${dimension.score}`,
+      `   - 指标：${dimension.metric}`,
+      `   - 说明：${dimension.description}`,
+      `   - 细节：${dimension.detail}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderPrepHealthPrimaryAction(action: PrepHealthAction): string {
+  return [
+    '## 主行动',
+    `- 动作：${action.label}`,
+    `- 说明：${action.description}`,
+    `- 入口：${action.to}`,
+  ].join('\n')
+}
+
+function labelForHealthLevel(level: PrepHealthLevel): string {
+  if (level === 'empty') {
+    return '待建立'
+  }
+  if (level === 'risk') {
+    return '高风险'
+  }
+  if (level === 'watch') {
+    return '需校准'
+  }
+  return '健康'
+}
+
+function labelForDimensionStatus(status: PrepHealthDimensionStatus): string {
+  if (status === 'danger') {
+    return '危险'
+  }
+  if (status === 'warning') {
+    return '预警'
+  }
+  if (status === 'empty') {
+    return '待建立'
+  }
+  return '稳定'
+}
+
+function formatMarkdownDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 10)
+  }
+  return date.toISOString().slice(0, 10)
+}
+
 function buildReviewDimension(progress: StudyProgress, now: string): HealthCandidate {
   const queue = buildScheduledReviewQueue(progress, now, 1000)
   const summary = summarizeReviewSchedule(queue)
