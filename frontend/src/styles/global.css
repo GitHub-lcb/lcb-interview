@@ -6082,6 +6082,149 @@ p {
   margin-top: 12px;
 }
 
+.practice-attempt-delta-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #2563EB;
+}
+
+.practice-attempt-delta-panel.level-empty,
+.practice-attempt-delta-panel.level-single,
+.practice-attempt-delta-panel.level-stable {
+  box-shadow: inset 4px 0 0 #71717A;
+}
+
+.practice-attempt-delta-panel.level-improved {
+  box-shadow: inset 4px 0 0 #059669;
+}
+
+.practice-attempt-delta-panel.level-regressed {
+  box-shadow: inset 4px 0 0 #DC2626;
+}
+
+.practice-attempt-delta-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.practice-attempt-delta-main span,
+.practice-attempt-delta-main small,
+.practice-attempt-delta-summary,
+.practice-attempt-delta-action-wrap small {
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.practice-attempt-delta-main strong {
+  display: block;
+  color: #0F172A;
+  font-size: 34px;
+  line-height: 1.1;
+}
+
+.practice-attempt-delta-main > em {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 34px;
+  border-radius: 8px;
+  background: #F8FAFC;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.practice-attempt-delta-main > em.tone-up {
+  background: #ECFDF5;
+  color: #047857;
+}
+
+.practice-attempt-delta-main > em.tone-down {
+  background: #FEF2F2;
+  color: #B91C1C;
+}
+
+.practice-attempt-delta-main > em.tone-same {
+  color: #52525B;
+}
+
+.practice-attempt-delta-summary {
+  margin: 0;
+}
+
+.practice-attempt-delta-criteria {
+  display: grid;
+  gap: 8px;
+}
+
+.practice-attempt-delta-criteria article {
+  min-width: 0;
+  padding: 10px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+}
+
+.practice-attempt-delta-criteria article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.practice-attempt-delta-criteria span,
+.practice-attempt-delta-criteria small {
+  display: block;
+  overflow: hidden;
+  color: #64748B;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-attempt-delta-criteria span {
+  color: #18181B;
+  font-weight: 800;
+}
+
+.practice-attempt-delta-criteria em {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 4px;
+  align-items: center;
+  color: #52525B;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.practice-attempt-delta-criteria article.tone-up em {
+  color: #047857;
+}
+
+.practice-attempt-delta-criteria article.tone-down em {
+  color: #B91C1C;
+}
+
+.practice-attempt-delta-action-wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.practice-attempt-delta-action {
+  justify-content: center;
+  width: 100%;
+}
+
 .practice-session-report-panel {
   display: grid;
   gap: 12px;

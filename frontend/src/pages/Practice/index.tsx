@@ -15,6 +15,7 @@ import FollowUpDrillPanel from '../../components/FollowUpDrillPanel'
 import InterviewReviewPanel from '../../components/InterviewReviewPanel'
 import PracticeAnswerReadinessPanel from '../../components/PracticeAnswerReadinessPanel'
 import PracticeAnswerScaffoldPanel from '../../components/PracticeAnswerScaffoldPanel'
+import PracticeAttemptDeltaPanel from '../../components/PracticeAttemptDeltaPanel'
 import PracticeFeedbackClosurePanel from '../../components/PracticeFeedbackClosurePanel'
 import PracticeSessionReportPanel from '../../components/PracticeSessionReportPanel'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
@@ -304,6 +305,7 @@ export default function Practice() {
     : undefined
   const currentState = current ? getState(current.id) : null
   const latestAttempt = current ? progress.interviewAttempts[current.id]?.[0] : undefined
+  const currentAttempts = current ? progress.interviewAttempts[current.id] ?? [] : []
   const progressPercent = queue.length === 0 ? 0 : Math.round(((currentIndex + 1) / queue.length) * 100)
   const answeredInQueue = queue.filter(item => (progress.interviewAttempts[item.id]?.length ?? 0) > 0).length
   const latestScore = feedback?.score ?? latestAttempt?.feedback.score
@@ -389,6 +391,11 @@ export default function Practice() {
 
   const useRepairTemplate = (template: string) => {
     setAnswerDraft(template)
+    setFeedback(null)
+  }
+
+  const startAttemptDeltaAnswer = (prompt: string) => {
+    setAnswerDraft(`${prompt}\n\n我的回答：`)
     setFeedback(null)
   }
 
@@ -611,6 +618,11 @@ export default function Practice() {
           </div>
           {latestAttempt && <small className="practice-side-footnote">本题最近评分 {latestAttempt.feedback.score}</small>}
         </div>
+        <PracticeAttemptDeltaPanel
+          question={current}
+          attempts={currentAttempts}
+          onUsePrompt={startAttemptDeltaAnswer}
+        />
         <PracticeSessionReportPanel queue={queue} progress={progress} onNavigate={navigate} />
         <InterviewReviewPanel progress={progress} compact />
         <div className="practice-queue-panel">
