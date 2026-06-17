@@ -3432,7 +3432,7 @@ p {
   gap: 5px;
 }
 
-.interview-emergency-kit-action span {
+.interview-emergency-kit-action > span {
   color: #64748B;
   font-size: 12px;
   line-height: 1.55;

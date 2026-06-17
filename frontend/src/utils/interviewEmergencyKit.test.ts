@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewAttempt, InterviewCriterionKey, StudyProgress } from '../types'
-import { buildInterviewEmergencyKit } from './interviewEmergencyKit'
+import { buildInterviewEmergencyKit, buildInterviewEmergencyKitMarkdown } from './interviewEmergencyKit'
 
 const NOW = '2026-06-17T09:00:00.000Z'
 
@@ -133,5 +133,33 @@ describe('buildInterviewEmergencyKit', () => {
     expect(kit.level).toBe('ready')
     expect(kit.title).toContain('可以轻量热身')
     expect(kit.primaryAction.to).toBe('/practice?queue=9')
+  })
+
+  it('exports critical emergency kit as portable markdown', () => {
+    const progress = emptyProgress()
+    addQuestion(progress, 1, 'weak', '2026-06-13T00:00:00.000Z')
+    addQuestion(progress, 2, 'learning', NOW)
+    progress.dailyPlan = [1, 2]
+    progress.interviewAttempts[2] = [attempt(2, { specificity: 40 })]
+
+    const markdown = buildInterviewEmergencyKitMarkdown(progress, NOW)
+
+    expect(markdown).toContain('# Java 后端 面试前急救包')
+    expect(markdown).toContain('生成时间：2026-06-17')
+    expect(markdown).toContain('## 急救概览')
+    expect(markdown).toContain('面试前先压最高风险')
+    expect(markdown).toContain('预计耗时')
+    expect(markdown).toContain('1 道复习债先清掉')
+    expect(markdown).toContain('入口：/practice?queue=1')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('keeps empty emergency kit export actionable', () => {
+    const markdown = buildInterviewEmergencyKitMarkdown(emptyProgress(), NOW)
+
+    expect(markdown).toContain('先建立临场样本')
+    expect(markdown).toContain('先建立一次模拟面试样本')
+    expect(markdown).toContain('开始模拟面试')
+    expect(markdown).not.toContain('undefined')
   })
 })

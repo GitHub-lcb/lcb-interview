@@ -15,6 +15,14 @@ import { buildScheduledReviewQueue } from './reviewSchedule'
 const MAX_TOTAL_MINUTES = 30
 const MAX_ACTIONS = 5
 
+const ITEM_KIND_LABELS: Record<InterviewEmergencyKitItem['kind'], string> = {
+  review: '复习债',
+  mistake: '错因修复',
+  weak: '薄弱开口',
+  closure: '今日闭环',
+  sample: '模拟样本',
+}
+
 /**
  * 面试前急救包，把本地学习闭环压缩成 30 分钟内可执行的临场行动。
  *
@@ -144,6 +152,77 @@ export function buildInterviewEmergencyKit(
     items,
     primaryAction,
   }
+}
+
+/**
+ * 构建面试前急救包 Markdown，便于用户复制到笔记或离线面试清单。
+ *
+ * @param progress 本地学习进度
+ * @param now 当前时间，用于生成稳定日期和复用急救包判断
+ * @returns 可携带的 Markdown 急救清单
+ */
+export function buildInterviewEmergencyKitMarkdown(
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): string {
+  const kit = buildInterviewEmergencyKit(progress, now)
+
+  return [
+    `# ${progress.targetRole} 面试前急救包`,
+    '',
+    `生成时间：${formatMarkdownDate(now)}`,
+    '',
+    renderEmergencyOverview(kit),
+    renderEmergencyMetrics(kit.metrics),
+    renderEmergencyItems(kit.items),
+  ].join('\n').trimEnd()
+}
+
+function renderEmergencyOverview(kit: InterviewEmergencyKit): string {
+  return [
+    '## 急救概览',
+    `- 状态：${kit.title}`,
+    `- 摘要：${kit.summary}`,
+    `- 预计耗时：${kit.totalMinutes} 分钟`,
+    `- 下一步：${kit.primaryAction.label}，${kit.primaryAction.to}`,
+    `- 说明：${kit.primaryAction.description}`,
+    '',
+  ].join('\n')
+}
+
+function renderEmergencyMetrics(metrics: InterviewEmergencyKitMetric[]): string {
+  return [
+    '## 指标',
+    ...metrics.map(metric => `- ${metric.label}：${metric.value}，${metric.detail}`),
+    '',
+  ].join('\n')
+}
+
+function renderEmergencyItems(items: InterviewEmergencyKitItem[]): string {
+  const lines = ['## 急救动作']
+
+  items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.title}`,
+      `   - 类型：${ITEM_KIND_LABELS[item.kind]}`,
+      `   - 耗时：${item.durationMinutes} 分钟`,
+      `   - 动作：${item.actionLabel}`,
+      `   - 说明：${item.description}`,
+      `   - 原因：${item.reason}`,
+      `   - 题目：${item.questionIds.length > 0 ? item.questionIds.join('、') : '按入口开始'}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function formatMarkdownDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 10)
+  }
+  return date.toISOString().slice(0, 10)
 }
 
 function selectWithinBudget(candidates: InterviewEmergencyKitItem[]): InterviewEmergencyKitItem[] {

@@ -1,12 +1,15 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import type { InterviewAttempt, StudyProgress } from '../types'
 import { createDefaultProgress } from '../utils/studyProgress'
 import InterviewEmergencyKitPanel from './InterviewEmergencyKitPanel'
 
 const NOW = '2026-06-17T09:00:00.000Z'
+
+afterEach(() => cleanup())
 
 function attempt(questionId: number): InterviewAttempt {
   return {
@@ -86,5 +89,25 @@ describe('InterviewEmergencyKitPanel', () => {
     expect(screen.getByText('24 分钟')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /先清复习债/ })).toBeInTheDocument()
     expect(screen.getByText('1 道复习债先清掉')).toBeInTheDocument()
+  })
+
+  it('copies emergency kit markdown', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    })
+
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <InterviewEmergencyKitPanel progress={progressWithRisk()} now={NOW} />
+      </MemoryRouter>
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /复制急救包/ }))
+
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1))
+    expect(writeText.mock.calls[0][0]).toContain('# Java 后端 面试前急救包')
+    expect(writeText.mock.calls[0][0]).toContain('1 道复习债先清掉')
   })
 })

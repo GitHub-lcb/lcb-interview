@@ -1,9 +1,9 @@
-import { ArrowRightOutlined, ClockCircleOutlined, ThunderboltOutlined } from '@ant-design/icons'
-import { Button } from 'antd'
+import { ArrowRightOutlined, ClockCircleOutlined, CopyOutlined, ThunderboltOutlined } from '@ant-design/icons'
+import { Button, message } from 'antd'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { StudyProgress } from '../types'
-import { buildInterviewEmergencyKit } from '../utils/interviewEmergencyKit'
+import { buildInterviewEmergencyKit, buildInterviewEmergencyKitMarkdown } from '../utils/interviewEmergencyKit'
 
 interface InterviewEmergencyKitPanelProps {
   progress: StudyProgress
@@ -19,6 +19,19 @@ export default function InterviewEmergencyKitPanel({
     () => buildInterviewEmergencyKit(progress, now),
     [now, progress],
   )
+
+  const handleCopyKit = async () => {
+    const markdown = buildInterviewEmergencyKitMarkdown(progress, now)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      message.success('面试急救包已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFileName(progress.targetRole))
+    message.warning('剪贴板不可用，已下载 Markdown 急救包')
+  }
 
   return (
     <section className={`interview-emergency-kit-panel level-${kit.level}`} aria-label="面试前急救包">
@@ -49,6 +62,9 @@ export default function InterviewEmergencyKitPanel({
         </div>
 
         <div className="interview-emergency-kit-action">
+          <Button size="small" icon={<CopyOutlined />} onClick={handleCopyKit}>
+            复制急救包
+          </Button>
           <Button type="primary" icon={<ClockCircleOutlined />} onClick={() => navigate(kit.primaryAction.to)}>
             {kit.primaryAction.label}
             <ArrowRightOutlined />
@@ -74,4 +90,32 @@ export default function InterviewEmergencyKitPanel({
       </div>
     </section>
   )
+}
+
+async function copyMarkdown(markdown: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(markdown)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function downloadMarkdown(markdown: string, fileName: string): void {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+function buildFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '岗位'}-面试前急救包.md`
 }
