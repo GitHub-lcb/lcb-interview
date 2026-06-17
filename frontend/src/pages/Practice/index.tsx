@@ -18,6 +18,7 @@ import PracticeAnswerScaffoldPanel from '../../components/PracticeAnswerScaffold
 import PracticeAttemptDeltaPanel from '../../components/PracticeAttemptDeltaPanel'
 import PracticeFeedbackClosurePanel from '../../components/PracticeFeedbackClosurePanel'
 import PracticeInterviewerScriptPanel from '../../components/PracticeInterviewerScriptPanel'
+import PracticeScriptAnswerAcceptancePanel from '../../components/PracticeScriptAnswerAcceptancePanel'
 import PracticeSessionReportPanel from '../../components/PracticeSessionReportPanel'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
@@ -508,6 +509,11 @@ export default function Practice() {
             question={current}
             answer={answerDraft}
             onUseRepairTemplate={useRepairTemplate}
+          />
+          <PracticeScriptAnswerAcceptancePanel
+            question={current}
+            attempts={currentAttempts}
+            answer={answerDraft}
           />
           <div className="practice-answer-actions">
             <Button
