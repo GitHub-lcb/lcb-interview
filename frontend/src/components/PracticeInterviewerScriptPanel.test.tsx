@@ -4,6 +4,7 @@ import '@testing-library/jest-dom/vitest'
 import { message } from 'antd'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { InterviewAttempt, InterviewCriterion, PracticeQueueItem } from '../types'
+import { buildPracticeInterviewerScript } from '../utils/practiceInterviewerScript'
 import PracticeInterviewerScriptPanel from './PracticeInterviewerScriptPanel'
 
 function question(): PracticeQueueItem {
@@ -165,6 +166,59 @@ describe('PracticeInterviewerScriptPanel', () => {
     expect(writeText.mock.calls[0][0]).toContain('HashMap 为什么线程不安全')
   })
 
+  it('uses the progress primary action to continue with the next pending prompt', async () => {
+    const onUsePrompt = vi.fn()
+    const warmupPrompt = buildPracticeInterviewerScript(question(), []).steps[0].prompt
+
+    render(
+      <PracticeInterviewerScriptPanel
+        question={question()}
+        attempts={[followUpAttempt(warmupPrompt, passedBody(), '2026-06-18T08:00:00.000Z')]}
+        onUsePrompt={onUsePrompt}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /继续下一问/ }))
+
+    expect(onUsePrompt).toHaveBeenCalledTimes(1)
+    expect(onUsePrompt.mock.calls[0][0]).toContain('结论 -> 机制 -> 场景 -> 边界')
+  })
+
+  it('uses the progress primary action to repair the attempted prompt first', async () => {
+    const onUsePrompt = vi.fn()
+    const warmupPrompt = buildPracticeInterviewerScript(question(), []).steps[0].prompt
+
+    render(
+      <PracticeInterviewerScriptPanel
+        question={question()}
+        attempts={[followUpAttempt(warmupPrompt, '结论：HashMap 多线程不安全。', '2026-06-18T08:00:00.000Z', 65)]}
+        onUsePrompt={onUsePrompt}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /修复当前问/ }))
+
+    expect(onUsePrompt).toHaveBeenCalledTimes(1)
+    expect(onUsePrompt.mock.calls[0][0]).toBe(warmupPrompt)
+  })
+
+  it('hides the progress primary action when all script steps have passed', () => {
+    const script = buildPracticeInterviewerScript(question(), [])
+
+    render(
+      <PracticeInterviewerScriptPanel
+        question={question()}
+        attempts={script.steps.map((step, index) => (
+          followUpAttempt(step.prompt, passedBody(), `2026-06-18T08:0${index}:00.000Z`)
+        ))}
+        onUsePrompt={vi.fn()}
+      />,
+    )
+
+    expect(screen.queryByRole('button', { name: /继续下一问/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /修复当前问/ })).not.toBeInTheDocument()
+  })
+
   it('renders script progress and passed state for completed follow-up steps', () => {
     const warmupPrompt = '请用 30 秒回答「HashMap 为什么线程不安全？扩容时会发生什么？」：先给结论，再补一句核心原因。'
 
@@ -178,7 +232,7 @@ describe('PracticeInterviewerScriptPanel', () => {
 
     expect(screen.getByText('脚本进度 1 / 3')).toBeInTheDocument()
     expect(screen.getByText('已通过')).toBeInTheDocument()
-    expect(screen.getByText(/下一问/)).toBeInTheDocument()
+    expect(screen.getByText('下一问已标出，继续完成未通过追问。')).toBeInTheDocument()
   })
 
   it('shows a repair action when a follow-up step was attempted but not passed', () => {

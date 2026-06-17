@@ -46,6 +46,8 @@ export default function PracticeInterviewerScriptPanel({
     [attempts, question],
   )
   const { script } = scriptProgress
+  const nextProgressItem = scriptProgress.steps.find(item => item.status !== 'passed')
+  const nextActionLabel = nextProgressItem?.status === 'attempted' ? '修复当前问' : '继续下一问'
 
   const handleCopyScript = async () => {
     const markdown = buildPracticeInterviewerScriptMarkdown(question, attempts)
@@ -71,6 +73,12 @@ export default function PracticeInterviewerScriptPanel({
 
     downloadMarkdown(markdown, buildProgressFileName(question.title))
     message.warning('剪贴板不可用，已下载 Markdown 进度')
+  }
+
+  const handleUseNextPrompt = () => {
+    if (nextProgressItem) {
+      onUsePrompt(nextProgressItem.step.prompt)
+    }
   }
 
   return (
@@ -107,9 +115,16 @@ export default function PracticeInterviewerScriptPanel({
             </span>
             <small>{scriptProgress.summary}</small>
           </div>
-          <Button size="small" icon={<CopyOutlined />} onClick={handleCopyProgress}>
-            复制进度
-          </Button>
+          <div className="practice-interviewer-script-progress-actions">
+            {nextProgressItem ? (
+              <Button size="small" type="primary" onClick={handleUseNextPrompt}>
+                {nextActionLabel}
+              </Button>
+            ) : null}
+            <Button size="small" icon={<CopyOutlined />} onClick={handleCopyProgress}>
+              复制进度
+            </Button>
+          </div>
         </div>
         <Progress percent={scriptProgress.progressPercent} showInfo={false} />
       </div>

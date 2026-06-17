@@ -6496,7 +6496,15 @@ p {
   line-height: 1.45;
 }
 
-.practice-interviewer-script-progress-top .ant-btn {
+.practice-interviewer-script-progress-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.practice-interviewer-script-progress-actions .ant-btn {
   flex: 0 0 auto;
 }
 
