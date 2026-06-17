@@ -2,6 +2,7 @@ import type { PrepRoute } from '../data/freeSuperiority'
 import type {
   DailyPlanBrief,
   DailyPlanCompletion,
+  InterviewEmergencyKit,
   InterviewBriefItem,
   InterviewBriefReport,
   InterviewMistakeLedger,
@@ -13,6 +14,7 @@ import type {
 import { buildDailyPlanBrief } from './dailyPlanBrief'
 import { buildDailyPlanCompletion } from './dailyPlanCompletion'
 import { buildInterviewBrief } from './interviewBrief'
+import { buildInterviewEmergencyKit } from './interviewEmergencyKit'
 import { buildInterviewMistakeLedger } from './interviewMistakeLedger'
 import { buildInterviewRecoveryPlan } from './interviewRecoveryPlan'
 import { buildPrepHealthReport } from './prepHealth'
@@ -34,6 +36,7 @@ export function buildSprintReportMarkdown(
   const dailyBrief = buildDailyPlanBrief(progress, [], now)
   const mistakeLedger = buildInterviewMistakeLedger(progress)
   const recoveryPlan = buildInterviewRecoveryPlan(mistakeLedger)
+  const emergencyKit = buildInterviewEmergencyKit(progress, now)
   const generatedDate = formatDate(now)
 
   return [
@@ -43,6 +46,7 @@ export function buildSprintReportMarkdown(
     `目标周期：${progress.sprintDays} 天`,
     '',
     renderExecutiveSummarySection(health, completion, mistakeLedger, recoveryPlan),
+    renderEmergencyKitSection(emergencyKit),
     renderHealthSection(health),
     renderDimensionsSection(health.dimensions),
     renderDailyCompletionSection(completion),
@@ -83,6 +87,25 @@ function renderExecutiveSummarySection(
     `- 先做健康动作：${health.primaryAction.label} - ${health.primaryAction.description}（${health.primaryAction.to}）`,
     `- 再做今日动作：${completion.primaryAction.label} - ${completion.primaryAction.description}（${completion.primaryAction.to}）`,
     `- 最后做恢复动作：${recoveryPlan.primaryAction.label} - ${recoveryPlan.primaryAction.description}（${recoveryTo}）`,
+    '',
+  ].join('\n')
+}
+
+function renderEmergencyKitSection(kit: InterviewEmergencyKit): string {
+  const itemLines = kit.items.length > 0
+    ? kit.items.slice(0, 5).map(item => (
+      `- ${item.durationMinutes} 分钟｜${item.title}：${item.description}；${item.reason}（${item.to || '/practice'}）`
+    ))
+    : ['- 暂无急救动作。']
+
+  return [
+    '## 面试前急救包',
+    `- 状态：${kit.title}`,
+    `- 摘要：${kit.summary}`,
+    `- 预计耗时：${kit.totalMinutes} 分钟`,
+    `- 复习债：${kit.reviewDebtCount} 道`,
+    `- 错因信号：${kit.mistakeCount} 个`,
+    ...itemLines,
     '',
   ].join('\n')
 }
