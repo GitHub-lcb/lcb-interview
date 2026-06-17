@@ -22,6 +22,7 @@ import type { Question, ReviewDueStatus } from '../../types'
 import { buildScheduledReviewQueue, summarizeReviewSchedule } from '../../utils/reviewSchedule'
 import { buildDailyPlan, resolvePlanQuestions, summarizeProgress } from '../../utils/studyProgress'
 import { buildPaceFilledDailyPlan } from '../../utils/studyPacePlan'
+import { buildDailyPracticePath } from '../../utils/practiceRoute'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
 const roleOptions = [
@@ -143,7 +144,11 @@ export default function StudyPlan() {
           >
             生成今日计划
           </Button>
-          <Button type="primary" icon={<PlayCircleOutlined />} onClick={() => navigate('/practice')}>
+          <Button
+            type="primary"
+            icon={<PlayCircleOutlined />}
+            onClick={() => navigate(buildDailyPracticePath(progress.dailyPlan))}
+          >
             开始训练
           </Button>
           <Button icon={<BookOutlined />} onClick={() => navigate('/banks')}>
