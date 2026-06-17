@@ -421,6 +421,46 @@ export interface DailyPlanBrief {
   items: DailyPlanBriefItem[]
 }
 
+export type DailyPlanCompletionLevel = 'empty' | 'risk' | 'active' | 'ready' | 'excellent'
+
+export interface DailyPlanCompletionMetric {
+  key: 'completion' | 'mastered' | 'risk' | 'interview'
+  label: string
+  value: string
+  detail: string
+}
+
+export interface DailyPlanCompletionAction {
+  label: string
+  description: string
+  to: string
+}
+
+export interface DailyPlanCompletionTodo {
+  id: string
+  questionId?: number
+  title: string
+  description: string
+  tone: 'danger' | 'warning' | 'default' | 'success'
+  to: string
+}
+
+export interface DailyPlanCompletion {
+  level: DailyPlanCompletionLevel
+  title: string
+  summary: string
+  completionRate: number
+  totalCount: number
+  masteredCount: number
+  remainingCount: number
+  weakCount: number
+  reviewDebtCount: number
+  interviewTodayCount: number
+  metrics: DailyPlanCompletionMetric[]
+  todos: DailyPlanCompletionTodo[]
+  primaryAction: DailyPlanCompletionAction
+}
+
 export type PracticeQueueSource = 'review' | 'plan' | 'page' | 'new'
 
 export interface PracticeQueueItem extends QuestionSnapshot {

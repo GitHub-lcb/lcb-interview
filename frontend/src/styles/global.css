@@ -3121,6 +3121,202 @@ p {
   margin: 0;
 }
 
+.daily-plan-completion-panel {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  margin-bottom: 18px;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: inset 4px 0 0 #2563EB;
+}
+
+.daily-plan-completion-panel.level-empty {
+  box-shadow: inset 4px 0 0 #64748B;
+}
+
+.daily-plan-completion-panel.level-risk {
+  box-shadow: inset 4px 0 0 #DC2626;
+}
+
+.daily-plan-completion-panel.level-ready {
+  box-shadow: inset 4px 0 0 #D97706;
+}
+
+.daily-plan-completion-panel.level-excellent {
+  box-shadow: inset 4px 0 0 #059669;
+}
+
+.daily-plan-completion-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.daily-plan-completion-head h2 {
+  margin: 0;
+  color: #18181B;
+  font-size: 24px;
+}
+
+.daily-plan-completion-head p {
+  max-width: 760px;
+  margin: 6px 0 0 0;
+  color: #52525B;
+}
+
+.daily-plan-completion-score {
+  display: grid;
+  justify-items: end;
+  flex: 0 0 auto;
+}
+
+.daily-plan-completion-score strong {
+  color: #0F172A;
+  font-size: 42px;
+  line-height: 1;
+}
+
+.daily-plan-completion-score span {
+  margin-top: 4px;
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.daily-plan-completion-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.daily-plan-completion-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.daily-plan-completion-metrics article {
+  min-width: 0;
+  padding: 11px;
+  background: #FAFAF9;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+}
+
+.daily-plan-completion-metrics span,
+.daily-plan-completion-metrics small {
+  display: block;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.daily-plan-completion-metrics strong {
+  display: block;
+  margin: 3px 0;
+  color: #18181B;
+  font-size: 22px;
+  line-height: 1.15;
+}
+
+.daily-plan-completion-action {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px;
+  background: #F8FAFC;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+}
+
+.daily-plan-completion-action .ant-btn {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.daily-plan-completion-action span {
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.daily-plan-completion-todos {
+  display: grid;
+  gap: 8px;
+}
+
+.daily-plan-completion-todos button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  padding: 11px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  box-shadow: inset 3px 0 0 #94A3B8;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.daily-plan-completion-todos button:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+}
+
+.daily-plan-completion-todos button.tone-danger {
+  box-shadow: inset 3px 0 0 #DC2626;
+}
+
+.daily-plan-completion-todos button.tone-warning {
+  box-shadow: inset 3px 0 0 #D97706;
+}
+
+.daily-plan-completion-todos button.tone-success {
+  box-shadow: inset 3px 0 0 #059669;
+}
+
+.daily-plan-completion-todos button > div {
+  min-width: 0;
+}
+
+.daily-plan-completion-todos strong,
+.daily-plan-completion-todos span {
+  display: block;
+}
+
+.daily-plan-completion-todos strong {
+  overflow: hidden;
+  color: #18181B;
+  font-size: 14px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.daily-plan-completion-todos span {
+  margin-top: 3px;
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.daily-plan-completion-todos svg {
+  color: #A1A1AA;
+}
+
 .interview-brief-panel {
   display: grid;
   gap: 12px;
@@ -4810,6 +5006,8 @@ p {
   .study-plan-metrics,
   .study-pace-metrics,
   .daily-plan-brief-metrics,
+  .daily-plan-completion-body,
+  .daily-plan-completion-metrics,
   .review-schedule-band,
   .study-plan-grid,
   .study-question-item,
@@ -4843,6 +5041,14 @@ p {
 
   .daily-plan-brief-list em {
     justify-self: start;
+  }
+
+  .daily-plan-completion-head {
+    display: grid;
+  }
+
+  .daily-plan-completion-score {
+    justify-items: start;
   }
 }
 
