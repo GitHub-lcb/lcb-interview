@@ -88,6 +88,28 @@ export default function PracticeSessionReportPanel({
         ))}
       </div>
 
+      {report.repairActions.length > 0 && (
+        <div className="practice-session-report-repairs" aria-label="本轮补弱动作">
+          <div className="practice-session-report-repairs-head">
+            <span>本轮补弱动作</span>
+            <small>{report.repairActions.length} 项</small>
+          </div>
+          {report.repairActions.slice(0, 3).map(action => (
+            <article key={`${action.questionId}-${action.criterionLabel}`}>
+              <div>
+                <strong title={action.title}>{action.title}</strong>
+                <span>{action.criterionLabel}</span>
+              </div>
+              <p>{action.reason}</p>
+              <small>{action.action}</small>
+              <Button size="small" icon={<ReloadOutlined />} onClick={() => onNavigate(action.to)}>
+                去补弱
+              </Button>
+            </article>
+          ))}
+        </div>
+      )}
+
       <Button
         className="practice-session-report-action"
         type="primary"

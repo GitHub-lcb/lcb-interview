@@ -654,6 +654,18 @@ export interface PracticeSessionReportAction {
   to: string
 }
 
+export interface PracticeSessionRepairAction {
+  questionId: number
+  title: string
+  score?: number
+  criterionKey?: InterviewCriterionKey
+  criterionLabel: string
+  criterionScore?: number
+  reason: string
+  action: string
+  to: string
+}
+
 export interface PracticeSessionReport {
   level: PracticeSessionReportLevel
   title: string
@@ -664,6 +676,7 @@ export interface PracticeSessionReport {
   passCount: number
   weakQuestionIds: number[]
   metrics: PracticeSessionReportMetric[]
+  repairActions: PracticeSessionRepairAction[]
   primaryAction: PracticeSessionReportAction
 }
 

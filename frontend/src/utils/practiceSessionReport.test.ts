@@ -112,6 +112,15 @@ describe('buildPracticeSessionReport', () => {
     expect(report.weakQuestionIds).toEqual([1, 2, 3])
     expect(report.primaryAction).toMatchObject({ kind: 'repair', to: '/practice?queue=1,2,3' })
     expect(report.metrics.find(metric => metric.key === 'weakest')?.value).toContain('结构化')
+    expect(report.repairActions[0]).toMatchObject({
+      questionId: 2,
+      title: 'Java 面试题 2',
+      criterionLabel: '结构化',
+      to: '/practice?question=2',
+    })
+    expect(report.repairActions[0].reason).toContain('55 分')
+    expect(report.repairActions[0].action).toContain('结构')
+    expect(report.repairActions.some(action => action.questionId === 3)).toBe(true)
   })
 
   it('marks the session as passed when all answered questions are strong', () => {
@@ -155,6 +164,10 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('低分/薄弱题：1, 2, 3')
     expect(markdown).toContain('## 核心指标')
     expect(markdown).toContain('最弱项：结构化')
+    expect(markdown).toContain('## 补弱动作清单')
+    expect(markdown).toContain('Java 面试题 2')
+    expect(markdown).toContain('结构化')
+    expect(markdown).toContain('/practice?question=2')
     expect(markdown).toContain('## 题目队列')
     expect(markdown).toContain('Java 面试题 2')
     expect(markdown).toContain('最近评分 55 分')

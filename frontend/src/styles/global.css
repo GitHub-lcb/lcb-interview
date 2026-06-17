@@ -6712,6 +6712,83 @@ p {
   white-space: nowrap;
 }
 
+.practice-session-report-repairs {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #FFFBEB;
+  border: 1px solid #FED7AA;
+  border-radius: 8px;
+}
+
+.practice-session-report-repairs-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.practice-session-report-repairs-head span {
+  color: #92400E;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-repairs-head small {
+  color: #B45309;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.practice-session-report-repairs article {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #FDE68A;
+  border-radius: 8px;
+}
+
+.practice-session-report-repairs article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.practice-session-report-repairs strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #18181B;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-repairs article span {
+  flex: 0 0 auto;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: #FEF3C7;
+  color: #92400E;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.practice-session-report-repairs p,
+.practice-session-report-repairs article small {
+  margin: 0;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.practice-session-report-repairs button {
+  justify-self: start;
+}
+
 .practice-session-report-action {
   justify-content: center;
   width: 100%;

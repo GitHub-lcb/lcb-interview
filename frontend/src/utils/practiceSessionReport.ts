@@ -7,6 +7,7 @@ import type {
   PracticeSessionReportAction,
   PracticeSessionReportLevel,
   PracticeSessionReportMetric,
+  PracticeSessionRepairAction,
   StudyProgress,
 } from '../types'
 
@@ -76,6 +77,7 @@ export function buildPracticeSessionReport(
       weakestCriterion,
       unansweredCount: unansweredIds.length,
     }),
+    repairActions: buildRepairActions(sessionItems, progress),
     primaryAction,
   }
 }
@@ -95,6 +97,7 @@ export function buildPracticeSessionReportMarkdown(
     '',
     renderSessionSummary(report),
     renderSessionMetrics(report.metrics),
+    renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
     renderSessionAction(report.primaryAction),
   ].join('\n')
@@ -117,6 +120,24 @@ function renderSessionMetrics(metrics: PracticeSessionReportMetric[]): string {
   return [
     '## 核心指标',
     ...metrics.map(metric => `- ${metric.label}：${metric.value}，${metric.detail}`),
+    '',
+  ].join('\n')
+}
+
+function renderSessionRepairActions(actions: PracticeSessionRepairAction[]): string {
+  const lines = actions.length > 0
+    ? actions.map((action, index) => [
+      `${index + 1}. ${action.title}`,
+      `   - 维度：${action.criterionLabel}`,
+      `   - 原因：${action.reason}`,
+      `   - 动作：${action.action}`,
+      `   - 入口：${action.to}`,
+    ].join('\n'))
+    : ['- 暂无补弱动作，先完成本轮评分后自动生成。']
+
+  return [
+    '## 补弱动作清单',
+    ...lines,
     '',
   ].join('\n')
 }
@@ -164,6 +185,7 @@ function buildEmptyReport(totalCount: number): PracticeSessionReport {
       passCount: 0,
       unansweredCount: totalCount,
     }),
+    repairActions: [],
     primaryAction: {
       kind: 'start',
       label: '开始本轮练习',
@@ -217,6 +239,69 @@ function summarizeWeakestCriterion(items: SessionAttemptItem[]): WeakestCriterio
       summary: bucket.summary,
     }))
     .sort((a, b) => a.averageScore - b.averageScore)[0]
+}
+
+function buildRepairActions(
+  items: SessionAttemptItem[],
+  progress: StudyProgress,
+): PracticeSessionRepairAction[] {
+  return items
+    .map(item => buildRepairAction(item, progress))
+    .filter((action): action is PracticeSessionRepairAction => Boolean(action))
+    .sort((a, b) => repairPriority(a) - repairPriority(b))
+}
+
+function buildRepairAction(
+  item: SessionAttemptItem,
+  progress: StudyProgress,
+): PracticeSessionRepairAction | undefined {
+  const latestScore = item.attempt?.feedback.score
+  const trackedStatus = progress.questionStates[item.question.id]?.status ?? item.question.status
+  const shouldRepair = (typeof latestScore === 'number' && latestScore < PASSING_SCORE) || trackedStatus === 'weak'
+
+  if (!shouldRepair) {
+    return undefined
+  }
+
+  if (!item.attempt) {
+    return {
+      questionId: item.question.id,
+      title: item.question.title,
+      criterionLabel: '未评分',
+      reason: '已标记薄弱但本轮还没有评分记录。',
+      action: '先完成一次模拟评分，再按最低维度补弱。',
+      to: buildQuestionPath(item.question.id),
+    }
+  }
+
+  const weakest = resolveWeakestAttemptCriterion(item.attempt.feedback.criteria)
+
+  return {
+    questionId: item.question.id,
+    title: item.question.title,
+    score: item.attempt.feedback.score,
+    criterionKey: weakest.key,
+    criterionLabel: weakest.label,
+    criterionScore: weakest.score,
+    reason: `最近评分 ${item.attempt.feedback.score} 分，${weakest.label} ${weakest.score} 分拖低本轮表现。`,
+    action: actionForCriterion(weakest.key),
+    to: buildQuestionPath(item.question.id),
+  }
+}
+
+function repairPriority(action: PracticeSessionRepairAction): number {
+  const score = action.score ?? Number.MAX_SAFE_INTEGER
+  const criterionScore = action.criterionScore ?? Number.MAX_SAFE_INTEGER
+  return score * 1000 + criterionScore
+}
+
+function resolveWeakestAttemptCriterion(criteria: InterviewCriterion[]): InterviewCriterion {
+  return [...criteria].sort((a, b) => a.score - b.score)[0] ?? {
+    key: 'structure',
+    label: '结构化',
+    score: 0,
+    summary: '暂无评分维度',
+  }
 }
 
 function resolveLevel(input: {
@@ -279,6 +364,10 @@ function buildQueuePath(questionIds: number[]): string {
     return '/practice'
   }
   return `/practice?queue=${questionIds.join(',')}`
+}
+
+function buildQuestionPath(questionId: number): string {
+  return `/practice?question=${questionId}`
 }
 
 function titleForLevel(level: PracticeSessionReportLevel, unansweredCount: number): string {
@@ -346,6 +435,19 @@ function buildMetrics(input: {
       detail: input.weakestCriterion?.summary ?? '完成评分后自动定位',
     },
   ]
+}
+
+function actionForCriterion(key: InterviewCriterionKey): string {
+  if (key === 'coverage') {
+    return '先补定义、机制和替代方案，再重答本题。'
+  }
+  if (key === 'structure') {
+    return '先按“结论 -> 原因 -> 场景 -> 边界”重组结构。'
+  }
+  if (key === 'specificity') {
+    return '补一个项目场景、触发条件和可验证指标。'
+  }
+  return '补失败边界、误区和兜底方案。'
 }
 
 function formatQuestionIds(questionIds: number[]): string {
