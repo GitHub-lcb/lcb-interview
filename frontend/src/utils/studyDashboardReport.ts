@@ -1,4 +1,4 @@
-import type { DailyPlanCompletion, Question, QuestionSnapshot, StudyProgress, WeakArea } from '../types'
+import type { DailyPlanCompletion, NextTrainingQueue, Question, QuestionSnapshot, StudyProgress, WeakArea } from '../types'
 import {
   buildDailyPlan,
   getQuestionState,
@@ -7,6 +7,7 @@ import {
   weakAreasFromQuestions,
 } from './studyProgress'
 import { buildDailyPlanCompletion } from './dailyPlanCompletion'
+import { buildNextTrainingQueue } from './nextTrainingQueue'
 
 /**
  * 构建首页备考工作台日报 Markdown，便于用户把当天执行清单和弱点雷达带到外部打卡或复盘文档。
@@ -28,6 +29,7 @@ export function buildStudyDashboardMarkdown(
   const nextQuestion = planQuestions[0] ?? hotQuestions[0]
   const weakAreas = weakAreasFromQuestions(progress, hotQuestions)
   const completion = buildDailyPlanCompletion(progress, now)
+  const nextTrainingQueue = buildNextTrainingQueue(progress, now, 5)
 
   return [
     `# ${progress.targetRole} 备考工作台日报`,
@@ -36,6 +38,7 @@ export function buildStudyDashboardMarkdown(
     '',
     renderOverview(progress, summary),
     renderDailyCompletion(completion),
+    renderNextTrainingQueue(nextTrainingQueue),
     renderNextQuestion(nextQuestion),
     renderPlanQuestions(progress, planQuestions, generatedPlanIds),
     renderWeakAreas(weakAreas),
@@ -138,6 +141,26 @@ function renderDailyCompletion(completion: DailyPlanCompletion): string {
     `- 完成率：${completion.completionRate}%`,
     `- 主行动：${completion.primaryAction.label}，${completion.primaryAction.to}`,
     ...impactLines,
+    '',
+  ].join('\n')
+}
+
+function renderNextTrainingQueue(queue: NextTrainingQueue): string {
+  const itemLines = queue.items.length > 0
+    ? queue.items.slice(0, 5).flatMap((item, index) => [
+      `${index + 1}. ${item.title}`,
+      `   - 来源：${item.sourceLabel}`,
+      `   - 原因：${item.reason}`,
+      `   - 行动：${item.actionLabel}，入口：${item.to}`,
+    ])
+    : ['- 暂无下一轮训练题。先做一次模拟面试或生成今日计划，系统会自动拼出下一轮队列。']
+
+  return [
+    '## 下一轮训练队列',
+    `- 状态：${queue.title}`,
+    `- 摘要：${queue.summary}`,
+    `- 主行动：${queue.primaryAction.label}，${queue.primaryAction.to}`,
+    ...itemLines,
     '',
   ].join('\n')
 }
