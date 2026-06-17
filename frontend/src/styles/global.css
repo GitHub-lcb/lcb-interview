@@ -6475,6 +6475,12 @@ p {
   align-items: flex-start;
 }
 
+.practice-interviewer-script-progress-top > div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
 .practice-interviewer-script-progress-top span {
   flex: 0 0 auto;
   color: #18181B;
@@ -6488,7 +6494,10 @@ p {
   color: #52525B;
   font-size: 12px;
   line-height: 1.45;
-  text-align: right;
+}
+
+.practice-interviewer-script-progress-top .ant-btn {
+  flex: 0 0 auto;
 }
 
 .practice-interviewer-script-steps {

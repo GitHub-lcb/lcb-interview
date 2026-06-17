@@ -141,6 +141,30 @@ describe('PracticeInterviewerScriptPanel', () => {
     expect(writeText.mock.calls[0][0]).toContain('HashMap 为什么线程不安全')
   })
 
+  it('copies the interviewer script progress markdown', async () => {
+    const warmupPrompt = '请用 30 秒回答「HashMap 为什么线程不安全？扩容时会发生什么？」：先给结论，再补一句核心原因。'
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+
+    render(
+      <PracticeInterviewerScriptPanel
+        question={question()}
+        attempts={[followUpAttempt(warmupPrompt, passedBody(), '2026-06-18T08:00:00.000Z')]}
+        onUsePrompt={vi.fn()}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /复制进度/ }))
+
+    expect(writeText).toHaveBeenCalledTimes(1)
+    expect(writeText.mock.calls[0][0]).toContain('本题面试官脚本进度')
+    expect(writeText.mock.calls[0][0]).toContain('脚本进度：1 / 3')
+    expect(writeText.mock.calls[0][0]).toContain('HashMap 为什么线程不安全')
+  })
+
   it('renders script progress and passed state for completed follow-up steps', () => {
     const warmupPrompt = '请用 30 秒回答「HashMap 为什么线程不安全？扩容时会发生什么？」：先给结论，再补一句核心原因。'
 

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import type { InterviewAttempt, InterviewCriterion, PracticeQueueItem } from '../types'
 import { buildPracticeInterviewerScript } from './practiceInterviewerScript'
-import { buildPracticeInterviewerScriptProgress } from './practiceInterviewerScriptProgress'
+import {
+  buildPracticeInterviewerScriptProgress,
+  buildPracticeInterviewerScriptProgressMarkdown,
+} from './practiceInterviewerScriptProgress'
 
 function question(): PracticeQueueItem {
   return {
@@ -111,5 +114,36 @@ describe('practiceInterviewerScriptProgress', () => {
     expect(progress.steps[0].status).toBe('attempted')
     expect(progress.steps[0].latestAttemptAt).toBe('2026-06-18T09:00:00.000Z')
     expect(progress.nextStep?.id).toBe(progress.steps[0].step.id)
+  })
+
+  it('exports script progress markdown for completed follow-up steps', () => {
+    const prompt = buildPracticeInterviewerScript(question(), []).steps[0].prompt
+    const markdown = buildPracticeInterviewerScriptProgressMarkdown(
+      question(),
+      [attempt(answerFor(prompt, passedBody()), '2026-06-18T08:00:00.000Z', 82)],
+      '2026-06-18T10:00:00.000Z',
+    )
+
+    expect(markdown).toContain('# HashMap 为什么线程不安全？扩容时会发生什么？ 本题面试官脚本进度')
+    expect(markdown).toContain('脚本进度：1 / 3（33%）')
+    expect(markdown).toContain('下一步：下一问已标出，继续完成未通过追问。')
+    expect(markdown).toContain('已通过')
+    expect(markdown).toContain('验收分：100')
+    expect(markdown).toContain('最近练习：2026-06-18')
+    expect(markdown).not.toContain('undefined')
+  })
+
+  it('exports repair guidance when a follow-up step is attempted but not passed', () => {
+    const prompt = buildPracticeInterviewerScript(question(), []).steps[0].prompt
+    const markdown = buildPracticeInterviewerScriptProgressMarkdown(
+      question(),
+      [attempt(answerFor(prompt, '结论：HashMap 多线程不安全。'), '2026-06-18T09:00:00.000Z', 65)],
+      '2026-06-18T10:00:00.000Z',
+    )
+
+    expect(markdown).toContain('脚本进度：0 / 3（0%）')
+    expect(markdown).toContain('修复中')
+    expect(markdown).toContain('继续修复当前未通过追问')
+    expect(markdown).not.toContain('undefined')
   })
 })
