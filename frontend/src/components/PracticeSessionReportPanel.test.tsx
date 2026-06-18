@@ -1457,6 +1457,41 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders first question reuse review handoff release receipt before the next session round', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const receipt = screen.getByLabelText('首题复用复盘回流放行回执')
+
+    expect(within(receipt).getByText('首题复用复盘回流放行回执')).toBeInTheDocument()
+    expect(within(receipt).getByText('回流回执待修复')).toBeInTheDocument()
+    expect(within(receipt).getByText('放行结论')).toBeInTheDocument()
+    expect(within(receipt).getByText('随身证据')).toBeInTheDocument()
+    expect(within(receipt).getByText('阻断处理')).toBeInTheDocument()
+    expect(within(receipt).getByText('下一轮入口')).toBeInTheDocument()
+    expect(within(receipt).getAllByText('交接证据').length).toBeGreaterThan(0)
+    expect(within(receipt).getAllByText('下一步动作').length).toBeGreaterThan(0)
+    expect(within(receipt).getAllByText('未交接').length).toBeGreaterThan(0)
+
+    await user.click(within(receipt).getByRole('button', { name: /回到回流修复/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

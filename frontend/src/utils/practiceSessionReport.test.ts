@@ -1111,6 +1111,31 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown.indexOf('## 首题复用复盘回流放行门禁')).toBeLessThan(markdown.indexOf('## 下一轮训练建议'))
   })
 
+  it('exports first question reuse review handoff release receipt before the next session round', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1), question(2)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 62, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+          2: [attempt(2, 72, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+        },
+      }),
+      NOW,
+    )
+
+    expect(markdown).toContain('## 首题复用复盘回流放行回执')
+    expect(markdown).toContain('回流回执待修复')
+    expect(markdown).toContain('放行结论')
+    expect(markdown).toContain('随身证据')
+    expect(markdown).toContain('阻断处理')
+    expect(markdown).toContain('下一轮入口')
+    expect(markdown).toContain('交接证据')
+    expect(markdown).toContain('下一步动作')
+    expect(markdown).toContain('未交接')
+    expect(markdown.indexOf('## 首题复用复盘回流放行回执')).toBeGreaterThan(markdown.indexOf('## 首题复用复盘回流放行门禁'))
+    expect(markdown.indexOf('## 首题复用复盘回流放行回执')).toBeLessThan(markdown.indexOf('## 下一轮训练建议'))
+  })
+
   it('keeps empty session markdown actionable', () => {
     const markdown = buildPracticeSessionReportMarkdown([], progress(), NOW)
 
@@ -1203,6 +1228,8 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('等待验收首题复用复盘回流')
     expect(markdown).toContain('## 首题复用复盘回流放行门禁')
     expect(markdown).toContain('等待首题复用复盘回流放行裁决')
+    expect(markdown).toContain('## 首题复用复盘回流放行回执')
+    expect(markdown).toContain('等待首题复用复盘回流放行回执')
     expect(markdown).toContain('## 下一轮训练建议')
     expect(markdown).toContain('先做一次模拟面试')
     expect(markdown).toContain('暂无题目')

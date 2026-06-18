@@ -1514,6 +1514,29 @@ export interface PracticeSessionFirstQuestionReuseReviewHandoffReleaseGate {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionFirstQuestionReuseReviewHandoffReleaseReceiptStatus = 'empty' | 'blocked' | 'ready'
+
+export type PracticeSessionFirstQuestionReuseReviewHandoffReleaseReceiptItemState = 'waiting' | 'blocked' | 'handed-off'
+
+export interface PracticeSessionFirstQuestionReuseReviewHandoffReleaseReceiptItem {
+  id: string
+  label: string
+  conclusion: string
+  evidence: string
+  nextAction: string
+  state: PracticeSessionFirstQuestionReuseReviewHandoffReleaseReceiptItemState
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionFirstQuestionReuseReviewHandoffReleaseReceipt {
+  status: PracticeSessionFirstQuestionReuseReviewHandoffReleaseReceiptStatus
+  title: string
+  summary: string
+  items: PracticeSessionFirstQuestionReuseReviewHandoffReleaseReceiptItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

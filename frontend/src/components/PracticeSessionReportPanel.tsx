@@ -38,6 +38,7 @@ import {
   buildPracticeSessionFirstQuestionReuseReviewHandoff,
   buildPracticeSessionFirstQuestionReuseReviewHandoffAcceptance,
   buildPracticeSessionFirstQuestionReuseReviewHandoffReleaseGate,
+  buildPracticeSessionFirstQuestionReuseReviewHandoffReleaseReceipt,
   buildPracticeSessionFirstQuestionReuseReviewTemplate,
   buildPracticeSessionFirstQuestionReviewAcceptance,
   buildPracticeSessionFirstQuestionReviewArchive,
@@ -278,6 +279,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionFirstQuestionReuseReviewHandoffReleaseGate = useMemo(
     () => buildPracticeSessionFirstQuestionReuseReviewHandoffReleaseGate(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionFirstQuestionReuseReviewHandoffReleaseReceipt = useMemo(
+    () => buildPracticeSessionFirstQuestionReuseReviewHandoffReleaseReceipt(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1981,6 +1986,50 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionFirstQuestionReuseReviewHandoffReleaseGate.primaryAction.to)}
         >
           {sessionFirstQuestionReuseReviewHandoffReleaseGate.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-first-reuse-review-handoff-release-receipt status-${sessionFirstQuestionReuseReviewHandoffReleaseReceipt.status}`}
+        aria-label="首题复用复盘回流放行回执"
+      >
+        <div className="practice-session-report-first-reuse-review-handoff-release-receipt-head">
+          <div>
+            <span>首题复用复盘回流放行回执</span>
+            <strong>{sessionFirstQuestionReuseReviewHandoffReleaseReceipt.title}</strong>
+            <small>{sessionFirstQuestionReuseReviewHandoffReleaseReceipt.summary}</small>
+          </div>
+        </div>
+        {sessionFirstQuestionReuseReviewHandoffReleaseReceipt.items.length === 0 ? (
+          <p>等待首题复用复盘回流放行回执。先完成回流放行门禁后，系统会整理可带入下一轮的结论和证据。</p>
+        ) : (
+          <div className="practice-session-report-first-reuse-review-handoff-release-receipt-list">
+            {sessionFirstQuestionReuseReviewHandoffReleaseReceipt.items.map(item => (
+              <article key={item.id} className={`state-${item.state}`}>
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.conclusion}</strong>
+                </div>
+                <dl>
+                  <dt>状态</dt>
+                  <dd>{item.state === 'blocked' ? '未交接' : item.state === 'handed-off' ? '已交接' : '等待样本'}</dd>
+                  <dt>交接证据</dt>
+                  <dd>{item.evidence}</dd>
+                  <dt>下一步动作</dt>
+                  <dd>{item.nextAction}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionFirstQuestionReuseReviewHandoffReleaseReceipt.status === 'blocked'}
+          icon={sessionFirstQuestionReuseReviewHandoffReleaseReceipt.status === 'blocked' ? <WarningOutlined /> : <ArrowRightOutlined />}
+          onClick={() => onNavigate(sessionFirstQuestionReuseReviewHandoffReleaseReceipt.primaryAction.to)}
+        >
+          {sessionFirstQuestionReuseReviewHandoffReleaseReceipt.primaryAction.label}
         </Button>
       </div>
 

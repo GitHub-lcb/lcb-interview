@@ -40,6 +40,8 @@ import type {
   PracticeSessionFirstQuestionReuseReviewHandoffItem,
   PracticeSessionFirstQuestionReuseReviewHandoffReleaseGate,
   PracticeSessionFirstQuestionReuseReviewHandoffReleaseGateItem,
+  PracticeSessionFirstQuestionReuseReviewHandoffReleaseReceipt,
+  PracticeSessionFirstQuestionReuseReviewHandoffReleaseReceiptItem,
   PracticeSessionFirstQuestionReuseReviewTemplate,
   PracticeSessionFirstQuestionReuseReviewTemplateItem,
   PracticeSessionFirstQuestionReleaseGate,
@@ -150,6 +152,15 @@ const firstQuestionReuseReviewHandoffReleaseGateItemStateLabels: Record<
   waiting: '等待样本',
   blocked: '未放行',
   passed: '已放行',
+}
+
+const firstQuestionReuseReviewHandoffReleaseReceiptItemStateLabels: Record<
+  PracticeSessionFirstQuestionReuseReviewHandoffReleaseReceiptItem['state'],
+  string
+> = {
+  waiting: '等待样本',
+  blocked: '未交接',
+  'handed-off': '已交接',
 }
 
 interface SessionAttemptItem {
@@ -311,6 +322,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFirstQuestionReuseReviewHandoff(queue, progress, now),
     renderSessionFirstQuestionReuseReviewHandoffAcceptance(queue, progress, now),
     renderSessionFirstQuestionReuseReviewHandoffReleaseGate(queue, progress, now),
+    renderSessionFirstQuestionReuseReviewHandoffReleaseReceipt(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -2122,6 +2134,44 @@ export function buildPracticeSessionFirstQuestionReuseReviewHandoffReleaseGate(
   }
 }
 
+export function buildPracticeSessionFirstQuestionReuseReviewHandoffReleaseReceipt(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionReuseReviewHandoffReleaseReceipt {
+  const gate = buildPracticeSessionFirstQuestionReuseReviewHandoffReleaseGate(queue, progress, now)
+
+  if (gate.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待首题复用复盘回流放行回执',
+      summary: '先完成首题复用复盘回流放行门禁，再生成可带入下一轮的交接回执。',
+      items: [],
+      primaryAction: {
+        kind: gate.primaryAction.kind,
+        label: '建立放行回执',
+        description: '先完成回流放行门禁，再整理放行结论、证据和下一步入口。',
+        to: gate.primaryAction.to,
+      },
+    }
+  }
+
+  const blocked = gate.status === 'blocked'
+
+  return {
+    status: blocked ? 'blocked' : 'ready',
+    title: blocked ? '回流回执待修复' : '回流回执已生成',
+    summary: blocked ? '放行门禁仍有阻断项，回执会把阻断证据和修复动作交接回当前队列。' : '放行门禁已经通过，回执可作为下一轮首题的随身证据。',
+    items: buildFirstQuestionReuseReviewHandoffReleaseReceiptItems(gate, blocked),
+    primaryAction: {
+      kind: blocked ? 'repair' : 'continue',
+      label: blocked ? '回到回流修复' : '携带回执进入下一轮',
+      description: blocked ? '先处理回执里的未交接项，再重新判断是否放行。' : '带着放行结论和随身证据进入下一轮首题。',
+      to: gate.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -3595,6 +3645,42 @@ function renderSessionFirstQuestionReuseReviewHandoffReleaseGate(
       `   - 证据：${item.evidence}`,
       `   - 放行规则：${item.releaseRule}`,
       `   - 处理动作：${item.action}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionReuseReviewHandoffReleaseReceipt(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const receipt = buildPracticeSessionFirstQuestionReuseReviewHandoffReleaseReceipt(queue, progress, now)
+  const lines = [
+    '## 首题复用复盘回流放行回执',
+    `- 状态：${receipt.title}`,
+    `- 摘要：${receipt.summary}`,
+    `- 主行动：${receipt.primaryAction.label}，${receipt.primaryAction.description}（${receipt.primaryAction.to}）`,
+    '',
+  ]
+
+  if (receipt.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待首题复用复盘回流放行回执。先完成回流放行门禁后，系统会整理可带入下一轮的结论和证据。',
+      '',
+    ].join('\n')
+  }
+
+  receipt.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 状态：${firstQuestionReuseReviewHandoffReleaseReceiptItemStateLabels[item.state]}`,
+      `   - 结论：${item.conclusion}`,
+      `   - 交接证据：${item.evidence}`,
+      `   - 下一步动作：${item.nextAction}`,
       `   - 入口：${item.to}`,
     )
   })
@@ -5895,6 +5981,67 @@ function buildFirstQuestionReuseReviewHandoffReleaseGateItems(
       priority: 4,
     },
   ]
+}
+
+function buildFirstQuestionReuseReviewHandoffReleaseReceiptItems(
+  gate: PracticeSessionFirstQuestionReuseReviewHandoffReleaseGate,
+  blocked: boolean,
+): PracticeSessionFirstQuestionReuseReviewHandoffReleaseReceiptItem[] {
+  const score = findFirstQuestionReuseReviewHandoffReleaseGateItem(gate, 'release-handoff-reuse-review-score')
+  const evidence = findFirstQuestionReuseReviewHandoffReleaseGateItem(gate, 'release-handoff-reuse-review-evidence')
+  const blocker = findFirstQuestionReuseReviewHandoffReleaseGateItem(gate, 'release-handoff-reuse-review-blocker')
+  const entry = findFirstQuestionReuseReviewHandoffReleaseGateItem(gate, 'release-handoff-reuse-review-entry')
+  const state: PracticeSessionFirstQuestionReuseReviewHandoffReleaseReceiptItem['state'] = blocked ? 'blocked' : 'handed-off'
+
+  return [
+    {
+      id: 'receipt-handoff-reuse-review-conclusion',
+      label: '放行结论',
+      conclusion: blocked ? '暂缓进入下一轮' : '允许进入下一轮',
+      evidence: score?.evidence ?? gate.summary,
+      nextAction: blocked ? (score?.action ?? '先补齐分数放行证据，再重新生成回执。') : '把分数基线写入下一轮首题复盘。',
+      state,
+      to: gate.primaryAction.to,
+      priority: 1,
+    },
+    {
+      id: 'receipt-handoff-reuse-review-evidence',
+      label: '随身证据',
+      conclusion: blocked ? '证据暂不完整' : '证据可随题携带',
+      evidence: evidence?.evidence ?? gate.summary,
+      nextAction: blocked ? (evidence?.action ?? '先补齐可追问证据，再重新交接。') : '把命中证据带入下一轮首题追问。',
+      state,
+      to: gate.primaryAction.to,
+      priority: 2,
+    },
+    {
+      id: 'receipt-handoff-reuse-review-blocker',
+      label: '阻断处理',
+      conclusion: blocked ? '阻断仍需处理' : '阻断已可控',
+      evidence: blocker?.evidence ?? gate.summary,
+      nextAction: blocked ? (blocker?.action ?? '先处理未放行阻断，再进入下一轮。') : '按阻断结论选择保留题序或压同一弱项。',
+      state,
+      to: gate.primaryAction.to,
+      priority: 3,
+    },
+    {
+      id: 'receipt-handoff-reuse-review-entry',
+      label: '下一轮入口',
+      conclusion: blocked ? '入口暂不交接' : '入口可执行',
+      evidence: entry?.evidence ?? gate.summary,
+      nextAction: blocked ? (entry?.action ?? '先补齐下一轮入口，再重新判断放行。') : '打开下一轮首题入口，并继续生成新战报证据。',
+      state,
+      to: gate.primaryAction.to,
+      priority: 4,
+    },
+  ]
+}
+
+function findFirstQuestionReuseReviewHandoffReleaseGateItem(
+  gate: PracticeSessionFirstQuestionReuseReviewHandoffReleaseGate,
+  id: string,
+): PracticeSessionFirstQuestionReuseReviewHandoffReleaseGateItem | undefined {
+  return gate.items.find(item => item.id === id)
 }
 
 function findFirstQuestionReuseReviewHandoffAcceptanceItem(
