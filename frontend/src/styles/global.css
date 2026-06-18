@@ -8252,6 +8252,120 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-evidence-gaps {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #FFF7ED;
+  border: 1px solid #FDBA74;
+  border-radius: 8px;
+}
+
+.practice-session-report-evidence-gaps-head {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-evidence-gaps-head span {
+  color: #9A3412;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-evidence-gaps-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-evidence-gaps-head small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #7C2D12;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-evidence-gaps p {
+  margin: 0;
+  color: #7C2D12;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.practice-session-report-evidence-gaps-list {
+  display: grid;
+  gap: 6px;
+}
+
+.practice-session-report-evidence-gaps-list article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #FED7AA;
+  border-radius: 8px;
+}
+
+.practice-session-report-evidence-gaps-list article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.practice-session-report-evidence-gaps-list strong,
+.practice-session-report-evidence-gaps-list span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-evidence-gaps-list strong {
+  min-width: 0;
+  color: #0F172A;
+  font-size: 13px;
+}
+
+.practice-session-report-evidence-gaps-list span {
+  flex: 0 0 auto;
+  max-width: 116px;
+  padding: 3px 6px;
+  color: #9A3412;
+  font-size: 12px;
+  font-weight: 900;
+  background: #FFEDD5;
+  border-radius: 6px;
+}
+
+.practice-session-report-evidence-gaps-list small,
+.practice-session-report-evidence-gaps-list em {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-evidence-gaps-list small {
+  color: #7C2D12;
+  font-weight: 700;
+}
+
+.practice-session-report-evidence-gaps .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;

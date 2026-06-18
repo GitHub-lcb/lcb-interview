@@ -364,6 +364,41 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders evidence gaps from the current session queue', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const gapsBlock = screen.getByLabelText('本轮证据缺口')
+
+    expect(within(gapsBlock).getByText('本轮证据缺口')).toBeInTheDocument()
+    expect(within(gapsBlock).getAllByText('Java 面试题 1').length).toBeGreaterThan(0)
+    expect(within(gapsBlock).getByText('场景细节 50 分')).toBeInTheDocument()
+    expect(
+      within(gapsBlock).getAllByText('这个回答放到你的项目里，规模、指标、数据和个人职责分别是什么？').length,
+    ).toBeGreaterThan(0)
+    expect(
+      within(gapsBlock).getAllByText('补一个项目场景、触发条件、量化指标和你本人负责的动作。').length,
+    ).toBeGreaterThan(0)
+
+    await user.click(within(gapsBlock).getByRole('button', { name: /修补证据缺口/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

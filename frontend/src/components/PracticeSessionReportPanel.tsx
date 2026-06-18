@@ -23,6 +23,7 @@ import {
   buildPracticeSessionActionPriorities,
   buildPracticeSessionDailyCompletion,
   buildPracticeSessionAbilityRadar,
+  buildPracticeSessionEvidenceGaps,
   buildPracticeSessionFollowUpDefense,
   buildPracticeSessionInterviewerDecision,
   buildPracticeSessionMaterialVault,
@@ -108,6 +109,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionActionPriorities = useMemo(
     () => buildPracticeSessionActionPriorities(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionEvidenceGaps = useMemo(
+    () => buildPracticeSessionEvidenceGaps(queue, progress),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -503,6 +508,39 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionActionPriorities.primaryAction.to)}
         >
           {sessionActionPriorities.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className="practice-session-report-evidence-gaps" aria-label="本轮证据缺口">
+        <div className="practice-session-report-evidence-gaps-head">
+          <span>本轮证据缺口</span>
+          <strong>{sessionEvidenceGaps.title}</strong>
+          <small>{sessionEvidenceGaps.summary}</small>
+        </div>
+        {sessionEvidenceGaps.items.length === 0 ? (
+          <p>等待生成证据缺口。先完成一次模拟面试后，系统会自动定位会被追问的证据漏洞。</p>
+        ) : (
+          <div className="practice-session-report-evidence-gaps-list">
+            {sessionEvidenceGaps.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <strong>{item.title}</strong>
+                  <span>{item.criterionLabel} {item.score} 分</span>
+                </div>
+                <small>{item.interviewerProbe}</small>
+                <em>{item.repairHint}</em>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionEvidenceGaps.status === 'blocked'}
+          icon={<WarningOutlined />}
+          onClick={() => onNavigate(sessionEvidenceGaps.primaryAction.to)}
+        >
+          {sessionEvidenceGaps.primaryAction.label}
         </Button>
       </div>
 

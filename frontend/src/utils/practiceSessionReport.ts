@@ -12,6 +12,8 @@ import type {
   PracticeSessionActionPriorityItem,
   PracticeSessionAbilityRadar,
   PracticeSessionAbilityRadarItem,
+  PracticeSessionEvidenceGapItem,
+  PracticeSessionEvidenceGaps,
   PracticeSessionInterviewerDecision,
   PracticeQueueItem,
   PracticeSessionReport,
@@ -34,6 +36,8 @@ import { buildPracticeInterviewerScriptProgress } from './practiceInterviewerScr
 
 const PASSING_SCORE = 70
 const STRONG_SESSION_SCORE = 80
+const EVIDENCE_GAP_SCORE = 75
+const CRITICAL_EVIDENCE_GAP_SCORE = 60
 
 const queueSourceLabels: Record<PracticeQueueItem['source'], string> = {
   review: '复习优先',
@@ -180,6 +184,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionAbilityRadar(queue, progress),
     renderSessionInterviewerDecision(queue, progress),
     renderSessionActionPriorities(queue, progress, now),
+    renderSessionEvidenceGaps(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -463,6 +468,76 @@ export function buildPracticeSessionActionPriorities(
         to: primaryItem.to,
       }
       : decision.primaryAction,
+  }
+}
+
+export function buildPracticeSessionEvidenceGaps(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): PracticeSessionEvidenceGaps {
+  const sessionItems = queue.map(question => ({
+    question,
+    attempt: latestAttemptForQuestion(progress, question.id),
+  }))
+  const answeredItems = sessionItems.filter((item): item is SessionAttemptItem & { attempt: InterviewAttempt } => (
+    Boolean(item.attempt)
+  ))
+
+  if (queue.length === 0 || answeredItems.length === 0) {
+    return {
+      status: 'empty',
+      title: '等待生成证据缺口',
+      summary: '先完成一次模拟面试，系统才能定位会被面试官继续追问的证据漏洞。',
+      totalCount: 0,
+      criticalCount: 0,
+      items: [],
+      primaryAction: {
+        kind: 'start',
+        label: '建立证据样本',
+        description: '先完成一次开口作答，让系统生成可分析的证据链。',
+        to: queue.length > 0 ? buildQueuePath(queue.map(item => item.id)) : '/practice',
+      },
+    }
+  }
+
+  const candidates = answeredItems
+    .flatMap(item => buildEvidenceGapItems(item.question, item.attempt))
+    .sort((a, b) => b.priority - a.priority)
+  const items = candidates.slice(0, 3)
+  const criticalCount = candidates.filter(item => item.score < CRITICAL_EVIDENCE_GAP_SCORE).length
+
+  if (items.length === 0) {
+    return {
+      status: 'ready',
+      title: '证据链暂稳',
+      summary: `本轮 ${answeredItems.length} 道已答题没有低于 ${EVIDENCE_GAP_SCORE} 分的证据维度，继续复测保持稳定。`,
+      totalCount: 0,
+      criticalCount: 0,
+      items: [],
+      primaryAction: {
+        kind: 'continue',
+        label: '继续复测',
+        description: '用下一轮训练继续验证证据链是否稳定。',
+        to: buildQueuePath(queue.map(item => item.id)),
+      },
+    }
+  }
+
+  const primaryQuestionIds = uniqueNumbers(items.map(item => item.questionId))
+
+  return {
+    status: criticalCount > 0 ? 'blocked' : 'watch',
+    title: criticalCount > 0 ? '证据链会被追问' : '证据链需要加固',
+    summary: `发现 ${items.length} 个最容易被继续追问的证据缺口，先补题目场景、指标和边界。`,
+    totalCount: candidates.length,
+    criticalCount,
+    items,
+    primaryAction: {
+      kind: 'repair',
+      label: '修补证据缺口',
+      description: `${items[0].criterionLabel} ${items[0].score} 分，先补可被追问的项目证据。`,
+      to: buildQueuePath(primaryQuestionIds),
+    },
   }
 }
 
@@ -790,6 +865,38 @@ function renderSessionActionPriorities(
       `${index + 1}. ${item.label}`,
       `   - 原因：${item.reason}`,
       `   - 动作：${item.description}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionEvidenceGaps(queue: PracticeQueueItem[], progress: StudyProgress): string {
+  const gaps = buildPracticeSessionEvidenceGaps(queue, progress)
+  const lines = [
+    '## 本轮证据缺口',
+    `- 状态：${gaps.title}`,
+    `- 摘要：${gaps.summary}`,
+    `- 主行动：${gaps.primaryAction.label}，${gaps.primaryAction.description}（${gaps.primaryAction.to}）`,
+    '',
+  ]
+
+  if (gaps.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待生成证据缺口。先完成一次模拟面试后，系统会自动定位会被追问的证据漏洞。',
+      '',
+    ].join('\n')
+  }
+
+  gaps.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.title}`,
+      `   - 低分维度：${item.criterionLabel} ${item.score} 分`,
+      `   - 证据缺口：${item.gap}`,
+      `   - 面试官追问：${item.interviewerProbe}`,
+      `   - 修复提示：${item.repairHint}`,
       `   - 入口：${item.to}`,
     )
   })
@@ -1437,6 +1544,88 @@ function uniquePriorityItems(items: PracticeSessionActionPriorityItem[]): Practi
   }
 
   return result
+}
+
+function buildEvidenceGapItems(
+  question: PracticeQueueItem,
+  attempt: InterviewAttempt,
+): PracticeSessionEvidenceGapItem[] {
+  return attempt.feedback.criteria
+    .filter(criterion => criterion.score < EVIDENCE_GAP_SCORE)
+    .map(criterion => ({
+      id: `${question.id}-${criterion.key}`,
+      questionId: question.id,
+      title: question.title,
+      criterionKey: criterion.key,
+      criterionLabel: criterion.label,
+      score: criterion.score,
+      gap: criterion.summary || evidenceGapForCriterion(criterion.key),
+      interviewerProbe: interviewerProbeForCriterion(criterion.key),
+      repairHint: evidenceRepairHintForCriterion(criterion.key),
+      to: buildQueuePath([question.id]),
+      priority: evidenceGapPriority(criterion, attempt.feedback.score),
+    }))
+    .sort((a, b) => b.priority - a.priority)
+    .slice(0, 2)
+}
+
+function evidenceGapPriority(criterion: InterviewCriterion, attemptScore: number): number {
+  const answerPenalty = Math.max(0, PASSING_SCORE - attemptScore)
+
+  // 证据缺口排序以维度分差为主，叠加整题低分和真实面试更容易深挖的维度权重。
+  return ((EVIDENCE_GAP_SCORE - criterion.score) * 2) + answerPenalty + evidenceCriterionWeight(criterion.key)
+}
+
+function evidenceCriterionWeight(key: InterviewCriterionKey): number {
+  if (key === 'specificity') {
+    return 12
+  }
+  if (key === 'risk') {
+    return 10
+  }
+  if (key === 'structure') {
+    return 6
+  }
+  return 4
+}
+
+function evidenceGapForCriterion(key: InterviewCriterionKey): string {
+  if (key === 'coverage') {
+    return '知识链路还不完整，关键机制、条件或替代方案容易被追问。'
+  }
+  if (key === 'structure') {
+    return '表达顺序不够稳定，面试官会要求你压缩并重讲。'
+  }
+  if (key === 'specificity') {
+    return '项目证据不足，缺少真实场景、指标、规模或个人动作。'
+  }
+  return '风险边界不足，缺少失败场景、降级策略或取舍依据。'
+}
+
+function interviewerProbeForCriterion(key: InterviewCriterionKey): string {
+  if (key === 'coverage') {
+    return '你漏掉的关键链路、前置条件和替代方案分别是什么？'
+  }
+  if (key === 'structure') {
+    return '请按“背景 -> 方案 -> 结果 -> 边界”在 60 秒内重新回答一遍。'
+  }
+  if (key === 'specificity') {
+    return '这个回答放到你的项目里，规模、指标、数据和个人职责分别是什么？'
+  }
+  return '这个方案的失败边界、降级策略和取舍依据是什么？'
+}
+
+function evidenceRepairHintForCriterion(key: InterviewCriterionKey): string {
+  if (key === 'coverage') {
+    return '补定义、核心机制、关键步骤和至少一个替代方案差异。'
+  }
+  if (key === 'structure') {
+    return '改成结论先行，再按背景、方案、结果和边界四段重答。'
+  }
+  if (key === 'specificity') {
+    return '补一个项目场景、触发条件、量化指标和你本人负责的动作。'
+  }
+  return '补失败场景、监控信号、降级策略和为什么这样取舍。'
 }
 
 function buildPracticeSessionScriptCommandItem(

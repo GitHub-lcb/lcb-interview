@@ -815,6 +815,32 @@ export interface PracticeSessionActionPriorities {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionEvidenceGapStatus = 'empty' | 'blocked' | 'watch' | 'ready'
+
+export interface PracticeSessionEvidenceGapItem {
+  id: string
+  questionId: number
+  title: string
+  criterionKey: InterviewCriterionKey
+  criterionLabel: string
+  score: number
+  gap: string
+  interviewerProbe: string
+  repairHint: string
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionEvidenceGaps {
+  status: PracticeSessionEvidenceGapStatus
+  title: string
+  summary: string
+  totalCount: number
+  criticalCount: number
+  items: PracticeSessionEvidenceGapItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

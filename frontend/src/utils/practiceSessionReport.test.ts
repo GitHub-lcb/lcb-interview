@@ -384,6 +384,26 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('3. 回炉场景细节')
   })
 
+  it('exports evidence gaps for the current session queue', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1), question(2)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 62, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+          2: [attempt(2, 72, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+        },
+      }),
+      NOW,
+    )
+
+    expect(markdown).toContain('## 本轮证据缺口')
+    expect(markdown).toContain('1. Java 面试题 1')
+    expect(markdown).toContain('低分维度：场景细节 50 分')
+    expect(markdown).toContain('面试官追问：这个回答放到你的项目里，规模、指标、数据和个人职责分别是什么？')
+    expect(markdown).toContain('修复提示：补一个项目场景、触发条件、量化指标和你本人负责的动作。')
+    expect(markdown).toContain('主行动：修补证据缺口')
+  })
+
   it('keeps empty session markdown actionable', () => {
     const markdown = buildPracticeSessionReportMarkdown([], progress(), NOW)
 
@@ -408,6 +428,8 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('等待面试样本')
     expect(markdown).toContain('## 本轮行动优先级')
     expect(markdown).toContain('等待建立行动队列')
+    expect(markdown).toContain('## 本轮证据缺口')
+    expect(markdown).toContain('等待生成证据缺口')
     expect(markdown).toContain('## 下一轮训练建议')
     expect(markdown).toContain('先做一次模拟面试')
     expect(markdown).toContain('暂无题目')
