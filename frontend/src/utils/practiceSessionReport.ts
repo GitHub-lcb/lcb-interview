@@ -5,6 +5,7 @@ import type {
   InterviewCriterion,
   InterviewCriterionKey,
   InterviewMaterialVault,
+  InterviewMistakeLedger,
   NextTrainingQueue,
   PracticeQueueItem,
   PracticeSessionReport,
@@ -19,6 +20,8 @@ import type {
 import { buildDailyPlanCompletion } from './dailyPlanCompletion'
 import { buildInterviewFollowUpDefense } from './interviewFollowUpDefense'
 import { buildInterviewMaterialVault } from './interviewMaterialVault'
+import { buildInterviewMistakeLedger } from './interviewMistakeLedger'
+import { buildInterviewRecoveryPlan } from './interviewRecoveryPlan'
 import { buildNextTrainingQueue, formatNextTrainingQueueItemMeta } from './nextTrainingQueue'
 import { buildPracticeInterviewerScriptProgress } from './practiceInterviewerScriptProgress'
 
@@ -165,6 +168,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionMaterialVault(queue, progress),
     renderSessionFollowUpDefense(queue, progress),
     renderSessionScriptCommand(queue, progress),
+    renderSessionMistakeLedger(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -261,6 +265,26 @@ export function buildPracticeSessionScriptCommand(
     primaryAction: buildScriptCommandPrimaryAction(status, primaryItem),
     items: sortedItems,
   }
+}
+
+export function buildPracticeSessionMistakeLedger(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): InterviewMistakeLedger {
+  const queueIdSet = new Set(
+    queue
+      .map(item => item.id)
+      .filter(questionId => Number.isFinite(questionId) && questionId > 0),
+  )
+  const context = buildPracticeSessionProgressContext(queue, progress)
+
+  return buildInterviewMistakeLedger({
+    ...context,
+    dailyPlan: context.dailyPlan.filter(questionId => queueIdSet.has(questionId)),
+    questionStates: filterRecordByQuestionIds(context.questionStates, queueIdSet),
+    questionSnapshots: filterRecordByQuestionIds(context.questionSnapshots, queueIdSet),
+    interviewAttempts: filterRecordByQuestionIds(context.interviewAttempts, queueIdSet),
+  })
 }
 
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
@@ -448,6 +472,47 @@ function renderSessionScriptCommand(queue: PracticeQueueItem[], progress: StudyP
       `   - 下一问：${item.nextPrompt || '本题脚本已通过，可以复练或沉淀素材。'}`,
       `   - 入口：${item.to}`,
     )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionMistakeLedger(queue: PracticeQueueItem[], progress: StudyProgress): string {
+  const ledger = buildPracticeSessionMistakeLedger(queue, progress)
+  const recoveryPlan = buildInterviewRecoveryPlan(ledger)
+  const lines = [
+    '## 本轮错因账本',
+    `- 状态：${ledger.title}`,
+    `- 摘要：${ledger.summary}`,
+    `- 问题数：${ledger.totalProblems}`,
+    `- 修复计划：${recoveryPlan.title}，${recoveryPlan.totalMinutes} 分钟`,
+    `- 主行动：${ledger.primaryAction.label}，${ledger.primaryAction.description}（${ledger.primaryAction.to}）`,
+    '',
+  ]
+
+  if (ledger.items.length === 0) {
+    return [
+      ...lines,
+      '- 暂无本轮错因账本。完成一次模拟面试后，战报会自动定位错因。',
+      '',
+    ].join('\n')
+  }
+
+  ledger.items.slice(0, 5).forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 类型：${item.type}`,
+      `   - 平均分：${item.averageScore}`,
+      `   - 影响题目：${formatQuestionIds(item.affectedQuestionIds)}`,
+      `   - 最近题目：${item.latestQuestionTitle}`,
+      `   - 动作：${item.actionLabel}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  lines.push('', '修复计划：')
+  recoveryPlan.steps.slice(0, 3).forEach((step, index) => {
+    lines.push(`${index + 1}. ${step.title}，${step.durationMinutes} 分钟，入口：${step.to}`)
   })
 
   return [...lines, ''].join('\n')
@@ -993,6 +1058,12 @@ function buildPracticeSessionProgressContext(
     questionSnapshots,
     questionStates,
   }
+}
+
+function filterRecordByQuestionIds<T>(record: Record<number, T>, questionIds: Set<number>): Record<number, T> {
+  return Object.fromEntries(
+    Object.entries(record).filter(([questionId]) => questionIds.has(Number(questionId))),
+  ) as Record<number, T>
 }
 
 function snapshotFromQueueItem(item: PracticeQueueItem): QuestionSnapshot {

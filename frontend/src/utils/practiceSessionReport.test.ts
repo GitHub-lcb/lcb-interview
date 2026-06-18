@@ -286,6 +286,26 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).not.toContain('Java 面试题 3')
   })
 
+  it('exports mistake ledger from the current session queue', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1), question(2)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 58, { specificity: 35 })],
+          3: [attempt(3, 40, { risk: 20 })],
+        },
+      }),
+      NOW,
+    )
+
+    expect(markdown).toContain('## 本轮错因账本')
+    expect(markdown).toContain('场景细节反复失分')
+    expect(markdown).toContain('影响题目：1')
+    expect(markdown).toContain('修复计划：三步修复首要错因')
+    expect(markdown).toContain('入口：/practice?queue=1')
+    expect(markdown).not.toContain('边界风险反复失分')
+  })
+
   it('keeps empty session markdown actionable', () => {
     const markdown = buildPracticeSessionReportMarkdown([], progress(), NOW)
 
@@ -300,6 +320,8 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('暂无本轮追问防线')
     expect(markdown).toContain('## 本轮脚本总控')
     expect(markdown).toContain('暂无本轮脚本总控')
+    expect(markdown).toContain('## 本轮错因账本')
+    expect(markdown).toContain('暂无本轮错因账本')
     expect(markdown).toContain('## 下一轮训练建议')
     expect(markdown).toContain('先做一次模拟面试')
     expect(markdown).toContain('暂无题目')

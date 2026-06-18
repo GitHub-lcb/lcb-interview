@@ -7,6 +7,7 @@ import {
   PlayCircleOutlined,
   ReloadOutlined,
   ThunderboltOutlined,
+  WarningOutlined,
 } from '@ant-design/icons'
 import { Button, message } from 'antd'
 import { useMemo } from 'react'
@@ -22,11 +23,13 @@ import {
   buildPracticeSessionDailyCompletion,
   buildPracticeSessionFollowUpDefense,
   buildPracticeSessionMaterialVault,
+  buildPracticeSessionMistakeLedger,
   buildPracticeSessionNextTrainingQueue,
   buildPracticeSessionReport,
   buildPracticeSessionReportMarkdown,
   buildPracticeSessionScriptCommand,
 } from '../utils/practiceSessionReport'
+import { buildInterviewRecoveryPlan } from '../utils/interviewRecoveryPlan'
 
 interface PracticeSessionReportPanelProps {
   queue: PracticeQueueItem[]
@@ -78,6 +81,14 @@ export default function PracticeSessionReportPanel({
   const sessionScriptCommand = useMemo(
     () => buildPracticeSessionScriptCommand(queue, progress),
     [progress, queue],
+  )
+  const sessionMistakeLedger = useMemo(
+    () => buildPracticeSessionMistakeLedger(queue, progress),
+    [progress, queue],
+  )
+  const sessionRecoveryPlan = useMemo(
+    () => buildInterviewRecoveryPlan(sessionMistakeLedger),
+    [sessionMistakeLedger],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
 
@@ -282,6 +293,49 @@ export default function PracticeSessionReportPanel({
             ))}
           </div>
         )}
+      </div>
+
+      <div className="practice-session-report-mistake-ledger" aria-label="本轮错因账本">
+        <div className="practice-session-report-mistake-ledger-head">
+          <div>
+            <span>本轮错因账本</span>
+            <small>{sessionMistakeLedger.summary}</small>
+          </div>
+          <Button
+            size="small"
+            icon={<WarningOutlined />}
+            onClick={() => onNavigate(sessionMistakeLedger.primaryAction.to)}
+          >
+            {sessionMistakeLedger.primaryAction.label}
+          </Button>
+        </div>
+        <div className="practice-session-report-mistake-ledger-metrics">
+          <div>
+            <span>问题</span>
+            <strong>{sessionMistakeLedger.totalProblems}</strong>
+          </div>
+          <div>
+            <span>计划</span>
+            <strong>{sessionRecoveryPlan.totalMinutes} 分钟</strong>
+          </div>
+        </div>
+        {sessionMistakeLedger.items.length === 0 ? (
+          <p>暂无本轮错因账本。完成一次模拟面试后，战报会自动定位错因。</p>
+        ) : (
+          <div className="practice-session-report-mistake-ledger-list">
+            {sessionMistakeLedger.items.slice(0, 3).map(item => (
+              <button key={item.id} type="button" onClick={() => onNavigate(item.to)}>
+                <strong>{item.label}</strong>
+                <span>{item.averageScore} 平均分 · {item.affectedQuestionIds.length} 道题</span>
+                <small>{item.latestQuestionTitle}</small>
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="practice-session-report-mistake-ledger-plan">
+          <span>{sessionRecoveryPlan.title}</span>
+          <small>{sessionRecoveryPlan.steps[0]?.description ?? sessionRecoveryPlan.summary}</small>
+        </div>
       </div>
 
       <div className="practice-session-report-next-training" aria-label="下一轮训练">

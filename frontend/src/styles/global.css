@@ -7626,6 +7626,161 @@ p {
   font-size: 12px;
 }
 
+.practice-session-report-mistake-ledger {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: 8px;
+}
+
+.practice-session-report-mistake-ledger-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.practice-session-report-mistake-ledger-head > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-mistake-ledger-head span {
+  color: #92400E;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-mistake-ledger-head small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #B45309;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-mistake-ledger-head .ant-btn {
+  flex: 0 0 auto;
+  max-width: 136px;
+}
+
+.practice-session-report-mistake-ledger-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.practice-session-report-mistake-ledger-metrics div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 7px 8px;
+  background: #FFFFFF;
+  border: 1px solid #FDE68A;
+  border-radius: 8px;
+}
+
+.practice-session-report-mistake-ledger-metrics span {
+  color: #92400E;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.practice-session-report-mistake-ledger-metrics strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-mistake-ledger p {
+  margin: 0;
+  color: #B45309;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.practice-session-report-mistake-ledger-list {
+  display: grid;
+  gap: 6px;
+}
+
+.practice-session-report-mistake-ledger-list button {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  text-align: left;
+  background: #FFFFFF;
+  border: 1px solid #FDE68A;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.practice-session-report-mistake-ledger-list button:hover {
+  border-color: #F59E0B;
+}
+
+.practice-session-report-mistake-ledger-list strong,
+.practice-session-report-mistake-ledger-list span,
+.practice-session-report-mistake-ledger-list small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-mistake-ledger-list strong {
+  color: #0F172A;
+  font-size: 13px;
+}
+
+.practice-session-report-mistake-ledger-list span {
+  color: #92400E;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.practice-session-report-mistake-ledger-list small {
+  color: #64748B;
+  font-size: 12px;
+}
+
+.practice-session-report-mistake-ledger-plan {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px dashed #F59E0B;
+  border-radius: 8px;
+}
+
+.practice-session-report-mistake-ledger-plan span {
+  overflow: hidden;
+  color: #92400E;
+  font-size: 12px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-mistake-ledger-plan small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;

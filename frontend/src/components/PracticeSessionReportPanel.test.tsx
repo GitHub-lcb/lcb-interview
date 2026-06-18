@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
 import { message } from 'antd'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { InterviewAttempt, PracticeQueueItem, StudyProgress } from '../types'
+import type { InterviewAttempt, InterviewCriterionKey, PracticeQueueItem, StudyProgress } from '../types'
 import { buildPracticeInterviewerScript } from '../utils/practiceInterviewerScript'
 import PracticeSessionReportPanel from './PracticeSessionReportPanel'
 
@@ -22,7 +22,12 @@ function question(id: number): PracticeQueueItem {
   }
 }
 
-function attempt(questionId: number, score: number, structureScore = score): InterviewAttempt {
+function attempt(
+  questionId: number,
+  score: number,
+  structureScore = score,
+  criterionScores: Partial<Record<InterviewCriterionKey, number>> = {},
+): InterviewAttempt {
   return {
     questionId,
     answer: '先讲结论，再补机制、场景、风险和落地方案。',
@@ -31,10 +36,10 @@ function attempt(questionId: number, score: number, structureScore = score): Int
       score,
       level: score >= 80 ? 'strong' : score >= 60 ? 'pass' : 'needs-work',
       criteria: [
-        { key: 'coverage', label: '覆盖度', score, summary: '覆盖核心概念' },
-        { key: 'structure', label: '结构化', score: structureScore, summary: '结构表达一般' },
-        { key: 'specificity', label: '场景细节', score, summary: '场景细节一般' },
-        { key: 'risk', label: '风险意识', score, summary: '风险意识一般' },
+        { key: 'coverage', label: '覆盖度', score: criterionScores.coverage ?? score, summary: '覆盖核心概念' },
+        { key: 'structure', label: '结构化', score: criterionScores.structure ?? structureScore, summary: '结构表达一般' },
+        { key: 'specificity', label: '场景细节', score: criterionScores.specificity ?? score, summary: '场景细节一般' },
+        { key: 'risk', label: '风险意识', score: criterionScores.risk ?? score, summary: '风险意识一般' },
       ],
       advice: [],
       followUps: [],
@@ -211,6 +216,34 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1')
   })
 
+  it('renders mistake ledger from the current session queue', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 58, 58, { specificity: 35 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const ledgerBlock = screen.getByLabelText('本轮错因账本')
+
+    expect(within(ledgerBlock).getByText('本轮错因账本')).toBeInTheDocument()
+    expect(within(ledgerBlock).getByText('场景细节反复失分')).toBeInTheDocument()
+    expect(within(ledgerBlock).getByText(/三步修复首要错因/)).toBeInTheDocument()
+
+    await user.click(within(ledgerBlock).getByRole('button', { name: /场景细节反复失分/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel
@@ -248,7 +281,7 @@ describe('PracticeSessionReportPanel', () => {
     expect(screen.getByText('本轮补弱动作')).toBeInTheDocument()
     expect(screen.getAllByText(/Java 面试题 1/).length).toBeGreaterThan(0)
     expect(screen.getAllByText(/结构化/).length).toBeGreaterThan(0)
-    expect(screen.getByText(/先按/)).toBeInTheDocument()
+    expect(within(screen.getByLabelText('本轮补弱动作')).getByText(/先按/)).toBeInTheDocument()
 
     await userEvent.click(screen.getAllByRole('button', { name: /去补弱/ })[0])
 
