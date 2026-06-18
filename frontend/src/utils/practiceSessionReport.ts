@@ -15,6 +15,8 @@ import type {
   PracticeSessionEvidenceGapItem,
   PracticeSessionEvidenceGaps,
   PracticeSessionInterviewerDecision,
+  PracticeSessionPassEvidence,
+  PracticeSessionPassEvidenceItem,
   PracticeSessionPassGate,
   PracticeSessionPassGateItem,
   PracticeQueueItem,
@@ -203,6 +205,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionRiskGuardrails(queue, progress),
     renderSessionRetryDrafts(queue, progress),
     renderSessionPassGate(queue, progress),
+    renderSessionPassEvidence(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -845,6 +848,51 @@ export function buildPracticeSessionPassGate(
   }
 }
 
+export function buildPracticeSessionPassEvidence(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): PracticeSessionPassEvidence {
+  const report = buildPracticeSessionReport(queue, progress)
+  const radar = buildPracticeSessionAbilityRadar(queue, progress)
+  const retryDrafts = buildPracticeSessionRetryDrafts(queue, progress)
+  const passGate = buildPracticeSessionPassGate(queue, progress)
+
+  if (passGate.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待生成过线证据包',
+      summary: '先完成一次模拟面试，系统才能沉淀评分、完成度、弱项和提交稿证据。',
+      totalCount: 0,
+      items: [],
+      primaryAction: {
+        kind: passGate.primaryAction.kind,
+        label: '建立证据样本',
+        description: '先完成一次开口作答，再生成本轮过线证据包。',
+        to: passGate.primaryAction.to,
+      },
+    }
+  }
+
+  const items = buildPassEvidenceItems(report, radar, retryDrafts)
+  const ready = passGate.status === 'ready'
+
+  return {
+    status: ready ? 'ready' : 'blocked',
+    title: ready ? '过线证据已齐' : '过线证据不足',
+    summary: ready
+      ? `已沉淀 ${items.length} 条过线证据，可以解释为什么本轮允许进入下一轮。`
+      : `已沉淀 ${items.length} 条复盘证据，先按证据包修复低分、弱项和提交稿。`,
+    totalCount: items.length,
+    items,
+    primaryAction: {
+      kind: passGate.primaryAction.kind,
+      label: ready ? '带证据进入下一轮' : '复核过线证据',
+      description: ready ? '带着本轮证据包进入下一轮加压。' : '按证据包回到本轮队列，先补齐过线缺口。',
+      to: passGate.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -1393,6 +1441,38 @@ function renderSessionPassGate(queue: PracticeQueueItem[], progress: StudyProgre
       `   - 状态：${item.status === 'ready' ? '已通过' : '待修复'}`,
       `   - 目标：${item.target}`,
       `   - 当前：${item.current}`,
+      `   - 动作：${item.action}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionPassEvidence(queue: PracticeQueueItem[], progress: StudyProgress): string {
+  const evidence = buildPracticeSessionPassEvidence(queue, progress)
+  const lines = [
+    '## 本轮过线证据包',
+    `- 状态：${evidence.title}`,
+    `- 摘要：${evidence.summary}`,
+    `- 证据数：${evidence.totalCount}`,
+    `- 主行动：${evidence.primaryAction.label}，${evidence.primaryAction.description}（${evidence.primaryAction.to}）`,
+    '',
+  ]
+
+  if (evidence.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待生成过线证据包。先完成一次模拟面试后，系统会沉淀本轮能否过线的关键证据。',
+      '',
+    ].join('\n')
+  }
+
+  evidence.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 证据：${item.value}`,
+      `   - 解释：${item.explanation}`,
       `   - 动作：${item.action}`,
       `   - 入口：${item.to}`,
     )
@@ -2382,6 +2462,60 @@ function buildPassGateItems(
       current: draftReady ? '二次提交稿已就绪' : retryDrafts.title,
       status: draftReady ? 'ready' : 'blocked',
       action: draftReady ? '按稿进入下一轮加压' : '先生成并使用二次提交稿，避免带着原始失分表达进入下一轮。',
+      to: retryDrafts.primaryAction.to,
+      priority: 4,
+    },
+  ]
+}
+
+function buildPassEvidenceItems(
+  report: PracticeSessionReport,
+  radar: PracticeSessionAbilityRadar,
+  retryDrafts: PracticeSessionRetryDrafts,
+): PracticeSessionPassEvidenceItem[] {
+  const unansweredCount = Math.max(report.totalCount - report.answeredCount, 0)
+  const queuePath = report.queueProfile.queuePath
+
+  return [
+    {
+      id: 'score-evidence',
+      label: '评分证据',
+      value: `${report.averageScore} 分均分，${report.passCount} 道达到基础通过线`,
+      explanation: report.averageScore >= STRONG_SESSION_SCORE
+        ? '均分已经达到下一轮加压标准。'
+        : `均分还低于 ${STRONG_SESSION_SCORE} 分强门槛，说明当前答案稳定性不足。`,
+      action: report.averageScore >= STRONG_SESSION_SCORE ? '保留当前答法并继续加压。' : '优先重答低分题，把均分补到 80 分以上。',
+      to: queuePath,
+      priority: 1,
+    },
+    {
+      id: 'completion-evidence',
+      label: '完成证据',
+      value: `${report.answeredCount}/${report.totalCount} 道已完成评分`,
+      explanation: unansweredCount === 0 ? '本轮样本完整，可以进行整轮判断。' : `还有 ${unansweredCount} 道未答，样本不完整。`,
+      action: unansweredCount === 0 ? '保持完整样本。' : '先完成剩余题目，再看总分和弱项。',
+      to: unansweredCount === 0 ? queuePath : buildQueuePath(report.queueProfile.unansweredQuestionIds),
+      priority: 2,
+    },
+    {
+      id: 'weakness-evidence',
+      label: '弱项证据',
+      value: `${report.weakQuestionIds.length} 道薄弱题，${radar.title}`,
+      explanation: report.weakQuestionIds.length === 0 && radar.status === 'stable'
+        ? '薄弱题已经清零，四项能力没有明显短板。'
+        : '仍有题目或能力维度会拖低面试官判断。',
+      action: report.weakQuestionIds.length === 0 && radar.status === 'stable' ? '继续保持四项能力均衡。' : '先修复薄弱题和最低能力维度。',
+      to: queuePath,
+      priority: 3,
+    },
+    {
+      id: 'submission-evidence',
+      label: '提交证据',
+      value: retryDrafts.title,
+      explanation: retryDrafts.status === 'ready'
+        ? '二次提交稿已稳定，可以作为下一轮回答基线。'
+        : '二次提交稿仍处在修复状态，需要先替换高风险表达。',
+      action: retryDrafts.status === 'ready' ? '带着稳定稿进入下一轮。' : '先使用二次提交稿完成一次重答。',
       to: retryDrafts.primaryAction.to,
       priority: 4,
     },

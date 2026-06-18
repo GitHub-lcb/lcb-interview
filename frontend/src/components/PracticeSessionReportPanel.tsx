@@ -29,6 +29,7 @@ import {
   buildPracticeSessionMaterialVault,
   buildPracticeSessionMistakeLedger,
   buildPracticeSessionNextTrainingQueue,
+  buildPracticeSessionPassEvidence,
   buildPracticeSessionPassGate,
   buildPracticeSessionPressureProbes,
   buildPracticeSessionRecoveryAcceptance,
@@ -143,6 +144,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionPassGate = useMemo(
     () => buildPracticeSessionPassGate(queue, progress),
+    [progress, queue],
+  )
+  const sessionPassEvidence = useMemo(
+    () => buildPracticeSessionPassEvidence(queue, progress),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -769,6 +774,37 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionPassGate.primaryAction.to)}
         >
           {sessionPassGate.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className={`practice-session-report-pass-evidence status-${sessionPassEvidence.status}`} aria-label="本轮过线证据包">
+        <div className="practice-session-report-pass-evidence-head">
+          <span>本轮过线证据包</span>
+          <strong>{sessionPassEvidence.title}</strong>
+          <small>{sessionPassEvidence.summary}</small>
+        </div>
+        {sessionPassEvidence.items.length === 0 ? (
+          <p>等待生成过线证据包。先完成一次模拟面试后，系统会沉淀本轮能否过线的关键证据。</p>
+        ) : (
+          <div className="practice-session-report-pass-evidence-list">
+            {sessionPassEvidence.items.map(item => (
+              <article key={item.id}>
+                <strong>{item.label}</strong>
+                <span>{item.value}</span>
+                <small>{item.explanation}</small>
+                <b>{item.action}</b>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionPassEvidence.status === 'blocked'}
+          icon={sessionPassEvidence.status === 'blocked' ? <WarningOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionPassEvidence.primaryAction.to)}
+        >
+          {sessionPassEvidence.primaryAction.label}
         </Button>
       </div>
 

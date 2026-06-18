@@ -978,6 +978,27 @@ export interface PracticeSessionPassGate {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionPassEvidenceStatus = 'empty' | 'blocked' | 'ready'
+
+export interface PracticeSessionPassEvidenceItem {
+  id: string
+  label: string
+  value: string
+  explanation: string
+  action: string
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionPassEvidence {
+  status: PracticeSessionPassEvidenceStatus
+  title: string
+  summary: string
+  totalCount: number
+  items: PracticeSessionPassEvidenceItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'
