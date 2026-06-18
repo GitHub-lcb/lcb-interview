@@ -29,6 +29,7 @@ import {
   buildPracticeSessionFirstQuestionReceipt,
   buildPracticeSessionFirstQuestionReceiptAcceptance,
   buildPracticeSessionFirstQuestionReleaseGate,
+  buildPracticeSessionFirstQuestionReviewTemplate,
   buildPracticeSessionFirstQuestionRubric,
   buildPracticeSessionFollowUpDefense,
   buildPracticeSessionInterviewerDecision,
@@ -213,6 +214,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionFirstQuestionReleaseGate = useMemo(
     () => buildPracticeSessionFirstQuestionReleaseGate(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionFirstQuestionReviewTemplate = useMemo(
+    () => buildPracticeSessionFirstQuestionReviewTemplate(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1351,6 +1356,47 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionFirstQuestionReleaseGate.primaryAction.to)}
         >
           {sessionFirstQuestionReleaseGate.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-first-review-template status-${sessionFirstQuestionReviewTemplate.status}`}
+        aria-label="首题复盘模板"
+      >
+        <div className="practice-session-report-first-review-template-head">
+          <div>
+            <span>首题复盘模板</span>
+            <strong>{sessionFirstQuestionReviewTemplate.title}</strong>
+            <small>{sessionFirstQuestionReviewTemplate.summary}</small>
+          </div>
+        </div>
+        {sessionFirstQuestionReviewTemplate.items.length === 0 ? (
+          <p>等待首题复盘模板。先完成首题放行门禁后，系统会给出复盘字段。</p>
+        ) : (
+          <div className="practice-session-report-first-review-template-list">
+            {sessionFirstQuestionReviewTemplate.items.map(item => (
+              <article key={item.id}>
+                <span>{item.label}</span>
+                <dl>
+                  <dt>填写提示</dt>
+                  <dd>{item.prompt}</dd>
+                  <dt>示例</dt>
+                  <dd>{item.example}</dd>
+                  <dt>验收规则</dt>
+                  <dd>{item.acceptanceRule}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionFirstQuestionReviewTemplate.status === 'repair'}
+          icon={sessionFirstQuestionReviewTemplate.status === 'repair' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionFirstQuestionReviewTemplate.primaryAction.to)}
+        >
+          {sessionFirstQuestionReviewTemplate.primaryAction.label}
         </Button>
       </div>
 

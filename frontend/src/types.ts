@@ -1252,6 +1252,25 @@ export interface PracticeSessionFirstQuestionReleaseGate {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionFirstQuestionReviewTemplateStatus = 'empty' | 'repair' | 'ready'
+
+export interface PracticeSessionFirstQuestionReviewTemplateItem {
+  id: string
+  label: string
+  prompt: string
+  example: string
+  acceptanceRule: string
+  priority: number
+}
+
+export interface PracticeSessionFirstQuestionReviewTemplate {
+  status: PracticeSessionFirstQuestionReviewTemplateStatus
+  title: string
+  summary: string
+  items: PracticeSessionFirstQuestionReviewTemplateItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

@@ -24,6 +24,8 @@ import type {
   PracticeSessionFirstQuestionReceiptItem,
   PracticeSessionFirstQuestionReleaseGate,
   PracticeSessionFirstQuestionReleaseGateItem,
+  PracticeSessionFirstQuestionReviewTemplate,
+  PracticeSessionFirstQuestionReviewTemplateItem,
   PracticeSessionFirstQuestionRubric,
   PracticeSessionFirstQuestionRubricItem,
   PracticeSessionLaunchChecklist,
@@ -257,6 +259,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFirstQuestionReceipt(queue, progress, now),
     renderSessionFirstQuestionReceiptAcceptance(queue, progress, now),
     renderSessionFirstQuestionReleaseGate(queue, progress, now),
+    renderSessionFirstQuestionReviewTemplate(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1559,6 +1562,46 @@ export function buildPracticeSessionFirstQuestionReleaseGate(
   }
 }
 
+export function buildPracticeSessionFirstQuestionReviewTemplate(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionReviewTemplate {
+  const gate = buildPracticeSessionFirstQuestionReleaseGate(queue, progress, now)
+
+  if (gate.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待首题复盘模板',
+      summary: '先完成首题放行门禁，再生成下一轮第一题的复盘字段。',
+      items: [],
+      primaryAction: {
+        kind: gate.primaryAction.kind,
+        label: '建立复盘模板',
+        description: '先完成首题放行裁决，再生成复盘模板。',
+        to: gate.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = gate.status === 'blocked'
+
+  return {
+    status: repairMode ? 'repair' : 'ready',
+    title: repairMode ? '回修首题复盘模板' : '下一轮首题复盘模板',
+    summary: repairMode
+      ? '记录回修首题是否真的减少阻断项，避免只重看提示。'
+      : '记录下一轮第一题是否形成新样本，方便继续加压。',
+    items: buildFirstQuestionReviewTemplateItems(gate, repairMode),
+    primaryAction: {
+      kind: gate.primaryAction.kind,
+      label: '填写首题复盘',
+      description: repairMode ? '回到首题入口，按模板记录回修结果。' : '进入下一轮首题，按模板记录第一题结果。',
+      to: gate.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -2580,6 +2623,40 @@ function renderSessionFirstQuestionReleaseGate(
       `   - 放行检查：${item.releaseRule}`,
       `   - 处理动作：${item.action}`,
       `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionReviewTemplate(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const template = buildPracticeSessionFirstQuestionReviewTemplate(queue, progress, now)
+  const lines = [
+    '## 首题复盘模板',
+    `- 状态：${template.title}`,
+    `- 摘要：${template.summary}`,
+    `- 主行动：${template.primaryAction.label}，${template.primaryAction.description}（${template.primaryAction.to}）`,
+    '',
+  ]
+
+  if (template.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待首题复盘模板。先完成首题放行门禁后，系统会给出复盘字段。',
+      '',
+    ].join('\n')
+  }
+
+  template.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 填写提示：${item.prompt}`,
+      `   - 示例：${item.example}`,
+      `   - 验收规则：${item.acceptanceRule}`,
     )
   })
 
@@ -4246,6 +4323,49 @@ function findFirstQuestionReceiptAcceptanceItem(
   id: string,
 ): PracticeSessionFirstQuestionReceiptAcceptanceItem | undefined {
   return acceptance.items.find(item => item.id === id)
+}
+
+function buildFirstQuestionReviewTemplateItems(
+  gate: PracticeSessionFirstQuestionReleaseGate,
+  repairMode: boolean,
+): PracticeSessionFirstQuestionReviewTemplateItem[] {
+  const blockedLabel = gate.items.find(item => item.state === 'blocked')?.label ?? '暂无阻断项'
+  const evidenceLabel = gate.items.find(item => item.id === 'release-receipt-evidence')?.evidence ?? '补齐首题证据'
+
+  return [
+    {
+      id: 'review-score-change',
+      label: '评分变化',
+      prompt: repairMode ? '本次回修首题评分是多少？相比阻断前提升了多少？' : '下一轮首题评分是多少？相比本轮基线提升了多少？',
+      example: repairMode ? '评分变化：62 -> __ 分；仍低于 80 的维度：__。' : '评分变化：本轮基线 80+，首题得分 __ 分；变化：+__ / -__。',
+      acceptanceRule: '必须写出具体分数或明确说明尚未评分。',
+      priority: 1,
+    },
+    {
+      id: 'review-evidence-change',
+      label: '证据变化',
+      prompt: repairMode ? '本次是否补上了缺失证据？' : '首题是否留下新的场景、指标或风险证据？',
+      example: `证据变化：${evidenceLabel}；新增证据：__。`,
+      acceptanceRule: '必须能追溯到回答文本、评分理由或回修记录。',
+      priority: 2,
+    },
+    {
+      id: 'review-blocker-change',
+      label: '阻断变化',
+      prompt: repairMode ? '原阻断项是否减少或清零？' : '是否出现新的阻断项？',
+      example: repairMode ? `阻断变化：${blockedLabel} -> 已减少/仍存在，依据：__。` : '阻断变化：暂无新增阻断/新增阻断为 __，依据：__。',
+      acceptanceRule: '必须给出继续回修或允许加压的判断。',
+      priority: 3,
+    },
+    {
+      id: 'review-next-question-action',
+      label: '下一题动作',
+      prompt: repairMode ? '下一步继续回修、重答首题，还是重新申请放行？' : '下一题继续加压、复盘首题，还是回修弱项？',
+      example: repairMode ? '下一题动作：继续回修 __，完成后重新验收首题回执。' : '下一题动作：进入下一题 __，同时保留首题复盘证据。',
+      acceptanceRule: '必须落到一个具体入口或具体题目，不能只写继续学习。',
+      priority: 4,
+    },
+  ]
 }
 
 function buildPracticeSessionScriptCommandItem(
