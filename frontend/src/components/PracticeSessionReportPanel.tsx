@@ -33,6 +33,7 @@ import {
   buildPracticeSessionFirstQuestionReuseReceipt,
   buildPracticeSessionFirstQuestionReuseReceiptAcceptance,
   buildPracticeSessionFirstQuestionReuseReleaseGate,
+  buildPracticeSessionFirstQuestionReuseReviewAcceptance,
   buildPracticeSessionFirstQuestionReuseReviewTemplate,
   buildPracticeSessionFirstQuestionReviewAcceptance,
   buildPracticeSessionFirstQuestionReviewArchive,
@@ -253,6 +254,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionFirstQuestionReuseReviewTemplate = useMemo(
     () => buildPracticeSessionFirstQuestionReuseReviewTemplate(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionFirstQuestionReuseReviewAcceptance = useMemo(
+    () => buildPracticeSessionFirstQuestionReuseReviewAcceptance(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1736,6 +1741,50 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionFirstQuestionReuseReviewTemplate.primaryAction.to)}
         >
           {sessionFirstQuestionReuseReviewTemplate.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-first-reuse-review-acceptance status-${sessionFirstQuestionReuseReviewAcceptance.status}`}
+        aria-label="首题复用复盘验收卡"
+      >
+        <div className="practice-session-report-first-reuse-review-acceptance-head">
+          <div>
+            <span>首题复用复盘验收卡</span>
+            <strong>{sessionFirstQuestionReuseReviewAcceptance.title}</strong>
+            <small>{sessionFirstQuestionReuseReviewAcceptance.summary}</small>
+          </div>
+        </div>
+        {sessionFirstQuestionReuseReviewAcceptance.items.length === 0 ? (
+          <p>等待验收首题复用复盘。先生成首题复用复盘模板后，系统会给出验收口径。</p>
+        ) : (
+          <div className="practice-session-report-first-reuse-review-acceptance-list">
+            {sessionFirstQuestionReuseReviewAcceptance.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.target}</strong>
+                </div>
+                <dl>
+                  <dt>通过信号</dt>
+                  <dd>{item.passSignal}</dd>
+                  <dt>缺失风险</dt>
+                  <dd>{item.missingRisk}</dd>
+                  <dt>补救动作</dt>
+                  <dd>{item.repairAction}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionFirstQuestionReuseReviewAcceptance.status === 'repair'}
+          icon={sessionFirstQuestionReuseReviewAcceptance.status === 'repair' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionFirstQuestionReuseReviewAcceptance.primaryAction.to)}
+        >
+          {sessionFirstQuestionReuseReviewAcceptance.primaryAction.label}
         </Button>
       </div>
 

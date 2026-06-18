@@ -30,6 +30,8 @@ import type {
   PracticeSessionFirstQuestionReuseReceiptItem,
   PracticeSessionFirstQuestionReuseReleaseGate,
   PracticeSessionFirstQuestionReuseReleaseGateItem,
+  PracticeSessionFirstQuestionReuseReviewAcceptance,
+  PracticeSessionFirstQuestionReuseReviewAcceptanceItem,
   PracticeSessionFirstQuestionReuseReviewTemplate,
   PracticeSessionFirstQuestionReuseReviewTemplateItem,
   PracticeSessionFirstQuestionReleaseGate,
@@ -287,6 +289,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFirstQuestionReuseReceiptAcceptance(queue, progress, now),
     renderSessionFirstQuestionReuseReleaseGate(queue, progress, now),
     renderSessionFirstQuestionReuseReviewTemplate(queue, progress, now),
+    renderSessionFirstQuestionReuseReviewAcceptance(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1908,6 +1911,44 @@ export function buildPracticeSessionFirstQuestionReuseReviewTemplate(
   }
 }
 
+export function buildPracticeSessionFirstQuestionReuseReviewAcceptance(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionReuseReviewAcceptance {
+  const template = buildPracticeSessionFirstQuestionReuseReviewTemplate(queue, progress, now)
+
+  if (template.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待验收首题复用复盘',
+      summary: '先生成首题复用复盘模板，再检查分数、证据、阻断和下一题回流是否可用。',
+      items: [],
+      primaryAction: {
+        kind: template.primaryAction.kind,
+        label: '建立复用复盘验收',
+        description: '先生成首题复用复盘模板，再验收复盘质量。',
+        to: template.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = template.status === 'repair'
+
+  return {
+    status: template.status,
+    title: repairMode ? '回修复用复盘待验收' : '首题复用复盘待验收',
+    summary: repairMode ? '检查回修复用复盘是否能证明未放行项已经补齐。' : '检查首题复用复盘是否能回流下一轮训练安排。',
+    items: buildFirstQuestionReuseReviewAcceptanceItems(template, repairMode),
+    primaryAction: {
+      kind: template.primaryAction.kind,
+      label: '验收复用复盘',
+      description: repairMode ? '回到复用修复入口，补齐未通过的复盘验收项。' : '回到下一轮首题，补齐复用复盘验收项。',
+      to: template.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -3206,6 +3247,41 @@ function renderSessionFirstQuestionReuseReviewTemplate(
       `   - 填写提示：${item.prompt}`,
       `   - 示例：${item.example}`,
       `   - 验收规则：${item.acceptanceRule}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionReuseReviewAcceptance(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const acceptance = buildPracticeSessionFirstQuestionReuseReviewAcceptance(queue, progress, now)
+  const lines = [
+    '## 首题复用复盘验收卡',
+    `- 状态：${acceptance.title}`,
+    `- 摘要：${acceptance.summary}`,
+    `- 主行动：${acceptance.primaryAction.label}，${acceptance.primaryAction.description}（${acceptance.primaryAction.to}）`,
+    '',
+  ]
+
+  if (acceptance.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待验收首题复用复盘。先生成首题复用复盘模板后，系统会给出验收口径。',
+      '',
+    ].join('\n')
+  }
+
+  acceptance.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 验收目标：${item.target}`,
+      `   - 通过信号：${item.passSignal}`,
+      `   - 缺失风险：${item.missingRisk}`,
+      `   - 补救动作：${item.repairAction}`,
     )
   })
 
@@ -5257,11 +5333,67 @@ function buildFirstQuestionReuseReviewTemplateItems(
   ]
 }
 
+function buildFirstQuestionReuseReviewAcceptanceItems(
+  template: PracticeSessionFirstQuestionReuseReviewTemplate,
+  repairMode: boolean,
+): PracticeSessionFirstQuestionReuseReviewAcceptanceItem[] {
+  const score = findFirstQuestionReuseReviewTemplateItem(template, 'reuse-review-score')
+  const evidence = findFirstQuestionReuseReviewTemplateItem(template, 'reuse-review-evidence')
+  const blocker = findFirstQuestionReuseReviewTemplateItem(template, 'reuse-review-blocker')
+  const nextQuestion = findFirstQuestionReuseReviewTemplateItem(template, 'reuse-review-next-question')
+
+  return [
+    {
+      id: 'accept-reuse-review-score',
+      label: '分数验收',
+      target: score?.prompt ?? '检查复用复盘是否写清基线分、新得分或尚未评分原因。',
+      passSignal: score?.acceptanceRule ?? '必须写出基线分、新得分或明确说明尚未评分。',
+      missingRisk: repairMode ? '分数没有对齐会让回修复用继续停在主观判断。' : '分数缺失会让下一轮训练无法判断复用是否有效。',
+      repairAction: score ? `回到「${score.label}」补齐分数回看。` : '回到首题复用复盘模板，补齐分数字段。',
+      priority: 1,
+    },
+    {
+      id: 'accept-reuse-review-evidence',
+      label: '证据验收',
+      target: evidence?.prompt ?? '检查复用复盘是否写清证据是否命中追问或复盘。',
+      passSignal: evidence?.acceptanceRule ?? '必须说明证据是否支撑追问或复盘。',
+      missingRisk: repairMode ? '证据没有命中会让未放行项无法确认补齐。' : '证据缺失会让下一题复用没有可追溯依据。',
+      repairAction: evidence ? `回到「${evidence.label}」补齐证据命中。` : '回到首题复用复盘模板，补齐证据字段。',
+      priority: 2,
+    },
+    {
+      id: 'accept-reuse-review-blocker',
+      label: '阻断验收',
+      target: blocker?.prompt ?? '检查复用复盘是否写清阻断状态变化。',
+      passSignal: blocker?.acceptanceRule ?? '必须写出阻断状态变化或明确未变化。',
+      missingRisk: repairMode ? '阻断没有回收会让同一问题继续阻塞放行。' : '阻断不明会让下一轮把未修复问题误判为已解决。',
+      repairAction: blocker ? `回到「${blocker.label}」补齐阻断回收。` : '回到首题复用复盘模板，补齐阻断字段。',
+      priority: 3,
+    },
+    {
+      id: 'accept-reuse-review-next-question',
+      label: '回流验收',
+      target: nextQuestion?.prompt ?? '检查复用复盘是否落到下一轮题序或回修动作。',
+      passSignal: nextQuestion?.acceptanceRule ?? '必须落到继续回修、保留题序或调整下一题。',
+      missingRisk: repairMode ? '回流不清会让回修结束后不知道接哪一题。' : '回流缺失会让复用结果无法影响后续训练计划。',
+      repairAction: nextQuestion ? `回到「${nextQuestion.label}」补齐下一题回流。` : '回到首题复用复盘模板，补齐下一题字段。',
+      priority: 4,
+    },
+  ]
+}
+
 function findFirstQuestionReuseReleaseGateItem(
   gate: PracticeSessionFirstQuestionReuseReleaseGate,
   id: string,
 ): PracticeSessionFirstQuestionReuseReleaseGateItem | undefined {
   return gate.items.find(item => item.id === id)
+}
+
+function findFirstQuestionReuseReviewTemplateItem(
+  template: PracticeSessionFirstQuestionReuseReviewTemplate,
+  id: string,
+): PracticeSessionFirstQuestionReuseReviewTemplateItem | undefined {
+  return template.items.find(item => item.id === id)
 }
 
 function findFirstQuestionReviewTemplateItem(

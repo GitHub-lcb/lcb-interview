@@ -1411,6 +1411,26 @@ export interface PracticeSessionFirstQuestionReuseReviewTemplate {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionFirstQuestionReuseReviewAcceptanceStatus = 'empty' | 'repair' | 'ready'
+
+export interface PracticeSessionFirstQuestionReuseReviewAcceptanceItem {
+  id: string
+  label: string
+  target: string
+  passSignal: string
+  missingRisk: string
+  repairAction: string
+  priority: number
+}
+
+export interface PracticeSessionFirstQuestionReuseReviewAcceptance {
+  status: PracticeSessionFirstQuestionReuseReviewAcceptanceStatus
+  title: string
+  summary: string
+  items: PracticeSessionFirstQuestionReuseReviewAcceptanceItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'
