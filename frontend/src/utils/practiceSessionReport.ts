@@ -22,6 +22,8 @@ import type {
   PracticeSessionReplayChecklistItem,
   PracticeSessionReplayCardItem,
   PracticeSessionReplayCards,
+  PracticeSessionRiskGuardrailItem,
+  PracticeSessionRiskGuardrails,
   PracticeSessionReport,
   PracticeSessionReportAction,
   PracticeSessionReportLevel,
@@ -194,6 +196,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionReplayCards(queue, progress),
     renderSessionReplayChecklist(queue, progress),
     renderSessionPressureProbes(queue, progress),
+    renderSessionRiskGuardrails(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -691,6 +694,45 @@ export function buildPracticeSessionPressureProbes(
   }
 }
 
+export function buildPracticeSessionRiskGuardrails(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): PracticeSessionRiskGuardrails {
+  const probes = buildPracticeSessionPressureProbes(queue, progress)
+
+  if (probes.items.length === 0) {
+    return {
+      status: 'empty',
+      title: '等待生成失分禁区',
+      summary: '先完成一次模拟面试并生成压力追问，系统才能定位重答时最容易踩的表达禁区。',
+      totalCount: 0,
+      items: [],
+      primaryAction: {
+        kind: probes.primaryAction.kind,
+        label: '建立禁区样本',
+        description: '先完成一次开口作答，再生成本轮失分禁区。',
+        to: probes.primaryAction.to,
+      },
+    }
+  }
+
+  const items = buildRiskGuardrailItems(probes.primaryAction.to)
+
+  return {
+    status: probes.status === 'pressure' ? 'warning' : 'ready',
+    title: probes.status === 'pressure' ? '重答前先避坑' : '高分表达护栏',
+    summary: `已生成 ${items.length} 条本轮失分禁区，把高风险表达替换后再重答。`,
+    totalCount: items.length,
+    items,
+    primaryAction: {
+      kind: probes.primaryAction.kind,
+      label: '避开失分禁区',
+      description: '重答前先替换空泛、无边界和只背答案的表达。',
+      to: probes.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -1143,6 +1185,37 @@ function renderSessionPressureProbes(queue: PracticeQueueItem[], progress: Study
       `   - 面试官追问：${item.probe}`,
       `   - 暴露风险：${item.riskSignal}`,
       `   - 回答口径：${item.answerGuide}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionRiskGuardrails(queue: PracticeQueueItem[], progress: StudyProgress): string {
+  const guardrails = buildPracticeSessionRiskGuardrails(queue, progress)
+  const lines = [
+    '## 本轮失分禁区',
+    `- 状态：${guardrails.title}`,
+    `- 摘要：${guardrails.summary}`,
+    `- 主行动：${guardrails.primaryAction.label}，${guardrails.primaryAction.description}（${guardrails.primaryAction.to}）`,
+    '',
+  ]
+
+  if (guardrails.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待生成失分禁区。先完成一次模拟面试并生成压力追问后，系统会给出重答避坑清单。',
+      '',
+    ].join('\n')
+  }
+
+  guardrails.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 不要这样说：${item.avoid}`,
+      `   - 失分原因：${item.reason}`,
+      `   - 改成这样说：${item.replacement}`,
       `   - 入口：${item.to}`,
     )
   })
@@ -2023,6 +2096,38 @@ function buildPressureProbeItems(
       priority: 100 - index,
     }
   })
+}
+
+function buildRiskGuardrailItems(to: string): PracticeSessionRiskGuardrailItem[] {
+  return [
+    {
+      id: 'empty-concept',
+      label: '禁止空讲概念',
+      avoid: '不要只说“我理解核心原理”或复述定义，却没有项目规模、指标和本人动作。',
+      reason: '面试官会继续追问你是否真的做过，空泛概念无法证明实战能力。',
+      replacement: '改成“在某项目里，因某触发条件，我负责某动作，指标从 A 变化到 B”。',
+      to,
+      priority: 100,
+    },
+    {
+      id: 'skip-boundary',
+      label: '禁止跳过失败边界',
+      avoid: '不要只讲正向方案，不讲什么时候失效、怎么监控、怎么降级和回滚。',
+      reason: '边界缺失会让答案像背诵，面试官很容易判断你没有处理过线上风险。',
+      replacement: '改成“这个方案在某场景会失效，我用某监控发现，再用某降级和回滚兜底”。',
+      to,
+      priority: 90,
+    },
+    {
+      id: 'standard-only',
+      label: '禁止只背标准答案',
+      avoid: '不要只说标准方案正确，不解释为什么不用替代方案以及成本收益。',
+      reason: '高级面试更看重取舍能力，只背标准答案无法证明你能独立做技术决策。',
+      replacement: '改成“我比较过 A/B 方案，因为约束、成本和收益选择 A，但在某边界会换成 B”。',
+      to,
+      priority: 80,
+    },
+  ]
 }
 
 function buildPracticeSessionScriptCommandItem(

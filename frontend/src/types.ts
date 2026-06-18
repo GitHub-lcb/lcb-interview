@@ -908,6 +908,27 @@ export interface PracticeSessionPressureProbes {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionRiskGuardrailStatus = 'empty' | 'warning' | 'ready'
+
+export interface PracticeSessionRiskGuardrailItem {
+  id: string
+  label: string
+  avoid: string
+  reason: string
+  replacement: string
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionRiskGuardrails {
+  status: PracticeSessionRiskGuardrailStatus
+  title: string
+  summary: string
+  totalCount: number
+  items: PracticeSessionRiskGuardrailItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

@@ -8705,6 +8705,105 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-risk-guardrails {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #FFF1F2;
+  border: 1px solid #FDA4AF;
+  border-radius: 8px;
+}
+
+.practice-session-report-risk-guardrails-head {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-risk-guardrails-head span {
+  color: #9F1239;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-risk-guardrails-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-risk-guardrails-head small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-risk-guardrails p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.practice-session-report-risk-guardrails-list {
+  display: grid;
+  gap: 6px;
+}
+
+.practice-session-report-risk-guardrails-list article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #FECDD3;
+  border-radius: 8px;
+}
+
+.practice-session-report-risk-guardrails-list strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-risk-guardrails-list small,
+.practice-session-report-risk-guardrails-list em,
+.practice-session-report-risk-guardrails-list b {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-risk-guardrails-list small {
+  color: #BE123C;
+  font-weight: 700;
+}
+
+.practice-session-report-risk-guardrails-list em {
+  color: #475569;
+}
+
+.practice-session-report-risk-guardrails-list b {
+  color: #166534;
+  font-weight: 800;
+}
+
+.practice-session-report-risk-guardrails .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;

@@ -493,6 +493,36 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders risk guardrails from the current session queue', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const guardrailsBlock = screen.getByLabelText('本轮失分禁区')
+
+    expect(within(guardrailsBlock).getByText('本轮失分禁区')).toBeInTheDocument()
+    expect(within(guardrailsBlock).getByText('禁止空讲概念')).toBeInTheDocument()
+    expect(within(guardrailsBlock).getByText('禁止跳过失败边界')).toBeInTheDocument()
+    expect(within(guardrailsBlock).getByText('禁止只背标准答案')).toBeInTheDocument()
+
+    await user.click(within(guardrailsBlock).getByRole('button', { name: /避开失分禁区/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

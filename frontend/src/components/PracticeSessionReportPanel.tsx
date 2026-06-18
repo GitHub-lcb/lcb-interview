@@ -35,6 +35,7 @@ import {
   buildPracticeSessionReplayCards,
   buildPracticeSessionReport,
   buildPracticeSessionReportMarkdown,
+  buildPracticeSessionRiskGuardrails,
   buildPracticeSessionScriptCommand,
 } from '../utils/practiceSessionReport'
 import { buildInterviewRecoveryPlan } from '../utils/interviewRecoveryPlan'
@@ -128,6 +129,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionPressureProbes = useMemo(
     () => buildPracticeSessionPressureProbes(queue, progress),
+    [progress, queue],
+  )
+  const sessionRiskGuardrails = useMemo(
+    () => buildPracticeSessionRiskGuardrails(queue, progress),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -653,6 +658,36 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionPressureProbes.primaryAction.to)}
         >
           {sessionPressureProbes.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className="practice-session-report-risk-guardrails" aria-label="本轮失分禁区">
+        <div className="practice-session-report-risk-guardrails-head">
+          <span>本轮失分禁区</span>
+          <strong>{sessionRiskGuardrails.title}</strong>
+          <small>{sessionRiskGuardrails.summary}</small>
+        </div>
+        {sessionRiskGuardrails.items.length === 0 ? (
+          <p>等待生成失分禁区。先完成一次模拟面试并生成压力追问后，系统会给出重答避坑清单。</p>
+        ) : (
+          <div className="practice-session-report-risk-guardrails-list">
+            {sessionRiskGuardrails.items.map(item => (
+              <article key={item.id}>
+                <strong>{item.label}</strong>
+                <small>{item.avoid}</small>
+                <em>{item.reason}</em>
+                <b>{item.replacement}</b>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          danger={sessionRiskGuardrails.status === 'warning'}
+          icon={<WarningOutlined />}
+          onClick={() => onNavigate(sessionRiskGuardrails.primaryAction.to)}
+        >
+          {sessionRiskGuardrails.primaryAction.label}
         </Button>
       </div>
 
