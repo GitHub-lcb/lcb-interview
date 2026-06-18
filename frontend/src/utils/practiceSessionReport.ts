@@ -24,6 +24,8 @@ import type {
   PracticeSessionFirstQuestionReceiptAcceptance,
   PracticeSessionFirstQuestionReceiptAcceptanceItem,
   PracticeSessionFirstQuestionReceiptItem,
+  PracticeSessionFirstQuestionReuseReceipt,
+  PracticeSessionFirstQuestionReuseReceiptItem,
   PracticeSessionFirstQuestionReleaseGate,
   PracticeSessionFirstQuestionReleaseGateItem,
   PracticeSessionFirstQuestionReviewAcceptance,
@@ -269,6 +271,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFirstQuestionReviewAcceptance(queue, progress, now),
     renderSessionFirstQuestionReviewArchive(queue, progress, now),
     renderSessionFirstQuestionArchiveReuse(queue, progress, now),
+    renderSessionFirstQuestionReuseReceipt(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1732,6 +1735,46 @@ export function buildPracticeSessionFirstQuestionArchiveReuse(
   }
 }
 
+export function buildPracticeSessionFirstQuestionReuseReceipt(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionReuseReceipt {
+  const reuse = buildPracticeSessionFirstQuestionArchiveReuse(queue, progress, now)
+
+  if (reuse.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待首题复用回执',
+      summary: '先生成首题归档复用清单，再记录分数、证据、阻断和下一题动作是否已执行。',
+      items: [],
+      primaryAction: {
+        kind: reuse.primaryAction.kind,
+        label: '建立复用回执',
+        description: '先生成首题归档复用清单，再填写复用回执。',
+        to: reuse.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = reuse.status === 'repair'
+
+  return {
+    status: reuse.status,
+    title: repairMode ? '回修复用回执模板' : '首题复用回执模板',
+    summary: repairMode
+      ? '记录回修首题是否真的带着归档证据继续修复。'
+      : '记录下一轮首题是否真的复用了上一轮归档证据。',
+    items: buildFirstQuestionReuseReceiptItems(reuse, repairMode),
+    primaryAction: {
+      kind: reuse.primaryAction.kind,
+      label: '填写复用回执',
+      description: repairMode ? '回到首题入口，填写回修复用结果。' : '回到下一轮首题，填写归档复用结果。',
+      to: reuse.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -2891,6 +2934,40 @@ function renderSessionFirstQuestionArchiveReuse(
       `   - 开场提示：${item.openingPrompt}`,
       `   - 验收口径：${item.acceptanceRule}`,
       `   - 失败回退：${item.fallbackAction}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionReuseReceipt(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const receipt = buildPracticeSessionFirstQuestionReuseReceipt(queue, progress, now)
+  const lines = [
+    '## 首题复用回执模板',
+    `- 状态：${receipt.title}`,
+    `- 摘要：${receipt.summary}`,
+    `- 主行动：${receipt.primaryAction.label}，${receipt.primaryAction.description}（${receipt.primaryAction.to}）`,
+    '',
+  ]
+
+  if (receipt.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待首题复用回执。先生成首题归档复用清单后，系统会给出回执字段。',
+      '',
+    ].join('\n')
+  }
+
+  receipt.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 填写提示：${item.prompt}`,
+      `   - 示例：${item.example}`,
+      `   - 验收规则：${item.acceptanceRule}`,
     )
   })
 
@@ -4749,6 +4826,51 @@ function buildFirstQuestionArchiveReuseItems(
   ]
 }
 
+function buildFirstQuestionReuseReceiptItems(
+  reuse: PracticeSessionFirstQuestionArchiveReuse,
+  repairMode: boolean,
+): PracticeSessionFirstQuestionReuseReceiptItem[] {
+  const score = findFirstQuestionArchiveReuseItem(reuse, 'reuse-read-score')
+  const evidence = findFirstQuestionArchiveReuseItem(reuse, 'reuse-carry-evidence')
+  const blocker = findFirstQuestionArchiveReuseItem(reuse, 'reuse-name-blocker')
+  const nextQuestion = findFirstQuestionArchiveReuseItem(reuse, 'reuse-open-next-question')
+
+  return [
+    {
+      id: 'receipt-read-score',
+      label: '分数已读',
+      prompt: repairMode ? '填写本次要拉回通过线的分数。' : '填写下一轮首题使用的基线分和目标分。',
+      example: score ? `已复读「${score.action}」，目标按「${score.acceptanceRule}」验收。` : '已读基线分 6 分，目标首题拉到 8 分。',
+      acceptanceRule: score?.acceptanceRule ?? '回执必须出现可对比的基线分和目标分。',
+      priority: 1,
+    },
+    {
+      id: 'receipt-carry-evidence',
+      label: '证据已带',
+      prompt: repairMode ? '填写本次补上的证据，说明它支撑哪个追问。' : '填写下一轮开口前带入的场景、指标或风险证据。',
+      example: evidence ? `已带入「${evidence.action}」，开场按「${evidence.openingPrompt}」。` : '已带入库存扣减链路的压测指标和失败回滚场景。',
+      acceptanceRule: evidence?.acceptanceRule ?? '回执必须说明证据会支撑哪一个追问或复盘点。',
+      priority: 2,
+    },
+    {
+      id: 'receipt-name-blocker',
+      label: '阻断已认',
+      prompt: repairMode ? '填写剩余阻断是否减少，以及还卡在哪里。' : '填写是否出现新阻断，以及下一轮是否可以继续加压。',
+      example: blocker ? `已确认「${blocker.action}」，失败时按「${blocker.fallbackAction}」回退。` : '阻断从“证据不足”降为“边界条件表达不稳”。',
+      acceptanceRule: blocker?.acceptanceRule ?? '回执必须给出继续回修、扩题量或压同一弱项的明确判断。',
+      priority: 3,
+    },
+    {
+      id: 'receipt-open-next-question',
+      label: '下一题已开',
+      prompt: repairMode ? '填写回修后的第一步入口或题目。' : '填写下一题入口，并说明它为什么接在首题之后。',
+      example: nextQuestion ? `已打开下一步「${nextQuestion.action}」，入口按「${nextQuestion.openingPrompt}」。` : '已进入并发容器追问，沿用首题的线程安全证据口径。',
+      acceptanceRule: nextQuestion?.acceptanceRule ?? '回执必须把首题归档转成一个已打开的下一步入口。',
+      priority: 4,
+    },
+  ]
+}
+
 function findFirstQuestionReviewTemplateItem(
   template: PracticeSessionFirstQuestionReviewTemplate,
   id: string,
@@ -4768,6 +4890,13 @@ function findFirstQuestionReviewArchiveItem(
   id: string,
 ): PracticeSessionFirstQuestionReviewArchiveItem | undefined {
   return archive.items.find(item => item.id === id)
+}
+
+function findFirstQuestionArchiveReuseItem(
+  reuse: PracticeSessionFirstQuestionArchiveReuse,
+  id: string,
+): PracticeSessionFirstQuestionArchiveReuseItem | undefined {
+  return reuse.items.find(item => item.id === id)
 }
 
 function buildPracticeSessionScriptCommandItem(
