@@ -32,6 +32,8 @@ import type {
   PracticeSessionFirstQuestionReuseReleaseGateItem,
   PracticeSessionFirstQuestionReuseReviewAcceptance,
   PracticeSessionFirstQuestionReuseReviewAcceptanceItem,
+  PracticeSessionFirstQuestionReuseReviewArchive,
+  PracticeSessionFirstQuestionReuseReviewArchiveItem,
   PracticeSessionFirstQuestionReuseReviewTemplate,
   PracticeSessionFirstQuestionReuseReviewTemplateItem,
   PracticeSessionFirstQuestionReleaseGate,
@@ -290,6 +292,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFirstQuestionReuseReleaseGate(queue, progress, now),
     renderSessionFirstQuestionReuseReviewTemplate(queue, progress, now),
     renderSessionFirstQuestionReuseReviewAcceptance(queue, progress, now),
+    renderSessionFirstQuestionReuseReviewArchive(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1949,6 +1952,44 @@ export function buildPracticeSessionFirstQuestionReuseReviewAcceptance(
   }
 }
 
+export function buildPracticeSessionFirstQuestionReuseReviewArchive(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionReuseReviewArchive {
+  const acceptance = buildPracticeSessionFirstQuestionReuseReviewAcceptance(queue, progress, now)
+
+  if (acceptance.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待首题复用复盘归档',
+      summary: '先验收首题复用复盘，再把分数、证据、阻断和下一题回流整理成下一轮输入。',
+      items: [],
+      primaryAction: {
+        kind: acceptance.primaryAction.kind,
+        label: '建立复用复盘归档',
+        description: '先验收首题复用复盘，再整理下一轮输入。',
+        to: acceptance.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = acceptance.status === 'repair'
+
+  return {
+    status: acceptance.status,
+    title: repairMode ? '回修复用复盘归档包' : '首题复用复盘归档包',
+    summary: repairMode ? '把回修复用复盘的未放行证据整理成可继续修复的输入。' : '把通过验收的复用复盘保存成下一轮可以复用的输入。',
+    items: buildFirstQuestionReuseReviewArchiveItems(acceptance, repairMode),
+    primaryAction: {
+      kind: acceptance.primaryAction.kind,
+      label: '归档复用复盘',
+      description: repairMode ? '回到复用修复入口，补齐归档所需的复盘证据。' : '回到下一轮首题，带着归档证据继续训练。',
+      to: acceptance.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -3282,6 +3323,41 @@ function renderSessionFirstQuestionReuseReviewAcceptance(
       `   - 通过信号：${item.passSignal}`,
       `   - 缺失风险：${item.missingRisk}`,
       `   - 补救动作：${item.repairAction}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionReuseReviewArchive(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const archive = buildPracticeSessionFirstQuestionReuseReviewArchive(queue, progress, now)
+  const lines = [
+    '## 首题复用复盘归档包',
+    `- 状态：${archive.title}`,
+    `- 摘要：${archive.summary}`,
+    `- 主行动：${archive.primaryAction.label}，${archive.primaryAction.description}（${archive.primaryAction.to}）`,
+    '',
+  ]
+
+  if (archive.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待首题复用复盘归档。先完成首题复用复盘验收后，系统会整理下一轮输入。',
+      '',
+    ].join('\n')
+  }
+
+  archive.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 来源：${item.source}`,
+      `   - 归档内容：${item.content}`,
+      `   - 下一轮用途：${item.nextUse}`,
+      `   - 丢失风险：${item.lossRisk}`,
     )
   })
 
@@ -5380,6 +5456,62 @@ function buildFirstQuestionReuseReviewAcceptanceItems(
       priority: 4,
     },
   ]
+}
+
+function buildFirstQuestionReuseReviewArchiveItems(
+  acceptance: PracticeSessionFirstQuestionReuseReviewAcceptance,
+  repairMode: boolean,
+): PracticeSessionFirstQuestionReuseReviewArchiveItem[] {
+  const score = findFirstQuestionReuseReviewAcceptanceItem(acceptance, 'accept-reuse-review-score')
+  const evidence = findFirstQuestionReuseReviewAcceptanceItem(acceptance, 'accept-reuse-review-evidence')
+  const blocker = findFirstQuestionReuseReviewAcceptanceItem(acceptance, 'accept-reuse-review-blocker')
+  const nextQuestion = findFirstQuestionReuseReviewAcceptanceItem(acceptance, 'accept-reuse-review-next-question')
+
+  return [
+    {
+      id: 'archive-reuse-review-score',
+      label: '复用分数快照',
+      source: score?.target ?? '首题复用复盘的分数回看。',
+      content: repairMode ? '保存未放行时缺失的基线分、新得分或尚未评分原因。' : '保存首题基线、新题得分和复用后的分差。',
+      nextUse: repairMode ? '判断回修后是否补齐分数证据。' : '作为下一轮判断复用是否有效的对照基线。',
+      lossRisk: '没有复用分数快照，下一轮无法判断复用到底提升还是拖累表现。',
+      priority: 1,
+    },
+    {
+      id: 'archive-reuse-review-evidence',
+      label: '复用证据归档',
+      source: evidence?.target ?? '首题复用复盘的证据命中。',
+      content: repairMode ? '保存未命中的证据、追问场景和需要补齐的材料。' : '保存已经命中追问或复盘的证据片段。',
+      nextUse: repairMode ? '回到原证据继续补材料，避免重复找原因。' : '带入下一题继续追问，验证证据是否能跨题复用。',
+      lossRisk: '没有复用证据归档，后续训练会失去可追溯的高价值材料。',
+      priority: 2,
+    },
+    {
+      id: 'archive-reuse-review-blocker',
+      label: '阻断回收结论',
+      source: blocker?.target ?? '首题复用复盘的阻断回收。',
+      content: repairMode ? '归档仍未回收的阻断项，以及下一次修复必须处理的原因。' : '归档原阻断是否减少、转移、消失或保持不变。',
+      nextUse: repairMode ? '决定继续回修还是重新申请复用放行。' : '决定下一轮训练是扩题、保留题序还是压同一弱项。',
+      lossRisk: '没有阻断回收结论，下一轮容易把未修复项误判成已通过。',
+      priority: 3,
+    },
+    {
+      id: 'archive-reuse-review-next-question',
+      label: '下一轮回流种子',
+      source: nextQuestion?.target ?? '首题复用复盘的下一题回流。',
+      content: repairMode ? '保存继续回修、保留题序或调整下一题的具体选择。' : '保存下一题结果如何进入下一轮计划。',
+      nextUse: repairMode ? '让复用修复后的第一步可执行。' : '把复用复盘直接转成下一轮训练入口。',
+      lossRisk: '没有下一轮回流种子，复用复盘结束后仍然不知道下一步练哪道题。',
+      priority: 4,
+    },
+  ]
+}
+
+function findFirstQuestionReuseReviewAcceptanceItem(
+  acceptance: PracticeSessionFirstQuestionReuseReviewAcceptance,
+  id: string,
+): PracticeSessionFirstQuestionReuseReviewAcceptanceItem | undefined {
+  return acceptance.items.find(item => item.id === id)
 }
 
 function findFirstQuestionReuseReleaseGateItem(
