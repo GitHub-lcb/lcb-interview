@@ -10003,6 +10003,128 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-launch-packet {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+}
+
+.practice-session-report-launch-packet.status-repair {
+  background: #FFF7ED;
+  border-color: #FDBA74;
+}
+
+.practice-session-report-launch-packet.status-ready {
+  background: #EFF6FF;
+  border-color: #93C5FD;
+}
+
+.practice-session-report-launch-packet-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.practice-session-report-launch-packet-head > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-launch-packet-head span {
+  color: #475569;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-launch-packet.status-repair .practice-session-report-launch-packet-head span {
+  color: #C2410C;
+}
+
+.practice-session-report-launch-packet.status-ready .practice-session-report-launch-packet-head span {
+  color: #1D4ED8;
+}
+
+.practice-session-report-launch-packet-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-launch-packet-head small,
+.practice-session-report-launch-packet p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.practice-session-report-launch-packet-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.practice-session-report-launch-packet-list article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+}
+
+.practice-session-report-launch-packet.status-repair .practice-session-report-launch-packet-list article {
+  border-color: #FED7AA;
+}
+
+.practice-session-report-launch-packet.status-ready .practice-session-report-launch-packet-list article {
+  border-color: #BFDBFE;
+}
+
+.practice-session-report-launch-packet-list strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-launch-packet-list span,
+.practice-session-report-launch-packet-list small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-launch-packet-list span {
+  color: #334155;
+  font-weight: 800;
+}
+
+.practice-session-report-launch-packet.status-repair .practice-session-report-launch-packet-list span {
+  color: #9A3412;
+}
+
+.practice-session-report-launch-packet.status-ready .practice-session-report-launch-packet-list span {
+  color: #1E40AF;
+}
+
+.practice-session-report-launch-packet .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;
@@ -10649,6 +10771,7 @@ p {
   .practice-session-report-training-receipt-list,
   .practice-session-report-receipt-acceptance-list,
   .practice-session-report-advance-gate-list,
+  .practice-session-report-launch-packet-list,
   .free-promise-band,
   .practice-feedback-lists {
     grid-template-columns: 1fr;

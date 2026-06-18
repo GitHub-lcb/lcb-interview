@@ -17,6 +17,8 @@ import type {
   PracticeSessionEvidenceGapItem,
   PracticeSessionEvidenceGaps,
   PracticeSessionInterviewerDecision,
+  PracticeSessionLaunchPacket,
+  PracticeSessionLaunchPacketItem,
   PracticeSessionPassEvidence,
   PracticeSessionPassEvidenceItem,
   PracticeSessionPassGate,
@@ -230,6 +232,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionTrainingReceipt(queue, progress, now),
     renderSessionReceiptAcceptance(queue, progress, now),
     renderSessionAdvanceGate(queue, progress, now),
+    renderSessionLaunchPacket(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1195,6 +1198,52 @@ export function buildPracticeSessionAdvanceGate(
   }
 }
 
+export function buildPracticeSessionLaunchPacket(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionLaunchPacket {
+  const gate = buildPracticeSessionAdvanceGate(queue, progress, now)
+
+  if (gate.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待建立启动样本',
+      summary: '先完成准入闸门判断，再生成可执行的下一轮启动包。',
+      items: [],
+      primaryAction: {
+        kind: gate.primaryAction.kind,
+        label: '建立启动样本',
+        description: '先完成一次模拟面试并生成准入闸门。',
+        to: gate.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = gate.status === 'blocked'
+  const nextQueue = buildPracticeSessionNextTrainingQueue(queue, progress, now, 5)
+  const items = buildLaunchPacketItems({
+    gate,
+    nextQueue,
+    repairMode,
+  })
+
+  return {
+    status: repairMode ? 'repair' : 'ready',
+    title: repairMode ? '回修启动包' : '下一轮启动包',
+    summary: repairMode
+      ? '先按准入闸门回修本轮阻断项，再重新验收。'
+      : '准入已经通过，按启动包进入下一轮训练并留下第一条样本。',
+    items,
+    primaryAction: {
+      kind: repairMode ? 'repair' : 'continue',
+      label: repairMode ? '启动回修' : '启动下一轮',
+      description: repairMode ? '打开本轮队列，先清掉第一个阻断项。' : '打开下一轮队列，完成第一题开口样本。',
+      to: gate.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -1983,6 +2032,40 @@ function renderSessionAdvanceGate(
       `   - 状态：${advanceGateItemStateLabels[item.state]}`,
       `   - 条件：${item.condition}`,
       `   - 行动：${item.action}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionLaunchPacket(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const packet = buildPracticeSessionLaunchPacket(queue, progress, now)
+  const lines = [
+    '## 下一轮启动包',
+    `- 状态：${packet.title}`,
+    `- 摘要：${packet.summary}`,
+    `- 主行动：${packet.primaryAction.label}，${packet.primaryAction.description}（${packet.primaryAction.to}）`,
+    '',
+  ]
+
+  if (packet.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待建立启动样本。先完成准入闸门后，系统会给出下一步启动动作。',
+      '',
+    ].join('\n')
+  }
+
+  packet.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 指令：${item.instruction}`,
+      `   - 完成口径：${item.completionRule}`,
       `   - 入口：${item.to}`,
     )
   })
@@ -3314,6 +3397,75 @@ function buildAdvanceGateItems(
     to: item.to,
     priority: item.priority,
   }))
+}
+
+function buildLaunchPacketItems({
+  gate,
+  nextQueue,
+  repairMode,
+}: {
+  gate: PracticeSessionAdvanceGate
+  nextQueue: NextTrainingQueue
+  repairMode: boolean
+}): PracticeSessionLaunchPacketItem[] {
+  const firstBlockedItem = gate.items[0]
+  const firstNextItem = nextQueue.items[0]
+
+  if (repairMode) {
+    return [
+      {
+        id: 'open-repair-entry',
+        label: '打开启动入口',
+        instruction: `回到 ${gate.primaryAction.to}，只处理准入闸门里第一项未通过条件。`,
+        completionRule: '能看到本轮训练队列，并明确第一项阻断条件。',
+        to: gate.primaryAction.to,
+        priority: 1,
+      },
+      {
+        id: 'repair-first-blocker',
+        label: firstBlockedItem?.label ?? '先清首个阻断',
+        instruction: firstBlockedItem?.action ?? '先补齐回执里的目标、证据、阻断和下一步。',
+        completionRule: firstBlockedItem?.condition ?? '至少补齐一条可追溯证据。',
+        to: firstBlockedItem?.to ?? gate.primaryAction.to,
+        priority: 2,
+      },
+      {
+        id: 'repair-completion-rule',
+        label: '完成口径',
+        instruction: '回修后重新填写训练回执，并再次检查准入闸门。',
+        completionRule: '准入闸门从“暂缓进入下一轮”变为“允许进入下一轮”。',
+        to: gate.primaryAction.to,
+        priority: 3,
+      },
+    ]
+  }
+
+  return [
+    {
+      id: 'open-next-entry',
+      label: '打开启动入口',
+      instruction: `进入 ${gate.primaryAction.to}，先确认下一轮训练队列已经生成。`,
+      completionRule: '能看到下一轮训练题，并知道第一题为什么被选中。',
+      to: gate.primaryAction.to,
+      priority: 1,
+    },
+    {
+      id: 'repeat-next-target',
+      label: '复读训练目标',
+      instruction: '开口复读下一轮目标分、题组和验收口径。',
+      completionRule: '能用一句话说清下一轮要验证哪一个能力缺口。',
+      to: gate.primaryAction.to,
+      priority: 2,
+    },
+    {
+      id: 'answer-first-next-question',
+      label: firstNextItem?.title ?? '完成第一题开口',
+      instruction: firstNextItem ? `先完成「${firstNextItem.title}」的开口作答。` : '先完成下一轮第一题的开口作答。',
+      completionRule: '留下第一条评分样本，作为下一份战报的输入。',
+      to: firstNextItem?.to ?? gate.primaryAction.to,
+      priority: 3,
+    },
+  ]
 }
 
 function buildPracticeSessionScriptCommandItem(

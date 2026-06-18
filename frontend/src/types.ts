@@ -1120,6 +1120,25 @@ export interface PracticeSessionAdvanceGate {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionLaunchPacketStatus = 'empty' | 'repair' | 'ready'
+
+export interface PracticeSessionLaunchPacketItem {
+  id: string
+  label: string
+  instruction: string
+  completionRule: string
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionLaunchPacket {
+  status: PracticeSessionLaunchPacketStatus
+  title: string
+  summary: string
+  items: PracticeSessionLaunchPacketItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

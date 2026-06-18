@@ -27,6 +27,7 @@ import {
   buildPracticeSessionEvidenceGaps,
   buildPracticeSessionFollowUpDefense,
   buildPracticeSessionInterviewerDecision,
+  buildPracticeSessionLaunchPacket,
   buildPracticeSessionMaterialVault,
   buildPracticeSessionMistakeLedger,
   buildPracticeSessionNextTrainingQueue,
@@ -178,6 +179,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionAdvanceGate = useMemo(
     () => buildPracticeSessionAdvanceGate(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionLaunchPacket = useMemo(
+    () => buildPracticeSessionLaunchPacket(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1043,6 +1048,38 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionAdvanceGate.primaryAction.to)}
         >
           {sessionAdvanceGate.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className={`practice-session-report-launch-packet status-${sessionLaunchPacket.status}`} aria-label="下一轮启动包">
+        <div className="practice-session-report-launch-packet-head">
+          <div>
+            <span>下一轮启动包</span>
+            <strong>{sessionLaunchPacket.title}</strong>
+            <small>{sessionLaunchPacket.summary}</small>
+          </div>
+        </div>
+        {sessionLaunchPacket.items.length === 0 ? (
+          <p>等待建立启动样本。先完成准入闸门后，系统会给出下一步启动动作。</p>
+        ) : (
+          <div className="practice-session-report-launch-packet-list">
+            {sessionLaunchPacket.items.map(item => (
+              <article key={item.id}>
+                <strong>{item.label}</strong>
+                <span>{item.instruction}</span>
+                <small>{item.completionRule}</small>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionLaunchPacket.status === 'repair'}
+          icon={sessionLaunchPacket.status === 'repair' ? <ReloadOutlined /> : <PlayCircleOutlined />}
+          onClick={() => onNavigate(sessionLaunchPacket.primaryAction.to)}
+        >
+          {sessionLaunchPacket.primaryAction.label}
         </Button>
       </div>
 
