@@ -22,6 +22,8 @@ import type {
   PracticeSessionReplayChecklistItem,
   PracticeSessionReplayCardItem,
   PracticeSessionReplayCards,
+  PracticeSessionRetryDraftItem,
+  PracticeSessionRetryDrafts,
   PracticeSessionRiskGuardrailItem,
   PracticeSessionRiskGuardrails,
   PracticeSessionReport,
@@ -197,6 +199,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionReplayChecklist(queue, progress),
     renderSessionPressureProbes(queue, progress),
     renderSessionRiskGuardrails(queue, progress),
+    renderSessionRetryDrafts(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -733,6 +736,46 @@ export function buildPracticeSessionRiskGuardrails(
   }
 }
 
+export function buildPracticeSessionRetryDrafts(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): PracticeSessionRetryDrafts {
+  const replayCards = buildPracticeSessionReplayCards(queue, progress)
+  const guardrails = buildPracticeSessionRiskGuardrails(queue, progress)
+
+  if (replayCards.items.length === 0) {
+    return {
+      status: 'empty',
+      title: '等待生成二次提交稿',
+      summary: '先完成一次模拟面试并生成复述卡，系统才能把修复信号合并成可重答草稿。',
+      totalCount: 0,
+      items: [],
+      primaryAction: {
+        kind: replayCards.primaryAction.kind,
+        label: '建立提交样本',
+        description: '先完成一次开口作答，再生成本轮二次提交稿。',
+        to: replayCards.primaryAction.to,
+      },
+    }
+  }
+
+  const items = replayCards.items.slice(0, 3).map(buildRetryDraftItem)
+
+  return {
+    status: guardrails.status === 'warning' || replayCards.status === 'repair' ? 'repair' : 'ready',
+    title: guardrails.status === 'warning' ? '重答稿已生成' : '稳定提交稿',
+    summary: `已把 ${items.length} 张复述卡合并成二次提交稿，按结论、证据、边界和收束重答。`,
+    totalCount: items.length,
+    items,
+    primaryAction: {
+      kind: replayCards.primaryAction.kind,
+      label: '使用二次提交稿',
+      description: '按稿重答前，先替换掉失分禁区里的高风险表达。',
+      to: replayCards.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -1216,6 +1259,39 @@ function renderSessionRiskGuardrails(queue: PracticeQueueItem[], progress: Study
       `   - 不要这样说：${item.avoid}`,
       `   - 失分原因：${item.reason}`,
       `   - 改成这样说：${item.replacement}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionRetryDrafts(queue: PracticeQueueItem[], progress: StudyProgress): string {
+  const drafts = buildPracticeSessionRetryDrafts(queue, progress)
+  const lines = [
+    '## 本轮二次提交稿',
+    `- 状态：${drafts.title}`,
+    `- 摘要：${drafts.summary}`,
+    `- 主行动：${drafts.primaryAction.label}，${drafts.primaryAction.description}（${drafts.primaryAction.to}）`,
+    '',
+  ]
+
+  if (drafts.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待生成二次提交稿。先完成一次模拟面试并生成复述卡后，系统会给出可直接重答的提交稿。',
+      '',
+    ].join('\n')
+  }
+
+  drafts.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.title}`,
+      `   - 结论句：${item.conclusionLine}`,
+      `   - 证据句：${item.evidenceLine}`,
+      `   - 边界句：${item.boundaryLine}`,
+      `   - 收束句：${item.closingLine}`,
+      `   - 完整稿：${item.fullDraft}`,
       `   - 入口：${item.to}`,
     )
   })
@@ -2128,6 +2204,29 @@ function buildRiskGuardrailItems(to: string): PracticeSessionRiskGuardrailItem[]
       priority: 80,
     },
   ]
+}
+
+function buildRetryDraftItem(card: PracticeSessionReplayCardItem): PracticeSessionRetryDraftItem {
+  const closingLine = '如果继续追问，我会补充项目规模、失败边界和替代方案取舍。'
+  const fullDraft = [
+    card.openingLine,
+    card.evidenceLine,
+    card.boundaryLine,
+    closingLine,
+  ].join(' ')
+
+  return {
+    id: `${card.id}-retry-draft`,
+    questionId: card.questionId,
+    title: card.title,
+    conclusionLine: card.openingLine,
+    evidenceLine: card.evidenceLine,
+    boundaryLine: card.boundaryLine,
+    closingLine,
+    fullDraft,
+    to: card.to,
+    priority: card.priority,
+  }
 }
 
 function buildPracticeSessionScriptCommandItem(

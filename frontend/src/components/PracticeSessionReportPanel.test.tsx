@@ -523,6 +523,37 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders retry drafts from the current session queue', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const draftBlock = screen.getByLabelText('本轮二次提交稿')
+
+    expect(within(draftBlock).getByText('本轮二次提交稿')).toBeInTheDocument()
+    expect(within(draftBlock).getByText('结论句')).toBeInTheDocument()
+    expect(within(draftBlock).getByText('证据句')).toBeInTheDocument()
+    expect(within(draftBlock).getByText('边界句')).toBeInTheDocument()
+    expect(within(draftBlock).getByText('收束句')).toBeInTheDocument()
+
+    await user.click(within(draftBlock).getByRole('button', { name: /使用二次提交稿/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

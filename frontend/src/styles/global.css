@@ -8804,6 +8804,125 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-retry-drafts {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #EFF6FF;
+  border: 1px solid #93C5FD;
+  border-radius: 8px;
+}
+
+.practice-session-report-retry-drafts-head {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-retry-drafts-head span {
+  color: #1D4ED8;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-retry-drafts-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-retry-drafts-head small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-retry-drafts-labels {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.practice-session-report-retry-drafts-labels span {
+  overflow: hidden;
+  padding: 4px 6px;
+  color: #1E40AF;
+  font-size: 11px;
+  font-weight: 900;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: #DBEAFE;
+  border-radius: 6px;
+}
+
+.practice-session-report-retry-drafts p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.practice-session-report-retry-drafts-list {
+  display: grid;
+  gap: 6px;
+}
+
+.practice-session-report-retry-drafts-list article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #BFDBFE;
+  border-radius: 8px;
+}
+
+.practice-session-report-retry-drafts-list strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-retry-drafts-list small,
+.practice-session-report-retry-drafts-list em,
+.practice-session-report-retry-drafts-list b {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-retry-drafts-list small:first-of-type {
+  color: #1D4ED8;
+  font-weight: 800;
+}
+
+.practice-session-report-retry-drafts-list em {
+  color: #115E59;
+}
+
+.practice-session-report-retry-drafts-list b {
+  color: #166534;
+  font-weight: 800;
+}
+
+.practice-session-report-retry-drafts .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;

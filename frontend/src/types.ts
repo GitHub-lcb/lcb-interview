@@ -929,6 +929,30 @@ export interface PracticeSessionRiskGuardrails {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionRetryDraftStatus = 'empty' | 'repair' | 'ready'
+
+export interface PracticeSessionRetryDraftItem {
+  id: string
+  questionId: number
+  title: string
+  conclusionLine: string
+  evidenceLine: string
+  boundaryLine: string
+  closingLine: string
+  fullDraft: string
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionRetryDrafts {
+  status: PracticeSessionRetryDraftStatus
+  title: string
+  summary: string
+  totalCount: number
+  items: PracticeSessionRetryDraftItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

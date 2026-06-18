@@ -35,6 +35,7 @@ import {
   buildPracticeSessionReplayCards,
   buildPracticeSessionReport,
   buildPracticeSessionReportMarkdown,
+  buildPracticeSessionRetryDrafts,
   buildPracticeSessionRiskGuardrails,
   buildPracticeSessionScriptCommand,
 } from '../utils/practiceSessionReport'
@@ -133,6 +134,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionRiskGuardrails = useMemo(
     () => buildPracticeSessionRiskGuardrails(queue, progress),
+    [progress, queue],
+  )
+  const sessionRetryDrafts = useMemo(
+    () => buildPracticeSessionRetryDrafts(queue, progress),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -688,6 +693,43 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionRiskGuardrails.primaryAction.to)}
         >
           {sessionRiskGuardrails.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className="practice-session-report-retry-drafts" aria-label="本轮二次提交稿">
+        <div className="practice-session-report-retry-drafts-head">
+          <span>本轮二次提交稿</span>
+          <strong>{sessionRetryDrafts.title}</strong>
+          <small>{sessionRetryDrafts.summary}</small>
+        </div>
+        <div className="practice-session-report-retry-drafts-labels" aria-hidden="true">
+          <span>结论句</span>
+          <span>证据句</span>
+          <span>边界句</span>
+          <span>收束句</span>
+        </div>
+        {sessionRetryDrafts.items.length === 0 ? (
+          <p>等待生成二次提交稿。先完成一次模拟面试并生成复述卡后，系统会给出可直接重答的提交稿。</p>
+        ) : (
+          <div className="practice-session-report-retry-drafts-list">
+            {sessionRetryDrafts.items.map(item => (
+              <article key={item.id}>
+                <strong>{item.title}</strong>
+                <small>{item.conclusionLine}</small>
+                <small>{item.evidenceLine}</small>
+                <em>{item.boundaryLine}</em>
+                <b>{item.closingLine}</b>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          icon={<HighlightOutlined />}
+          onClick={() => onNavigate(sessionRetryDrafts.primaryAction.to)}
+        >
+          {sessionRetryDrafts.primaryAction.label}
         </Button>
       </div>
 
