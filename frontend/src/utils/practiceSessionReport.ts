@@ -8,6 +8,8 @@ import type {
   InterviewMistakeLedger,
   InterviewRecoveryAcceptance,
   NextTrainingQueue,
+  PracticeSessionAdvanceGate,
+  PracticeSessionAdvanceGateItem,
   PracticeSessionActionPriorities,
   PracticeSessionActionPriorityItem,
   PracticeSessionAbilityRadar,
@@ -81,6 +83,12 @@ const difficultyLabels: Record<string, string> = {
   EASY: '简单',
   MEDIUM: '中等',
   HARD: '困难',
+}
+
+const advanceGateItemStateLabels: Record<PracticeSessionAdvanceGateItem['state'], string> = {
+  waiting: '等待样本',
+  blocked: '未通过',
+  passed: '已通过',
 }
 
 interface SessionAttemptItem {
@@ -221,6 +229,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionScheduleChecklist(queue, progress, now),
     renderSessionTrainingReceipt(queue, progress, now),
     renderSessionReceiptAcceptance(queue, progress, now),
+    renderSessionAdvanceGate(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1145,6 +1154,47 @@ export function buildPracticeSessionReceiptAcceptance(
   }
 }
 
+export function buildPracticeSessionAdvanceGate(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionAdvanceGate {
+  const acceptance = buildPracticeSessionReceiptAcceptance(queue, progress, now)
+
+  if (acceptance.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待建立准入样本',
+      summary: '先生成训练回执和回执验收卡，再判断是否能进入下一轮。',
+      items: [],
+      primaryAction: {
+        kind: acceptance.primaryAction.kind,
+        label: '建立准入样本',
+        description: '先完成一次模拟面试并生成回执验收卡。',
+        to: acceptance.primaryAction.to,
+      },
+    }
+  }
+
+  const blocked = acceptance.status === 'repair'
+  const nextQueue = buildPracticeSessionNextTrainingQueue(queue, progress, now, 5)
+
+  return {
+    status: blocked ? 'blocked' : 'ready',
+    title: blocked ? '暂缓进入下一轮' : '允许进入下一轮',
+    summary: blocked
+      ? '本轮回执仍有准入条件需要先修复，先不要把问题带进下一轮。'
+      : '回执验收条件已经满足，可以进入下一轮个性化训练。',
+    items: buildAdvanceGateItems(acceptance, blocked),
+    primaryAction: {
+      kind: blocked ? 'repair' : 'continue',
+      label: blocked ? '回到本轮修复' : '进入下一轮训练',
+      description: blocked ? '按未通过条件回修本轮，再重新验收。' : '带着已通过的回执进入下一轮训练。',
+      to: blocked ? acceptance.primaryAction.to : nextQueue.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -1898,6 +1948,41 @@ function renderSessionReceiptAcceptance(
       `   - 目标：${item.target}`,
       `   - 检查：${item.check}`,
       `   - 未通过动作：${item.fallbackAction}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionAdvanceGate(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const gate = buildPracticeSessionAdvanceGate(queue, progress, now)
+  const lines = [
+    '## 下一轮准入闸门',
+    `- 裁决：${gate.title}`,
+    `- 摘要：${gate.summary}`,
+    `- 主行动：${gate.primaryAction.label}，${gate.primaryAction.description}（${gate.primaryAction.to}）`,
+    '',
+  ]
+
+  if (gate.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待建立准入样本。先完成训练回执和验收卡后，系统会给出进入下一轮的裁决。',
+      '',
+    ].join('\n')
+  }
+
+  gate.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 状态：${advanceGateItemStateLabels[item.state]}`,
+      `   - 条件：${item.condition}`,
+      `   - 行动：${item.action}`,
       `   - 入口：${item.to}`,
     )
   })
@@ -3214,6 +3299,21 @@ function buildReceiptAcceptanceItems(
       priority: 4,
     },
   ]
+}
+
+function buildAdvanceGateItems(
+  acceptance: PracticeSessionReceiptAcceptance,
+  blocked: boolean,
+): PracticeSessionAdvanceGateItem[] {
+  return acceptance.items.map(item => ({
+    id: `advance-${item.id}`,
+    label: item.label,
+    condition: item.check,
+    state: blocked ? 'blocked' : 'passed',
+    action: blocked ? item.fallbackAction : '已满足，可以作为进入下一轮的依据。',
+    to: item.to,
+    priority: item.priority,
+  }))
 }
 
 function buildPracticeSessionScriptCommandItem(

@@ -20,6 +20,7 @@ import type {
 } from '../types'
 import { formatNextTrainingQueueItemMeta } from '../utils/nextTrainingQueue'
 import {
+  buildPracticeSessionAdvanceGate,
   buildPracticeSessionActionPriorities,
   buildPracticeSessionDailyCompletion,
   buildPracticeSessionAbilityRadar,
@@ -173,6 +174,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionReceiptAcceptance = useMemo(
     () => buildPracticeSessionReceiptAcceptance(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionAdvanceGate = useMemo(
+    () => buildPracticeSessionAdvanceGate(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1003,6 +1008,41 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionReceiptAcceptance.primaryAction.to)}
         >
           {sessionReceiptAcceptance.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className={`practice-session-report-advance-gate status-${sessionAdvanceGate.status}`} aria-label="下一轮准入闸门">
+        <div className="practice-session-report-advance-gate-head">
+          <div>
+            <span>下一轮准入闸门</span>
+            <strong>{sessionAdvanceGate.title}</strong>
+            <small>{sessionAdvanceGate.summary}</small>
+          </div>
+        </div>
+        {sessionAdvanceGate.items.length === 0 ? (
+          <p>等待建立准入样本。先完成训练回执和验收卡后，系统会给出进入下一轮的裁决。</p>
+        ) : (
+          <div className="practice-session-report-advance-gate-list">
+            {sessionAdvanceGate.items.map(item => (
+              <article key={item.id} className={`state-${item.state}`}>
+                <div>
+                  <strong>{item.label}</strong>
+                  <em>{item.state === 'passed' ? '已通过' : '未通过'}</em>
+                </div>
+                <span>{item.condition}</span>
+                <small>{item.action}</small>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionAdvanceGate.status === 'blocked'}
+          icon={sessionAdvanceGate.status === 'blocked' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionAdvanceGate.primaryAction.to)}
+        >
+          {sessionAdvanceGate.primaryAction.label}
         </Button>
       </div>
 

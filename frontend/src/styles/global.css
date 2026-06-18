@@ -9865,6 +9865,144 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-advance-gate {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+}
+
+.practice-session-report-advance-gate.status-blocked {
+  background: #FEF2F2;
+  border-color: #FCA5A5;
+}
+
+.practice-session-report-advance-gate.status-ready {
+  background: #ECFDF5;
+  border-color: #86EFAC;
+}
+
+.practice-session-report-advance-gate-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.practice-session-report-advance-gate-head > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-advance-gate-head span {
+  color: #475569;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-advance-gate.status-blocked .practice-session-report-advance-gate-head span {
+  color: #B91C1C;
+}
+
+.practice-session-report-advance-gate.status-ready .practice-session-report-advance-gate-head span {
+  color: #047857;
+}
+
+.practice-session-report-advance-gate-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-advance-gate-head small,
+.practice-session-report-advance-gate p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.practice-session-report-advance-gate-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.practice-session-report-advance-gate-list article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+}
+
+.practice-session-report-advance-gate-list article.state-blocked {
+  border-color: #FCA5A5;
+}
+
+.practice-session-report-advance-gate-list article.state-passed {
+  border-color: #86EFAC;
+}
+
+.practice-session-report-advance-gate-list article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.practice-session-report-advance-gate-list strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-advance-gate-list em {
+  flex: 0 0 auto;
+  color: #64748B;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.practice-session-report-advance-gate-list article.state-blocked em {
+  color: #B91C1C;
+}
+
+.practice-session-report-advance-gate-list article.state-passed em {
+  color: #047857;
+}
+
+.practice-session-report-advance-gate-list span,
+.practice-session-report-advance-gate-list small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-advance-gate-list span {
+  color: #334155;
+  font-weight: 800;
+}
+
+.practice-session-report-advance-gate .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;
@@ -10510,6 +10648,7 @@ p {
   .practice-session-report-schedule-checklist-list,
   .practice-session-report-training-receipt-list,
   .practice-session-report-receipt-acceptance-list,
+  .practice-session-report-advance-gate-list,
   .free-promise-band,
   .practice-feedback-lists {
     grid-template-columns: 1fr;

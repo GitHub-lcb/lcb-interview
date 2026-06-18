@@ -1098,6 +1098,28 @@ export interface PracticeSessionReceiptAcceptance {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionAdvanceGateStatus = 'empty' | 'blocked' | 'ready'
+
+export type PracticeSessionAdvanceGateItemState = 'waiting' | 'blocked' | 'passed'
+
+export interface PracticeSessionAdvanceGateItem {
+  id: string
+  label: string
+  condition: string
+  state: PracticeSessionAdvanceGateItemState
+  action: string
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionAdvanceGate {
+  status: PracticeSessionAdvanceGateStatus
+  title: string
+  summary: string
+  items: PracticeSessionAdvanceGateItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

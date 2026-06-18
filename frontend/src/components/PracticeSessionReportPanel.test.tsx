@@ -769,6 +769,36 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders advance gate before the next session round', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const advanceGate = screen.getByLabelText('下一轮准入闸门')
+
+    expect(within(advanceGate).getByText('下一轮准入闸门')).toBeInTheDocument()
+    expect(within(advanceGate).getByText('暂缓进入下一轮')).toBeInTheDocument()
+    expect(within(advanceGate).getByText('目标清晰')).toBeInTheDocument()
+    expect(within(advanceGate).getByText('证据可查')).toBeInTheDocument()
+
+    await user.click(within(advanceGate).getByRole('button', { name: /回到本轮修复/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel
