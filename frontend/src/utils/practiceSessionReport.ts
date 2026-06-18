@@ -24,6 +24,8 @@ import type {
   PracticeSessionFirstQuestionReceiptItem,
   PracticeSessionFirstQuestionReleaseGate,
   PracticeSessionFirstQuestionReleaseGateItem,
+  PracticeSessionFirstQuestionReviewAcceptance,
+  PracticeSessionFirstQuestionReviewAcceptanceItem,
   PracticeSessionFirstQuestionReviewTemplate,
   PracticeSessionFirstQuestionReviewTemplateItem,
   PracticeSessionFirstQuestionRubric,
@@ -260,6 +262,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFirstQuestionReceiptAcceptance(queue, progress, now),
     renderSessionFirstQuestionReleaseGate(queue, progress, now),
     renderSessionFirstQuestionReviewTemplate(queue, progress, now),
+    renderSessionFirstQuestionReviewAcceptance(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1602,6 +1605,46 @@ export function buildPracticeSessionFirstQuestionReviewTemplate(
   }
 }
 
+export function buildPracticeSessionFirstQuestionReviewAcceptance(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionReviewAcceptance {
+  const template = buildPracticeSessionFirstQuestionReviewTemplate(queue, progress, now)
+
+  if (template.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待验收首题复盘',
+      summary: '先生成首题复盘模板，再检查评分、证据、阻断和下一题动作是否可用。',
+      items: [],
+      primaryAction: {
+        kind: template.primaryAction.kind,
+        label: '建立复盘验收',
+        description: '先生成首题复盘模板，再验收复盘质量。',
+        to: template.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = template.status === 'repair'
+
+  return {
+    status: template.status,
+    title: repairMode ? '回修复盘验收卡' : '首题复盘验收卡',
+    summary: repairMode
+      ? '检查回修复盘是否能证明阻断项已经减少。'
+      : '检查首题复盘是否能证明下一轮第一题留下了有效样本。',
+    items: buildFirstQuestionReviewAcceptanceItems(template, repairMode),
+    primaryAction: {
+      kind: template.primaryAction.kind,
+      label: '验收首题复盘',
+      description: repairMode ? '回到首题入口，补齐未通过的复盘字段。' : '回到下一轮首题，补齐未通过的复盘字段。',
+      to: template.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -2657,6 +2700,40 @@ function renderSessionFirstQuestionReviewTemplate(
       `   - 填写提示：${item.prompt}`,
       `   - 示例：${item.example}`,
       `   - 验收规则：${item.acceptanceRule}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionReviewAcceptance(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const acceptance = buildPracticeSessionFirstQuestionReviewAcceptance(queue, progress, now)
+  const lines = [
+    '## 首题复盘验收卡',
+    `- 状态：${acceptance.title}`,
+    `- 摘要：${acceptance.summary}`,
+    `- 主行动：${acceptance.primaryAction.label}，${acceptance.primaryAction.description}（${acceptance.primaryAction.to}）`,
+    '',
+  ]
+
+  if (acceptance.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待验收首题复盘。先生成首题复盘模板后，系统会给出验收口径。',
+      '',
+    ].join('\n')
+  }
+
+  acceptance.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 目标：${item.target}`,
+      `   - 检查：${item.check}`,
+      `   - 未通过补救：${item.fallbackAction}`,
     )
   })
 
@@ -4366,6 +4443,58 @@ function buildFirstQuestionReviewTemplateItems(
       priority: 4,
     },
   ]
+}
+
+function buildFirstQuestionReviewAcceptanceItems(
+  template: PracticeSessionFirstQuestionReviewTemplate,
+  repairMode: boolean,
+): PracticeSessionFirstQuestionReviewAcceptanceItem[] {
+  const score = findFirstQuestionReviewTemplateItem(template, 'review-score-change')
+  const evidence = findFirstQuestionReviewTemplateItem(template, 'review-evidence-change')
+  const blocker = findFirstQuestionReviewTemplateItem(template, 'review-blocker-change')
+  const nextAction = findFirstQuestionReviewTemplateItem(template, 'review-next-question-action')
+
+  return [
+    {
+      id: 'accept-review-score-comparable',
+      label: '评分可比',
+      target: score?.prompt ?? '写清首题评分变化。',
+      check: repairMode ? '必须能看出回修前后分数是否变化。' : '必须能看出下一轮首题与本轮基线的分差。',
+      fallbackAction: score ? `按「${score.label}」补齐具体分数。` : '回到首题复盘模板，补齐评分变化。',
+      priority: 1,
+    },
+    {
+      id: 'accept-review-evidence-traceable',
+      label: '证据可追溯',
+      target: evidence?.prompt ?? '写清证据变化。',
+      check: '必须包含可追溯的回答文本、评分理由、场景指标或回修记录。',
+      fallbackAction: evidence ? `按「${evidence.label}」补齐证据。` : '回到首题复盘模板，补齐证据变化。',
+      priority: 2,
+    },
+    {
+      id: 'accept-review-blocker-judgeable',
+      label: '阻断可判定',
+      target: blocker?.prompt ?? '写清阻断变化。',
+      check: repairMode ? '必须能判断原阻断项是否减少。' : '必须能判断是否出现新的阻断项。',
+      fallbackAction: blocker ? `按「${blocker.label}」补齐阻断判断。` : '回到首题复盘模板，补齐阻断变化。',
+      priority: 3,
+    },
+    {
+      id: 'accept-review-next-action-executable',
+      label: '下一题可执行',
+      target: nextAction?.prompt ?? '写清下一题动作。',
+      check: '必须落到继续回修、重答首题、进入下一题或复盘弱项的具体动作。',
+      fallbackAction: nextAction ? `按「${nextAction.label}」补齐下一步。` : '回到首题复盘模板，补齐下一题动作。',
+      priority: 4,
+    },
+  ]
+}
+
+function findFirstQuestionReviewTemplateItem(
+  template: PracticeSessionFirstQuestionReviewTemplate,
+  id: string,
+): PracticeSessionFirstQuestionReviewTemplateItem | undefined {
+  return template.items.find(item => item.id === id)
 }
 
 function buildPracticeSessionScriptCommandItem(

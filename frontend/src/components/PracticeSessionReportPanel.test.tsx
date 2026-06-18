@@ -1049,6 +1049,39 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders first question review acceptance before the next session round', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const acceptance = screen.getByLabelText('首题复盘验收卡')
+
+    expect(within(acceptance).getByText('首题复盘验收卡')).toBeInTheDocument()
+    expect(within(acceptance).getByText('回修复盘验收卡')).toBeInTheDocument()
+    expect(within(acceptance).getByText('评分可比')).toBeInTheDocument()
+    expect(within(acceptance).getByText('证据可追溯')).toBeInTheDocument()
+    expect(within(acceptance).getByText('阻断可判定')).toBeInTheDocument()
+    expect(within(acceptance).getByText('下一题可执行')).toBeInTheDocument()
+    expect(within(acceptance).getAllByText('未通过补救').length).toBeGreaterThan(0)
+
+    await user.click(within(acceptance).getByRole('button', { name: /验收首题复盘/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel
