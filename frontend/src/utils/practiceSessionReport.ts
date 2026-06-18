@@ -35,6 +35,8 @@ import type {
   PracticeSessionFirstQuestionReuseReviewArchive,
   PracticeSessionFirstQuestionReuseReviewArchiveItem,
   PracticeSessionFirstQuestionReuseReviewHandoff,
+  PracticeSessionFirstQuestionReuseReviewHandoffAcceptance,
+  PracticeSessionFirstQuestionReuseReviewHandoffAcceptanceItem,
   PracticeSessionFirstQuestionReuseReviewHandoffItem,
   PracticeSessionFirstQuestionReuseReviewTemplate,
   PracticeSessionFirstQuestionReuseReviewTemplateItem,
@@ -296,6 +298,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFirstQuestionReuseReviewAcceptance(queue, progress, now),
     renderSessionFirstQuestionReuseReviewArchive(queue, progress, now),
     renderSessionFirstQuestionReuseReviewHandoff(queue, progress, now),
+    renderSessionFirstQuestionReuseReviewHandoffAcceptance(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -2031,6 +2034,44 @@ export function buildPracticeSessionFirstQuestionReuseReviewHandoff(
   }
 }
 
+export function buildPracticeSessionFirstQuestionReuseReviewHandoffAcceptance(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionReuseReviewHandoffAcceptance {
+  const handoff = buildPracticeSessionFirstQuestionReuseReviewHandoff(queue, progress, now)
+
+  if (handoff.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待验收首题复用复盘回流',
+      summary: '先生成首题复用复盘回流清单，再检查动作是否足以进入下一轮。',
+      items: [],
+      primaryAction: {
+        kind: handoff.primaryAction.kind,
+        label: '建立回流验收',
+        description: '先生成首题复用复盘回流清单，再验收回流动作。',
+        to: handoff.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = handoff.status === 'repair'
+
+  return {
+    status: handoff.status,
+    title: repairMode ? '回修复用复盘回流待验收' : '首题复用复盘回流待验收',
+    summary: repairMode ? '检查回修回流动作是否补齐不可执行项。' : '检查复用复盘回流动作是否足以进入下一轮训练。',
+    items: buildFirstQuestionReuseReviewHandoffAcceptanceItems(handoff, repairMode),
+    primaryAction: {
+      kind: handoff.primaryAction.kind,
+      label: '验收复盘回流',
+      description: repairMode ? '回到复用修复入口，按验收卡补齐不可执行项。' : '回到下一轮首题，按验收卡确认回流动作。',
+      to: handoff.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -3434,6 +3475,41 @@ function renderSessionFirstQuestionReuseReviewHandoff(
       `   - 开场提示：${item.openingPrompt}`,
       `   - 验收规则：${item.acceptanceRule}`,
       `   - 回退动作：${item.fallbackAction}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionReuseReviewHandoffAcceptance(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const acceptance = buildPracticeSessionFirstQuestionReuseReviewHandoffAcceptance(queue, progress, now)
+  const lines = [
+    '## 首题复用复盘回流验收卡',
+    `- 状态：${acceptance.title}`,
+    `- 摘要：${acceptance.summary}`,
+    `- 主行动：${acceptance.primaryAction.label}，${acceptance.primaryAction.description}（${acceptance.primaryAction.to}）`,
+    '',
+  ]
+
+  if (acceptance.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待验收首题复用复盘回流。先生成首题复用复盘回流清单后，系统会给出验收口径。',
+      '',
+    ].join('\n')
+  }
+
+  acceptance.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 验收目标：${item.target}`,
+      `   - 通过信号：${item.passSignal}`,
+      `   - 缺失风险：${item.missingRisk}`,
+      `   - 补救动作：${item.repairAction}`,
     )
   })
 
@@ -5630,6 +5706,62 @@ function buildFirstQuestionReuseReviewHandoffItems(
       priority: 4,
     },
   ]
+}
+
+function buildFirstQuestionReuseReviewHandoffAcceptanceItems(
+  handoff: PracticeSessionFirstQuestionReuseReviewHandoff,
+  repairMode: boolean,
+): PracticeSessionFirstQuestionReuseReviewHandoffAcceptanceItem[] {
+  const score = findFirstQuestionReuseReviewHandoffItem(handoff, 'handoff-reuse-review-score')
+  const evidence = findFirstQuestionReuseReviewHandoffItem(handoff, 'handoff-reuse-review-evidence')
+  const blocker = findFirstQuestionReuseReviewHandoffItem(handoff, 'handoff-reuse-review-blocker')
+  const nextQuestion = findFirstQuestionReuseReviewHandoffItem(handoff, 'handoff-reuse-review-next-question')
+
+  return [
+    {
+      id: 'accept-handoff-reuse-review-score',
+      label: '分数可核验',
+      target: score?.action ?? '检查分数回流是否有明确基线和下一步判断。',
+      passSignal: score?.acceptanceRule ?? '必须能说明基线、新题得分和回修判断。',
+      missingRisk: repairMode ? '分数不明会让回修无法判断能否放行。' : '分数不可核验会让下一轮无法判断复用是否有效。',
+      repairAction: score ? `回到「${score.label}」补齐开场提示和验收规则。` : '回到首题复用复盘回流清单，补齐分数回流动作。',
+      priority: 1,
+    },
+    {
+      id: 'accept-handoff-reuse-review-evidence',
+      label: '证据可带入',
+      target: evidence?.action ?? '检查证据带入是否明确片段或补证据动作。',
+      passSignal: evidence?.acceptanceRule ?? '必须明确要带入下一题的证据片段或补证据动作。',
+      missingRisk: repairMode ? '证据不可带入会让回修继续停在口头判断。' : '证据不可带入会让下一题失去可追问材料。',
+      repairAction: evidence ? `回到「${evidence.label}」补齐开场提示和验收规则。` : '回到首题复用复盘回流清单，补齐证据带入动作。',
+      priority: 2,
+    },
+    {
+      id: 'accept-handoff-reuse-review-blocker',
+      label: '阻断可处置',
+      target: blocker?.action ?? '检查阻断处置是否明确继续回修或压同一弱项。',
+      passSignal: blocker?.acceptanceRule ?? '必须明确继续回修、保留题序或压同一弱项。',
+      missingRisk: repairMode ? '阻断不可处置会让回修入口继续漂移。' : '阻断不可处置会让下一轮误跳过未修复问题。',
+      repairAction: blocker ? `回到「${blocker.label}」补齐开场提示和验收规则。` : '回到首题复用复盘回流清单，补齐阻断处置动作。',
+      priority: 3,
+    },
+    {
+      id: 'accept-handoff-reuse-review-next-question',
+      label: '入口可执行',
+      target: nextQuestion?.action ?? '检查下一题启动是否落到可点击入口、题序或回修对象。',
+      passSignal: nextQuestion?.acceptanceRule ?? '必须落到可点击入口、题序或明确回修对象。',
+      missingRisk: repairMode ? '入口不可执行会让回修后仍不知道从哪里继续。' : '入口不可执行会让复用复盘无法进入下一轮训练。',
+      repairAction: nextQuestion ? `回到「${nextQuestion.label}」补齐开场提示和验收规则。` : '回到首题复用复盘回流清单，补齐下一题启动动作。',
+      priority: 4,
+    },
+  ]
+}
+
+function findFirstQuestionReuseReviewHandoffItem(
+  handoff: PracticeSessionFirstQuestionReuseReviewHandoff,
+  id: string,
+): PracticeSessionFirstQuestionReuseReviewHandoffItem | undefined {
+  return handoff.items.find(item => item.id === id)
 }
 
 function findFirstQuestionReuseReviewArchiveItem(

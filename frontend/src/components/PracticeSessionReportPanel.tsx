@@ -36,6 +36,7 @@ import {
   buildPracticeSessionFirstQuestionReuseReviewAcceptance,
   buildPracticeSessionFirstQuestionReuseReviewArchive,
   buildPracticeSessionFirstQuestionReuseReviewHandoff,
+  buildPracticeSessionFirstQuestionReuseReviewHandoffAcceptance,
   buildPracticeSessionFirstQuestionReuseReviewTemplate,
   buildPracticeSessionFirstQuestionReviewAcceptance,
   buildPracticeSessionFirstQuestionReviewArchive,
@@ -268,6 +269,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionFirstQuestionReuseReviewHandoff = useMemo(
     () => buildPracticeSessionFirstQuestionReuseReviewHandoff(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionFirstQuestionReuseReviewHandoffAcceptance = useMemo(
+    () => buildPracticeSessionFirstQuestionReuseReviewHandoffAcceptance(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1883,6 +1888,50 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionFirstQuestionReuseReviewHandoff.primaryAction.to)}
         >
           {sessionFirstQuestionReuseReviewHandoff.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-first-reuse-review-handoff-acceptance status-${sessionFirstQuestionReuseReviewHandoffAcceptance.status}`}
+        aria-label="首题复用复盘回流验收卡"
+      >
+        <div className="practice-session-report-first-reuse-review-handoff-acceptance-head">
+          <div>
+            <span>首题复用复盘回流验收卡</span>
+            <strong>{sessionFirstQuestionReuseReviewHandoffAcceptance.title}</strong>
+            <small>{sessionFirstQuestionReuseReviewHandoffAcceptance.summary}</small>
+          </div>
+        </div>
+        {sessionFirstQuestionReuseReviewHandoffAcceptance.items.length === 0 ? (
+          <p>等待验收首题复用复盘回流。先生成首题复用复盘回流清单后，系统会给出验收口径。</p>
+        ) : (
+          <div className="practice-session-report-first-reuse-review-handoff-acceptance-list">
+            {sessionFirstQuestionReuseReviewHandoffAcceptance.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.target}</strong>
+                </div>
+                <dl>
+                  <dt>通过信号</dt>
+                  <dd>{item.passSignal}</dd>
+                  <dt>缺失风险</dt>
+                  <dd>{item.missingRisk}</dd>
+                  <dt>补救动作</dt>
+                  <dd>{item.repairAction}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionFirstQuestionReuseReviewHandoffAcceptance.status === 'repair'}
+          icon={sessionFirstQuestionReuseReviewHandoffAcceptance.status === 'repair' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionFirstQuestionReuseReviewHandoffAcceptance.primaryAction.to)}
+        >
+          {sessionFirstQuestionReuseReviewHandoffAcceptance.primaryAction.label}
         </Button>
       </div>
 
