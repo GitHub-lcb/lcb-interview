@@ -3,6 +3,7 @@ import {
   BarChartOutlined,
   CheckCircleOutlined,
   CopyOutlined,
+  HighlightOutlined,
   PlayCircleOutlined,
   ReloadOutlined,
 } from '@ant-design/icons'
@@ -18,6 +19,7 @@ import type {
 import { formatNextTrainingQueueItemMeta } from '../utils/nextTrainingQueue'
 import {
   buildPracticeSessionDailyCompletion,
+  buildPracticeSessionMaterialVault,
   buildPracticeSessionNextTrainingQueue,
   buildPracticeSessionReport,
   buildPracticeSessionReportMarkdown,
@@ -60,6 +62,10 @@ export default function PracticeSessionReportPanel({
   )
   const dailyClosure = useMemo(
     () => buildPracticeSessionDailyCompletion(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionMaterialVault = useMemo(
+    () => buildPracticeSessionMaterialVault(queue, progress),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -178,6 +184,35 @@ export default function PracticeSessionReportPanel({
             <strong>{dailyClosure.interviewTodayCount}</strong>
           </div>
         </div>
+      </div>
+
+      <div className="practice-session-report-material-vault" aria-label="本轮高分素材">
+        <div className="practice-session-report-material-vault-head">
+          <div>
+            <span>本轮高分素材</span>
+            <small>{sessionMaterialVault.summary}</small>
+          </div>
+          <Button
+            size="small"
+            icon={<HighlightOutlined />}
+            onClick={() => onNavigate(sessionMaterialVault.primaryAction.to)}
+          >
+            {sessionMaterialVault.primaryAction.label}
+          </Button>
+        </div>
+        {sessionMaterialVault.snippets.length === 0 ? (
+          <p>暂无本轮高分素材。完成 80 分以上模拟回答后，战报会自动沉淀可复用表达。</p>
+        ) : (
+          <div className="practice-session-report-material-vault-list">
+            {sessionMaterialVault.snippets.slice(0, 3).map(snippet => (
+              <button key={snippet.id} type="button" onClick={() => onNavigate(snippet.to)}>
+                <strong>{snippet.title}</strong>
+                <span>{snippet.label} · {snippet.score} 分</span>
+                <small>{snippet.content}</small>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="practice-session-report-next-training" aria-label="下一轮训练">

@@ -3,6 +3,7 @@ import type {
   InterviewAttempt,
   InterviewCriterion,
   InterviewCriterionKey,
+  InterviewMaterialVault,
   NextTrainingQueue,
   PracticeQueueItem,
   PracticeSessionReport,
@@ -15,6 +16,7 @@ import type {
   StudyProgress,
 } from '../types'
 import { buildDailyPlanCompletion } from './dailyPlanCompletion'
+import { buildInterviewMaterialVault } from './interviewMaterialVault'
 import { buildNextTrainingQueue, formatNextTrainingQueueItemMeta } from './nextTrainingQueue'
 
 const PASSING_SCORE = 70
@@ -128,6 +130,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionMetrics(report.metrics),
     renderSessionQueueProfile(report.queueProfile),
     renderSessionDailyClosure(queue, progress, now),
+    renderSessionMaterialVault(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -150,6 +153,27 @@ export function buildPracticeSessionDailyCompletion(
   now = new Date().toISOString(),
 ): DailyPlanCompletion {
   return buildDailyPlanCompletion(buildPracticeSessionProgressContext(queue, progress), now)
+}
+
+export function buildPracticeSessionMaterialVault(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): InterviewMaterialVault {
+  const queueIdSet = new Set(
+    queue
+      .map(item => item.id)
+      .filter(questionId => Number.isFinite(questionId) && questionId > 0),
+  )
+  const context = buildPracticeSessionProgressContext(queue, progress)
+  const interviewAttempts = Object.fromEntries(
+    Object.entries(context.interviewAttempts)
+      .filter(([questionId]) => queueIdSet.has(Number(questionId))),
+  )
+
+  return buildInterviewMaterialVault({
+    ...context,
+    interviewAttempts,
+  })
 }
 
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
@@ -235,6 +259,41 @@ function renderSessionDailyClosure(
     ...impactLines,
     '',
   ].join('\n')
+}
+
+function renderSessionMaterialVault(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): string {
+  const vault = buildPracticeSessionMaterialVault(queue, progress)
+  const lines = [
+    '## 本轮高分素材',
+    `- 状态：${vault.title}`,
+    `- 摘要：${vault.summary}`,
+    `- 主行动：${vault.primaryAction.label}，${vault.primaryAction.description}（${vault.primaryAction.to}）`,
+    '',
+  ]
+
+  if (vault.snippets.length === 0) {
+    return [
+      ...lines,
+      '- 暂无本轮高分素材。完成 80 分以上模拟回答后，战报会自动沉淀可复用表达。',
+      '',
+    ].join('\n')
+  }
+
+  vault.snippets.slice(0, 5).forEach((snippet, index) => {
+    lines.push(
+      `${index + 1}. ${snippet.title}`,
+      `   - 类型：${snippet.label}`,
+      `   - 得分：${snippet.score} 分`,
+      `   - 片段：${snippet.content}`,
+      `   - 原因：${snippet.reason}`,
+      `   - 入口：${snippet.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
 }
 
 function renderSessionNextTraining(

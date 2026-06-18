@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
 import { message } from 'antd'
@@ -106,6 +106,34 @@ describe('PracticeSessionReportPanel', () => {
     await userEvent.click(screen.getByRole('button', { name: /继续未答题/ }))
 
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=2')
+  })
+
+  it('renders high-score materials from the current session queue', async () => {
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 88)],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const materialBlock = screen.getByLabelText('本轮高分素材')
+
+    expect(within(materialBlock).getByText('本轮高分素材')).toBeInTheDocument()
+    expect(within(materialBlock).getAllByText(/高分素材/).length).toBeGreaterThan(0)
+    expect(within(materialBlock).getByText('Java 面试题 1')).toBeInTheDocument()
+    expect(within(materialBlock).getByText(/88 分/)).toBeInTheDocument()
+
+    await userEvent.click(within(materialBlock).getByRole('button', { name: /Java 面试题 1/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/question/1')
   })
 
   it('keeps the queue profile actionable for empty sessions', () => {

@@ -202,6 +202,25 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('/practice?queue=1,2,3')
   })
 
+  it('exports high-score materials from the current session queue', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1), question(2)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 88)],
+          2: [attempt(2, 76)],
+        },
+      }),
+      NOW,
+    )
+
+    expect(markdown).toContain('## 本轮高分素材')
+    expect(markdown).toContain('Java 面试题 1')
+    expect(markdown).toContain('得分：88 分')
+    expect(markdown).toContain('片段：')
+    expect(markdown).toContain('入口：/question/1')
+  })
+
   it('keeps empty session markdown actionable', () => {
     const markdown = buildPracticeSessionReportMarkdown([], progress(), NOW)
 
@@ -210,6 +229,8 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('暂无队列画像')
     expect(markdown).toContain('## 今日闭环快照')
     expect(markdown).toContain('今日计划待验收')
+    expect(markdown).toContain('## 本轮高分素材')
+    expect(markdown).toContain('暂无本轮高分素材')
     expect(markdown).toContain('## 下一轮训练建议')
     expect(markdown).toContain('先做一次模拟面试')
     expect(markdown).toContain('暂无题目')

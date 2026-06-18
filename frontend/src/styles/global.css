@@ -7338,6 +7338,102 @@ p {
   white-space: nowrap;
 }
 
+.practice-session-report-material-vault {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #EEF2FF;
+  border: 1px solid #C7D2FE;
+  border-radius: 8px;
+}
+
+.practice-session-report-material-vault-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.practice-session-report-material-vault-head > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-material-vault-head span {
+  color: #3730A3;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-material-vault-head small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #4338CA;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-material-vault-head .ant-btn {
+  flex: 0 0 auto;
+  max-width: 136px;
+}
+
+.practice-session-report-material-vault p {
+  margin: 0;
+  color: #4338CA;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.practice-session-report-material-vault-list {
+  display: grid;
+  gap: 6px;
+}
+
+.practice-session-report-material-vault-list button {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  text-align: left;
+  background: #FFFFFF;
+  border: 1px solid #C7D2FE;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.practice-session-report-material-vault-list button:hover {
+  border-color: #6366F1;
+}
+
+.practice-session-report-material-vault-list strong,
+.practice-session-report-material-vault-list span,
+.practice-session-report-material-vault-list small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-material-vault-list strong {
+  color: #0F172A;
+  font-size: 13px;
+}
+
+.practice-session-report-material-vault-list span {
+  color: #3730A3;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.practice-session-report-material-vault-list small {
+  color: #64748B;
+  font-size: 12px;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;
