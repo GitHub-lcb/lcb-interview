@@ -33,6 +33,7 @@ import {
   buildPracticeSessionFirstQuestionReuseReceipt,
   buildPracticeSessionFirstQuestionReuseReceiptAcceptance,
   buildPracticeSessionFirstQuestionReuseReleaseGate,
+  buildPracticeSessionFirstQuestionReuseReviewTemplate,
   buildPracticeSessionFirstQuestionReviewAcceptance,
   buildPracticeSessionFirstQuestionReviewArchive,
   buildPracticeSessionFirstQuestionReviewTemplate,
@@ -248,6 +249,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionFirstQuestionReuseReleaseGate = useMemo(
     () => buildPracticeSessionFirstQuestionReuseReleaseGate(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionFirstQuestionReuseReviewTemplate = useMemo(
+    () => buildPracticeSessionFirstQuestionReuseReviewTemplate(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1687,6 +1692,50 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionFirstQuestionReuseReleaseGate.primaryAction.to)}
         >
           {sessionFirstQuestionReuseReleaseGate.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-first-reuse-review status-${sessionFirstQuestionReuseReviewTemplate.status}`}
+        aria-label="首题复用复盘模板"
+      >
+        <div className="practice-session-report-first-reuse-review-head">
+          <div>
+            <span>首题复用复盘模板</span>
+            <strong>{sessionFirstQuestionReuseReviewTemplate.title}</strong>
+            <small>{sessionFirstQuestionReuseReviewTemplate.summary}</small>
+          </div>
+        </div>
+        {sessionFirstQuestionReuseReviewTemplate.items.length === 0 ? (
+          <p>等待首题复用复盘模板。先完成首题复用放行门禁后，系统会给出复盘字段。</p>
+        ) : (
+          <div className="practice-session-report-first-reuse-review-list">
+            {sessionFirstQuestionReuseReviewTemplate.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.prompt}</strong>
+                </div>
+                <dl>
+                  <dt>填写提示</dt>
+                  <dd>{item.prompt}</dd>
+                  <dt>示例</dt>
+                  <dd>{item.example}</dd>
+                  <dt>验收规则</dt>
+                  <dd>{item.acceptanceRule}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionFirstQuestionReuseReviewTemplate.status === 'repair'}
+          icon={sessionFirstQuestionReuseReviewTemplate.status === 'repair' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionFirstQuestionReuseReviewTemplate.primaryAction.to)}
+        >
+          {sessionFirstQuestionReuseReviewTemplate.primaryAction.label}
         </Button>
       </div>
 

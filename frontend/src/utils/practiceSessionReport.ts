@@ -30,6 +30,8 @@ import type {
   PracticeSessionFirstQuestionReuseReceiptItem,
   PracticeSessionFirstQuestionReuseReleaseGate,
   PracticeSessionFirstQuestionReuseReleaseGateItem,
+  PracticeSessionFirstQuestionReuseReviewTemplate,
+  PracticeSessionFirstQuestionReuseReviewTemplateItem,
   PracticeSessionFirstQuestionReleaseGate,
   PracticeSessionFirstQuestionReleaseGateItem,
   PracticeSessionFirstQuestionReviewAcceptance,
@@ -284,6 +286,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFirstQuestionReuseReceipt(queue, progress, now),
     renderSessionFirstQuestionReuseReceiptAcceptance(queue, progress, now),
     renderSessionFirstQuestionReuseReleaseGate(queue, progress, now),
+    renderSessionFirstQuestionReuseReviewTemplate(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1867,6 +1870,44 @@ export function buildPracticeSessionFirstQuestionReuseReleaseGate(
   }
 }
 
+export function buildPracticeSessionFirstQuestionReuseReviewTemplate(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionReuseReviewTemplate {
+  const gate = buildPracticeSessionFirstQuestionReuseReleaseGate(queue, progress, now)
+
+  if (gate.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待首题复用复盘模板',
+      summary: '先完成首题复用放行门禁，再记录复用后的分数、证据、阻断和下一题反馈。',
+      items: [],
+      primaryAction: {
+        kind: gate.primaryAction.kind,
+        label: '建立复用复盘',
+        description: '先完成首题复用放行裁决，再生成复用复盘模板。',
+        to: gate.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = gate.status === 'blocked'
+
+  return {
+    status: repairMode ? 'repair' : 'ready',
+    title: repairMode ? '回修复用复盘模板' : '首题复用复盘模板',
+    summary: repairMode ? '记录复用未放行时还缺哪一项证据，以及如何补回。' : '记录复用放行后对下一题分数、证据和阻断的真实影响。',
+    items: buildFirstQuestionReuseReviewTemplateItems(gate, repairMode),
+    primaryAction: {
+      kind: gate.primaryAction.kind,
+      label: '复盘复用结果',
+      description: repairMode ? '回到复用修复入口，记录未放行项的修复结果。' : '回到下一轮首题，记录复用后的复盘结果。',
+      to: gate.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -3131,6 +3172,40 @@ function renderSessionFirstQuestionReuseReleaseGate(
       `   - 放行检查：${item.releaseRule}`,
       `   - 处理动作：${item.action}`,
       `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionReuseReviewTemplate(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const template = buildPracticeSessionFirstQuestionReuseReviewTemplate(queue, progress, now)
+  const lines = [
+    '## 首题复用复盘模板',
+    `- 状态：${template.title}`,
+    `- 摘要：${template.summary}`,
+    `- 主行动：${template.primaryAction.label}，${template.primaryAction.description}（${template.primaryAction.to}）`,
+    '',
+  ]
+
+  if (template.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待首题复用复盘模板。先完成首题复用放行门禁后，系统会给出复盘字段。',
+      '',
+    ].join('\n')
+  }
+
+  template.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 填写提示：${item.prompt}`,
+      `   - 示例：${item.example}`,
+      `   - 验收规则：${item.acceptanceRule}`,
     )
   })
 
@@ -5135,6 +5210,58 @@ function buildFirstQuestionReuseReleaseGateItems(
       priority: 4,
     },
   ]
+}
+
+function buildFirstQuestionReuseReviewTemplateItems(
+  gate: PracticeSessionFirstQuestionReuseReleaseGate,
+  repairMode: boolean,
+): PracticeSessionFirstQuestionReuseReviewTemplateItem[] {
+  const score = findFirstQuestionReuseReleaseGateItem(gate, 'reuse-release-score')
+  const evidence = findFirstQuestionReuseReleaseGateItem(gate, 'reuse-release-evidence')
+  const blocker = findFirstQuestionReuseReleaseGateItem(gate, 'reuse-release-blocker')
+  const nextQuestion = findFirstQuestionReuseReleaseGateItem(gate, 'reuse-release-next-question')
+
+  return [
+    {
+      id: 'reuse-review-score',
+      label: '分数回看',
+      prompt: repairMode ? '复用未放行时，哪一个分数目标没有对齐？' : '复用进入下一题后，首题基线和新题得分有什么变化？',
+      example: score ? `分数回看：${score.evidence}；放行检查：${score.releaseRule}。` : '分数回看：基线 62 分，新题 __ 分，变化 __。',
+      acceptanceRule: '必须写出基线分、新得分或明确说明尚未评分。',
+      priority: 1,
+    },
+    {
+      id: 'reuse-review-evidence',
+      label: '证据命中',
+      prompt: repairMode ? '未放行时哪条证据没有支撑追问？' : '下一题追问中命中了哪条复用证据？',
+      example: evidence ? `证据命中：${evidence.evidence}；放行检查：${evidence.releaseRule}。` : '证据命中：复用了 __ 证据，被追问 __ 时能支撑 / 不能支撑。',
+      acceptanceRule: '必须说明证据是否支撑追问或复盘。',
+      priority: 2,
+    },
+    {
+      id: 'reuse-review-blocker',
+      label: '阻断回收',
+      prompt: repairMode ? '未放行阻断还剩什么？' : '原阻断是否减少、转移或消失？',
+      example: blocker ? `阻断回收：${blocker.evidence}；处理动作：${blocker.action}。` : '阻断回收：原阻断 __，当前状态 __。',
+      acceptanceRule: '必须写出阻断状态变化或明确未变化。',
+      priority: 3,
+    },
+    {
+      id: 'reuse-review-next-question',
+      label: '下一题回流',
+      prompt: repairMode ? '补齐后下一题入口是否需要调整？' : '下一题结果要如何回流到下一轮计划？',
+      example: nextQuestion ? `下一题回流：${nextQuestion.evidence}；处理动作：${nextQuestion.action}。` : '下一题回流：继续回修 / 保留题序 / 调整下一题为 __。',
+      acceptanceRule: '必须落到继续回修、保留题序或调整下一题。',
+      priority: 4,
+    },
+  ]
+}
+
+function findFirstQuestionReuseReleaseGateItem(
+  gate: PracticeSessionFirstQuestionReuseReleaseGate,
+  id: string,
+): PracticeSessionFirstQuestionReuseReleaseGateItem | undefined {
+  return gate.items.find(item => item.id === id)
 }
 
 function findFirstQuestionReviewTemplateItem(

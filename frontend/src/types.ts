@@ -1392,6 +1392,25 @@ export interface PracticeSessionFirstQuestionReuseReleaseGate {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionFirstQuestionReuseReviewTemplateStatus = 'empty' | 'repair' | 'ready'
+
+export interface PracticeSessionFirstQuestionReuseReviewTemplateItem {
+  id: string
+  label: string
+  prompt: string
+  example: string
+  acceptanceRule: string
+  priority: number
+}
+
+export interface PracticeSessionFirstQuestionReuseReviewTemplate {
+  status: PracticeSessionFirstQuestionReuseReviewTemplateStatus
+  title: string
+  summary: string
+  items: PracticeSessionFirstQuestionReuseReviewTemplateItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

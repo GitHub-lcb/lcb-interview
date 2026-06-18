@@ -1252,6 +1252,40 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders first question reuse review template before the next session round', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const reviewTemplate = screen.getByLabelText('首题复用复盘模板')
+
+    expect(within(reviewTemplate).getByText('首题复用复盘模板')).toBeInTheDocument()
+    expect(within(reviewTemplate).getByText('回修复用复盘模板')).toBeInTheDocument()
+    expect(within(reviewTemplate).getByText('分数回看')).toBeInTheDocument()
+    expect(within(reviewTemplate).getByText('证据命中')).toBeInTheDocument()
+    expect(within(reviewTemplate).getByText('阻断回收')).toBeInTheDocument()
+    expect(within(reviewTemplate).getByText('下一题回流')).toBeInTheDocument()
+    expect(within(reviewTemplate).getAllByText('填写提示').length).toBeGreaterThan(0)
+    expect(within(reviewTemplate).getAllByText('验收规则').length).toBeGreaterThan(0)
+
+    await user.click(within(reviewTemplate).getByRole('button', { name: /复盘复用结果/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel
