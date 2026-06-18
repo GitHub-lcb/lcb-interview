@@ -1349,6 +1349,26 @@ export interface PracticeSessionFirstQuestionReuseReceipt {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionFirstQuestionReuseReceiptAcceptanceStatus = 'empty' | 'repair' | 'ready'
+
+export interface PracticeSessionFirstQuestionReuseReceiptAcceptanceItem {
+  id: string
+  label: string
+  target: string
+  passSignal: string
+  missingRisk: string
+  repairAction: string
+  priority: number
+}
+
+export interface PracticeSessionFirstQuestionReuseReceiptAcceptance {
+  status: PracticeSessionFirstQuestionReuseReceiptAcceptanceStatus
+  title: string
+  summary: string
+  items: PracticeSessionFirstQuestionReuseReceiptAcceptanceItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

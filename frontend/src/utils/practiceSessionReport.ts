@@ -25,6 +25,8 @@ import type {
   PracticeSessionFirstQuestionReceiptAcceptanceItem,
   PracticeSessionFirstQuestionReceiptItem,
   PracticeSessionFirstQuestionReuseReceipt,
+  PracticeSessionFirstQuestionReuseReceiptAcceptance,
+  PracticeSessionFirstQuestionReuseReceiptAcceptanceItem,
   PracticeSessionFirstQuestionReuseReceiptItem,
   PracticeSessionFirstQuestionReleaseGate,
   PracticeSessionFirstQuestionReleaseGateItem,
@@ -272,6 +274,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFirstQuestionReviewArchive(queue, progress, now),
     renderSessionFirstQuestionArchiveReuse(queue, progress, now),
     renderSessionFirstQuestionReuseReceipt(queue, progress, now),
+    renderSessionFirstQuestionReuseReceiptAcceptance(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1775,6 +1778,46 @@ export function buildPracticeSessionFirstQuestionReuseReceipt(
   }
 }
 
+export function buildPracticeSessionFirstQuestionReuseReceiptAcceptance(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionReuseReceiptAcceptance {
+  const receipt = buildPracticeSessionFirstQuestionReuseReceipt(queue, progress, now)
+
+  if (receipt.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待验收首题复用回执',
+      summary: '先生成首题复用回执模板，再检查分数、证据、阻断和下一题是否闭环。',
+      items: [],
+      primaryAction: {
+        kind: receipt.primaryAction.kind,
+        label: '建立复用验收',
+        description: '先生成首题复用回执模板，再验收回执质量。',
+        to: receipt.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = receipt.status === 'repair'
+
+  return {
+    status: receipt.status,
+    title: repairMode ? '回修复用回执待验收' : '首题复用回执待验收',
+    summary: repairMode
+      ? '检查回修复用是否真的补齐分数、证据、阻断和下一步。'
+      : '检查首题复用回执是否足以支撑下一轮训练放行。',
+    items: buildFirstQuestionReuseReceiptAcceptanceItems(receipt, repairMode),
+    primaryAction: {
+      kind: receipt.primaryAction.kind,
+      label: '验收复用回执',
+      description: repairMode ? '回到首题入口，按验收卡补齐回修复用证据。' : '回到下一轮首题，按验收卡确认复用结果。',
+      to: receipt.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -2968,6 +3011,41 @@ function renderSessionFirstQuestionReuseReceipt(
       `   - 填写提示：${item.prompt}`,
       `   - 示例：${item.example}`,
       `   - 验收规则：${item.acceptanceRule}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionReuseReceiptAcceptance(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const acceptance = buildPracticeSessionFirstQuestionReuseReceiptAcceptance(queue, progress, now)
+  const lines = [
+    '## 首题复用回执验收卡',
+    `- 状态：${acceptance.title}`,
+    `- 摘要：${acceptance.summary}`,
+    `- 主行动：${acceptance.primaryAction.label}，${acceptance.primaryAction.description}（${acceptance.primaryAction.to}）`,
+    '',
+  ]
+
+  if (acceptance.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待验收首题复用回执。先生成首题复用回执模板后，系统会给出验收口径。',
+      '',
+    ].join('\n')
+  }
+
+  acceptance.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 验收目标：${item.target}`,
+      `   - 通过信号：${item.passSignal}`,
+      `   - 缺失风险：${item.missingRisk}`,
+      `   - 补救动作：${item.repairAction}`,
     )
   })
 
@@ -4871,6 +4949,55 @@ function buildFirstQuestionReuseReceiptItems(
   ]
 }
 
+function buildFirstQuestionReuseReceiptAcceptanceItems(
+  receipt: PracticeSessionFirstQuestionReuseReceipt,
+  repairMode: boolean,
+): PracticeSessionFirstQuestionReuseReceiptAcceptanceItem[] {
+  const score = findFirstQuestionReuseReceiptItem(receipt, 'receipt-read-score')
+  const evidence = findFirstQuestionReuseReceiptItem(receipt, 'receipt-carry-evidence')
+  const blocker = findFirstQuestionReuseReceiptItem(receipt, 'receipt-name-blocker')
+  const nextQuestion = findFirstQuestionReuseReceiptItem(receipt, 'receipt-open-next-question')
+
+  return [
+    {
+      id: 'accept-reuse-score',
+      label: '分数对齐',
+      target: score?.prompt ?? '确认首题复用回执已经写清基线分和目标分。',
+      passSignal: score?.acceptanceRule ?? '回执里出现可对比的基线分、目标分和验收规则。',
+      missingRisk: repairMode ? '分数不清会让回修无法证明是否过线。' : '分数不清会让下一轮训练缺少起点和目标。',
+      repairAction: score ? `回到「${score.label}」补齐分数口径。` : '回到首题复用回执模板，补齐分数字段。',
+      priority: 1,
+    },
+    {
+      id: 'accept-reuse-evidence',
+      label: '证据引用',
+      target: evidence?.prompt ?? '确认回执已经写清本轮带入的场景、指标或风险证据。',
+      passSignal: evidence?.acceptanceRule ?? '回执说明证据会支撑哪一个追问或复盘点。',
+      missingRisk: repairMode ? '没有证据引用，回修回答仍然会停留在空泛结论。' : '没有证据引用，下一轮追问会重新暴露同一个缺口。',
+      repairAction: evidence ? `回到「${evidence.label}」补齐证据引用。` : '回到首题复用回执模板，补齐证据字段。',
+      priority: 2,
+    },
+    {
+      id: 'accept-reuse-blocker',
+      label: '阻断判断',
+      target: blocker?.prompt ?? '确认回执已经写清剩余阻断和是否允许继续加压。',
+      passSignal: blocker?.acceptanceRule ?? '回执给出继续回修、扩题量或压同一弱项的明确判断。',
+      missingRisk: repairMode ? '阻断不清会让回修入口继续空转。' : '阻断不清会让下一轮训练误把未修好的问题当成已通过。',
+      repairAction: blocker ? `回到「${blocker.label}」补齐阻断判断。` : '回到首题复用回执模板，补齐阻断字段。',
+      priority: 3,
+    },
+    {
+      id: 'accept-reuse-next-question',
+      label: '下一题接续',
+      target: nextQuestion?.prompt ?? '确认回执已经写清下一题入口，以及它为什么接在首题之后。',
+      passSignal: nextQuestion?.acceptanceRule ?? '回执把首题归档转成一个已打开的下一步入口。',
+      missingRisk: repairMode ? '下一步不清会让回修结束后不知道继续补哪一项。' : '下一题不清会让首题复用停留在记录，没有进入训练。',
+      repairAction: nextQuestion ? `回到「${nextQuestion.label}」补齐下一题入口。` : '回到首题复用回执模板，补齐下一题字段。',
+      priority: 4,
+    },
+  ]
+}
+
 function findFirstQuestionReviewTemplateItem(
   template: PracticeSessionFirstQuestionReviewTemplate,
   id: string,
@@ -4897,6 +5024,13 @@ function findFirstQuestionArchiveReuseItem(
   id: string,
 ): PracticeSessionFirstQuestionArchiveReuseItem | undefined {
   return reuse.items.find(item => item.id === id)
+}
+
+function findFirstQuestionReuseReceiptItem(
+  receipt: PracticeSessionFirstQuestionReuseReceipt,
+  id: string,
+): PracticeSessionFirstQuestionReuseReceiptItem | undefined {
+  return receipt.items.find(item => item.id === id)
 }
 
 function buildPracticeSessionScriptCommandItem(

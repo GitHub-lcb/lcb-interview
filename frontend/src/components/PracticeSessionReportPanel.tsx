@@ -31,6 +31,7 @@ import {
   buildPracticeSessionFirstQuestionReceiptAcceptance,
   buildPracticeSessionFirstQuestionReleaseGate,
   buildPracticeSessionFirstQuestionReuseReceipt,
+  buildPracticeSessionFirstQuestionReuseReceiptAcceptance,
   buildPracticeSessionFirstQuestionReviewAcceptance,
   buildPracticeSessionFirstQuestionReviewArchive,
   buildPracticeSessionFirstQuestionReviewTemplate,
@@ -238,6 +239,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionFirstQuestionReuseReceipt = useMemo(
     () => buildPracticeSessionFirstQuestionReuseReceipt(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionFirstQuestionReuseReceiptAcceptance = useMemo(
+    () => buildPracticeSessionFirstQuestionReuseReceiptAcceptance(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1591,6 +1596,50 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionFirstQuestionReuseReceipt.primaryAction.to)}
         >
           {sessionFirstQuestionReuseReceipt.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-first-reuse-acceptance status-${sessionFirstQuestionReuseReceiptAcceptance.status}`}
+        aria-label="首题复用回执验收卡"
+      >
+        <div className="practice-session-report-first-reuse-acceptance-head">
+          <div>
+            <span>首题复用回执验收卡</span>
+            <strong>{sessionFirstQuestionReuseReceiptAcceptance.title}</strong>
+            <small>{sessionFirstQuestionReuseReceiptAcceptance.summary}</small>
+          </div>
+        </div>
+        {sessionFirstQuestionReuseReceiptAcceptance.items.length === 0 ? (
+          <p>等待验收首题复用回执。先生成首题复用回执模板后，系统会给出验收口径。</p>
+        ) : (
+          <div className="practice-session-report-first-reuse-acceptance-list">
+            {sessionFirstQuestionReuseReceiptAcceptance.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.target}</strong>
+                </div>
+                <dl>
+                  <dt>通过信号</dt>
+                  <dd>{item.passSignal}</dd>
+                  <dt>缺失风险</dt>
+                  <dd>{item.missingRisk}</dd>
+                  <dt>补救动作</dt>
+                  <dd>{item.repairAction}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionFirstQuestionReuseReceiptAcceptance.status === 'repair'}
+          icon={sessionFirstQuestionReuseReceiptAcceptance.status === 'repair' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionFirstQuestionReuseReceiptAcceptance.primaryAction.to)}
+        >
+          {sessionFirstQuestionReuseReceiptAcceptance.primaryAction.label}
         </Button>
       </div>
 
