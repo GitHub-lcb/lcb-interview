@@ -25,6 +25,7 @@ import {
   buildPracticeSessionMaterialVault,
   buildPracticeSessionMistakeLedger,
   buildPracticeSessionNextTrainingQueue,
+  buildPracticeSessionRecoveryAcceptance,
   buildPracticeSessionReport,
   buildPracticeSessionReportMarkdown,
   buildPracticeSessionScriptCommand,
@@ -89,6 +90,10 @@ export default function PracticeSessionReportPanel({
   const sessionRecoveryPlan = useMemo(
     () => buildInterviewRecoveryPlan(sessionMistakeLedger),
     [sessionMistakeLedger],
+  )
+  const sessionRecoveryAcceptance = useMemo(
+    () => buildPracticeSessionRecoveryAcceptance(queue, progress),
+    [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
 
@@ -336,6 +341,38 @@ export default function PracticeSessionReportPanel({
           <span>{sessionRecoveryPlan.title}</span>
           <small>{sessionRecoveryPlan.steps[0]?.description ?? sessionRecoveryPlan.summary}</small>
         </div>
+      </div>
+
+      <div
+        className={`practice-session-report-recovery-acceptance status-${sessionRecoveryAcceptance.status}`}
+        aria-label="本轮错因验收"
+      >
+        <div className="practice-session-report-recovery-acceptance-head">
+          <span>本轮错因验收</span>
+          <strong>{sessionRecoveryAcceptance.title}</strong>
+          <small>{sessionRecoveryAcceptance.summary}</small>
+        </div>
+        <div className="practice-session-report-recovery-acceptance-metrics">
+          <div>
+            <span>通过</span>
+            <strong>{sessionRecoveryAcceptance.passedCount} / {sessionRecoveryAcceptance.totalCount}</strong>
+          </div>
+          <div>
+            <span>失败</span>
+            <strong>{sessionRecoveryAcceptance.failedQuestionIds.length}</strong>
+          </div>
+          <div>
+            <span>待复测</span>
+            <strong>{sessionRecoveryAcceptance.pendingQuestionIds.length}</strong>
+          </div>
+        </div>
+        <Button
+          size="small"
+          icon={<CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionRecoveryAcceptance.primaryAction.to)}
+        >
+          {sessionRecoveryAcceptance.primaryAction.label}
+        </Button>
       </div>
 
       <div className="practice-session-report-next-training" aria-label="下一轮训练">

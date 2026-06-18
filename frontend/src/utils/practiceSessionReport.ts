@@ -6,6 +6,7 @@ import type {
   InterviewCriterionKey,
   InterviewMaterialVault,
   InterviewMistakeLedger,
+  InterviewRecoveryAcceptance,
   NextTrainingQueue,
   PracticeQueueItem,
   PracticeSessionReport,
@@ -21,6 +22,7 @@ import { buildDailyPlanCompletion } from './dailyPlanCompletion'
 import { buildInterviewFollowUpDefense } from './interviewFollowUpDefense'
 import { buildInterviewMaterialVault } from './interviewMaterialVault'
 import { buildInterviewMistakeLedger } from './interviewMistakeLedger'
+import { buildInterviewRecoveryAcceptance } from './interviewRecoveryAcceptance'
 import { buildInterviewRecoveryPlan } from './interviewRecoveryPlan'
 import { buildNextTrainingQueue, formatNextTrainingQueueItemMeta } from './nextTrainingQueue'
 import { buildPracticeInterviewerScriptProgress } from './practiceInterviewerScriptProgress'
@@ -169,6 +171,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFollowUpDefense(queue, progress),
     renderSessionScriptCommand(queue, progress),
     renderSessionMistakeLedger(queue, progress),
+    renderSessionRecoveryAcceptance(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -271,20 +274,17 @@ export function buildPracticeSessionMistakeLedger(
   queue: PracticeQueueItem[],
   progress: StudyProgress,
 ): InterviewMistakeLedger {
-  const queueIdSet = new Set(
-    queue
-      .map(item => item.id)
-      .filter(questionId => Number.isFinite(questionId) && questionId > 0),
-  )
-  const context = buildPracticeSessionProgressContext(queue, progress)
+  return buildInterviewMistakeLedger(buildPracticeSessionScopedProgress(queue, progress))
+}
 
-  return buildInterviewMistakeLedger({
-    ...context,
-    dailyPlan: context.dailyPlan.filter(questionId => queueIdSet.has(questionId)),
-    questionStates: filterRecordByQuestionIds(context.questionStates, queueIdSet),
-    questionSnapshots: filterRecordByQuestionIds(context.questionSnapshots, queueIdSet),
-    interviewAttempts: filterRecordByQuestionIds(context.interviewAttempts, queueIdSet),
-  })
+export function buildPracticeSessionRecoveryAcceptance(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): InterviewRecoveryAcceptance {
+  const scopedProgress = buildPracticeSessionScopedProgress(queue, progress)
+  const ledger = buildInterviewMistakeLedger(scopedProgress)
+
+  return buildInterviewRecoveryAcceptance(scopedProgress, ledger)
 }
 
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
@@ -516,6 +516,21 @@ function renderSessionMistakeLedger(queue: PracticeQueueItem[], progress: StudyP
   })
 
   return [...lines, ''].join('\n')
+}
+
+function renderSessionRecoveryAcceptance(queue: PracticeQueueItem[], progress: StudyProgress): string {
+  const acceptance = buildPracticeSessionRecoveryAcceptance(queue, progress)
+
+  return [
+    '## 本轮错因验收',
+    `- 状态：${acceptance.title}`,
+    `- 摘要：${acceptance.summary}`,
+    `- 通过：${acceptance.passedCount} / ${acceptance.totalCount}`,
+    `- 失败题：${formatQuestionIds(acceptance.failedQuestionIds)}`,
+    `- 待复测：${formatQuestionIds(acceptance.pendingQuestionIds)}`,
+    `- 主行动：${acceptance.primaryAction.label}，${acceptance.primaryAction.description}（${acceptance.primaryAction.to}）`,
+    '',
+  ].join('\n')
 }
 
 function renderSessionNextTraining(
@@ -1057,6 +1072,26 @@ function buildPracticeSessionProgressContext(
     dailyPlan: [...new Set([...progress.dailyPlan, ...sessionQuestionIds])],
     questionSnapshots,
     questionStates,
+  }
+}
+
+function buildPracticeSessionScopedProgress(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): StudyProgress {
+  const queueIdSet = new Set(
+    queue
+      .map(item => item.id)
+      .filter(questionId => Number.isFinite(questionId) && questionId > 0),
+  )
+  const context = buildPracticeSessionProgressContext(queue, progress)
+
+  return {
+    ...context,
+    dailyPlan: context.dailyPlan.filter(questionId => queueIdSet.has(questionId)),
+    questionStates: filterRecordByQuestionIds(context.questionStates, queueIdSet),
+    questionSnapshots: filterRecordByQuestionIds(context.questionSnapshots, queueIdSet),
+    interviewAttempts: filterRecordByQuestionIds(context.interviewAttempts, queueIdSet),
   }
 }
 

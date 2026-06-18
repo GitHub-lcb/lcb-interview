@@ -27,11 +27,12 @@ function attempt(
   score: number,
   structureScore = score,
   criterionScores: Partial<Record<InterviewCriterionKey, number>> = {},
+  createdAt = NOW,
 ): InterviewAttempt {
   return {
     questionId,
     answer: '先讲结论，再补机制、场景、风险和落地方案。',
-    createdAt: NOW,
+    createdAt,
     feedback: {
       score,
       level: score >= 80 ? 'strong' : score >= 60 ? 'pass' : 'needs-work',
@@ -242,6 +243,38 @@ describe('PracticeSessionReportPanel', () => {
     await user.click(within(ledgerBlock).getByRole('button', { name: /场景细节反复失分/ }))
 
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1')
+  })
+
+  it('renders recovery acceptance from the current session queue', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 58, 58, { specificity: 35 })],
+            2: [
+              attempt(2, 82, 82, { specificity: 82 }),
+              attempt(2, 52, 52, { specificity: 35 }, '2026-06-16T08:00:00.000Z'),
+            ],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const acceptanceBlock = screen.getByLabelText('本轮错因验收')
+
+    expect(within(acceptanceBlock).getByText('本轮错因验收')).toBeInTheDocument()
+    expect(within(acceptanceBlock).getByText('最新复测仍未过线')).toBeInTheDocument()
+    expect(within(acceptanceBlock).getByText('1 / 2')).toBeInTheDocument()
+
+    await user.click(within(acceptanceBlock).getByRole('button', { name: /继续复测/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
   it('keeps the queue profile actionable for empty sessions', () => {

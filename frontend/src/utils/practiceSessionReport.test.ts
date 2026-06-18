@@ -306,6 +306,29 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).not.toContain('边界风险反复失分')
   })
 
+  it('exports recovery acceptance for the current session queue', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1), question(2)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 58, { specificity: 35 }, NOW)],
+          2: [
+            attempt(2, 82, { specificity: 82 }, NOW),
+            attempt(2, 52, { specificity: 35 }, '2026-06-16T08:00:00.000Z'),
+          ],
+        },
+      }),
+      NOW,
+    )
+
+    expect(markdown).toContain('## 本轮错因验收')
+    expect(markdown).toContain('最新复测仍未过线')
+    expect(markdown).toContain('通过：1 / 2')
+    expect(markdown).toContain('失败题：1')
+    expect(markdown).toContain('待复测：暂无')
+    expect(markdown).toContain('主行动：继续复测')
+  })
+
   it('keeps empty session markdown actionable', () => {
     const markdown = buildPracticeSessionReportMarkdown([], progress(), NOW)
 
@@ -322,6 +345,8 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('暂无本轮脚本总控')
     expect(markdown).toContain('## 本轮错因账本')
     expect(markdown).toContain('暂无本轮错因账本')
+    expect(markdown).toContain('## 本轮错因验收')
+    expect(markdown).toContain('等待建立验收样本')
     expect(markdown).toContain('## 下一轮训练建议')
     expect(markdown).toContain('先做一次模拟面试')
     expect(markdown).toContain('暂无题目')
