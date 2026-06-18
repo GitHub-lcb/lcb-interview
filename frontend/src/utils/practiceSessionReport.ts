@@ -1,5 +1,6 @@
 import type {
   DailyPlanCompletion,
+  InterviewFollowUpDefense,
   InterviewAttempt,
   InterviewCriterion,
   InterviewCriterionKey,
@@ -16,6 +17,7 @@ import type {
   StudyProgress,
 } from '../types'
 import { buildDailyPlanCompletion } from './dailyPlanCompletion'
+import { buildInterviewFollowUpDefense } from './interviewFollowUpDefense'
 import { buildInterviewMaterialVault } from './interviewMaterialVault'
 import { buildNextTrainingQueue, formatNextTrainingQueueItemMeta } from './nextTrainingQueue'
 
@@ -131,6 +133,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionQueueProfile(report.queueProfile),
     renderSessionDailyClosure(queue, progress, now),
     renderSessionMaterialVault(queue, progress),
+    renderSessionFollowUpDefense(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -171,6 +174,27 @@ export function buildPracticeSessionMaterialVault(
   )
 
   return buildInterviewMaterialVault({
+    ...context,
+    interviewAttempts,
+  })
+}
+
+export function buildPracticeSessionFollowUpDefense(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): InterviewFollowUpDefense {
+  const queueIdSet = new Set(
+    queue
+      .map(item => item.id)
+      .filter(questionId => Number.isFinite(questionId) && questionId > 0),
+  )
+  const context = buildPracticeSessionProgressContext(queue, progress)
+  const interviewAttempts = Object.fromEntries(
+    Object.entries(context.interviewAttempts)
+      .filter(([questionId]) => queueIdSet.has(Number(questionId))),
+  )
+
+  return buildInterviewFollowUpDefense({
     ...context,
     interviewAttempts,
   })
@@ -290,6 +314,42 @@ function renderSessionMaterialVault(
       `   - 片段：${snippet.content}`,
       `   - 原因：${snippet.reason}`,
       `   - 入口：${snippet.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFollowUpDefense(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): string {
+  const defense = buildPracticeSessionFollowUpDefense(queue, progress)
+  const lines = [
+    '## 本轮追问防线',
+    `- 状态：${defense.title}`,
+    `- 摘要：${defense.summary}`,
+    `- 主行动：${defense.primaryAction.label}，${defense.primaryAction.description}（${defense.primaryAction.to}）`,
+    '',
+  ]
+
+  if (defense.items.length === 0) {
+    return [
+      ...lines,
+      '- 暂无本轮追问防线。完成一次模拟面试后，战报会自动生成可防守追问。',
+      '',
+    ].join('\n')
+  }
+
+  defense.items.slice(0, 5).forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.title}`,
+      `   - 维度：${item.criterionLabel}`,
+      `   - 得分：${item.score} 分`,
+      `   - 追问：${item.prompt}`,
+      `   - 压力点：${item.pressurePoint}`,
+      `   - 回答引导：${item.answerGuide}`,
+      `   - 入口：${item.to}`,
     )
   })
 

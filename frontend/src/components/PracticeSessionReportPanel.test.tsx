@@ -78,7 +78,7 @@ describe('PracticeSessionReportPanel', () => {
     )
 
     expect(screen.getByText('下一轮训练')).toBeInTheDocument()
-    expect(screen.getByText('Java 面试题 1')).toBeInTheDocument()
+    expect(screen.getAllByText('Java 面试题 1').length).toBeGreaterThan(0)
     expect(screen.getByRole('button', { name: /开始下一轮训练/ })).toBeInTheDocument()
     expect(screen.getByText('本轮模拟面试战报')).toBeInTheDocument()
     expect(screen.getByText('本轮正在推进')).toBeInTheDocument()
@@ -134,6 +134,33 @@ describe('PracticeSessionReportPanel', () => {
     await userEvent.click(within(materialBlock).getByRole('button', { name: /Java 面试题 1/ }))
 
     expect(onNavigate).toHaveBeenCalledWith('/question/1')
+  })
+
+  it('renders follow-up defenses from the current session queue', async () => {
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 45)],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const defenseBlock = screen.getByLabelText('本轮追问防线')
+
+    expect(within(defenseBlock).getByText('本轮追问防线')).toBeInTheDocument()
+    expect(within(defenseBlock).getAllByText('Java 面试题 1').length).toBeGreaterThan(0)
+    expect(within(defenseBlock).getByText(/表达结构/)).toBeInTheDocument()
+
+    await userEvent.click(within(defenseBlock).getAllByRole('button', { name: /Java 面试题 1/ })[0])
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1')
   })
 
   it('keeps the queue profile actionable for empty sessions', () => {

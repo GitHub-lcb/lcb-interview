@@ -6,6 +6,7 @@ import {
   HighlightOutlined,
   PlayCircleOutlined,
   ReloadOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons'
 import { Button, message } from 'antd'
 import { useMemo } from 'react'
@@ -19,6 +20,7 @@ import type {
 import { formatNextTrainingQueueItemMeta } from '../utils/nextTrainingQueue'
 import {
   buildPracticeSessionDailyCompletion,
+  buildPracticeSessionFollowUpDefense,
   buildPracticeSessionMaterialVault,
   buildPracticeSessionNextTrainingQueue,
   buildPracticeSessionReport,
@@ -66,6 +68,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionMaterialVault = useMemo(
     () => buildPracticeSessionMaterialVault(queue, progress),
+    [progress, queue],
+  )
+  const sessionFollowUpDefense = useMemo(
+    () => buildPracticeSessionFollowUpDefense(queue, progress),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -209,6 +215,35 @@ export default function PracticeSessionReportPanel({
                 <strong>{snippet.title}</strong>
                 <span>{snippet.label} · {snippet.score} 分</span>
                 <small>{snippet.content}</small>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="practice-session-report-follow-up-defense" aria-label="本轮追问防线">
+        <div className="practice-session-report-follow-up-defense-head">
+          <div>
+            <span>本轮追问防线</span>
+            <small>{sessionFollowUpDefense.summary}</small>
+          </div>
+          <Button
+            size="small"
+            icon={<ThunderboltOutlined />}
+            onClick={() => onNavigate(sessionFollowUpDefense.primaryAction.to)}
+          >
+            {sessionFollowUpDefense.primaryAction.label}
+          </Button>
+        </div>
+        {sessionFollowUpDefense.items.length === 0 ? (
+          <p>暂无本轮追问防线。完成一次模拟面试后，战报会自动生成可防守追问。</p>
+        ) : (
+          <div className="practice-session-report-follow-up-defense-list">
+            {sessionFollowUpDefense.items.slice(0, 3).map(item => (
+              <button key={item.id} type="button" onClick={() => onNavigate(item.to)}>
+                <strong>{item.title}</strong>
+                <span>{item.criterionLabel} · {item.score} 分</span>
+                <small>{item.pressurePoint}</small>
               </button>
             ))}
           </div>

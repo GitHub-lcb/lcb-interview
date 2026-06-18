@@ -7434,6 +7434,102 @@ p {
   font-size: 12px;
 }
 
+.practice-session-report-follow-up-defense {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #FFF1F2;
+  border: 1px solid #FDA4AF;
+  border-radius: 8px;
+}
+
+.practice-session-report-follow-up-defense-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.practice-session-report-follow-up-defense-head > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-follow-up-defense-head span {
+  color: #9F1239;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-follow-up-defense-head small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #BE123C;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-follow-up-defense-head .ant-btn {
+  flex: 0 0 auto;
+  max-width: 136px;
+}
+
+.practice-session-report-follow-up-defense p {
+  margin: 0;
+  color: #BE123C;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.practice-session-report-follow-up-defense-list {
+  display: grid;
+  gap: 6px;
+}
+
+.practice-session-report-follow-up-defense-list button {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  text-align: left;
+  background: #FFFFFF;
+  border: 1px solid #FECDD3;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.practice-session-report-follow-up-defense-list button:hover {
+  border-color: #F43F5E;
+}
+
+.practice-session-report-follow-up-defense-list strong,
+.practice-session-report-follow-up-defense-list span,
+.practice-session-report-follow-up-defense-list small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-follow-up-defense-list strong {
+  color: #0F172A;
+  font-size: 13px;
+}
+
+.practice-session-report-follow-up-defense-list span {
+  color: #9F1239;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.practice-session-report-follow-up-defense-list small {
+  color: #64748B;
+  font-size: 12px;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;
