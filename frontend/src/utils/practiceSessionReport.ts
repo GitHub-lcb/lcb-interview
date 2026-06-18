@@ -19,6 +19,8 @@ import type {
   PracticeSessionInterviewerDecision,
   PracticeSessionFirstQuestionRehearsal,
   PracticeSessionFirstQuestionReceipt,
+  PracticeSessionFirstQuestionReceiptAcceptance,
+  PracticeSessionFirstQuestionReceiptAcceptanceItem,
   PracticeSessionFirstQuestionReceiptItem,
   PracticeSessionFirstQuestionRubric,
   PracticeSessionFirstQuestionRubricItem,
@@ -245,6 +247,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFirstQuestionRehearsal(queue, progress, now),
     renderSessionFirstQuestionRubric(queue, progress, now),
     renderSessionFirstQuestionReceipt(queue, progress, now),
+    renderSessionFirstQuestionReceiptAcceptance(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1464,6 +1467,46 @@ export function buildPracticeSessionFirstQuestionReceipt(
   }
 }
 
+export function buildPracticeSessionFirstQuestionReceiptAcceptance(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionReceiptAcceptance {
+  const receipt = buildPracticeSessionFirstQuestionReceipt(queue, progress, now)
+
+  if (receipt.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待验收首题回执',
+      summary: '先生成首题回执模板，再检查动作、证据、结论和下一步是否闭环。',
+      items: [],
+      primaryAction: {
+        kind: receipt.primaryAction.kind,
+        label: '建立验收卡',
+        description: '先生成首题回执模板，再验收回执质量。',
+        to: receipt.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = receipt.status === 'repair'
+
+  return {
+    status: receipt.status,
+    title: repairMode ? '回修回执验收卡' : '首题回执验收卡',
+    summary: repairMode
+      ? '检查回修首题回执是否能证明阻断项已经减少。'
+      : '检查首题回执是否能证明已经留下新的评分样本。',
+    items: buildFirstQuestionReceiptAcceptanceItems(receipt, repairMode),
+    primaryAction: {
+      kind: receipt.primaryAction.kind,
+      label: '验收首题回执',
+      description: repairMode ? '回到回修入口，补齐未通过的回执字段。' : '回到首题入口，补齐未通过的回执字段。',
+      to: receipt.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -2415,6 +2458,40 @@ function renderSessionFirstQuestionReceipt(
       `${index + 1}. ${item.label}`,
       `   - 填写项：${item.prompt}`,
       `   - 示例：${item.example}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionReceiptAcceptance(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const acceptance = buildPracticeSessionFirstQuestionReceiptAcceptance(queue, progress, now)
+  const lines = [
+    '## 首题回执验收卡',
+    `- 状态：${acceptance.title}`,
+    `- 摘要：${acceptance.summary}`,
+    `- 主行动：${acceptance.primaryAction.label}，${acceptance.primaryAction.description}（${acceptance.primaryAction.to}）`,
+    '',
+  ]
+
+  if (acceptance.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待验收首题回执。先生成首题回执模板后，系统会给出验收口径。',
+      '',
+    ].join('\n')
+  }
+
+  acceptance.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 目标：${item.target}`,
+      `   - 检查：${item.check}`,
+      `   - 未通过补救：${item.fallbackAction}`,
     )
   })
 
@@ -3964,6 +4041,58 @@ function findFirstQuestionRubricItem(
   id: string,
 ): PracticeSessionFirstQuestionRubricItem | undefined {
   return rubric.items.find(item => item.id === id)
+}
+
+function buildFirstQuestionReceiptAcceptanceItems(
+  receipt: PracticeSessionFirstQuestionReceipt,
+  repairMode: boolean,
+): PracticeSessionFirstQuestionReceiptAcceptanceItem[] {
+  const action = findFirstQuestionReceiptItem(receipt, 'receipt-action')
+  const evidence = findFirstQuestionReceiptItem(receipt, 'receipt-evidence')
+  const result = findFirstQuestionReceiptItem(receipt, 'receipt-result')
+  const nextStep = findFirstQuestionReceiptItem(receipt, 'receipt-next-step')
+
+  return [
+    {
+      id: 'accept-action-clear',
+      label: '动作明确',
+      target: action?.prompt ?? '写清本次首题动作。',
+      check: repairMode ? '必须能看出本次先修哪一个阻断项。' : '必须能看出本次回答的是哪一道首题。',
+      fallbackAction: action ? `按「${action.label}」补齐动作描述。` : '回到首题回执模板，补齐动作描述。',
+      priority: 1,
+    },
+    {
+      id: 'accept-evidence-traceable',
+      label: '证据可查',
+      target: evidence?.prompt ?? '写清评分或回修证据。',
+      check: '必须包含可追溯的评分、文字样本、回修记录或回执依据。',
+      fallbackAction: evidence ? `按「${evidence.label}」补齐证据。` : '回到首题回执模板，补齐证据。',
+      priority: 2,
+    },
+    {
+      id: 'accept-result-judgeable',
+      label: '结论可判',
+      target: result?.prompt ?? '写清是否达标。',
+      check: repairMode ? '必须能判断阻断项是否减少。' : '必须能判断首题是否形成强通过样本。',
+      fallbackAction: result ? `按「${result.label}」补齐达标结论。` : '回到首题回执模板，补齐达标结论。',
+      priority: 3,
+    },
+    {
+      id: 'accept-next-step-executable',
+      label: '下一步可执行',
+      target: nextStep?.prompt ?? '写清下一步入口。',
+      check: '必须落到继续回修、重答首题或进入下一轮的明确入口。',
+      fallbackAction: nextStep ? `按「${nextStep.label}」补齐下一步。` : '回到首题回执模板，补齐下一步。',
+      priority: 4,
+    },
+  ]
+}
+
+function findFirstQuestionReceiptItem(
+  receipt: PracticeSessionFirstQuestionReceipt,
+  id: string,
+): PracticeSessionFirstQuestionReceiptItem | undefined {
+  return receipt.items.find(item => item.id === id)
 }
 
 function buildPracticeSessionScriptCommandItem(

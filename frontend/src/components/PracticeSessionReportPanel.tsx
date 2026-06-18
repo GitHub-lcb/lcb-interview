@@ -27,6 +27,7 @@ import {
   buildPracticeSessionEvidenceGaps,
   buildPracticeSessionFirstQuestionRehearsal,
   buildPracticeSessionFirstQuestionReceipt,
+  buildPracticeSessionFirstQuestionReceiptAcceptance,
   buildPracticeSessionFirstQuestionRubric,
   buildPracticeSessionFollowUpDefense,
   buildPracticeSessionInterviewerDecision,
@@ -203,6 +204,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionFirstQuestionReceipt = useMemo(
     () => buildPracticeSessionFirstQuestionReceipt(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionFirstQuestionReceiptAcceptance = useMemo(
+    () => buildPracticeSessionFirstQuestionReceiptAcceptance(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1257,6 +1262,48 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionFirstQuestionReceipt.primaryAction.to)}
         >
           {sessionFirstQuestionReceipt.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-first-receipt-acceptance status-${sessionFirstQuestionReceiptAcceptance.status}`}
+        aria-label="首题回执验收卡"
+      >
+        <div className="practice-session-report-first-receipt-acceptance-head">
+          <div>
+            <span>首题回执验收卡</span>
+            <strong>{sessionFirstQuestionReceiptAcceptance.title}</strong>
+            <small>{sessionFirstQuestionReceiptAcceptance.summary}</small>
+          </div>
+        </div>
+        {sessionFirstQuestionReceiptAcceptance.items.length === 0 ? (
+          <p>等待验收首题回执。先生成首题回执模板后，系统会给出验收口径。</p>
+        ) : (
+          <div className="practice-session-report-first-receipt-acceptance-list">
+            {sessionFirstQuestionReceiptAcceptance.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.target}</strong>
+                </div>
+                <dl>
+                  <dt>检查</dt>
+                  <dd>{item.check}</dd>
+                  <dt>未通过补救</dt>
+                  <dd>{item.fallbackAction}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionFirstQuestionReceiptAcceptance.status === 'repair'}
+          icon={sessionFirstQuestionReceiptAcceptance.status === 'repair' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionFirstQuestionReceiptAcceptance.primaryAction.to)}
+        >
+          {sessionFirstQuestionReceiptAcceptance.primaryAction.label}
         </Button>
       </div>
 

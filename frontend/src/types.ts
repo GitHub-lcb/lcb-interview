@@ -1210,6 +1210,25 @@ export interface PracticeSessionFirstQuestionReceipt {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionFirstQuestionReceiptAcceptanceStatus = 'empty' | 'repair' | 'ready'
+
+export interface PracticeSessionFirstQuestionReceiptAcceptanceItem {
+  id: string
+  label: string
+  target: string
+  check: string
+  fallbackAction: string
+  priority: number
+}
+
+export interface PracticeSessionFirstQuestionReceiptAcceptance {
+  status: PracticeSessionFirstQuestionReceiptAcceptanceStatus
+  title: string
+  summary: string
+  items: PracticeSessionFirstQuestionReceiptAcceptanceItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'
