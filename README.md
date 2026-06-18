@@ -45,11 +45,12 @@ lcb-interview/
 
 ### 1. 数据库初始化
 
-```sql
-CREATE DATABASE IF NOT EXISTS lcb_interview DEFAULT CHARSET utf8mb4;
-SOURCE backend/src/main/resources/schema.sql;
-SOURCE backend/src/main/resources/data.sql;
+```bash
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS lcb_interview DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p lcb_interview < backend/scripts/sql/init.sql
 ```
+
+`init.sql` 会先清空并重建 `category`、`tag`、`question`、`question_tag` 四张表，然后导入完整题库数据。
 
 ### 2. 启动后端
 
