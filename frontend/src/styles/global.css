@@ -9606,6 +9606,128 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-training-receipt {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #F5F3FF;
+  border: 1px solid #DDD6FE;
+  border-radius: 8px;
+}
+
+.practice-session-report-training-receipt.status-repair {
+  background: #FFF7ED;
+  border-color: #FDBA74;
+}
+
+.practice-session-report-training-receipt.status-advance {
+  background: #EFF6FF;
+  border-color: #BFDBFE;
+}
+
+.practice-session-report-training-receipt-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.practice-session-report-training-receipt-head > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-training-receipt-head span {
+  color: #6D28D9;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-training-receipt.status-repair .practice-session-report-training-receipt-head span {
+  color: #C2410C;
+}
+
+.practice-session-report-training-receipt.status-advance .practice-session-report-training-receipt-head span {
+  color: #1D4ED8;
+}
+
+.practice-session-report-training-receipt-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-training-receipt-head small,
+.practice-session-report-training-receipt p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.practice-session-report-training-receipt-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.practice-session-report-training-receipt-list article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #DDD6FE;
+  border-radius: 8px;
+}
+
+.practice-session-report-training-receipt.status-repair .practice-session-report-training-receipt-list article {
+  border-color: #FED7AA;
+}
+
+.practice-session-report-training-receipt.status-advance .practice-session-report-training-receipt-list article {
+  border-color: #BFDBFE;
+}
+
+.practice-session-report-training-receipt-list strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-training-receipt-list span,
+.practice-session-report-training-receipt-list small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-training-receipt-list span {
+  color: #4C1D95;
+  font-weight: 800;
+}
+
+.practice-session-report-training-receipt.status-repair .practice-session-report-training-receipt-list span {
+  color: #9A3412;
+}
+
+.practice-session-report-training-receipt.status-advance .practice-session-report-training-receipt-list span {
+  color: #1E40AF;
+}
+
+.practice-session-report-training-receipt .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;
@@ -10249,6 +10371,7 @@ p {
   .practice-session-report-training-contract-list,
   .practice-session-report-training-schedule-list,
   .practice-session-report-schedule-checklist-list,
+  .practice-session-report-training-receipt-list,
   .free-promise-band,
   .practice-feedback-lists {
     grid-template-columns: 1fr;

@@ -34,6 +34,8 @@ import type {
   PracticeSessionScheduleChecklistItem,
   PracticeSessionTrainingContract,
   PracticeSessionTrainingContractItem,
+  PracticeSessionTrainingReceipt,
+  PracticeSessionTrainingReceiptItem,
   PracticeSessionTrainingSchedule,
   PracticeSessionTrainingScheduleItem,
   PracticeSessionReport,
@@ -215,6 +217,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionTrainingContract(queue, progress, now),
     renderSessionTrainingSchedule(queue, progress, now),
     renderSessionScheduleChecklist(queue, progress, now),
+    renderSessionTrainingReceipt(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1052,6 +1055,52 @@ export function buildPracticeSessionScheduleChecklist(
   }
 }
 
+export function buildPracticeSessionTrainingReceipt(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionTrainingReceipt {
+  const contract = buildPracticeSessionTrainingContract(queue, progress, now)
+  const checklist = buildPracticeSessionScheduleChecklist(queue, progress, now)
+
+  if (checklist.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待生成训练回执',
+      summary: '先完成一次模拟面试并生成打卡清单，再填写训练回执。',
+      items: [],
+      primaryAction: {
+        kind: checklist.primaryAction.kind,
+        label: '建立回执样本',
+        description: '先完成一次模拟面试，让系统生成可填写的训练回执。',
+        to: checklist.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = checklist.status === 'repair'
+  const items = buildTrainingReceiptItems({
+    contract,
+    checklist,
+    repairMode,
+  })
+
+  return {
+    status: checklist.status,
+    title: repairMode ? '修复回执模板' : '推进回执模板',
+    summary: repairMode
+      ? '把修复目标、完成证据、阻断项和下一步写清楚，避免低分问题反复出现。'
+      : '把推进目标、完成证据、剩余风险和下一步写清楚，确保下一轮继续增压。',
+    items,
+    primaryAction: {
+      kind: checklist.primaryAction.kind,
+      label: '填写训练回执',
+      description: '按模板记录本轮训练结果，再进入下一轮判断。',
+      to: checklist.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -1738,6 +1787,39 @@ function renderSessionScheduleChecklist(
       `   - 证据模板：${item.evidenceTemplate}`,
       `   - 复盘问题：${item.reviewQuestion}`,
       `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionTrainingReceipt(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const receipt = buildPracticeSessionTrainingReceipt(queue, progress, now)
+  const lines = [
+    '## 训练回执模板',
+    `- 状态：${receipt.title}`,
+    `- 摘要：${receipt.summary}`,
+    `- 主行动：${receipt.primaryAction.label}，${receipt.primaryAction.description}（${receipt.primaryAction.to}）`,
+    '',
+  ]
+
+  if (receipt.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待生成训练回执。先完成一次模拟面试并生成打卡清单后，系统会给出可填写模板。',
+      '',
+    ].join('\n')
+  }
+
+  receipt.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 填写提示：${item.prompt}`,
+      `   - 示例：${item.example}`,
     )
   })
 
@@ -2956,6 +3038,54 @@ function buildScheduleReviewQuestion(
   }
 
   return status === 'repair' ? '三项通过门槛是否都达标？' : '新证据包是否足够支撑继续加题？'
+}
+
+function buildTrainingReceiptItems({
+  contract,
+  checklist,
+  repairMode,
+}: {
+  contract: PracticeSessionTrainingContract
+  checklist: PracticeSessionScheduleChecklist
+  repairMode: boolean
+}): PracticeSessionTrainingReceiptItem[] {
+  const targetValue = contract.items.find(item => item.id === 'target-score')?.value ?? '80 分以上'
+  const queueValue = contract.items.find(item => item.id === 'training-queue')?.value ?? contract.primaryAction.to
+  const acceptanceValue = contract.items.find(item => item.id === 'acceptance-rule')?.value ?? '均分达标、弱项清零、提交稿可复述'
+  const evidenceTemplate = checklist.items[0]?.evidenceTemplate ?? '我已完成本轮训练，结果证据是：'
+
+  return [
+    {
+      id: 'training-target',
+      label: '训练目标',
+      prompt: `写清本轮目标分和训练题组：${targetValue}，${queueValue}。`,
+      example: `本轮目标：${targetValue}；题组：${queueValue}。`,
+      priority: 1,
+    },
+    {
+      id: 'completion-evidence',
+      label: '完成证据',
+      prompt: '粘贴最关键的一条打卡证据，说明你确实完成了开口训练。',
+      example: evidenceTemplate,
+      priority: 2,
+    },
+    {
+      id: 'blocking-risk',
+      label: '阻断项',
+      prompt: repairMode
+        ? `对照 ${acceptanceValue} 写出仍未通过的阻断项。`
+        : '写出推进后仍可能被追问的风险点，没有则写“暂无阻断”。',
+      example: repairMode ? `当前阻断：${acceptanceValue} 中仍有一项未达标。` : '当前阻断：暂无，下一轮继续加压验证。',
+      priority: 3,
+    },
+    {
+      id: 'next-step',
+      label: '下一步',
+      prompt: repairMode ? '如果阻断仍存在，回到本轮队列继续修复；如果清零，再进入下一轮。' : '进入下一轮个性化训练，并用新战报继续验收。',
+      example: repairMode ? `下一步：回到 ${contract.primaryAction.to} 继续修复。` : `下一步：进入 ${contract.primaryAction.to} 继续训练。`,
+      priority: 4,
+    },
+  ]
 }
 
 function buildPracticeSessionScriptCommandItem(

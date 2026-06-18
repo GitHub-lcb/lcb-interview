@@ -42,6 +42,7 @@ import {
   buildPracticeSessionScheduleChecklist,
   buildPracticeSessionScriptCommand,
   buildPracticeSessionTrainingContract,
+  buildPracticeSessionTrainingReceipt,
   buildPracticeSessionTrainingSchedule,
 } from '../utils/practiceSessionReport'
 import { buildInterviewRecoveryPlan } from '../utils/interviewRecoveryPlan'
@@ -163,6 +164,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionScheduleChecklist = useMemo(
     () => buildPracticeSessionScheduleChecklist(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionTrainingReceipt = useMemo(
+    () => buildPracticeSessionTrainingReceipt(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -928,6 +933,38 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionScheduleChecklist.primaryAction.to)}
         >
           {sessionScheduleChecklist.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className={`practice-session-report-training-receipt status-${sessionTrainingReceipt.status}`} aria-label="训练回执模板">
+        <div className="practice-session-report-training-receipt-head">
+          <div>
+            <span>训练回执模板</span>
+            <strong>{sessionTrainingReceipt.title}</strong>
+            <small>{sessionTrainingReceipt.summary}</small>
+          </div>
+        </div>
+        {sessionTrainingReceipt.items.length === 0 ? (
+          <p>等待生成训练回执。先完成一次模拟面试并生成打卡清单后，系统会给出可填写模板。</p>
+        ) : (
+          <div className="practice-session-report-training-receipt-list">
+            {sessionTrainingReceipt.items.map(item => (
+              <article key={item.id}>
+                <strong>{item.label}</strong>
+                <span>{item.prompt}</span>
+                <small>{item.example}</small>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionTrainingReceipt.status === 'repair'}
+          icon={sessionTrainingReceipt.status === 'repair' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionTrainingReceipt.primaryAction.to)}
+        >
+          {sessionTrainingReceipt.primaryAction.label}
         </Button>
       </div>
 
