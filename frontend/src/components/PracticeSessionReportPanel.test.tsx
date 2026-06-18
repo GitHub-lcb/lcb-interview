@@ -1082,6 +1082,40 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders first question review archive before the next session round', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const archive = screen.getByLabelText('首题复盘归档包')
+
+    expect(within(archive).getByText('首题复盘归档包')).toBeInTheDocument()
+    expect(within(archive).getByText('回修复盘归档包')).toBeInTheDocument()
+    expect(within(archive).getByText('分数快照')).toBeInTheDocument()
+    expect(within(archive).getByText('证据归档')).toBeInTheDocument()
+    expect(within(archive).getByText('阻断结论')).toBeInTheDocument()
+    expect(within(archive).getByText('下一题种子')).toBeInTheDocument()
+    expect(within(archive).getAllByText('下一轮用途').length).toBeGreaterThan(0)
+    expect(within(archive).getAllByText('丢失风险').length).toBeGreaterThan(0)
+
+    await user.click(within(archive).getByRole('button', { name: /归档首题复盘/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

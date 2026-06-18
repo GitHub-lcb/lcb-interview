@@ -26,6 +26,8 @@ import type {
   PracticeSessionFirstQuestionReleaseGateItem,
   PracticeSessionFirstQuestionReviewAcceptance,
   PracticeSessionFirstQuestionReviewAcceptanceItem,
+  PracticeSessionFirstQuestionReviewArchive,
+  PracticeSessionFirstQuestionReviewArchiveItem,
   PracticeSessionFirstQuestionReviewTemplate,
   PracticeSessionFirstQuestionReviewTemplateItem,
   PracticeSessionFirstQuestionRubric,
@@ -263,6 +265,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFirstQuestionReleaseGate(queue, progress, now),
     renderSessionFirstQuestionReviewTemplate(queue, progress, now),
     renderSessionFirstQuestionReviewAcceptance(queue, progress, now),
+    renderSessionFirstQuestionReviewArchive(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1645,6 +1648,47 @@ export function buildPracticeSessionFirstQuestionReviewAcceptance(
   }
 }
 
+export function buildPracticeSessionFirstQuestionReviewArchive(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionReviewArchive {
+  const acceptance = buildPracticeSessionFirstQuestionReviewAcceptance(queue, progress, now)
+  const nextTraining = buildPracticeSessionNextTrainingQueue(queue, progress, now, 3)
+
+  if (acceptance.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待首题复盘归档',
+      summary: '先验收首题复盘，再把评分、证据、阻断和下一题动作整理成下一轮输入。',
+      items: [],
+      primaryAction: {
+        kind: acceptance.primaryAction.kind,
+        label: '建立复盘归档',
+        description: '先验收首题复盘，再整理下一轮输入。',
+        to: acceptance.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = acceptance.status === 'repair'
+
+  return {
+    status: acceptance.status,
+    title: repairMode ? '回修复盘归档包' : '首题复盘归档包',
+    summary: repairMode
+      ? '把回修首题的评分、证据和阻断结论保存成可继续修复的输入。'
+      : '把下一轮首题样本保存成后续加压训练可以复用的输入。',
+    items: buildFirstQuestionReviewArchiveItems(acceptance, nextTraining.items[0], repairMode),
+    primaryAction: {
+      kind: acceptance.primaryAction.kind,
+      label: '归档首题复盘',
+      description: repairMode ? '回到首题入口，补齐可归档的回修证据。' : '回到下一轮首题，补齐可归档的复盘证据。',
+      to: acceptance.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -2734,6 +2778,41 @@ function renderSessionFirstQuestionReviewAcceptance(
       `   - 目标：${item.target}`,
       `   - 检查：${item.check}`,
       `   - 未通过补救：${item.fallbackAction}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionReviewArchive(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const archive = buildPracticeSessionFirstQuestionReviewArchive(queue, progress, now)
+  const lines = [
+    '## 首题复盘归档包',
+    `- 状态：${archive.title}`,
+    `- 摘要：${archive.summary}`,
+    `- 主行动：${archive.primaryAction.label}，${archive.primaryAction.description}（${archive.primaryAction.to}）`,
+    '',
+  ]
+
+  if (archive.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待首题复盘归档。先完成首题复盘验收后，系统会整理下一轮输入。',
+      '',
+    ].join('\n')
+  }
+
+  archive.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 来源：${item.source}`,
+      `   - 归档内容：${item.content}`,
+      `   - 下一轮用途：${item.nextUse}`,
+      `   - 丢失风险：${item.lossRisk}`,
     )
   })
 
@@ -4490,11 +4569,71 @@ function buildFirstQuestionReviewAcceptanceItems(
   ]
 }
 
+function buildFirstQuestionReviewArchiveItems(
+  acceptance: PracticeSessionFirstQuestionReviewAcceptance,
+  firstNextItem: NextTrainingQueueItem | undefined,
+  repairMode: boolean,
+): PracticeSessionFirstQuestionReviewArchiveItem[] {
+  const score = findFirstQuestionReviewAcceptanceItem(acceptance, 'accept-review-score-comparable')
+  const evidence = findFirstQuestionReviewAcceptanceItem(acceptance, 'accept-review-evidence-traceable')
+  const blocker = findFirstQuestionReviewAcceptanceItem(acceptance, 'accept-review-blocker-judgeable')
+  const nextAction = findFirstQuestionReviewAcceptanceItem(acceptance, 'accept-review-next-action-executable')
+  const nextQuestionTitle = firstNextItem?.title ?? '下一轮第一题'
+
+  return [
+    {
+      id: 'archive-review-score-snapshot',
+      label: '分数快照',
+      source: score?.target ?? '首题复盘评分变化。',
+      content: repairMode ? '保存回修前后分数和仍低于 80 的维度。' : '保存本轮基线、首题得分和分差。',
+      nextUse: repairMode ? '判断同一阻断项是否真的被修复。' : '作为下一轮首题加压后的对照基线。',
+      lossRisk: '没有分数快照，下一轮只能凭感觉判断是否进步。',
+      priority: 1,
+    },
+    {
+      id: 'archive-review-evidence',
+      label: '证据归档',
+      source: evidence?.target ?? '首题复盘证据变化。',
+      content: '保存回答文本、评分理由、场景指标或回修记录。',
+      nextUse: repairMode ? '复核回修动作是否真的补上证据。' : '支撑下一轮继续追问，而不是重新从零找素材。',
+      lossRisk: '没有证据归档，后续复盘无法追溯为什么通过或失败。',
+      priority: 2,
+    },
+    {
+      id: 'archive-review-blocker',
+      label: '阻断结论',
+      source: blocker?.target ?? '首题复盘阻断变化。',
+      content: repairMode ? '归档原阻断是否减少，以及剩余阻断是什么。' : '归档是否出现新的阻断项，以及是否允许继续加压。',
+      nextUse: repairMode ? '决定继续回修还是重新申请放行。' : '决定下一轮训练是扩题量还是先压同一弱项。',
+      lossRisk: '没有阻断结论，下一轮容易跳过真正卡住通过的原因。',
+      priority: 3,
+    },
+    {
+      id: 'archive-review-next-seed',
+      label: '下一题种子',
+      source: nextAction?.target ?? '首题复盘下一题动作。',
+      content: firstNextItem
+        ? `优先带入「${nextQuestionTitle}」，并保留当前复盘口径。`
+        : '把下一题动作写成具体入口、题目或回修对象。',
+      nextUse: repairMode ? '让回修后的第一步可执行，避免再次空转。' : '把首题复盘直接转成下一轮第一步。',
+      lossRisk: '没有下一题种子，复盘结束后仍然不知道下一步练哪道题。',
+      priority: 4,
+    },
+  ]
+}
+
 function findFirstQuestionReviewTemplateItem(
   template: PracticeSessionFirstQuestionReviewTemplate,
   id: string,
 ): PracticeSessionFirstQuestionReviewTemplateItem | undefined {
   return template.items.find(item => item.id === id)
+}
+
+function findFirstQuestionReviewAcceptanceItem(
+  acceptance: PracticeSessionFirstQuestionReviewAcceptance,
+  id: string,
+): PracticeSessionFirstQuestionReviewAcceptanceItem | undefined {
+  return acceptance.items.find(item => item.id === id)
 }
 
 function buildPracticeSessionScriptCommandItem(

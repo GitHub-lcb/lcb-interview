@@ -30,6 +30,7 @@ import {
   buildPracticeSessionFirstQuestionReceiptAcceptance,
   buildPracticeSessionFirstQuestionReleaseGate,
   buildPracticeSessionFirstQuestionReviewAcceptance,
+  buildPracticeSessionFirstQuestionReviewArchive,
   buildPracticeSessionFirstQuestionReviewTemplate,
   buildPracticeSessionFirstQuestionRubric,
   buildPracticeSessionFollowUpDefense,
@@ -223,6 +224,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionFirstQuestionReviewAcceptance = useMemo(
     () => buildPracticeSessionFirstQuestionReviewAcceptance(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionFirstQuestionReviewArchive = useMemo(
+    () => buildPracticeSessionFirstQuestionReviewArchive(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1444,6 +1449,50 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionFirstQuestionReviewAcceptance.primaryAction.to)}
         >
           {sessionFirstQuestionReviewAcceptance.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-first-review-archive status-${sessionFirstQuestionReviewArchive.status}`}
+        aria-label="首题复盘归档包"
+      >
+        <div className="practice-session-report-first-review-archive-head">
+          <div>
+            <span>首题复盘归档包</span>
+            <strong>{sessionFirstQuestionReviewArchive.title}</strong>
+            <small>{sessionFirstQuestionReviewArchive.summary}</small>
+          </div>
+        </div>
+        {sessionFirstQuestionReviewArchive.items.length === 0 ? (
+          <p>等待首题复盘归档。先完成首题复盘验收后，系统会整理下一轮输入。</p>
+        ) : (
+          <div className="practice-session-report-first-review-archive-list">
+            {sessionFirstQuestionReviewArchive.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.source}</strong>
+                </div>
+                <dl>
+                  <dt>归档内容</dt>
+                  <dd>{item.content}</dd>
+                  <dt>下一轮用途</dt>
+                  <dd>{item.nextUse}</dd>
+                  <dt>丢失风险</dt>
+                  <dd>{item.lossRisk}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionFirstQuestionReviewArchive.status === 'repair'}
+          icon={sessionFirstQuestionReviewArchive.status === 'repair' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionFirstQuestionReviewArchive.primaryAction.to)}
+        >
+          {sessionFirstQuestionReviewArchive.primaryAction.label}
         </Button>
       </div>
 
