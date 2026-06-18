@@ -27,6 +27,7 @@ export interface PracticeSessionPressureProbeItem {
   id: string
   questionId: number
   title: string
+  label: string
   probe: string
   riskSignal: string
   answerGuide: string

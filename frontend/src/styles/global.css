@@ -8587,6 +8587,124 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-pressure-probes {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #FFFBEB;
+  border: 1px solid #FCD34D;
+  border-radius: 8px;
+}
+
+.practice-session-report-pressure-probes-head {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-pressure-probes-head span {
+  color: #854D0E;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-pressure-probes-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-pressure-probes-head small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-pressure-probes p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.practice-session-report-pressure-probes-list {
+  display: grid;
+  gap: 6px;
+}
+
+.practice-session-report-pressure-probes-list article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #FDE68A;
+  border-radius: 8px;
+}
+
+.practice-session-report-pressure-probes-list article > div {
+  display: grid;
+  grid-template-columns: minmax(96px, auto) minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.practice-session-report-pressure-probes-list strong,
+.practice-session-report-pressure-probes-list span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-pressure-probes-list strong {
+  color: #0F172A;
+  font-size: 13px;
+}
+
+.practice-session-report-pressure-probes-list span {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.practice-session-report-pressure-probes-list small,
+.practice-session-report-pressure-probes-list em,
+.practice-session-report-pressure-probes-list b {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-pressure-probes-list small {
+  color: #92400E;
+  font-weight: 800;
+}
+
+.practice-session-report-pressure-probes-list em {
+  color: #B91C1C;
+}
+
+.practice-session-report-pressure-probes-list b {
+  color: #166534;
+}
+
+.practice-session-report-pressure-probes .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;

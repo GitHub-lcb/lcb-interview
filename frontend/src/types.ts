@@ -885,6 +885,29 @@ export interface PracticeSessionReplayChecklist {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionPressureProbeStatus = 'empty' | 'pressure' | 'ready'
+
+export interface PracticeSessionPressureProbeItem {
+  id: string
+  questionId: number
+  title: string
+  label: string
+  probe: string
+  riskSignal: string
+  answerGuide: string
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionPressureProbes {
+  status: PracticeSessionPressureProbeStatus
+  title: string
+  summary: string
+  totalCount: number
+  items: PracticeSessionPressureProbeItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

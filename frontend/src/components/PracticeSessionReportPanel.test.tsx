@@ -463,6 +463,36 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders pressure probes from the current session queue', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const probesBlock = screen.getByLabelText('本轮压力追问卡')
+
+    expect(within(probesBlock).getByText('本轮压力追问卡')).toBeInTheDocument()
+    expect(within(probesBlock).getByText('落地证据追问')).toBeInTheDocument()
+    expect(within(probesBlock).getByText('失败边界追问')).toBeInTheDocument()
+    expect(within(probesBlock).getByText('技术取舍追问')).toBeInTheDocument()
+
+    await user.click(within(probesBlock).getByRole('button', { name: /开始压力追问/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

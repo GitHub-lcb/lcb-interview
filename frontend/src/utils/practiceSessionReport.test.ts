@@ -444,6 +444,25 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('主行动：按清单重答')
   })
 
+  it('exports pressure probes for the current session queue', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1), question(2)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 62, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+          2: [attempt(2, 72, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+        },
+      }),
+      NOW,
+    )
+
+    expect(markdown).toContain('## 本轮压力追问卡')
+    expect(markdown).toContain('1. 落地证据追问')
+    expect(markdown).toContain('2. 失败边界追问')
+    expect(markdown).toContain('3. 技术取舍追问')
+    expect(markdown).toContain('主行动：开始压力追问')
+  })
+
   it('keeps empty session markdown actionable', () => {
     const markdown = buildPracticeSessionReportMarkdown([], progress(), NOW)
 
@@ -474,6 +493,8 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('等待生成复述卡')
     expect(markdown).toContain('## 本轮复述验收清单')
     expect(markdown).toContain('等待生成验收清单')
+    expect(markdown).toContain('## 本轮压力追问卡')
+    expect(markdown).toContain('等待生成压力追问')
     expect(markdown).toContain('## 下一轮训练建议')
     expect(markdown).toContain('先做一次模拟面试')
     expect(markdown).toContain('暂无题目')

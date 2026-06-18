@@ -16,6 +16,8 @@ import type {
   PracticeSessionEvidenceGaps,
   PracticeSessionInterviewerDecision,
   PracticeQueueItem,
+  PracticeSessionPressureProbeItem,
+  PracticeSessionPressureProbes,
   PracticeSessionReplayChecklist,
   PracticeSessionReplayChecklistItem,
   PracticeSessionReplayCardItem,
@@ -191,6 +193,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionEvidenceGaps(queue, progress),
     renderSessionReplayCards(queue, progress),
     renderSessionReplayChecklist(queue, progress),
+    renderSessionPressureProbes(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -649,6 +652,45 @@ export function buildPracticeSessionReplayChecklist(
   }
 }
 
+export function buildPracticeSessionPressureProbes(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): PracticeSessionPressureProbes {
+  const replayCards = buildPracticeSessionReplayCards(queue, progress)
+
+  if (replayCards.items.length === 0) {
+    return {
+      status: 'empty',
+      title: '等待生成压力追问',
+      summary: '先完成一次模拟面试并生成复述卡，系统才能把复述内容推到现场追问。',
+      totalCount: 0,
+      items: [],
+      primaryAction: {
+        kind: replayCards.primaryAction.kind,
+        label: '建立压力样本',
+        description: '先完成一次开口作答，再生成可连续追问的压力卡。',
+        to: replayCards.primaryAction.to,
+      },
+    }
+  }
+
+  const items = buildPressureProbeItems(replayCards.items, replayCards.primaryAction.to)
+
+  return {
+    status: replayCards.status === 'repair' ? 'pressure' : 'ready',
+    title: replayCards.status === 'repair' ? '三连问压测' : '高分追问保温',
+    summary: `已把复述卡升级成 ${items.length} 个现场追问，按顺序回答即可验证抗压稳定性。`,
+    totalCount: items.length,
+    items,
+    primaryAction: {
+      kind: replayCards.primaryAction.kind,
+      label: '开始压力追问',
+      description: '按落地证据、失败边界和技术取舍连续回答。',
+      to: replayCards.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -1069,6 +1111,38 @@ function renderSessionReplayChecklist(queue: PracticeQueueItem[], progress: Stud
       `   - 验收点：${item.description}`,
       `   - 失败信号：${item.failureSignal}`,
       `   - 达标口径：${item.target}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionPressureProbes(queue: PracticeQueueItem[], progress: StudyProgress): string {
+  const probes = buildPracticeSessionPressureProbes(queue, progress)
+  const lines = [
+    '## 本轮压力追问卡',
+    `- 状态：${probes.title}`,
+    `- 摘要：${probes.summary}`,
+    `- 主行动：${probes.primaryAction.label}，${probes.primaryAction.description}（${probes.primaryAction.to}）`,
+    '',
+  ]
+
+  if (probes.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待生成压力追问。先完成一次模拟面试并生成复述卡后，系统会给出现场连问脚本。',
+      '',
+    ].join('\n')
+  }
+
+  probes.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 题目：${item.title}`,
+      `   - 面试官追问：${item.probe}`,
+      `   - 暴露风险：${item.riskSignal}`,
+      `   - 回答口径：${item.answerGuide}`,
       `   - 入口：${item.to}`,
     )
   })
@@ -1904,6 +1978,51 @@ function buildReplayChecklistItems(to: string): PracticeSessionReplayChecklistIt
       to,
     },
   ]
+}
+
+function buildPressureProbeItems(
+  replayCards: PracticeSessionReplayCardItem[],
+  fallbackTo: string,
+): PracticeSessionPressureProbeItem[] {
+  const templates = [
+    {
+      id: 'landing',
+      label: '落地证据追问',
+      probe: '如果这个答案放到你的真实项目里，规模、指标、数据和你的职责分别是什么？',
+      riskSignal: '只能讲概念，讲不出项目规模、触发条件、量化指标或本人动作。',
+      guide: '先补业务场景，再补触发条件、指标变化和你本人负责的决策或实现。',
+    },
+    {
+      id: 'failure-boundary',
+      label: '失败边界追问',
+      probe: '如果方案在高并发、异常数据或依赖故障下失败，你会怎么发现、降级和回滚？',
+      riskSignal: '只讲正向路径，答不出失效信号、降级策略、监控指标和回滚动作。',
+      guide: '用一个失败场景说明监控信号、影响范围、降级动作和恢复验证。',
+    },
+    {
+      id: 'tradeoff',
+      label: '技术取舍追问',
+      probe: '为什么选择这个方案，不选替代方案？成本、收益和边界分别是什么？',
+      riskSignal: '只能背标准方案，无法解释替代方案差异、成本收益和适用边界。',
+      guide: '把主方案、替代方案、选择依据、代价和不适用场景按顺序说清楚。',
+    },
+  ] as const
+
+  return templates.map((template, index) => {
+    const card = replayCards[index % replayCards.length]
+
+    return {
+      id: `${card.id}-${template.id}-probe`,
+      questionId: card.questionId,
+      title: card.title,
+      label: template.label,
+      probe: template.probe,
+      riskSignal: template.riskSignal,
+      answerGuide: `${template.guide} 当前题目先围绕「${card.title}」回答。`,
+      to: card.to || fallbackTo,
+      priority: 100 - index,
+    }
+  })
 }
 
 function buildPracticeSessionScriptCommandItem(

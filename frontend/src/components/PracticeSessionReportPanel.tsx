@@ -29,6 +29,7 @@ import {
   buildPracticeSessionMaterialVault,
   buildPracticeSessionMistakeLedger,
   buildPracticeSessionNextTrainingQueue,
+  buildPracticeSessionPressureProbes,
   buildPracticeSessionRecoveryAcceptance,
   buildPracticeSessionReplayChecklist,
   buildPracticeSessionReplayCards,
@@ -123,6 +124,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionReplayChecklist = useMemo(
     () => buildPracticeSessionReplayChecklist(queue, progress),
+    [progress, queue],
+  )
+  const sessionPressureProbes = useMemo(
+    () => buildPracticeSessionPressureProbes(queue, progress),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -615,6 +620,39 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionReplayChecklist.primaryAction.to)}
         >
           {sessionReplayChecklist.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className="practice-session-report-pressure-probes" aria-label="本轮压力追问卡">
+        <div className="practice-session-report-pressure-probes-head">
+          <span>本轮压力追问卡</span>
+          <strong>{sessionPressureProbes.title}</strong>
+          <small>{sessionPressureProbes.summary}</small>
+        </div>
+        {sessionPressureProbes.items.length === 0 ? (
+          <p>等待生成压力追问。先完成一次模拟面试并生成复述卡后，系统会给出现场连问脚本。</p>
+        ) : (
+          <div className="practice-session-report-pressure-probes-list">
+            {sessionPressureProbes.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <strong>{item.label}</strong>
+                  <span>{item.title}</span>
+                </div>
+                <small>{item.probe}</small>
+                <em>{item.riskSignal}</em>
+                <b>{item.answerGuide}</b>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          icon={<ThunderboltOutlined />}
+          onClick={() => onNavigate(sessionPressureProbes.primaryAction.to)}
+        >
+          {sessionPressureProbes.primaryAction.label}
         </Button>
       </div>
 
