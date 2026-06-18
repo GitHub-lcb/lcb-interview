@@ -1139,6 +1139,26 @@ export interface PracticeSessionLaunchPacket {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionLaunchChecklistStatus = 'empty' | 'repair' | 'ready'
+
+export interface PracticeSessionLaunchChecklistItem {
+  id: string
+  phase: string
+  completionRule: string
+  evidenceTemplate: string
+  reviewQuestion: string
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionLaunchChecklist {
+  status: PracticeSessionLaunchChecklistStatus
+  title: string
+  summary: string
+  items: PracticeSessionLaunchChecklistItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

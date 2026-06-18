@@ -678,6 +678,25 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('主行动：')
   })
 
+  it('exports launch checklist before the next session round', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1), question(2)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 62, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+          2: [attempt(2, 72, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+        },
+      }),
+      NOW,
+    )
+
+    expect(markdown).toContain('## 启动执行清单')
+    expect(markdown).toContain('证据模板')
+    expect(markdown).toContain('复盘问题')
+    expect(markdown).toContain('完成口径')
+    expect(markdown).toContain('主行动：')
+  })
+
   it('keeps empty session markdown actionable', () => {
     const markdown = buildPracticeSessionReportMarkdown([], progress(), NOW)
 
@@ -732,6 +751,8 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('等待建立准入样本')
     expect(markdown).toContain('## 下一轮启动包')
     expect(markdown).toContain('等待建立启动样本')
+    expect(markdown).toContain('## 启动执行清单')
+    expect(markdown).toContain('等待生成启动执行清单')
     expect(markdown).toContain('## 下一轮训练建议')
     expect(markdown).toContain('先做一次模拟面试')
     expect(markdown).toContain('暂无题目')

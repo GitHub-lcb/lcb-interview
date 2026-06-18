@@ -829,6 +829,36 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders launch checklist before the next session round', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const checklist = screen.getByLabelText('启动执行清单')
+
+    expect(within(checklist).getByText('启动执行清单')).toBeInTheDocument()
+    expect(within(checklist).getByText('回修执行清单')).toBeInTheDocument()
+    expect(within(checklist).getAllByText('证据模板').length).toBeGreaterThan(0)
+    expect(within(checklist).getAllByText('复盘问题').length).toBeGreaterThan(0)
+
+    await user.click(within(checklist).getByRole('button', { name: /按清单执行/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

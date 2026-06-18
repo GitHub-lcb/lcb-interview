@@ -27,6 +27,7 @@ import {
   buildPracticeSessionEvidenceGaps,
   buildPracticeSessionFollowUpDefense,
   buildPracticeSessionInterviewerDecision,
+  buildPracticeSessionLaunchChecklist,
   buildPracticeSessionLaunchPacket,
   buildPracticeSessionMaterialVault,
   buildPracticeSessionMistakeLedger,
@@ -183,6 +184,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionLaunchPacket = useMemo(
     () => buildPracticeSessionLaunchPacket(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionLaunchChecklist = useMemo(
+    () => buildPracticeSessionLaunchChecklist(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1080,6 +1085,45 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionLaunchPacket.primaryAction.to)}
         >
           {sessionLaunchPacket.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className={`practice-session-report-launch-checklist status-${sessionLaunchChecklist.status}`} aria-label="启动执行清单">
+        <div className="practice-session-report-launch-checklist-head">
+          <div>
+            <span>启动执行清单</span>
+            <strong>{sessionLaunchChecklist.title}</strong>
+            <small>{sessionLaunchChecklist.summary}</small>
+          </div>
+        </div>
+        {sessionLaunchChecklist.items.length === 0 ? (
+          <p>等待生成启动执行清单。先生成下一轮启动包后，系统会把启动动作转成可核销证据。</p>
+        ) : (
+          <div className="practice-session-report-launch-checklist-list">
+            {sessionLaunchChecklist.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <span>{item.phase}</span>
+                  <strong>{item.completionRule}</strong>
+                </div>
+                <dl>
+                  <dt>证据模板</dt>
+                  <dd>{item.evidenceTemplate}</dd>
+                  <dt>复盘问题</dt>
+                  <dd>{item.reviewQuestion}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionLaunchChecklist.status === 'repair'}
+          icon={sessionLaunchChecklist.status === 'repair' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionLaunchChecklist.primaryAction.to)}
+        >
+          {sessionLaunchChecklist.primaryAction.label}
         </Button>
       </div>
 

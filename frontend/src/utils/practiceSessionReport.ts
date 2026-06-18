@@ -17,6 +17,8 @@ import type {
   PracticeSessionEvidenceGapItem,
   PracticeSessionEvidenceGaps,
   PracticeSessionInterviewerDecision,
+  PracticeSessionLaunchChecklist,
+  PracticeSessionLaunchChecklistItem,
   PracticeSessionLaunchPacket,
   PracticeSessionLaunchPacketItem,
   PracticeSessionPassEvidence,
@@ -233,6 +235,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionReceiptAcceptance(queue, progress, now),
     renderSessionAdvanceGate(queue, progress, now),
     renderSessionLaunchPacket(queue, progress, now),
+    renderSessionLaunchChecklist(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1244,6 +1247,46 @@ export function buildPracticeSessionLaunchPacket(
   }
 }
 
+export function buildPracticeSessionLaunchChecklist(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionLaunchChecklist {
+  const packet = buildPracticeSessionLaunchPacket(queue, progress, now)
+
+  if (packet.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待生成启动执行清单',
+      summary: '先生成下一轮启动包，再把启动动作转成可核销证据。',
+      items: [],
+      primaryAction: {
+        kind: packet.primaryAction.kind,
+        label: '建立执行样本',
+        description: '先完成一次模拟面试并生成下一轮启动包。',
+        to: packet.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = packet.status === 'repair'
+
+  return {
+    status: packet.status,
+    title: repairMode ? '回修执行清单' : '下一轮执行清单',
+    summary: repairMode
+      ? '把回修启动动作转成证据模板，确保阻断项被真实处理。'
+      : '把下一轮启动动作转成证据模板，确保第一条训练样本留下来。',
+    items: buildLaunchChecklistItems(packet, repairMode),
+    primaryAction: {
+      kind: packet.primaryAction.kind,
+      label: '按清单执行',
+      description: '按执行清单留下证据，再进入下一轮战报判断。',
+      to: packet.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -2066,6 +2109,41 @@ function renderSessionLaunchPacket(
       `${index + 1}. ${item.label}`,
       `   - 指令：${item.instruction}`,
       `   - 完成口径：${item.completionRule}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionLaunchChecklist(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const checklist = buildPracticeSessionLaunchChecklist(queue, progress, now)
+  const lines = [
+    '## 启动执行清单',
+    `- 状态：${checklist.title}`,
+    `- 摘要：${checklist.summary}`,
+    `- 主行动：${checklist.primaryAction.label}，${checklist.primaryAction.description}（${checklist.primaryAction.to}）`,
+    '',
+  ]
+
+  if (checklist.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待生成启动执行清单。先生成下一轮启动包后，系统会把启动动作转成可核销证据。',
+      '',
+    ].join('\n')
+  }
+
+  checklist.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.phase}`,
+      `   - 完成口径：${item.completionRule}`,
+      `   - 证据模板：${item.evidenceTemplate}`,
+      `   - 复盘问题：${item.reviewQuestion}`,
       `   - 入口：${item.to}`,
     )
   })
@@ -3466,6 +3544,42 @@ function buildLaunchPacketItems({
       priority: 3,
     },
   ]
+}
+
+function buildLaunchChecklistItems(
+  packet: PracticeSessionLaunchPacket,
+  repairMode: boolean,
+): PracticeSessionLaunchChecklistItem[] {
+  return packet.items.map(item => ({
+    id: `check-${item.id}`,
+    phase: item.label,
+    completionRule: item.completionRule,
+    evidenceTemplate: buildLaunchEvidenceTemplate(item, repairMode),
+    reviewQuestion: buildLaunchReviewQuestion(item.priority, repairMode),
+    to: item.to,
+    priority: item.priority,
+  }))
+}
+
+function buildLaunchEvidenceTemplate(
+  item: PracticeSessionLaunchPacketItem,
+  repairMode: boolean,
+): string {
+  const modeLabel = repairMode ? '回修' : '推进'
+
+  return `【${modeLabel}-启动】${item.label}：我已完成「${item.instruction}」，结果证据是：`
+}
+
+function buildLaunchReviewQuestion(priority: number, repairMode: boolean): string {
+  if (priority === 1) {
+    return '我是否已经打开正确入口，并确认本轮要处理的第一件事？'
+  }
+
+  if (priority === 2) {
+    return repairMode ? '我是否真的处理了第一项阻断，而不是只看提示？' : '我是否能开口说清下一轮目标？'
+  }
+
+  return repairMode ? '我是否重新验收准入闸门，并看到阻断项减少？' : '我是否已经留下第一条评分样本？'
 }
 
 function buildPracticeSessionScriptCommandItem(
