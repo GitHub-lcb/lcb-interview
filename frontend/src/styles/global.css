@@ -10806,6 +10806,150 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-first-release-gate {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+}
+
+.practice-session-report-first-release-gate.status-blocked {
+  background: #FEF2F2;
+  border-color: #FCA5A5;
+}
+
+.practice-session-report-first-release-gate.status-ready {
+  background: #ECFDF5;
+  border-color: #86EFAC;
+}
+
+.practice-session-report-first-release-gate-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.practice-session-report-first-release-gate-head > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-first-release-gate-head span {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-first-release-gate.status-blocked .practice-session-report-first-release-gate-head span {
+  color: #B91C1C;
+}
+
+.practice-session-report-first-release-gate.status-ready .practice-session-report-first-release-gate-head span {
+  color: #047857;
+}
+
+.practice-session-report-first-release-gate-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-first-release-gate-head small,
+.practice-session-report-first-release-gate p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.practice-session-report-first-release-gate-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.practice-session-report-first-release-gate-list article {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+}
+
+.practice-session-report-first-release-gate-list article.state-blocked {
+  border-color: #FCA5A5;
+}
+
+.practice-session-report-first-release-gate-list article.state-passed {
+  border-color: #86EFAC;
+}
+
+.practice-session-report-first-release-gate-list article > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-first-release-gate-list span {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-first-release-gate-list article.state-blocked span {
+  color: #B91C1C;
+}
+
+.practice-session-report-first-release-gate-list article.state-passed span {
+  color: #047857;
+}
+
+.practice-session-report-first-release-gate-list strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-first-release-gate-list dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 8px;
+  margin: 0;
+}
+
+.practice-session-report-first-release-gate-list dt {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-first-release-gate-list dd {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-first-release-gate .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;
@@ -11458,6 +11602,7 @@ p {
   .practice-session-report-first-rubric-list,
   .practice-session-report-first-receipt-list,
   .practice-session-report-first-receipt-acceptance-list,
+  .practice-session-report-first-release-gate-list,
   .free-promise-band,
   .practice-feedback-lists {
     grid-template-columns: 1fr;

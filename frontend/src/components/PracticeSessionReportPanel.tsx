@@ -28,6 +28,7 @@ import {
   buildPracticeSessionFirstQuestionRehearsal,
   buildPracticeSessionFirstQuestionReceipt,
   buildPracticeSessionFirstQuestionReceiptAcceptance,
+  buildPracticeSessionFirstQuestionReleaseGate,
   buildPracticeSessionFirstQuestionRubric,
   buildPracticeSessionFollowUpDefense,
   buildPracticeSessionInterviewerDecision,
@@ -208,6 +209,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionFirstQuestionReceiptAcceptance = useMemo(
     () => buildPracticeSessionFirstQuestionReceiptAcceptance(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionFirstQuestionReleaseGate = useMemo(
+    () => buildPracticeSessionFirstQuestionReleaseGate(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1304,6 +1309,48 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionFirstQuestionReceiptAcceptance.primaryAction.to)}
         >
           {sessionFirstQuestionReceiptAcceptance.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-first-release-gate status-${sessionFirstQuestionReleaseGate.status}`}
+        aria-label="首题放行门禁"
+      >
+        <div className="practice-session-report-first-release-gate-head">
+          <div>
+            <span>首题放行门禁</span>
+            <strong>{sessionFirstQuestionReleaseGate.title}</strong>
+            <small>{sessionFirstQuestionReleaseGate.summary}</small>
+          </div>
+        </div>
+        {sessionFirstQuestionReleaseGate.items.length === 0 ? (
+          <p>等待首题放行裁决。先完成首题回执验收后，系统会判断是否进入下一轮。</p>
+        ) : (
+          <div className="practice-session-report-first-release-gate-list">
+            {sessionFirstQuestionReleaseGate.items.map(item => (
+              <article key={item.id} className={`state-${item.state}`}>
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.evidence}</strong>
+                </div>
+                <dl>
+                  <dt>放行检查</dt>
+                  <dd>{item.releaseRule}</dd>
+                  <dt>处理动作</dt>
+                  <dd>{item.action}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionFirstQuestionReleaseGate.status === 'blocked'}
+          icon={sessionFirstQuestionReleaseGate.status === 'blocked' ? <WarningOutlined /> : <ArrowRightOutlined />}
+          onClick={() => onNavigate(sessionFirstQuestionReleaseGate.primaryAction.to)}
+        >
+          {sessionFirstQuestionReleaseGate.primaryAction.label}
         </Button>
       </div>
 
