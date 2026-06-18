@@ -9314,6 +9314,157 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-training-schedule {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+}
+
+.practice-session-report-training-schedule.status-repair {
+  background: #FFF7ED;
+  border-color: #FDBA74;
+}
+
+.practice-session-report-training-schedule.status-advance {
+  background: #EEF2FF;
+  border-color: #C7D2FE;
+}
+
+.practice-session-report-training-schedule-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.practice-session-report-training-schedule-head > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-training-schedule-head span {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-training-schedule.status-repair .practice-session-report-training-schedule-head span {
+  color: #C2410C;
+}
+
+.practice-session-report-training-schedule.status-advance .practice-session-report-training-schedule-head span {
+  color: #4338CA;
+}
+
+.practice-session-report-training-schedule-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-training-schedule-head small,
+.practice-session-report-training-schedule p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.practice-session-report-training-schedule-head em {
+  flex: 0 0 auto;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: #FFFFFF;
+  color: #334155;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.practice-session-report-training-schedule-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.practice-session-report-training-schedule-list article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+}
+
+.practice-session-report-training-schedule.status-repair .practice-session-report-training-schedule-list article {
+  border-color: #FED7AA;
+}
+
+.practice-session-report-training-schedule.status-advance .practice-session-report-training-schedule-list article {
+  border-color: #C7D2FE;
+}
+
+.practice-session-report-training-schedule-list article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  align-items: center;
+}
+
+.practice-session-report-training-schedule-list span,
+.practice-session-report-training-schedule-list b {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-training-schedule-list b {
+  color: #334155;
+}
+
+.practice-session-report-training-schedule.status-repair .practice-session-report-training-schedule-list b {
+  color: #9A3412;
+}
+
+.practice-session-report-training-schedule.status-advance .practice-session-report-training-schedule-list b {
+  color: #4338CA;
+}
+
+.practice-session-report-training-schedule-list strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-training-schedule-list p,
+.practice-session-report-training-schedule-list small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-training-schedule-list small {
+  color: #334155;
+  font-weight: 700;
+}
+
+.practice-session-report-training-schedule .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;
@@ -9955,6 +10106,7 @@ p {
   .practice-session-report-pass-gate-list,
   .practice-session-report-pass-evidence-list,
   .practice-session-report-training-contract-list,
+  .practice-session-report-training-schedule-list,
   .free-promise-band,
   .practice-feedback-lists {
     grid-template-columns: 1fr;

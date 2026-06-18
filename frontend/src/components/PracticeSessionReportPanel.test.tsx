@@ -647,6 +647,36 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders training schedule for the next session round', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const scheduleBlock = screen.getByLabelText('下一轮训练日程')
+
+    expect(within(scheduleBlock).getByText('下一轮训练日程')).toBeInTheDocument()
+    expect(within(scheduleBlock).getByText('预热')).toBeInTheDocument()
+    expect(within(scheduleBlock).getByText('限时作答')).toBeInTheDocument()
+    expect(within(scheduleBlock).getByText('验收复盘')).toBeInTheDocument()
+
+    await user.click(within(scheduleBlock).getByRole('button', { name: /执行日程/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

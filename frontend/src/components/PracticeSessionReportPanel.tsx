@@ -41,6 +41,7 @@ import {
   buildPracticeSessionRiskGuardrails,
   buildPracticeSessionScriptCommand,
   buildPracticeSessionTrainingContract,
+  buildPracticeSessionTrainingSchedule,
 } from '../utils/practiceSessionReport'
 import { buildInterviewRecoveryPlan } from '../utils/interviewRecoveryPlan'
 
@@ -153,6 +154,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionTrainingContract = useMemo(
     () => buildPracticeSessionTrainingContract(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionTrainingSchedule = useMemo(
+    () => buildPracticeSessionTrainingSchedule(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -840,6 +845,43 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionTrainingContract.primaryAction.to)}
         >
           {sessionTrainingContract.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className={`practice-session-report-training-schedule status-${sessionTrainingSchedule.status}`} aria-label="下一轮训练日程">
+        <div className="practice-session-report-training-schedule-head">
+          <div>
+            <span>下一轮训练日程</span>
+            <strong>{sessionTrainingSchedule.title}</strong>
+            <small>{sessionTrainingSchedule.summary}</small>
+          </div>
+          <em>{sessionTrainingSchedule.totalMinutes} 分钟</em>
+        </div>
+        {sessionTrainingSchedule.items.length === 0 ? (
+          <p>等待生成训练日程。先完成一次模拟面试后，系统会把训练契约拆成预热、作答和验收复盘。</p>
+        ) : (
+          <div className="practice-session-report-training-schedule-list">
+            {sessionTrainingSchedule.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <span>{item.timeRange}</span>
+                  <b>{item.phase}</b>
+                </div>
+                <strong>{item.title}</strong>
+                <p>{item.task}</p>
+                <small>{item.acceptance}</small>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionTrainingSchedule.status === 'repair'}
+          icon={sessionTrainingSchedule.status === 'repair' ? <ReloadOutlined /> : <PlayCircleOutlined />}
+          onClick={() => onNavigate(sessionTrainingSchedule.primaryAction.to)}
+        >
+          {sessionTrainingSchedule.primaryAction.label}
         </Button>
       </div>
 

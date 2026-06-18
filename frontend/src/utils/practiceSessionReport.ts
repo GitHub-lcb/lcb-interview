@@ -32,6 +32,8 @@ import type {
   PracticeSessionRiskGuardrails,
   PracticeSessionTrainingContract,
   PracticeSessionTrainingContractItem,
+  PracticeSessionTrainingSchedule,
+  PracticeSessionTrainingScheduleItem,
   PracticeSessionReport,
   PracticeSessionReportAction,
   PracticeSessionReportLevel,
@@ -209,6 +211,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionPassGate(queue, progress),
     renderSessionPassEvidence(queue, progress),
     renderSessionTrainingContract(queue, progress, now),
+    renderSessionTrainingSchedule(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -950,6 +953,64 @@ export function buildPracticeSessionTrainingContract(
   }
 }
 
+export function buildPracticeSessionTrainingSchedule(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionTrainingSchedule {
+  const report = buildPracticeSessionReport(queue, progress)
+  const passGate = buildPracticeSessionPassGate(queue, progress)
+  const contract = buildPracticeSessionTrainingContract(queue, progress, now)
+  const nextQueue = buildPracticeSessionNextTrainingQueue(queue, progress, now, 5)
+
+  if (contract.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待生成训练日程',
+      summary: '先完成一次模拟面试，系统才能把训练契约拆成可执行日程。',
+      totalMinutes: 0,
+      items: [],
+      primaryAction: {
+        kind: passGate.primaryAction.kind,
+        label: '建立日程样本',
+        description: '先完成一次开口作答，再生成下一轮训练日程。',
+        to: passGate.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = contract.status === 'repair'
+  const queuePath = contract.primaryAction.to
+  const targetScore = contract.items.find(item => item.id === 'target-score')?.value ?? `${STRONG_SESSION_SCORE} 分以上`
+  const queueLabel = contract.items.find(item => item.id === 'training-queue')?.value
+    ?? `${repairMode ? report.totalCount : nextQueue.items.length} 道题，入口 ${queuePath}`
+  const evidenceFocus = contract.items.find(item => item.id === 'evidence-reference')?.value ?? '评分证据'
+  const scheduleItems = buildTrainingScheduleItems({
+    repairMode,
+    queuePath,
+    targetScore,
+    queueLabel,
+    evidenceFocus,
+    repairCount: report.repairActions.length,
+  })
+
+  return {
+    status: repairMode ? 'repair' : 'advance',
+    title: repairMode ? '修复日程已排好' : '推进日程已排好',
+    summary: repairMode
+      ? `用 ${scheduleItems.length} 个时间块先修复本轮缺口，再判断是否进入下一轮。`
+      : `用 ${scheduleItems.length} 个时间块完成下一轮预热、作答和证据复盘。`,
+    totalMinutes: repairMode ? 35 : 32,
+    items: scheduleItems,
+    primaryAction: {
+      kind: repairMode ? 'repair' : 'continue',
+      label: '执行日程',
+      description: repairMode ? '按时间块回到本轮队列完成修复。' : '按时间块进入下一轮个性化训练。',
+      to: queuePath,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -1565,6 +1626,42 @@ function renderSessionTrainingContract(
       `${index + 1}. ${item.label}`,
       `   - 值：${item.value}`,
       `   - 说明：${item.detail}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionTrainingSchedule(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const schedule = buildPracticeSessionTrainingSchedule(queue, progress, now)
+  const lines = [
+    '## 下一轮训练日程',
+    `- 状态：${schedule.title}`,
+    `- 摘要：${schedule.summary}`,
+    `- 总时长：${schedule.totalMinutes} 分钟`,
+    `- 主行动：${schedule.primaryAction.label}，${schedule.primaryAction.description}（${schedule.primaryAction.to}）`,
+    '',
+  ]
+
+  if (schedule.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待生成训练日程。先完成一次模拟面试后，系统会把训练契约拆成预热、作答和验收复盘。',
+      '',
+    ].join('\n')
+  }
+
+  schedule.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.phase}：${item.title}`,
+      `   - 时间：${item.timeRange}`,
+      `   - 任务：${item.task}`,
+      `   - 验收：${item.acceptance}`,
+      `   - 入口：${item.to}`,
     )
   })
 
@@ -2657,6 +2754,90 @@ function buildTrainingContractItems({
       value: evidenceFocus,
       detail: '下一轮复盘时先对照这条证据，确认短板是否真的被修掉。',
       priority: 4,
+    },
+  ]
+}
+
+function buildTrainingScheduleItems({
+  repairMode,
+  queuePath,
+  targetScore,
+  queueLabel,
+  evidenceFocus,
+  repairCount,
+}: {
+  repairMode: boolean
+  queuePath: string
+  targetScore: string
+  queueLabel: string
+  evidenceFocus: string
+  repairCount: number
+}): PracticeSessionTrainingScheduleItem[] {
+  if (repairMode) {
+    return [
+      {
+        id: 'warm-up',
+        phase: '预热',
+        timeRange: '0-8 分钟',
+        title: '锁定修复目标',
+        task: `打开 ${queueLabel}，先复读目标分、过线证据和本轮失分禁区。`,
+        acceptance: `能说清本轮要把均分补到 ${targetScore}，且知道优先修复 ${repairCount || 1} 个缺口。`,
+        to: queuePath,
+        priority: 1,
+      },
+      {
+        id: 'timed-answer',
+        phase: '限时作答',
+        timeRange: '8-26 分钟',
+        title: '逐题重答补弱',
+        task: '按二次提交稿逐题开口重答，低分题先给结论、证据、边界和收束。',
+        acceptance: '每道题完成一次可复述重答，不能只看稿或只收藏。',
+        to: queuePath,
+        priority: 2,
+      },
+      {
+        id: 'acceptance-review',
+        phase: '验收复盘',
+        timeRange: '26-35 分钟',
+        title: '用门槛验收能否过线',
+        task: `对照 ${evidenceFocus}、通过门槛和训练契约，判断是否可以进入下一轮。`,
+        acceptance: '均分、弱项和提交稿三项都达标后再推进，否则继续修复。',
+        to: queuePath,
+        priority: 3,
+      },
+    ]
+  }
+
+  return [
+    {
+      id: 'warm-up',
+      phase: '预热',
+      timeRange: '0-6 分钟',
+      title: '读取下一轮题组',
+      task: `打开 ${queueLabel}，先看题目来源和本轮过线证据。`,
+      acceptance: `明确本轮保持 ${targetScore} 的目标，并知道第一题为什么被排进来。`,
+      to: queuePath,
+      priority: 1,
+    },
+    {
+      id: 'timed-answer',
+      phase: '限时作答',
+      timeRange: '6-24 分钟',
+      title: '完成个性化题组',
+      task: '按下一轮题组限时作答，优先把证据、场景和风险讲完整。',
+      acceptance: '每道题都产生一次评分样本，避免跳题进入下一轮。',
+      to: queuePath,
+      priority: 2,
+    },
+    {
+      id: 'acceptance-review',
+      phase: '验收复盘',
+      timeRange: '24-32 分钟',
+      title: '沉淀新证据包',
+      task: `用 ${evidenceFocus} 校验本轮表达是否更稳，并更新下一轮训练契约。`,
+      acceptance: '强通过、证据包和下一轮契约同步更新后再扩大题量。',
+      to: queuePath,
+      priority: 3,
     },
   ]
 }

@@ -1017,6 +1017,28 @@ export interface PracticeSessionTrainingContract {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionTrainingScheduleStatus = 'empty' | 'repair' | 'advance'
+
+export interface PracticeSessionTrainingScheduleItem {
+  id: string
+  phase: string
+  timeRange: string
+  title: string
+  task: string
+  acceptance: string
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionTrainingSchedule {
+  status: PracticeSessionTrainingScheduleStatus
+  title: string
+  summary: string
+  totalMinutes: number
+  items: PracticeSessionTrainingScheduleItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'
