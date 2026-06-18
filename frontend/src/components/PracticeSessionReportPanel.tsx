@@ -25,6 +25,7 @@ import {
   buildPracticeSessionNextTrainingQueue,
   buildPracticeSessionReport,
   buildPracticeSessionReportMarkdown,
+  buildPracticeSessionScriptCommand,
 } from '../utils/practiceSessionReport'
 
 interface PracticeSessionReportPanelProps {
@@ -72,6 +73,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionFollowUpDefense = useMemo(
     () => buildPracticeSessionFollowUpDefense(queue, progress),
+    [progress, queue],
+  )
+  const sessionScriptCommand = useMemo(
+    () => buildPracticeSessionScriptCommand(queue, progress),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -244,6 +249,35 @@ export default function PracticeSessionReportPanel({
                 <strong>{item.title}</strong>
                 <span>{item.criterionLabel} · {item.score} 分</span>
                 <small>{item.pressurePoint}</small>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="practice-session-report-script-command" aria-label="本轮脚本总控">
+        <div className="practice-session-report-script-command-head">
+          <div>
+            <span>本轮脚本总控</span>
+            <small>{sessionScriptCommand.summary}</small>
+          </div>
+          <Button
+            size="small"
+            icon={<ThunderboltOutlined />}
+            onClick={() => onNavigate(sessionScriptCommand.primaryAction.to)}
+          >
+            {sessionScriptCommand.primaryAction.label}
+          </Button>
+        </div>
+        {sessionScriptCommand.items.length === 0 ? (
+          <p>暂无本轮脚本总控。先建立练习队列，再完成本题面试官脚本。</p>
+        ) : (
+          <div className="practice-session-report-script-command-list">
+            {sessionScriptCommand.items.slice(0, 3).map(item => (
+              <button key={item.questionId} type="button" onClick={() => onNavigate(item.to)}>
+                <strong>{item.title}</strong>
+                <span>{item.scriptTitle} · {item.passedCount} / {item.totalSteps}</span>
+                <small>{item.nextPrompt || item.summary}</small>
               </button>
             ))}
           </div>

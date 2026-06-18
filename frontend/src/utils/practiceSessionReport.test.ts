@@ -5,6 +5,7 @@ import {
   buildPracticeSessionReport,
   buildPracticeSessionReportMarkdown,
 } from './practiceSessionReport'
+import { buildPracticeInterviewerScript } from './practiceInterviewerScript'
 
 const NOW = '2026-06-17T08:00:00.000Z'
 
@@ -65,6 +66,18 @@ function feedback(
     advice: [],
     followUps: [],
   }
+}
+
+function answerFor(prompt: string, body: string): string {
+  return `追问：${prompt}\n\n我的回答：${body}`
+}
+
+function passedScriptBody(): string {
+  return [
+    '结论：这个问题需要先说明机制，再补充项目证据。',
+    '在线上项目中我会用错误率、耗时和吞吐指标验证。',
+    '面试官继续追问时，我会补充风险边界和替代方案。',
+  ].join('\n')
 }
 
 describe('buildPracticeSessionReport', () => {
@@ -240,6 +253,39 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('入口：/practice?queue=1')
   })
 
+  it('exports script command from the current session queue', () => {
+    const currentQueue = [question(1), question(2)]
+    const prompt = buildPracticeInterviewerScript(currentQueue[0], []).steps[0].prompt
+    const markdown = buildPracticeSessionReportMarkdown(
+      currentQueue,
+      progress({
+        interviewAttempts: {
+          1: [
+            {
+              ...attempt(1, 82),
+              answer: answerFor(prompt, passedScriptBody()),
+            },
+          ],
+          3: [
+            {
+              ...attempt(3, 95),
+              answer: '这道题不在当前队列，不应该出现在本轮脚本总控。',
+            },
+          ],
+        },
+      }),
+      NOW,
+    )
+
+    expect(markdown).toContain('## 本轮脚本总控')
+    expect(markdown).toContain('总进度：1 / 6（17%）')
+    expect(markdown).toContain('Java 面试题 1')
+    expect(markdown).toContain('脚本阶段：')
+    expect(markdown).toContain('下一问：')
+    expect(markdown).toContain('入口：/practice?queue=1')
+    expect(markdown).not.toContain('Java 面试题 3')
+  })
+
   it('keeps empty session markdown actionable', () => {
     const markdown = buildPracticeSessionReportMarkdown([], progress(), NOW)
 
@@ -252,6 +298,8 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('暂无本轮高分素材')
     expect(markdown).toContain('## 本轮追问防线')
     expect(markdown).toContain('暂无本轮追问防线')
+    expect(markdown).toContain('## 本轮脚本总控')
+    expect(markdown).toContain('暂无本轮脚本总控')
     expect(markdown).toContain('## 下一轮训练建议')
     expect(markdown).toContain('先做一次模拟面试')
     expect(markdown).toContain('暂无题目')

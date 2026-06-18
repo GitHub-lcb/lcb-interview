@@ -7530,6 +7530,102 @@ p {
   font-size: 12px;
 }
 
+.practice-session-report-script-command {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+}
+
+.practice-session-report-script-command-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.practice-session-report-script-command-head > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-script-command-head span {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-script-command-head small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-script-command-head .ant-btn {
+  flex: 0 0 auto;
+  max-width: 136px;
+}
+
+.practice-session-report-script-command p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.practice-session-report-script-command-list {
+  display: grid;
+  gap: 6px;
+}
+
+.practice-session-report-script-command-list button {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  text-align: left;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.practice-session-report-script-command-list button:hover {
+  border-color: #64748B;
+}
+
+.practice-session-report-script-command-list strong,
+.practice-session-report-script-command-list span,
+.practice-session-report-script-command-list small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-script-command-list strong {
+  color: #0F172A;
+  font-size: 13px;
+}
+
+.practice-session-report-script-command-list span {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.practice-session-report-script-command-list small {
+  color: #64748B;
+  font-size: 12px;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;

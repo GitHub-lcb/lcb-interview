@@ -20,6 +20,7 @@ import { buildDailyPlanCompletion } from './dailyPlanCompletion'
 import { buildInterviewFollowUpDefense } from './interviewFollowUpDefense'
 import { buildInterviewMaterialVault } from './interviewMaterialVault'
 import { buildNextTrainingQueue, formatNextTrainingQueueItemMeta } from './nextTrainingQueue'
+import { buildPracticeInterviewerScriptProgress } from './practiceInterviewerScriptProgress'
 
 const PASSING_SCORE = 70
 const STRONG_SESSION_SCORE = 80
@@ -54,6 +55,35 @@ interface WeakestCriterionSummary {
   label: string
   averageScore: number
   summary: string
+}
+
+export type PracticeSessionScriptCommandStatus = 'empty' | 'pending' | 'active' | 'repair' | 'complete'
+
+export interface PracticeSessionScriptCommandItem {
+  questionId: number
+  title: string
+  to: string
+  status: Exclude<PracticeSessionScriptCommandStatus, 'empty'>
+  scriptTitle: string
+  summary: string
+  totalSteps: number
+  passedCount: number
+  attemptedCount: number
+  progressPercent: number
+  nextPrompt: string
+  queueIndex: number
+}
+
+export interface PracticeSessionScriptCommand {
+  status: PracticeSessionScriptCommandStatus
+  title: string
+  summary: string
+  totalSteps: number
+  passedCount: number
+  attemptedQuestionCount: number
+  progressPercent: number
+  primaryAction: PracticeSessionReportAction
+  items: PracticeSessionScriptCommandItem[]
 }
 
 export function buildPracticeSessionReport(
@@ -134,6 +164,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionDailyClosure(queue, progress, now),
     renderSessionMaterialVault(queue, progress),
     renderSessionFollowUpDefense(queue, progress),
+    renderSessionScriptCommand(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -198,6 +229,38 @@ export function buildPracticeSessionFollowUpDefense(
     ...context,
     interviewAttempts,
   })
+}
+
+export function buildPracticeSessionScriptCommand(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): PracticeSessionScriptCommand {
+  const items = queue.map((question, index) => {
+    const scriptProgress = buildPracticeInterviewerScriptProgress(
+      question,
+      progress.interviewAttempts[question.id] ?? [],
+    )
+    return buildPracticeSessionScriptCommandItem(question, index, scriptProgress)
+  })
+  const totalSteps = items.reduce((total, item) => total + item.totalSteps, 0)
+  const passedCount = items.reduce((total, item) => total + item.passedCount, 0)
+  const attemptedQuestionCount = items.filter(item => item.attemptedCount > 0).length
+  const status = resolveScriptCommandStatus(items)
+  const sortedItems = [...items].sort(compareScriptCommandItems)
+  const primaryItem = sortedItems[0]
+  const progressPercent = totalSteps > 0 ? Math.round((passedCount / totalSteps) * 100) : 0
+
+  return {
+    status,
+    title: resolveScriptCommandTitle(status),
+    summary: resolveScriptCommandSummary(status, passedCount, totalSteps, attemptedQuestionCount),
+    totalSteps,
+    passedCount,
+    attemptedQuestionCount,
+    progressPercent,
+    primaryAction: buildScriptCommandPrimaryAction(status, primaryItem),
+    items: sortedItems,
+  }
 }
 
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
@@ -349,6 +412,40 @@ function renderSessionFollowUpDefense(
       `   - 追问：${item.prompt}`,
       `   - 压力点：${item.pressurePoint}`,
       `   - 回答引导：${item.answerGuide}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionScriptCommand(queue: PracticeQueueItem[], progress: StudyProgress): string {
+  const command = buildPracticeSessionScriptCommand(queue, progress)
+  const repairCount = command.items.filter(item => item.status === 'repair').length
+  const lines = [
+    '## 本轮脚本总控',
+    `- 状态：${command.title}`,
+    `- 总进度：${command.passedCount} / ${command.totalSteps}（${command.progressPercent}%）`,
+    `- 修复中：${repairCount} 道`,
+    `- 主行动：${command.primaryAction.label}，${command.primaryAction.description}（${command.primaryAction.to}）`,
+    '',
+  ]
+
+  if (command.items.length === 0) {
+    return [
+      ...lines,
+      '- 暂无本轮脚本总控。先建立练习队列，再完成本题面试官脚本。',
+      '',
+    ].join('\n')
+  }
+
+  command.items.slice(0, 5).forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.title}`,
+      `   - 脚本阶段：${item.scriptTitle}`,
+      `   - 进度：${item.passedCount} / ${item.totalSteps}（${item.progressPercent}%）`,
+      `   - 状态：${scriptCommandItemStatusLabel(item.status)}`,
+      `   - 下一问：${item.nextPrompt || '本题脚本已通过，可以复练或沉淀素材。'}`,
       `   - 入口：${item.to}`,
     )
   })
@@ -663,6 +760,170 @@ function buildQueuePath(questionIds: number[]): string {
     return '/practice'
   }
   return `/practice?queue=${questionIds.join(',')}`
+}
+
+function buildPracticeSessionScriptCommandItem(
+  question: PracticeQueueItem,
+  queueIndex: number,
+  progress: ReturnType<typeof buildPracticeInterviewerScriptProgress>,
+): PracticeSessionScriptCommandItem {
+  return {
+    questionId: question.id,
+    title: question.title,
+    to: buildQueuePath([question.id]),
+    status: resolveScriptCommandItemStatus(progress),
+    scriptTitle: progress.script.title,
+    summary: progress.summary,
+    totalSteps: progress.totalSteps,
+    passedCount: progress.passedCount,
+    attemptedCount: progress.attemptedCount,
+    progressPercent: progress.progressPercent,
+    nextPrompt: progress.nextStep?.prompt ?? '',
+    queueIndex,
+  }
+}
+
+function resolveScriptCommandItemStatus(
+  progress: ReturnType<typeof buildPracticeInterviewerScriptProgress>,
+): PracticeSessionScriptCommandItem['status'] {
+  if (progress.totalSteps > 0 && progress.passedCount === progress.totalSteps) {
+    return 'complete'
+  }
+  if (progress.attemptedCount > 0) {
+    return 'repair'
+  }
+  if (progress.passedCount > 0) {
+    return 'active'
+  }
+  return 'pending'
+}
+
+function resolveScriptCommandStatus(
+  items: PracticeSessionScriptCommandItem[],
+): PracticeSessionScriptCommandStatus {
+  if (items.length === 0) {
+    return 'empty'
+  }
+  if (items.every(item => item.status === 'complete')) {
+    return 'complete'
+  }
+  if (items.some(item => item.status === 'repair')) {
+    return 'repair'
+  }
+  if (items.some(item => item.status === 'active')) {
+    return 'active'
+  }
+  return 'pending'
+}
+
+function compareScriptCommandItems(
+  left: PracticeSessionScriptCommandItem,
+  right: PracticeSessionScriptCommandItem,
+): number {
+  const priority: Record<PracticeSessionScriptCommandItem['status'], number> = {
+    repair: 0,
+    active: 1,
+    pending: 2,
+    complete: 3,
+  }
+
+  return priority[left.status] - priority[right.status]
+    || left.progressPercent - right.progressPercent
+    || left.queueIndex - right.queueIndex
+}
+
+function resolveScriptCommandTitle(status: PracticeSessionScriptCommandStatus): string {
+  if (status === 'empty') {
+    return '脚本总控待建立'
+  }
+  if (status === 'complete') {
+    return '脚本追问已打穿'
+  }
+  if (status === 'repair') {
+    return '脚本追问需要修复'
+  }
+  if (status === 'active') {
+    return '脚本追问正在推进'
+  }
+  return '脚本追问待开始'
+}
+
+function resolveScriptCommandSummary(
+  status: PracticeSessionScriptCommandStatus,
+  passedCount: number,
+  totalSteps: number,
+  attemptedQuestionCount: number,
+): string {
+  if (status === 'empty') {
+    return '先建立本轮练习队列，系统会汇总每题面试官脚本进度。'
+  }
+  if (status === 'complete') {
+    return `本轮 ${totalSteps} 个脚本追问已全部通过，可以复练或沉淀高分素材。`
+  }
+  if (status === 'repair') {
+    return `已通过 ${passedCount}/${totalSteps} 个脚本追问，${attemptedQuestionCount} 道题存在修复中追问。`
+  }
+  if (status === 'active') {
+    return `已通过 ${passedCount}/${totalSteps} 个脚本追问，继续完成剩余追问。`
+  }
+  return `本轮共有 ${totalSteps} 个脚本追问，先从第一道题开始推进。`
+}
+
+function buildScriptCommandPrimaryAction(
+  status: PracticeSessionScriptCommandStatus,
+  item?: PracticeSessionScriptCommandItem,
+): PracticeSessionReportAction {
+  if (!item) {
+    return {
+      kind: 'start',
+      label: '建立脚本总控',
+      description: '先建立本轮练习队列，再完成本题面试官脚本。',
+      to: '/practice',
+    }
+  }
+  if (status === 'complete') {
+    return {
+      kind: 'review',
+      label: '复练脚本追问',
+      description: '本轮脚本已通过，回到题目复练保持临场手感。',
+      to: item.to,
+    }
+  }
+  if (status === 'repair') {
+    return {
+      kind: 'repair',
+      label: '修复当前脚本',
+      description: '先处理修复中的追问，补齐证据后再进入下一问。',
+      to: item.to,
+    }
+  }
+  if (status === 'active') {
+    return {
+      kind: 'continue',
+      label: '继续脚本追问',
+      description: '从已开始的题目继续推进未通过追问。',
+      to: item.to,
+    }
+  }
+  return {
+    kind: 'continue',
+    label: '开始脚本追问',
+    description: '从队列第一题开始完成本题面试官脚本。',
+    to: item.to,
+  }
+}
+
+function scriptCommandItemStatusLabel(status: PracticeSessionScriptCommandItem['status']): string {
+  if (status === 'complete') {
+    return '已通过'
+  }
+  if (status === 'repair') {
+    return '修复中'
+  }
+  if (status === 'active') {
+    return '推进中'
+  }
+  return '待练'
 }
 
 function buildQueueProfile(

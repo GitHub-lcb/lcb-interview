@@ -4,6 +4,7 @@ import '@testing-library/jest-dom/vitest'
 import { message } from 'antd'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { InterviewAttempt, PracticeQueueItem, StudyProgress } from '../types'
+import { buildPracticeInterviewerScript } from '../utils/practiceInterviewerScript'
 import PracticeSessionReportPanel from './PracticeSessionReportPanel'
 
 const NOW = '2026-06-17T08:30:00.000Z'
@@ -53,6 +54,18 @@ function progress(): StudyProgress {
     dailyPlan: [],
     updatedAt: NOW,
   }
+}
+
+function answerFor(prompt: string, body: string): string {
+  return `追问：${prompt}\n\n我的回答：${body}`
+}
+
+function passedScriptBody(): string {
+  return [
+    '结论：这个问题需要先说明机制，再补充项目证据。',
+    '在线上项目中我会用错误率、耗时和吞吐指标验证。',
+    '面试官继续追问时，我会补充风险边界和替代方案。',
+  ].join('\n')
 }
 
 describe('PracticeSessionReportPanel', () => {
@@ -159,6 +172,41 @@ describe('PracticeSessionReportPanel', () => {
     expect(within(defenseBlock).getByText(/表达结构/)).toBeInTheDocument()
 
     await userEvent.click(within(defenseBlock).getAllByRole('button', { name: /Java 面试题 1/ })[0])
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1')
+  })
+
+  it('renders script command from the current session queue', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+    const currentQueue = [question(1), question(2)]
+    const prompt = buildPracticeInterviewerScript(currentQueue[0], []).steps[0].prompt
+
+    render(
+      <PracticeSessionReportPanel
+        queue={currentQueue}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [
+              {
+                ...attempt(1, 82),
+                answer: answerFor(prompt, passedScriptBody()),
+              },
+            ],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const commandBlock = screen.getByLabelText('本轮脚本总控')
+
+    expect(within(commandBlock).getByText('本轮脚本总控')).toBeInTheDocument()
+    expect(within(commandBlock).getAllByText('Java 面试题 1').length).toBeGreaterThan(0)
+    expect(within(commandBlock).getByText(/1 \/ 3/)).toBeInTheDocument()
+
+    await user.click(within(commandBlock).getAllByRole('button', { name: /Java 面试题 1/ })[0])
 
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1')
   })
