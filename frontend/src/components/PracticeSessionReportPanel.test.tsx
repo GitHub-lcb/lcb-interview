@@ -890,6 +890,37 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders first question rubric before the next session round', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const rubric = screen.getByLabelText('首题验收尺')
+
+    expect(within(rubric).getByText('首题验收尺')).toBeInTheDocument()
+    expect(within(rubric).getByText('回修首题验收尺')).toBeInTheDocument()
+    expect(within(rubric).getByText('开场命中')).toBeInTheDocument()
+    expect(within(rubric).getByText('证据留存')).toBeInTheDocument()
+    expect(within(rubric).getAllByText('检查口径').length).toBeGreaterThan(0)
+
+    await user.click(within(rubric).getByRole('button', { name: /按验收尺执行/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

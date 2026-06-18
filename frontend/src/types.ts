@@ -1173,6 +1173,25 @@ export interface PracticeSessionFirstQuestionRehearsal {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionFirstQuestionRubricStatus = 'empty' | 'repair' | 'ready'
+
+export interface PracticeSessionFirstQuestionRubricItem {
+  id: string
+  label: string
+  target: string
+  check: string
+  evidence: string
+  priority: number
+}
+
+export interface PracticeSessionFirstQuestionRubric {
+  status: PracticeSessionFirstQuestionRubricStatus
+  title: string
+  summary: string
+  items: PracticeSessionFirstQuestionRubricItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

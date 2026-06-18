@@ -26,6 +26,7 @@ import {
   buildPracticeSessionAbilityRadar,
   buildPracticeSessionEvidenceGaps,
   buildPracticeSessionFirstQuestionRehearsal,
+  buildPracticeSessionFirstQuestionRubric,
   buildPracticeSessionFollowUpDefense,
   buildPracticeSessionInterviewerDecision,
   buildPracticeSessionLaunchChecklist,
@@ -193,6 +194,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionFirstQuestionRehearsal = useMemo(
     () => buildPracticeSessionFirstQuestionRehearsal(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionFirstQuestionRubric = useMemo(
+    () => buildPracticeSessionFirstQuestionRubric(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1166,6 +1171,48 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionFirstQuestionRehearsal.primaryAction.to)}
         >
           {sessionFirstQuestionRehearsal.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-first-rubric status-${sessionFirstQuestionRubric.status}`}
+        aria-label="首题验收尺"
+      >
+        <div className="practice-session-report-first-rubric-head">
+          <div>
+            <span>首题验收尺</span>
+            <strong>{sessionFirstQuestionRubric.title}</strong>
+            <small>{sessionFirstQuestionRubric.summary}</small>
+          </div>
+        </div>
+        {sessionFirstQuestionRubric.items.length === 0 ? (
+          <p>等待首题验收尺。先生成首题预演卡后，系统会给出 4 条验收口径。</p>
+        ) : (
+          <div className="practice-session-report-first-rubric-list">
+            {sessionFirstQuestionRubric.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.target}</strong>
+                </div>
+                <dl>
+                  <dt>检查口径</dt>
+                  <dd>{item.check}</dd>
+                  <dt>证据</dt>
+                  <dd>{item.evidence}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionFirstQuestionRubric.status === 'repair'}
+          icon={sessionFirstQuestionRubric.status === 'repair' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionFirstQuestionRubric.primaryAction.to)}
+        >
+          {sessionFirstQuestionRubric.primaryAction.label}
         </Button>
       </div>
 

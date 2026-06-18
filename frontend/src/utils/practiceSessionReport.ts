@@ -18,6 +18,8 @@ import type {
   PracticeSessionEvidenceGaps,
   PracticeSessionInterviewerDecision,
   PracticeSessionFirstQuestionRehearsal,
+  PracticeSessionFirstQuestionRubric,
+  PracticeSessionFirstQuestionRubricItem,
   PracticeSessionLaunchChecklist,
   PracticeSessionLaunchChecklistItem,
   PracticeSessionLaunchPacket,
@@ -239,6 +241,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionLaunchPacket(queue, progress, now),
     renderSessionLaunchChecklist(queue, progress, now),
     renderSessionFirstQuestionRehearsal(queue, progress, now),
+    renderSessionFirstQuestionRubric(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1378,6 +1381,46 @@ export function buildPracticeSessionFirstQuestionRehearsal(
   }
 }
 
+export function buildPracticeSessionFirstQuestionRubric(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionRubric {
+  const rehearsal = buildPracticeSessionFirstQuestionRehearsal(queue, progress, now)
+
+  if (rehearsal.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待首题验收尺',
+      summary: '先生成首题预演卡，再把开口动作拆成可核验标准。',
+      items: [],
+      primaryAction: {
+        kind: rehearsal.primaryAction.kind,
+        label: '建立验收尺',
+        description: '先生成首题预演，再建立首题验收口径。',
+        to: rehearsal.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = rehearsal.status === 'repair'
+
+  return {
+    status: rehearsal.status,
+    title: repairMode ? '回修首题验收尺' : '下一轮首题验收尺',
+    summary: repairMode
+      ? '用 4 条硬口径确认第一项阻断是否被真实修掉。'
+      : '用 4 条硬口径确认第一题是否形成可评分样本。',
+    items: buildFirstQuestionRubricItems(rehearsal, repairMode),
+    primaryAction: {
+      kind: rehearsal.primaryAction.kind,
+      label: '按验收尺执行',
+      description: repairMode ? '进入回修入口，按 4 条验收点逐项核销。' : '进入首题，按 4 条验收点留下评分样本。',
+      to: rehearsal.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -2266,6 +2309,40 @@ function renderSessionFirstQuestionRehearsal(
   }
 
   return lines.join('\n')
+}
+
+function renderSessionFirstQuestionRubric(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const rubric = buildPracticeSessionFirstQuestionRubric(queue, progress, now)
+  const lines = [
+    '## 首题验收尺',
+    `- 状态：${rubric.title}`,
+    `- 摘要：${rubric.summary}`,
+    `- 主行动：${rubric.primaryAction.label}，${rubric.primaryAction.description}（${rubric.primaryAction.to}）`,
+    '',
+  ]
+
+  if (rubric.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待首题验收尺。先生成首题预演卡后，系统会给出 4 条验收口径。',
+      '',
+    ].join('\n')
+  }
+
+  rubric.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 目标：${item.target}`,
+      `   - 检查口径：${item.check}`,
+      `   - 证据：${item.evidence}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
 }
 
 function renderSessionNextTraining(
@@ -3717,6 +3794,52 @@ function buildFirstQuestionPassSignal(item: NextTrainingQueueItem): string {
 
 function buildFirstQuestionEvidenceRequirement(item: NextTrainingQueueItem): string {
   return `完成「${item.title}」后保留一次评分样本，并记录来源「${item.sourceLabel}」、原因「${item.reason}」。`
+}
+
+function buildFirstQuestionRubricItems(
+  rehearsal: PracticeSessionFirstQuestionRehearsal,
+  repairMode: boolean,
+): PracticeSessionFirstQuestionRubricItem[] {
+  return [
+    {
+      id: 'opening-hit',
+      label: '开场命中',
+      target: rehearsal.openingPrompt,
+      check: repairMode
+        ? '开口先说明本次只修复哪一项阻断，不能直接进入下一轮题目。'
+        : '30 秒内先给结论，再说明本题要验证的核心能力。',
+      evidence: '保留首段开场文本或录音转写。',
+      priority: 1,
+    },
+    {
+      id: 'pass-signal-hit',
+      label: '通过信号',
+      target: rehearsal.passSignal,
+      check: repairMode
+        ? '回修后必须能对照通过信号说明阻断项已减少。'
+        : '回答后必须能对照通过信号判断是否达到强通过线。',
+      evidence: '保留评分结果或人工复盘结论。',
+      priority: 2,
+    },
+    {
+      id: 'evidence-saved',
+      label: '证据留存',
+      target: rehearsal.evidenceRequirement,
+      check: '不能只完成跳转，必须留下可追溯的文字、评分或回执证据。',
+      evidence: rehearsal.evidenceRequirement,
+      priority: 3,
+    },
+    {
+      id: 'next-step-clear',
+      label: '下一步明确',
+      target: rehearsal.primaryAction.to,
+      check: repairMode
+        ? '未达标就继续回修；达标后再重新检查准入闸门。'
+        : '达标后进入下一轮训练建议，未达标则回到首题继续重答。',
+      evidence: '下一份战报里能看到新的评分样本或阻断项变化。',
+      priority: 4,
+    },
+  ]
 }
 
 function buildPracticeSessionScriptCommandItem(
