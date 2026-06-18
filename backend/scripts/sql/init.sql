@@ -3,7 +3,7 @@ SET NAMES utf8mb4;
 -- =============================================
 -- lcb-interview 数据库初始化脚本
 -- 生成时间: 2026-06-04T05:58:00.590Z
--- 包含: 建表 + 46个分类 + 74个标签 + 6386道DRAFT题目
+-- 包含: 建表 + 46个分类 + 71个标签 + 6386道DRAFT题目
 -- =============================================
 
 DROP TABLE IF EXISTS question_tag;
@@ -125,8 +125,79 @@ INSERT INTO category (name, icon, description, sort_order, create_time, update_t
 
 
 -- =============================================
--- 标签（50 个）
-
+-- 标签（71 个，ID 与 fetch-questions.js 的 TAG_MAP 保持一致）
+INSERT INTO tag (id, name, create_time, update_time, is_deleted) VALUES
+(1, 'Java', NOW(), NOW(), 0),
+(2, '集合', NOW(), NOW(), 0),
+(3, '多线程', NOW(), NOW(), 0),
+(4, 'JVM', NOW(), NOW(), 0),
+(5, '索引', NOW(), NOW(), 0),
+(6, '事务', NOW(), NOW(), 0),
+(7, '缓存', NOW(), NOW(), 0),
+(8, 'IoC', NOW(), NOW(), 0),
+(9, 'AOP', NOW(), NOW(), 0),
+(10, '分布式', NOW(), NOW(), 0),
+(11, '数据结构', NOW(), NOW(), 0),
+(12, '算法', NOW(), NOW(), 0),
+(13, 'Spring', NOW(), NOW(), 0),
+(14, 'SpringBoot', NOW(), NOW(), 0),
+(15, 'SpringCloud', NOW(), NOW(), 0),
+(16, '微服务', NOW(), NOW(), 0),
+(17, 'MySQL', NOW(), NOW(), 0),
+(18, 'Redis', NOW(), NOW(), 0),
+(19, 'MongoDB', NOW(), NOW(), 0),
+(20, 'MyBatis', NOW(), NOW(), 0),
+(21, 'Netty', NOW(), NOW(), 0),
+(22, '网络', NOW(), NOW(), 0),
+(23, 'TCP', NOW(), NOW(), 0),
+(24, 'HTTP', NOW(), NOW(), 0),
+(25, '操作系统', NOW(), NOW(), 0),
+(26, '进程', NOW(), NOW(), 0),
+(27, '设计模式', NOW(), NOW(), 0),
+(28, '消息队列', NOW(), NOW(), 0),
+(29, 'Kafka', NOW(), NOW(), 0),
+(30, 'RabbitMQ', NOW(), NOW(), 0),
+(31, 'Nginx', NOW(), NOW(), 0),
+(32, 'Docker', NOW(), NOW(), 0),
+(33, 'Kubernetes', NOW(), NOW(), 0),
+(34, 'Git', NOW(), NOW(), 0),
+(35, 'Linux', NOW(), NOW(), 0),
+(36, '系统设计', NOW(), NOW(), 0),
+(37, '高并发', NOW(), NOW(), 0),
+(38, 'Dubbo', NOW(), NOW(), 0),
+(39, 'Elasticsearch', NOW(), NOW(), 0),
+(40, 'CI/CD', NOW(), NOW(), 0),
+(43, '锁', NOW(), NOW(), 0),
+(44, '线程池', NOW(), NOW(), 0),
+(45, '垃圾回收', NOW(), NOW(), 0),
+(46, '内存模型', NOW(), NOW(), 0),
+(47, '分库分表', NOW(), NOW(), 0),
+(48, 'RPC', NOW(), NOW(), 0),
+(49, 'REST', NOW(), NOW(), 0),
+(50, '安全', NOW(), NOW(), 0),
+(51, 'Go', NOW(), NOW(), 0),
+(52, 'Python', NOW(), NOW(), 0),
+(53, 'C++', NOW(), NOW(), 0),
+(54, 'C#', NOW(), NOW(), 0),
+(55, 'PHP', NOW(), NOW(), 0),
+(56, 'JavaScript', NOW(), NOW(), 0),
+(57, 'TypeScript', NOW(), NOW(), 0),
+(58, 'Vue', NOW(), NOW(), 0),
+(59, 'React', NOW(), NOW(), 0),
+(60, 'Node.js', NOW(), NOW(), 0),
+(61, 'Webpack', NOW(), NOW(), 0),
+(62, 'CSS', NOW(), NOW(), 0),
+(63, 'HTML', NOW(), NOW(), 0),
+(64, 'AI', NOW(), NOW(), 0),
+(65, '大模型', NOW(), NOW(), 0),
+(66, 'LLM', NOW(), NOW(), 0),
+(67, 'RAG', NOW(), NOW(), 0),
+(68, 'Agent', NOW(), NOW(), 0),
+(69, 'Prompt', NOW(), NOW(), 0),
+(70, 'LangChain', NOW(), NOW(), 0),
+(71, 'OpenClaw', NOW(), NOW(), 0),
+(72, '运维', NOW(), NOW(), 0),
+(73, '监控', NOW(), NOW(), 0);
 
 -- =============================================
 -- 6386 道 DRAFT 题目（含题目-标签关联）

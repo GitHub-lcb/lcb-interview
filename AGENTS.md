@@ -171,7 +171,7 @@ node fetch-questions.js
 ### 2. 初始化数据库（一站式）
 
 ```bash
-# init.sql 包含: 建表 + 46个分类 + 74个标签 + 6386道DRAFT题目
+# init.sql 包含: 建表 + 46个分类 + 71个标签 + 6386道DRAFT题目
 mysql -u root -p lcb_interview < backend/scripts/sql/init.sql
 ```
 
