@@ -424,6 +424,26 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('复述提示：请用 60 秒重答「Java 面试题 1」')
   })
 
+  it('exports replay checklist for the current session queue', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1), question(2)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 62, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+          2: [attempt(2, 72, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+        },
+      }),
+      NOW,
+    )
+
+    expect(markdown).toContain('## 本轮复述验收清单')
+    expect(markdown).toContain('1. 结论先行')
+    expect(markdown).toContain('2. 证据可追问')
+    expect(markdown).toContain('3. 风险有边界')
+    expect(markdown).toContain('4. 60 秒内讲完')
+    expect(markdown).toContain('主行动：按清单重答')
+  })
+
   it('keeps empty session markdown actionable', () => {
     const markdown = buildPracticeSessionReportMarkdown([], progress(), NOW)
 
@@ -452,6 +472,8 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('等待生成证据缺口')
     expect(markdown).toContain('## 本轮 60 秒复述卡')
     expect(markdown).toContain('等待生成复述卡')
+    expect(markdown).toContain('## 本轮复述验收清单')
+    expect(markdown).toContain('等待生成验收清单')
     expect(markdown).toContain('## 下一轮训练建议')
     expect(markdown).toContain('先做一次模拟面试')
     expect(markdown).toContain('暂无题目')

@@ -865,6 +865,26 @@ export interface PracticeSessionReplayCards {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionReplayChecklistStatus = 'empty' | 'checking' | 'ready'
+
+export interface PracticeSessionReplayChecklistItem {
+  id: string
+  label: string
+  description: string
+  failureSignal: string
+  target: string
+  to: string
+}
+
+export interface PracticeSessionReplayChecklist {
+  status: PracticeSessionReplayChecklistStatus
+  title: string
+  summary: string
+  totalCount: number
+  items: PracticeSessionReplayChecklistItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

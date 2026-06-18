@@ -30,6 +30,7 @@ import {
   buildPracticeSessionMistakeLedger,
   buildPracticeSessionNextTrainingQueue,
   buildPracticeSessionRecoveryAcceptance,
+  buildPracticeSessionReplayChecklist,
   buildPracticeSessionReplayCards,
   buildPracticeSessionReport,
   buildPracticeSessionReportMarkdown,
@@ -118,6 +119,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionReplayCards = useMemo(
     () => buildPracticeSessionReplayCards(queue, progress),
+    [progress, queue],
+  )
+  const sessionReplayChecklist = useMemo(
+    () => buildPracticeSessionReplayChecklist(queue, progress),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -579,6 +584,37 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionReplayCards.primaryAction.to)}
         >
           {sessionReplayCards.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className="practice-session-report-replay-checklist" aria-label="本轮复述验收清单">
+        <div className="practice-session-report-replay-checklist-head">
+          <span>本轮复述验收清单</span>
+          <strong>{sessionReplayChecklist.title}</strong>
+          <small>{sessionReplayChecklist.summary}</small>
+        </div>
+        {sessionReplayChecklist.items.length === 0 ? (
+          <p>等待生成验收清单。先完成一次模拟面试并生成复述卡后，系统会给出提交前自查标准。</p>
+        ) : (
+          <div className="practice-session-report-replay-checklist-list">
+            {sessionReplayChecklist.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <strong>{item.label}</strong>
+                  <span>{item.target}</span>
+                </div>
+                <small>{item.description}</small>
+                <em>{item.failureSignal}</em>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          icon={<CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionReplayChecklist.primaryAction.to)}
+        >
+          {sessionReplayChecklist.primaryAction.label}
         </Button>
       </div>
 

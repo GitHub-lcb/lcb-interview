@@ -8480,6 +8480,113 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-replay-checklist {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+}
+
+.practice-session-report-replay-checklist-head {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-replay-checklist-head span {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-replay-checklist-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-replay-checklist-head small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-replay-checklist p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.practice-session-report-replay-checklist-list {
+  display: grid;
+  gap: 6px;
+}
+
+.practice-session-report-replay-checklist-list article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+}
+
+.practice-session-report-replay-checklist-list article > div {
+  display: grid;
+  grid-template-columns: minmax(86px, auto) minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.practice-session-report-replay-checklist-list strong,
+.practice-session-report-replay-checklist-list span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-replay-checklist-list strong {
+  color: #0F172A;
+  font-size: 13px;
+}
+
+.practice-session-report-replay-checklist-list span {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.practice-session-report-replay-checklist-list small,
+.practice-session-report-replay-checklist-list em {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-replay-checklist-list em {
+  color: #9F1239;
+}
+
+.practice-session-report-replay-checklist .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;

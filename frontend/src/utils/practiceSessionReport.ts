@@ -16,6 +16,8 @@ import type {
   PracticeSessionEvidenceGaps,
   PracticeSessionInterviewerDecision,
   PracticeQueueItem,
+  PracticeSessionReplayChecklist,
+  PracticeSessionReplayChecklistItem,
   PracticeSessionReplayCardItem,
   PracticeSessionReplayCards,
   PracticeSessionReport,
@@ -188,6 +190,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionActionPriorities(queue, progress, now),
     renderSessionEvidenceGaps(queue, progress),
     renderSessionReplayCards(queue, progress),
+    renderSessionReplayChecklist(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -607,6 +610,45 @@ export function buildPracticeSessionReplayCards(
   }
 }
 
+export function buildPracticeSessionReplayChecklist(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): PracticeSessionReplayChecklist {
+  const replayCards = buildPracticeSessionReplayCards(queue, progress)
+
+  if (replayCards.items.length === 0) {
+    return {
+      status: 'empty',
+      title: '等待生成验收清单',
+      summary: '先完成一次模拟面试并生成复述卡，系统才能给出提交前自查标准。',
+      totalCount: 0,
+      items: [],
+      primaryAction: {
+        kind: replayCards.primaryAction.kind,
+        label: '建立验收样本',
+        description: '先完成一次开口作答，再生成复述验收清单。',
+        to: replayCards.primaryAction.to,
+      },
+    }
+  }
+
+  const items = buildReplayChecklistItems(replayCards.primaryAction.to)
+
+  return {
+    status: replayCards.status === 'repair' ? 'checking' : 'ready',
+    title: replayCards.status === 'repair' ? '提交前必须自查' : '稳定复述自查',
+    summary: `按 ${items.length} 个验收点检查复述内容，全部满足后再进入下一轮评分。`,
+    totalCount: items.length,
+    items,
+    primaryAction: {
+      kind: replayCards.primaryAction.kind,
+      label: '按清单重答',
+      description: '用复述卡回答前，先按清单自查结论、证据和边界。',
+      to: replayCards.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -996,6 +1038,37 @@ function renderSessionReplayCards(queue: PracticeQueueItem[], progress: StudyPro
       `   - 证据句：${item.evidenceLine}`,
       `   - 边界句：${item.boundaryLine}`,
       `   - 复述提示：${item.rehearsalPrompt}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionReplayChecklist(queue: PracticeQueueItem[], progress: StudyProgress): string {
+  const checklist = buildPracticeSessionReplayChecklist(queue, progress)
+  const lines = [
+    '## 本轮复述验收清单',
+    `- 状态：${checklist.title}`,
+    `- 摘要：${checklist.summary}`,
+    `- 主行动：${checklist.primaryAction.label}，${checklist.primaryAction.description}（${checklist.primaryAction.to}）`,
+    '',
+  ]
+
+  if (checklist.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待生成验收清单。先完成一次模拟面试并生成复述卡后，系统会给出提交前自查标准。',
+      '',
+    ].join('\n')
+  }
+
+  checklist.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 验收点：${item.description}`,
+      `   - 失败信号：${item.failureSignal}`,
+      `   - 达标口径：${item.target}`,
       `   - 入口：${item.to}`,
     )
   })
@@ -1794,6 +1867,43 @@ function replayScriptForCriterion(key: InterviewCriterionKey): {
     evidenceLine: '补失败场景、监控信号、降级策略和取舍依据。',
     boundaryLine: '最后说明为什么这样兜底，以及什么情况下会换方案。',
   }
+}
+
+function buildReplayChecklistItems(to: string): PracticeSessionReplayChecklistItem[] {
+  return [
+    {
+      id: 'conclusion',
+      label: '结论先行',
+      description: '10 秒内给出明确判断，不先铺大段背景。',
+      failureSignal: '开头超过 10 秒还没有结论，或只复述题目没有观点。',
+      target: '第一句话能直接回答题目，并说明接下来会补机制、证据和边界。',
+      to,
+    },
+    {
+      id: 'evidence',
+      label: '证据可追问',
+      description: '至少给出一个项目场景、指标、规模或个人动作。',
+      failureSignal: '只说“我理解/我会处理”，没有可继续追问的事实细节。',
+      target: '面试官继续问规模、指标、职责时，答案里已经有可展开的证据点。',
+      to,
+    },
+    {
+      id: 'boundary',
+      label: '风险有边界',
+      description: '说明失败场景、降级方案、监控信号或取舍依据。',
+      failureSignal: '答案只讲正向方案，不讲什么时候失效、怎么兜底。',
+      target: '至少补一个风险边界和一个验证/回滚动作。',
+      to,
+    },
+    {
+      id: 'duration',
+      label: '60 秒内讲完',
+      description: '控制在 45-60 秒内讲完结论、证据和边界。',
+      failureSignal: '超过 60 秒仍未讲到边界，或 30 秒内只有零散关键词。',
+      target: '一轮复述完整、可停顿、可被追问，不依赖长篇背诵。',
+      to,
+    },
+  ]
 }
 
 function buildPracticeSessionScriptCommandItem(
