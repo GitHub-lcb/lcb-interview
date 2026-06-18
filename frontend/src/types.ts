@@ -1192,6 +1192,24 @@ export interface PracticeSessionFirstQuestionRubric {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionFirstQuestionReceiptStatus = 'empty' | 'repair' | 'ready'
+
+export interface PracticeSessionFirstQuestionReceiptItem {
+  id: string
+  label: string
+  prompt: string
+  example: string
+  priority: number
+}
+
+export interface PracticeSessionFirstQuestionReceipt {
+  status: PracticeSessionFirstQuestionReceiptStatus
+  title: string
+  summary: string
+  items: PracticeSessionFirstQuestionReceiptItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

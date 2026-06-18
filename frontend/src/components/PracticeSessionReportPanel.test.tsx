@@ -921,6 +921,37 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders first question receipt template before the next session round', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const receipt = screen.getByLabelText('首题回执模板')
+
+    expect(within(receipt).getByText('首题回执模板')).toBeInTheDocument()
+    expect(within(receipt).getByText('回修首题回执')).toBeInTheDocument()
+    expect(within(receipt).getByText('本次动作')).toBeInTheDocument()
+    expect(within(receipt).getByText('评分证据')).toBeInTheDocument()
+    expect(within(receipt).getByText('是否达标')).toBeInTheDocument()
+
+    await user.click(within(receipt).getByRole('button', { name: /填写首题回执/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

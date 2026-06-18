@@ -10542,6 +10542,130 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-first-receipt {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: 8px;
+}
+
+.practice-session-report-first-receipt.status-repair {
+  background: #FFF7ED;
+  border-color: #FDBA74;
+}
+
+.practice-session-report-first-receipt.status-ready {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+}
+
+.practice-session-report-first-receipt-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.practice-session-report-first-receipt-head > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-first-receipt-head span {
+  color: #B45309;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-first-receipt.status-repair .practice-session-report-first-receipt-head span {
+  color: #C2410C;
+}
+
+.practice-session-report-first-receipt.status-ready .practice-session-report-first-receipt-head span {
+  color: #334155;
+}
+
+.practice-session-report-first-receipt-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-first-receipt-head small,
+.practice-session-report-first-receipt p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.practice-session-report-first-receipt-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.practice-session-report-first-receipt-list article {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #FDE68A;
+  border-radius: 8px;
+}
+
+.practice-session-report-first-receipt.status-repair .practice-session-report-first-receipt-list article {
+  border-color: #FED7AA;
+}
+
+.practice-session-report-first-receipt.status-ready .practice-session-report-first-receipt-list article {
+  border-color: #CBD5E1;
+}
+
+.practice-session-report-first-receipt-list span {
+  color: #B45309;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-first-receipt.status-repair .practice-session-report-first-receipt-list span {
+  color: #9A3412;
+}
+
+.practice-session-report-first-receipt-list dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 8px;
+  margin: 0;
+}
+
+.practice-session-report-first-receipt-list dt {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-first-receipt-list dd {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-first-receipt .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;
@@ -11192,6 +11316,7 @@ p {
   .practice-session-report-launch-checklist-list,
   .practice-session-report-first-rehearsal-body,
   .practice-session-report-first-rubric-list,
+  .practice-session-report-first-receipt-list,
   .free-promise-band,
   .practice-feedback-lists {
     grid-template-columns: 1fr;

@@ -18,6 +18,8 @@ import type {
   PracticeSessionEvidenceGaps,
   PracticeSessionInterviewerDecision,
   PracticeSessionFirstQuestionRehearsal,
+  PracticeSessionFirstQuestionReceipt,
+  PracticeSessionFirstQuestionReceiptItem,
   PracticeSessionFirstQuestionRubric,
   PracticeSessionFirstQuestionRubricItem,
   PracticeSessionLaunchChecklist,
@@ -242,6 +244,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionLaunchChecklist(queue, progress, now),
     renderSessionFirstQuestionRehearsal(queue, progress, now),
     renderSessionFirstQuestionRubric(queue, progress, now),
+    renderSessionFirstQuestionReceipt(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1421,6 +1424,46 @@ export function buildPracticeSessionFirstQuestionRubric(
   }
 }
 
+export function buildPracticeSessionFirstQuestionReceipt(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionReceipt {
+  const rubric = buildPracticeSessionFirstQuestionRubric(queue, progress, now)
+
+  if (rubric.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待首题回执',
+      summary: '先生成首题验收尺，再填写首题动作、证据、达标结论和下一步。',
+      items: [],
+      primaryAction: {
+        kind: rubric.primaryAction.kind,
+        label: '建立首题回执',
+        description: '先生成首题验收尺，再填写首题回执。',
+        to: rubric.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = rubric.status === 'repair'
+
+  return {
+    status: rubric.status,
+    title: repairMode ? '回修首题回执' : '下一轮首题回执',
+    summary: repairMode
+      ? '把第一项阻断的处理结果写成回执，便于重新检查准入闸门。'
+      : '把第一题开口结果写成回执，便于下一份战报继续追踪。',
+    items: buildFirstQuestionReceiptItems(rubric, repairMode),
+    primaryAction: {
+      kind: rubric.primaryAction.kind,
+      label: '填写首题回执',
+      description: repairMode ? '回到回修入口，按模板补齐首题回执。' : '回到首题入口，按模板补齐首题回执。',
+      to: rubric.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -2339,6 +2382,39 @@ function renderSessionFirstQuestionRubric(
       `   - 目标：${item.target}`,
       `   - 检查口径：${item.check}`,
       `   - 证据：${item.evidence}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionReceipt(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const receipt = buildPracticeSessionFirstQuestionReceipt(queue, progress, now)
+  const lines = [
+    '## 首题回执模板',
+    `- 状态：${receipt.title}`,
+    `- 摘要：${receipt.summary}`,
+    `- 主行动：${receipt.primaryAction.label}，${receipt.primaryAction.description}（${receipt.primaryAction.to}）`,
+    '',
+  ]
+
+  if (receipt.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待首题回执。先生成首题验收尺后，系统会给出可填写模板。',
+      '',
+    ].join('\n')
+  }
+
+  receipt.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 填写项：${item.prompt}`,
+      `   - 示例：${item.example}`,
     )
   })
 
@@ -3840,6 +3916,54 @@ function buildFirstQuestionRubricItems(
       priority: 4,
     },
   ]
+}
+
+function buildFirstQuestionReceiptItems(
+  rubric: PracticeSessionFirstQuestionRubric,
+  repairMode: boolean,
+): PracticeSessionFirstQuestionReceiptItem[] {
+  const opening = findFirstQuestionRubricItem(rubric, 'opening-hit')
+  const passSignal = findFirstQuestionRubricItem(rubric, 'pass-signal-hit')
+  const evidence = findFirstQuestionRubricItem(rubric, 'evidence-saved')
+  const nextStep = findFirstQuestionRubricItem(rubric, 'next-step-clear')
+
+  return [
+    {
+      id: 'receipt-action',
+      label: '本次动作',
+      prompt: repairMode ? '我本次处理的阻断项是什么？' : '我本次回答的首题是什么？',
+      example: `本次动作：${opening?.target ?? '按首题预演完成一次开口。'}`,
+      priority: 1,
+    },
+    {
+      id: 'receipt-evidence',
+      label: '评分证据',
+      prompt: '我留下了什么评分、回修或文字证据？',
+      example: `证据：${evidence?.evidence ?? '已保留本次评分样本。'}`,
+      priority: 2,
+    },
+    {
+      id: 'receipt-result',
+      label: '是否达标',
+      prompt: '对照通过信号，本次结论是达标还是未达标？',
+      example: `结论：达标/未达标；依据：${passSignal?.check ?? '对照首题验收尺逐项检查。'}`,
+      priority: 3,
+    },
+    {
+      id: 'receipt-next-step',
+      label: '下一步',
+      prompt: '下一步继续回修、重答，还是进入下一轮？',
+      example: `下一步：${nextStep?.check ?? '按战报主行动继续推进。'} 入口：${rubric.primaryAction.to}`,
+      priority: 4,
+    },
+  ]
+}
+
+function findFirstQuestionRubricItem(
+  rubric: PracticeSessionFirstQuestionRubric,
+  id: string,
+): PracticeSessionFirstQuestionRubricItem | undefined {
+  return rubric.items.find(item => item.id === id)
 }
 
 function buildPracticeSessionScriptCommandItem(
