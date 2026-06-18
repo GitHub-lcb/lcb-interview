@@ -870,6 +870,30 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown.indexOf('## 首题复盘归档包')).toBeLessThan(markdown.indexOf('## 下一轮训练建议'))
   })
 
+  it('exports first question archive reuse checklist before the next session round', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1), question(2)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 62, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+          2: [attempt(2, 72, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+        },
+      }),
+      NOW,
+    )
+
+    expect(markdown).toContain('## 首题归档复用清单')
+    expect(markdown).toContain('回修归档复用清单')
+    expect(markdown).toContain('读分数')
+    expect(markdown).toContain('带证据')
+    expect(markdown).toContain('认阻断')
+    expect(markdown).toContain('开下一题')
+    expect(markdown).toContain('开场提示')
+    expect(markdown).toContain('失败回退')
+    expect(markdown.indexOf('## 首题归档复用清单')).toBeGreaterThan(markdown.indexOf('## 首题复盘归档包'))
+    expect(markdown.indexOf('## 首题归档复用清单')).toBeLessThan(markdown.indexOf('## 下一轮训练建议'))
+  })
+
   it('keeps empty session markdown actionable', () => {
     const markdown = buildPracticeSessionReportMarkdown([], progress(), NOW)
 
@@ -942,6 +966,8 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('等待验收首题复盘')
     expect(markdown).toContain('## 首题复盘归档包')
     expect(markdown).toContain('等待首题复盘归档')
+    expect(markdown).toContain('## 首题归档复用清单')
+    expect(markdown).toContain('等待首题归档复用')
     expect(markdown).toContain('## 下一轮训练建议')
     expect(markdown).toContain('先做一次模拟面试')
     expect(markdown).toContain('暂无题目')

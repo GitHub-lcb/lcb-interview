@@ -1310,6 +1310,26 @@ export interface PracticeSessionFirstQuestionReviewArchive {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionFirstQuestionArchiveReuseStatus = 'empty' | 'repair' | 'ready'
+
+export interface PracticeSessionFirstQuestionArchiveReuseItem {
+  id: string
+  label: string
+  action: string
+  openingPrompt: string
+  acceptanceRule: string
+  fallbackAction: string
+  priority: number
+}
+
+export interface PracticeSessionFirstQuestionArchiveReuse {
+  status: PracticeSessionFirstQuestionArchiveReuseStatus
+  title: string
+  summary: string
+  items: PracticeSessionFirstQuestionArchiveReuseItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

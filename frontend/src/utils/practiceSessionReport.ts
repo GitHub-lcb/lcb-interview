@@ -17,6 +17,8 @@ import type {
   PracticeSessionEvidenceGapItem,
   PracticeSessionEvidenceGaps,
   PracticeSessionInterviewerDecision,
+  PracticeSessionFirstQuestionArchiveReuse,
+  PracticeSessionFirstQuestionArchiveReuseItem,
   PracticeSessionFirstQuestionRehearsal,
   PracticeSessionFirstQuestionReceipt,
   PracticeSessionFirstQuestionReceiptAcceptance,
@@ -266,6 +268,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFirstQuestionReviewTemplate(queue, progress, now),
     renderSessionFirstQuestionReviewAcceptance(queue, progress, now),
     renderSessionFirstQuestionReviewArchive(queue, progress, now),
+    renderSessionFirstQuestionArchiveReuse(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1689,6 +1692,46 @@ export function buildPracticeSessionFirstQuestionReviewArchive(
   }
 }
 
+export function buildPracticeSessionFirstQuestionArchiveReuse(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionArchiveReuse {
+  const archive = buildPracticeSessionFirstQuestionReviewArchive(queue, progress, now)
+
+  if (archive.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待首题归档复用',
+      summary: '先生成首题复盘归档包，再把归档内容转成下一轮可执行动作。',
+      items: [],
+      primaryAction: {
+        kind: archive.primaryAction.kind,
+        label: '建立复用清单',
+        description: '先完成首题复盘归档，再建立下一轮复用动作。',
+        to: archive.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = archive.status === 'repair'
+
+  return {
+    status: archive.status,
+    title: repairMode ? '回修归档复用清单' : '首题归档复用清单',
+    summary: repairMode
+      ? '把回修归档证据转成下一次开口前必须核销的动作。'
+      : '把首题归档内容转成下一轮开场、作答和复盘的复用动作。',
+    items: buildFirstQuestionArchiveReuseItems(archive, repairMode),
+    primaryAction: {
+      kind: archive.primaryAction.kind,
+      label: '复用首题归档',
+      description: repairMode ? '回到首题入口，带着归档证据继续修复。' : '回到下一轮首题，带着归档证据开练。',
+      to: archive.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -2813,6 +2856,41 @@ function renderSessionFirstQuestionReviewArchive(
       `   - 归档内容：${item.content}`,
       `   - 下一轮用途：${item.nextUse}`,
       `   - 丢失风险：${item.lossRisk}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionArchiveReuse(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const reuse = buildPracticeSessionFirstQuestionArchiveReuse(queue, progress, now)
+  const lines = [
+    '## 首题归档复用清单',
+    `- 状态：${reuse.title}`,
+    `- 摘要：${reuse.summary}`,
+    `- 主行动：${reuse.primaryAction.label}，${reuse.primaryAction.description}（${reuse.primaryAction.to}）`,
+    '',
+  ]
+
+  if (reuse.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待首题归档复用。先生成首题复盘归档包后，系统会给出复用动作。',
+      '',
+    ].join('\n')
+  }
+
+  reuse.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 复用动作：${item.action}`,
+      `   - 开场提示：${item.openingPrompt}`,
+      `   - 验收口径：${item.acceptanceRule}`,
+      `   - 失败回退：${item.fallbackAction}`,
     )
   })
 
@@ -4622,6 +4700,55 @@ function buildFirstQuestionReviewArchiveItems(
   ]
 }
 
+function buildFirstQuestionArchiveReuseItems(
+  archive: PracticeSessionFirstQuestionReviewArchive,
+  repairMode: boolean,
+): PracticeSessionFirstQuestionArchiveReuseItem[] {
+  const score = findFirstQuestionReviewArchiveItem(archive, 'archive-review-score-snapshot')
+  const evidence = findFirstQuestionReviewArchiveItem(archive, 'archive-review-evidence')
+  const blocker = findFirstQuestionReviewArchiveItem(archive, 'archive-review-blocker')
+  const nextSeed = findFirstQuestionReviewArchiveItem(archive, 'archive-review-next-seed')
+
+  return [
+    {
+      id: 'reuse-read-score',
+      label: '读分数',
+      action: score?.content ?? '复读首题评分快照。',
+      openingPrompt: repairMode ? '先说清本次要把哪个分数拉回通过线。' : '先说清本轮基线和首题目标分。',
+      acceptanceRule: score?.nextUse ?? '必须让下一轮有可对比的分数基线。',
+      fallbackAction: score ? `回到「${score.label}」补齐分数快照。` : '回到首题复盘归档包，补齐分数快照。',
+      priority: 1,
+    },
+    {
+      id: 'reuse-carry-evidence',
+      label: '带证据',
+      action: evidence?.content ?? '带入首题证据归档。',
+      openingPrompt: repairMode ? '开口前先点名本次补上的证据。' : '开口前先点名上一轮留下的场景、指标或风险证据。',
+      acceptanceRule: evidence?.nextUse ?? '必须能支撑下一轮追问和复盘。',
+      fallbackAction: evidence ? `回到「${evidence.label}」补齐证据归档。` : '回到首题复盘归档包，补齐证据归档。',
+      priority: 2,
+    },
+    {
+      id: 'reuse-name-blocker',
+      label: '认阻断',
+      action: blocker?.content ?? '复述首题阻断结论。',
+      openingPrompt: repairMode ? '先承认剩余阻断，再回答题目。' : '先确认是否有新阻断，再决定是否加压。',
+      acceptanceRule: blocker?.nextUse ?? '必须决定继续回修、扩题量或压同一弱项。',
+      fallbackAction: blocker ? `回到「${blocker.label}」补齐阻断结论。` : '回到首题复盘归档包，补齐阻断结论。',
+      priority: 3,
+    },
+    {
+      id: 'reuse-open-next-question',
+      label: '开下一题',
+      action: nextSeed?.content ?? '带着归档口径进入下一题。',
+      openingPrompt: repairMode ? '用一句话说明回修后的第一步。' : '用一句话说明下一题为什么接在首题之后。',
+      acceptanceRule: nextSeed?.nextUse ?? '必须把首题归档转成下一轮第一步。',
+      fallbackAction: nextSeed ? `回到「${nextSeed.label}」补齐下一题种子。` : '回到首题复盘归档包，补齐下一题种子。',
+      priority: 4,
+    },
+  ]
+}
+
 function findFirstQuestionReviewTemplateItem(
   template: PracticeSessionFirstQuestionReviewTemplate,
   id: string,
@@ -4634,6 +4761,13 @@ function findFirstQuestionReviewAcceptanceItem(
   id: string,
 ): PracticeSessionFirstQuestionReviewAcceptanceItem | undefined {
   return acceptance.items.find(item => item.id === id)
+}
+
+function findFirstQuestionReviewArchiveItem(
+  archive: PracticeSessionFirstQuestionReviewArchive,
+  id: string,
+): PracticeSessionFirstQuestionReviewArchiveItem | undefined {
+  return archive.items.find(item => item.id === id)
 }
 
 function buildPracticeSessionScriptCommandItem(

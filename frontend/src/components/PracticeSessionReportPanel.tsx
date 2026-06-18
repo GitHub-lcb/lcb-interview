@@ -25,6 +25,7 @@ import {
   buildPracticeSessionDailyCompletion,
   buildPracticeSessionAbilityRadar,
   buildPracticeSessionEvidenceGaps,
+  buildPracticeSessionFirstQuestionArchiveReuse,
   buildPracticeSessionFirstQuestionRehearsal,
   buildPracticeSessionFirstQuestionReceipt,
   buildPracticeSessionFirstQuestionReceiptAcceptance,
@@ -228,6 +229,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionFirstQuestionReviewArchive = useMemo(
     () => buildPracticeSessionFirstQuestionReviewArchive(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionFirstQuestionArchiveReuse = useMemo(
+    () => buildPracticeSessionFirstQuestionArchiveReuse(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1493,6 +1498,50 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionFirstQuestionReviewArchive.primaryAction.to)}
         >
           {sessionFirstQuestionReviewArchive.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-first-archive-reuse status-${sessionFirstQuestionArchiveReuse.status}`}
+        aria-label="首题归档复用清单"
+      >
+        <div className="practice-session-report-first-archive-reuse-head">
+          <div>
+            <span>首题归档复用清单</span>
+            <strong>{sessionFirstQuestionArchiveReuse.title}</strong>
+            <small>{sessionFirstQuestionArchiveReuse.summary}</small>
+          </div>
+        </div>
+        {sessionFirstQuestionArchiveReuse.items.length === 0 ? (
+          <p>等待首题归档复用。先生成首题复盘归档包后，系统会给出复用动作。</p>
+        ) : (
+          <div className="practice-session-report-first-archive-reuse-list">
+            {sessionFirstQuestionArchiveReuse.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.action}</strong>
+                </div>
+                <dl>
+                  <dt>开场提示</dt>
+                  <dd>{item.openingPrompt}</dd>
+                  <dt>验收口径</dt>
+                  <dd>{item.acceptanceRule}</dd>
+                  <dt>失败回退</dt>
+                  <dd>{item.fallbackAction}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionFirstQuestionArchiveReuse.status === 'repair'}
+          icon={sessionFirstQuestionArchiveReuse.status === 'repair' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionFirstQuestionArchiveReuse.primaryAction.to)}
+        >
+          {sessionFirstQuestionArchiveReuse.primaryAction.label}
         </Button>
       </div>
 
