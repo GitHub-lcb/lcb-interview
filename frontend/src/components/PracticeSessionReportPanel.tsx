@@ -37,6 +37,7 @@ import {
   buildPracticeSessionFirstQuestionReuseReviewArchive,
   buildPracticeSessionFirstQuestionReuseReviewHandoff,
   buildPracticeSessionFirstQuestionReuseReviewHandoffAcceptance,
+  buildPracticeSessionFirstQuestionReuseReviewHandoffReleaseGate,
   buildPracticeSessionFirstQuestionReuseReviewTemplate,
   buildPracticeSessionFirstQuestionReviewAcceptance,
   buildPracticeSessionFirstQuestionReviewArchive,
@@ -273,6 +274,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionFirstQuestionReuseReviewHandoffAcceptance = useMemo(
     () => buildPracticeSessionFirstQuestionReuseReviewHandoffAcceptance(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionFirstQuestionReuseReviewHandoffReleaseGate = useMemo(
+    () => buildPracticeSessionFirstQuestionReuseReviewHandoffReleaseGate(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1932,6 +1937,50 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionFirstQuestionReuseReviewHandoffAcceptance.primaryAction.to)}
         >
           {sessionFirstQuestionReuseReviewHandoffAcceptance.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-first-reuse-review-handoff-release status-${sessionFirstQuestionReuseReviewHandoffReleaseGate.status}`}
+        aria-label="首题复用复盘回流放行门禁"
+      >
+        <div className="practice-session-report-first-reuse-review-handoff-release-head">
+          <div>
+            <span>首题复用复盘回流放行门禁</span>
+            <strong>{sessionFirstQuestionReuseReviewHandoffReleaseGate.title}</strong>
+            <small>{sessionFirstQuestionReuseReviewHandoffReleaseGate.summary}</small>
+          </div>
+        </div>
+        {sessionFirstQuestionReuseReviewHandoffReleaseGate.items.length === 0 ? (
+          <p>等待首题复用复盘回流放行裁决。先完成首题复用复盘回流验收后，系统会判断是否进入下一轮。</p>
+        ) : (
+          <div className="practice-session-report-first-reuse-review-handoff-release-list">
+            {sessionFirstQuestionReuseReviewHandoffReleaseGate.items.map(item => (
+              <article key={item.id} className={`state-${item.state}`}>
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.evidence}</strong>
+                </div>
+                <dl>
+                  <dt>状态</dt>
+                  <dd>{item.state === 'blocked' ? '未放行' : item.state === 'passed' ? '已放行' : '等待样本'}</dd>
+                  <dt>放行规则</dt>
+                  <dd>{item.releaseRule}</dd>
+                  <dt>处理动作</dt>
+                  <dd>{item.action}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionFirstQuestionReuseReviewHandoffReleaseGate.status === 'blocked'}
+          icon={sessionFirstQuestionReuseReviewHandoffReleaseGate.status === 'blocked' ? <WarningOutlined /> : <ArrowRightOutlined />}
+          onClick={() => onNavigate(sessionFirstQuestionReuseReviewHandoffReleaseGate.primaryAction.to)}
+        >
+          {sessionFirstQuestionReuseReviewHandoffReleaseGate.primaryAction.label}
         </Button>
       </div>
 
