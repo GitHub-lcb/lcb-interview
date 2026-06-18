@@ -28,6 +28,8 @@ import type {
   PracticeSessionFirstQuestionReuseReceiptAcceptance,
   PracticeSessionFirstQuestionReuseReceiptAcceptanceItem,
   PracticeSessionFirstQuestionReuseReceiptItem,
+  PracticeSessionFirstQuestionReuseReleaseGate,
+  PracticeSessionFirstQuestionReuseReleaseGateItem,
   PracticeSessionFirstQuestionReleaseGate,
   PracticeSessionFirstQuestionReleaseGateItem,
   PracticeSessionFirstQuestionReviewAcceptance,
@@ -118,6 +120,12 @@ const advanceGateItemStateLabels: Record<PracticeSessionAdvanceGateItem['state']
 }
 
 const firstQuestionReleaseGateItemStateLabels: Record<PracticeSessionFirstQuestionReleaseGateItem['state'], string> = {
+  waiting: '等待样本',
+  blocked: '未放行',
+  passed: '已放行',
+}
+
+const firstQuestionReuseReleaseGateItemStateLabels: Record<PracticeSessionFirstQuestionReuseReleaseGateItem['state'], string> = {
   waiting: '等待样本',
   blocked: '未放行',
   passed: '已放行',
@@ -275,6 +283,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFirstQuestionArchiveReuse(queue, progress, now),
     renderSessionFirstQuestionReuseReceipt(queue, progress, now),
     renderSessionFirstQuestionReuseReceiptAcceptance(queue, progress, now),
+    renderSessionFirstQuestionReuseReleaseGate(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1818,6 +1827,46 @@ export function buildPracticeSessionFirstQuestionReuseReceiptAcceptance(
   }
 }
 
+export function buildPracticeSessionFirstQuestionReuseReleaseGate(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionReuseReleaseGate {
+  const acceptance = buildPracticeSessionFirstQuestionReuseReceiptAcceptance(queue, progress, now)
+
+  if (acceptance.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待首题复用放行裁决',
+      summary: '先完成首题复用回执验收，再判断是否可以带着复用证据进入下一轮。',
+      items: [],
+      primaryAction: {
+        kind: acceptance.primaryAction.kind,
+        label: '建立复用门禁',
+        description: '先生成首题复用回执验收卡，再判断是否放行。',
+        to: acceptance.primaryAction.to,
+      },
+    }
+  }
+
+  const blocked = acceptance.status === 'repair'
+
+  return {
+    status: blocked ? 'blocked' : 'ready',
+    title: blocked ? '复用暂缓放行' : '复用已放行',
+    summary: blocked
+      ? '复用回执仍有未通过项，先回到复用链路补齐证据。'
+      : '复用回执已经通过验收，可以带着归档证据进入下一轮。',
+    items: buildFirstQuestionReuseReleaseGateItems(acceptance, blocked),
+    primaryAction: {
+      kind: blocked ? 'repair' : 'continue',
+      label: blocked ? '回到复用修复' : '放行下一轮',
+      description: blocked ? '按复用放行门禁补齐未放行项。' : '带着复用证据进入下一轮首题。',
+      to: acceptance.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -3046,6 +3095,42 @@ function renderSessionFirstQuestionReuseReceiptAcceptance(
       `   - 通过信号：${item.passSignal}`,
       `   - 缺失风险：${item.missingRisk}`,
       `   - 补救动作：${item.repairAction}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionReuseReleaseGate(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const gate = buildPracticeSessionFirstQuestionReuseReleaseGate(queue, progress, now)
+  const lines = [
+    '## 首题复用放行门禁',
+    `- 裁决：${gate.title}`,
+    `- 摘要：${gate.summary}`,
+    `- 主行动：${gate.primaryAction.label}，${gate.primaryAction.description}（${gate.primaryAction.to}）`,
+    '',
+  ]
+
+  if (gate.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待首题复用放行裁决。先完成首题复用回执验收后，系统会判断是否进入下一轮。',
+      '',
+    ].join('\n')
+  }
+
+  gate.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 状态：${firstQuestionReuseReleaseGateItemStateLabels[item.state]}`,
+      `   - 证据：${item.evidence}`,
+      `   - 放行检查：${item.releaseRule}`,
+      `   - 处理动作：${item.action}`,
+      `   - 入口：${item.to}`,
     )
   })
 
@@ -4998,6 +5083,60 @@ function buildFirstQuestionReuseReceiptAcceptanceItems(
   ]
 }
 
+function buildFirstQuestionReuseReleaseGateItems(
+  acceptance: PracticeSessionFirstQuestionReuseReceiptAcceptance,
+  blocked: boolean,
+): PracticeSessionFirstQuestionReuseReleaseGateItem[] {
+  const score = findFirstQuestionReuseReceiptAcceptanceItem(acceptance, 'accept-reuse-score')
+  const evidence = findFirstQuestionReuseReceiptAcceptanceItem(acceptance, 'accept-reuse-evidence')
+  const blocker = findFirstQuestionReuseReceiptAcceptanceItem(acceptance, 'accept-reuse-blocker')
+  const nextQuestion = findFirstQuestionReuseReceiptAcceptanceItem(acceptance, 'accept-reuse-next-question')
+  const state: PracticeSessionFirstQuestionReuseReleaseGateItem['state'] = blocked ? 'blocked' : 'passed'
+
+  return [
+    {
+      id: 'reuse-release-score',
+      label: '分数放行',
+      evidence: score?.target ?? acceptance.summary,
+      releaseRule: score?.passSignal ?? '必须出现可对比的基线分和目标分。',
+      action: blocked ? (score?.repairAction ?? '回到首题复用回执模板，补齐分数字段。') : '保留分数口径，作为下一轮首题基线。',
+      state,
+      to: acceptance.primaryAction.to,
+      priority: 1,
+    },
+    {
+      id: 'reuse-release-evidence',
+      label: '证据放行',
+      evidence: evidence?.target ?? acceptance.summary,
+      releaseRule: evidence?.passSignal ?? '必须说明证据会支撑哪一个追问或复盘点。',
+      action: blocked ? (evidence?.repairAction ?? '回到首题复用回执模板，补齐证据字段。') : '带着证据进入下一题，继续接受追问。',
+      state,
+      to: acceptance.primaryAction.to,
+      priority: 2,
+    },
+    {
+      id: 'reuse-release-blocker',
+      label: '阻断放行',
+      evidence: blocker?.target ?? acceptance.summary,
+      releaseRule: blocker?.passSignal ?? '必须明确继续回修、扩题量或压同一弱项。',
+      action: blocked ? (blocker?.repairAction ?? '回到首题复用回执模板，补齐阻断字段。') : '按阻断判断进入下一轮，不把未修复项当成已通过。',
+      state,
+      to: acceptance.primaryAction.to,
+      priority: 3,
+    },
+    {
+      id: 'reuse-release-next-question',
+      label: '下一题放行',
+      evidence: nextQuestion?.target ?? acceptance.summary,
+      releaseRule: nextQuestion?.passSignal ?? '必须把首题归档转成一个已打开的下一步入口。',
+      action: blocked ? (nextQuestion?.repairAction ?? '回到首题复用回执模板，补齐下一题字段。') : '打开下一轮首题，并继续生成新战报证据。',
+      state,
+      to: acceptance.primaryAction.to,
+      priority: 4,
+    },
+  ]
+}
+
 function findFirstQuestionReviewTemplateItem(
   template: PracticeSessionFirstQuestionReviewTemplate,
   id: string,
@@ -5031,6 +5170,13 @@ function findFirstQuestionReuseReceiptItem(
   id: string,
 ): PracticeSessionFirstQuestionReuseReceiptItem | undefined {
   return receipt.items.find(item => item.id === id)
+}
+
+function findFirstQuestionReuseReceiptAcceptanceItem(
+  acceptance: PracticeSessionFirstQuestionReuseReceiptAcceptance,
+  id: string,
+): PracticeSessionFirstQuestionReuseReceiptAcceptanceItem | undefined {
+  return acceptance.items.find(item => item.id === id)
 }
 
 function buildPracticeSessionScriptCommandItem(

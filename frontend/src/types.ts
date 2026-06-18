@@ -1369,6 +1369,29 @@ export interface PracticeSessionFirstQuestionReuseReceiptAcceptance {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionFirstQuestionReuseReleaseGateStatus = 'empty' | 'blocked' | 'ready'
+
+export type PracticeSessionFirstQuestionReuseReleaseGateItemState = 'waiting' | 'blocked' | 'passed'
+
+export interface PracticeSessionFirstQuestionReuseReleaseGateItem {
+  id: string
+  label: string
+  evidence: string
+  releaseRule: string
+  action: string
+  state: PracticeSessionFirstQuestionReuseReleaseGateItemState
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionFirstQuestionReuseReleaseGate {
+  status: PracticeSessionFirstQuestionReuseReleaseGateStatus
+  title: string
+  summary: string
+  items: PracticeSessionFirstQuestionReuseReleaseGateItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

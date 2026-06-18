@@ -1218,6 +1218,40 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders first question reuse release gate before the next session round', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const releaseGate = screen.getByLabelText('首题复用放行门禁')
+
+    expect(within(releaseGate).getByText('首题复用放行门禁')).toBeInTheDocument()
+    expect(within(releaseGate).getByText('复用暂缓放行')).toBeInTheDocument()
+    expect(within(releaseGate).getByText('分数放行')).toBeInTheDocument()
+    expect(within(releaseGate).getByText('证据放行')).toBeInTheDocument()
+    expect(within(releaseGate).getByText('阻断放行')).toBeInTheDocument()
+    expect(within(releaseGate).getByText('下一题放行')).toBeInTheDocument()
+    expect(within(releaseGate).getAllByText('放行检查').length).toBeGreaterThan(0)
+    expect(within(releaseGate).getAllByText('处理动作').length).toBeGreaterThan(0)
+
+    await user.click(within(releaseGate).getByRole('button', { name: /回到复用修复/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel
