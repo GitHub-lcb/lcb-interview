@@ -28,6 +28,8 @@ import type {
   PracticeSessionReplayCards,
   PracticeSessionRetryDraftItem,
   PracticeSessionRetryDrafts,
+  PracticeSessionReceiptAcceptance,
+  PracticeSessionReceiptAcceptanceItem,
   PracticeSessionRiskGuardrailItem,
   PracticeSessionRiskGuardrails,
   PracticeSessionScheduleChecklist,
@@ -218,6 +220,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionTrainingSchedule(queue, progress, now),
     renderSessionScheduleChecklist(queue, progress, now),
     renderSessionTrainingReceipt(queue, progress, now),
+    renderSessionReceiptAcceptance(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1101,6 +1104,47 @@ export function buildPracticeSessionTrainingReceipt(
   }
 }
 
+export function buildPracticeSessionReceiptAcceptance(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionReceiptAcceptance {
+  const receipt = buildPracticeSessionTrainingReceipt(queue, progress, now)
+
+  if (receipt.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待验收训练回执',
+      summary: '先生成训练回执模板，再检查目标、证据、阻断和下一步是否闭环。',
+      items: [],
+      primaryAction: {
+        kind: receipt.primaryAction.kind,
+        label: '建立验收样本',
+        description: '先完成一次模拟面试并生成训练回执。',
+        to: receipt.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = receipt.status === 'repair'
+  const items = buildReceiptAcceptanceItems(receipt, repairMode)
+
+  return {
+    status: receipt.status,
+    title: repairMode ? '修复回执待验收' : '推进回执待验收',
+    summary: repairMode
+      ? '先确认目标、证据、阻断和下一步都写清，再决定是否继续修复。'
+      : '先确认回执足够支撑加压，再进入下一轮个性化训练。',
+    items,
+    primaryAction: {
+      kind: receipt.primaryAction.kind,
+      label: '验收训练回执',
+      description: '按验收卡检查回执质量，再决定是否推进下一轮。',
+      to: receipt.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -1820,6 +1864,41 @@ function renderSessionTrainingReceipt(
       `${index + 1}. ${item.label}`,
       `   - 填写提示：${item.prompt}`,
       `   - 示例：${item.example}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionReceiptAcceptance(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const acceptance = buildPracticeSessionReceiptAcceptance(queue, progress, now)
+  const lines = [
+    '## 回执验收卡',
+    `- 状态：${acceptance.title}`,
+    `- 摘要：${acceptance.summary}`,
+    `- 主行动：${acceptance.primaryAction.label}，${acceptance.primaryAction.description}（${acceptance.primaryAction.to}）`,
+    '',
+  ]
+
+  if (acceptance.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待验收训练回执。先生成训练回执模板后，系统会给出进入下一轮前的检查点。',
+      '',
+    ].join('\n')
+  }
+
+  acceptance.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 目标：${item.target}`,
+      `   - 检查：${item.check}`,
+      `   - 未通过动作：${item.fallbackAction}`,
+      `   - 入口：${item.to}`,
     )
   })
 
@@ -3083,6 +3162,55 @@ function buildTrainingReceiptItems({
       label: '下一步',
       prompt: repairMode ? '如果阻断仍存在，回到本轮队列继续修复；如果清零，再进入下一轮。' : '进入下一轮个性化训练，并用新战报继续验收。',
       example: repairMode ? `下一步：回到 ${contract.primaryAction.to} 继续修复。` : `下一步：进入 ${contract.primaryAction.to} 继续训练。`,
+      priority: 4,
+    },
+  ]
+}
+
+function buildReceiptAcceptanceItems(
+  receipt: PracticeSessionTrainingReceipt,
+  repairMode: boolean,
+): PracticeSessionReceiptAcceptanceItem[] {
+  const target = receipt.items.find(item => item.id === 'training-target')?.example ?? '写清本轮训练目标。'
+  const evidence = receipt.items.find(item => item.id === 'completion-evidence')?.example ?? '补充可追溯完成证据。'
+  const blocker = receipt.items.find(item => item.id === 'blocking-risk')?.example ?? '说明是否还有阻断项。'
+  const nextStep = receipt.items.find(item => item.id === 'next-step')?.example ?? receipt.primaryAction.to
+
+  return [
+    {
+      id: 'target-clear',
+      label: '目标清晰',
+      target,
+      check: '回执里必须写清本轮目标分、题组和验收口径。',
+      fallbackAction: '目标不清时先回到训练契约，重写本轮目标。',
+      to: receipt.primaryAction.to,
+      priority: 1,
+    },
+    {
+      id: 'evidence-traceable',
+      label: '证据可查',
+      target: evidence,
+      check: '回执里必须能看到开口训练、打卡或评分证据。',
+      fallbackAction: '证据不足时回到打卡清单，补一条可追溯记录。',
+      to: receipt.primaryAction.to,
+      priority: 2,
+    },
+    {
+      id: 'blocker-explained',
+      label: '阻断说明',
+      target: blocker,
+      check: repairMode ? '修复态必须说明阻断项是否已经清零。' : '推进态必须说明是否还有可被追问的风险点。',
+      fallbackAction: repairMode ? '阻断未清零时继续修复本轮队列。' : '风险点不清时先补一轮压力追问。',
+      to: receipt.primaryAction.to,
+      priority: 3,
+    },
+    {
+      id: 'next-step-clear',
+      label: '下一步明确',
+      target: nextStep,
+      check: '回执最后必须落到继续修复或进入下一轮的具体入口。',
+      fallbackAction: '下一步不明确时先按回执模板补齐行动入口。',
+      to: receipt.primaryAction.to,
       priority: 4,
     },
   ]

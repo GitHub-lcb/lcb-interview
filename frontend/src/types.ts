@@ -1078,6 +1078,26 @@ export interface PracticeSessionTrainingReceipt {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionReceiptAcceptanceStatus = 'empty' | 'repair' | 'advance'
+
+export interface PracticeSessionReceiptAcceptanceItem {
+  id: string
+  label: string
+  target: string
+  check: string
+  fallbackAction: string
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionReceiptAcceptance {
+  status: PracticeSessionReceiptAcceptanceStatus
+  title: string
+  summary: string
+  items: PracticeSessionReceiptAcceptanceItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

@@ -37,6 +37,7 @@ import {
   buildPracticeSessionReplayCards,
   buildPracticeSessionReport,
   buildPracticeSessionReportMarkdown,
+  buildPracticeSessionReceiptAcceptance,
   buildPracticeSessionRetryDrafts,
   buildPracticeSessionRiskGuardrails,
   buildPracticeSessionScheduleChecklist,
@@ -168,6 +169,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionTrainingReceipt = useMemo(
     () => buildPracticeSessionTrainingReceipt(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionReceiptAcceptance = useMemo(
+    () => buildPracticeSessionReceiptAcceptance(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -965,6 +970,39 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionTrainingReceipt.primaryAction.to)}
         >
           {sessionTrainingReceipt.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className={`practice-session-report-receipt-acceptance status-${sessionReceiptAcceptance.status}`} aria-label="回执验收卡">
+        <div className="practice-session-report-receipt-acceptance-head">
+          <div>
+            <span>回执验收卡</span>
+            <strong>{sessionReceiptAcceptance.title}</strong>
+            <small>{sessionReceiptAcceptance.summary}</small>
+          </div>
+        </div>
+        {sessionReceiptAcceptance.items.length === 0 ? (
+          <p>等待验收训练回执。先生成训练回执模板后，系统会给出进入下一轮前的检查点。</p>
+        ) : (
+          <div className="practice-session-report-receipt-acceptance-list">
+            {sessionReceiptAcceptance.items.map(item => (
+              <article key={item.id}>
+                <strong>{item.label}</strong>
+                <span>{item.target}</span>
+                <small>{item.check}</small>
+                <em>{item.fallbackAction}</em>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionReceiptAcceptance.status === 'repair'}
+          icon={sessionReceiptAcceptance.status === 'repair' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionReceiptAcceptance.primaryAction.to)}
+        >
+          {sessionReceiptAcceptance.primaryAction.label}
         </Button>
       </div>
 

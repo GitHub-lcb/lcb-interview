@@ -738,6 +738,37 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders receipt acceptance card for the next session round', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const acceptanceBlock = screen.getByLabelText('回执验收卡')
+
+    expect(within(acceptanceBlock).getByText('回执验收卡')).toBeInTheDocument()
+    expect(within(acceptanceBlock).getByText('目标清晰')).toBeInTheDocument()
+    expect(within(acceptanceBlock).getByText('证据可查')).toBeInTheDocument()
+    expect(within(acceptanceBlock).getByText('阻断说明')).toBeInTheDocument()
+    expect(within(acceptanceBlock).getByText('下一步明确')).toBeInTheDocument()
+
+    await user.click(within(acceptanceBlock).getByRole('button', { name: /验收训练回执/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel
