@@ -15,6 +15,8 @@ import type {
   PracticeSessionEvidenceGapItem,
   PracticeSessionEvidenceGaps,
   PracticeSessionInterviewerDecision,
+  PracticeSessionPassGate,
+  PracticeSessionPassGateItem,
   PracticeQueueItem,
   PracticeSessionPressureProbeItem,
   PracticeSessionPressureProbes,
@@ -200,6 +202,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionPressureProbes(queue, progress),
     renderSessionRiskGuardrails(queue, progress),
     renderSessionRetryDrafts(queue, progress),
+    renderSessionPassGate(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -776,6 +779,72 @@ export function buildPracticeSessionRetryDrafts(
   }
 }
 
+export function buildPracticeSessionPassGate(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): PracticeSessionPassGate {
+  const report = buildPracticeSessionReport(queue, progress)
+  const radar = buildPracticeSessionAbilityRadar(queue, progress)
+  const retryDrafts = buildPracticeSessionRetryDrafts(queue, progress)
+
+  if (report.totalCount === 0 || report.answeredCount === 0) {
+    return {
+      status: 'empty',
+      title: '等待生成通过门槛',
+      summary: '先完成一次模拟面试，系统才能把本轮表现换算成进入下一轮前的硬门槛。',
+      passedCount: 0,
+      totalCount: 0,
+      items: [],
+      primaryAction: {
+        kind: report.primaryAction.kind,
+        label: '建立通过样本',
+        description: '先完成一次开口作答，再判断本轮是否能进入下一轮。',
+        to: report.primaryAction.to,
+      },
+    }
+  }
+
+  const unansweredCount = Math.max(report.totalCount - report.answeredCount, 0)
+  const queuePath = report.queueProfile.queuePath
+  const items = buildPassGateItems(report, radar, retryDrafts, unansweredCount, queuePath)
+  const passedCount = items.filter(item => item.status === 'ready').length
+  const blockedItem = items.find(item => item.status === 'blocked')
+
+  if (blockedItem) {
+    return {
+      status: 'blocked',
+      title: '暂缓进入下一轮',
+      summary: `先处理「${blockedItem.label}」：${blockedItem.action}。`,
+      passedCount,
+      totalCount: items.length,
+      items,
+      primaryAction: {
+        kind: 'repair',
+        label: '修复通过门槛',
+        description: `${blockedItem.label} 未达标，先回到本轮队列完成修复。`,
+        to: queuePath,
+      },
+    }
+  }
+
+  const nextQueue = buildPracticeSessionNextTrainingQueue(queue, progress, progress.updatedAt, 5)
+
+  return {
+    status: 'ready',
+    title: '可以进入下一轮',
+    summary: `本轮 ${items.length} 个通过门槛全部满足，可以带着二次提交稿进入下一轮加压训练。`,
+    passedCount,
+    totalCount: items.length,
+    items,
+    primaryAction: {
+      kind: 'continue',
+      label: '进入下一轮训练',
+      description: '本轮已达到推进标准，继续用个性化队列加压。',
+      to: nextQueue.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -1292,6 +1361,39 @@ function renderSessionRetryDrafts(queue: PracticeQueueItem[], progress: StudyPro
       `   - 边界句：${item.boundaryLine}`,
       `   - 收束句：${item.closingLine}`,
       `   - 完整稿：${item.fullDraft}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionPassGate(queue: PracticeQueueItem[], progress: StudyProgress): string {
+  const gate = buildPracticeSessionPassGate(queue, progress)
+  const lines = [
+    '## 本轮通过门槛',
+    `- 状态：${gate.title}`,
+    `- 摘要：${gate.summary}`,
+    `- 通过：${gate.passedCount}/${gate.totalCount}`,
+    `- 主行动：${gate.primaryAction.label}，${gate.primaryAction.description}（${gate.primaryAction.to}）`,
+    '',
+  ]
+
+  if (gate.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待生成通过门槛。先完成一次模拟面试后，系统会判断本轮是否可以进入下一轮。',
+      '',
+    ].join('\n')
+  }
+
+  gate.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 状态：${item.status === 'ready' ? '已通过' : '待修复'}`,
+      `   - 目标：${item.target}`,
+      `   - 当前：${item.current}`,
+      `   - 动作：${item.action}`,
       `   - 入口：${item.to}`,
     )
   })
@@ -2227,6 +2329,63 @@ function buildRetryDraftItem(card: PracticeSessionReplayCardItem): PracticeSessi
     to: card.to,
     priority: card.priority,
   }
+}
+
+function buildPassGateItems(
+  report: PracticeSessionReport,
+  radar: PracticeSessionAbilityRadar,
+  retryDrafts: PracticeSessionRetryDrafts,
+  unansweredCount: number,
+  queuePath: string,
+): PracticeSessionPassGateItem[] {
+  const answerReady = unansweredCount === 0
+  // 通过门槛使用 80 分强标准，避免 70 分基础通过的答案直接被放进下一轮加压。
+  const scoreReady = report.averageScore >= STRONG_SESSION_SCORE
+  const weaknessReady = report.weakQuestionIds.length === 0 && radar.status === 'stable'
+  const draftReady = retryDrafts.status === 'ready'
+
+  return [
+    {
+      id: 'answered',
+      label: '全题完成',
+      target: '本轮题目全部完成一次评分',
+      current: answerReady ? `已答完 ${report.answeredCount}/${report.totalCount}` : `还剩 ${unansweredCount} 道未答`,
+      status: answerReady ? 'ready' : 'blocked',
+      action: answerReady ? '保持完整样本' : '先完成未答题，避免用残缺样本判断通过。',
+      to: answerReady ? queuePath : buildQueuePath(report.queueProfile.unansweredQuestionIds),
+      priority: 1,
+    },
+    {
+      id: 'average-score',
+      label: '平均分达标',
+      target: `${STRONG_SESSION_SCORE} 分以上再进入下一轮`,
+      current: `当前平均 ${report.averageScore} 分`,
+      status: scoreReady ? 'ready' : 'blocked',
+      action: scoreReady ? '保持高分稳定性' : `先把平均分从 ${report.averageScore} 分补到 ${STRONG_SESSION_SCORE} 分以上。`,
+      to: queuePath,
+      priority: 2,
+    },
+    {
+      id: 'weakness-cleanup',
+      label: '弱项清零',
+      target: '无薄弱题且四项能力雷达稳定',
+      current: weaknessReady ? '弱题清零，能力雷达稳定' : `${report.weakQuestionIds.length} 道薄弱题，雷达状态：${radar.title}`,
+      status: weaknessReady ? 'ready' : 'blocked',
+      action: weaknessReady ? '保留当前答法' : '先修复薄弱题和最低能力维度，再进入下一轮。',
+      to: queuePath,
+      priority: 3,
+    },
+    {
+      id: 'retry-draft',
+      label: '二次提交稿就绪',
+      target: '重答前已生成可直接提交的结论、证据、边界和收束稿',
+      current: draftReady ? '二次提交稿已就绪' : retryDrafts.title,
+      status: draftReady ? 'ready' : 'blocked',
+      action: draftReady ? '按稿进入下一轮加压' : '先生成并使用二次提交稿，避免带着原始失分表达进入下一轮。',
+      to: retryDrafts.primaryAction.to,
+      priority: 4,
+    },
+  ]
 }
 
 function buildPracticeSessionScriptCommandItem(

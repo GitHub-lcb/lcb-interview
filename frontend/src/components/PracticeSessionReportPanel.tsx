@@ -29,6 +29,7 @@ import {
   buildPracticeSessionMaterialVault,
   buildPracticeSessionMistakeLedger,
   buildPracticeSessionNextTrainingQueue,
+  buildPracticeSessionPassGate,
   buildPracticeSessionPressureProbes,
   buildPracticeSessionRecoveryAcceptance,
   buildPracticeSessionReplayChecklist,
@@ -138,6 +139,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionRetryDrafts = useMemo(
     () => buildPracticeSessionRetryDrafts(queue, progress),
+    [progress, queue],
+  )
+  const sessionPassGate = useMemo(
+    () => buildPracticeSessionPassGate(queue, progress),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -730,6 +735,40 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionRetryDrafts.primaryAction.to)}
         >
           {sessionRetryDrafts.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className={`practice-session-report-pass-gate status-${sessionPassGate.status}`} aria-label="本轮通过门槛">
+        <div className="practice-session-report-pass-gate-head">
+          <span>本轮通过门槛</span>
+          <strong>{sessionPassGate.title}</strong>
+          <small>{sessionPassGate.summary}</small>
+        </div>
+        {sessionPassGate.items.length === 0 ? (
+          <p>等待生成通过门槛。先完成一次模拟面试后，系统会判断本轮是否可以进入下一轮。</p>
+        ) : (
+          <div className="practice-session-report-pass-gate-list">
+            {sessionPassGate.items.map(item => (
+              <article key={item.id} className={`status-${item.status}`}>
+                <div>
+                  <strong>{item.label}</strong>
+                  <em>{item.status === 'ready' ? '已通过' : '待修复'}</em>
+                </div>
+                <span>{item.target}</span>
+                <small>{item.current}</small>
+                <b>{item.action}</b>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionPassGate.status === 'blocked'}
+          icon={sessionPassGate.status === 'blocked' ? <WarningOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionPassGate.primaryAction.to)}
+        >
+          {sessionPassGate.primaryAction.label}
         </Button>
       </div>
 

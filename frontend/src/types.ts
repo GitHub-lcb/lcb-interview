@@ -953,6 +953,31 @@ export interface PracticeSessionRetryDrafts {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionPassGateStatus = 'empty' | 'blocked' | 'ready'
+
+export type PracticeSessionPassGateItemStatus = 'blocked' | 'ready'
+
+export interface PracticeSessionPassGateItem {
+  id: string
+  label: string
+  target: string
+  current: string
+  status: PracticeSessionPassGateItemStatus
+  action: string
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionPassGate {
+  status: PracticeSessionPassGateStatus
+  title: string
+  summary: string
+  passedCount: number
+  totalCount: number
+  items: PracticeSessionPassGateItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

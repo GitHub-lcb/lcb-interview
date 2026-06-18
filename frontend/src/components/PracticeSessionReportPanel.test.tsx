@@ -554,6 +554,37 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders pass gates from the current session queue', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const gateBlock = screen.getByLabelText('本轮通过门槛')
+
+    expect(within(gateBlock).getByText('本轮通过门槛')).toBeInTheDocument()
+    expect(within(gateBlock).getByText('全题完成')).toBeInTheDocument()
+    expect(within(gateBlock).getByText('平均分达标')).toBeInTheDocument()
+    expect(within(gateBlock).getByText('弱项清零')).toBeInTheDocument()
+    expect(within(gateBlock).getByText('二次提交稿就绪')).toBeInTheDocument()
+
+    await user.click(within(gateBlock).getByRole('button', { name: /修复通过门槛/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

@@ -502,6 +502,26 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('主行动：使用二次提交稿')
   })
 
+  it('exports pass gates for the current session queue', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1), question(2)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 62, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+          2: [attempt(2, 72, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+        },
+      }),
+      NOW,
+    )
+
+    expect(markdown).toContain('## 本轮通过门槛')
+    expect(markdown).toContain('全题完成')
+    expect(markdown).toContain('平均分达标')
+    expect(markdown).toContain('弱项清零')
+    expect(markdown).toContain('二次提交稿就绪')
+    expect(markdown).toContain('主行动：')
+  })
+
   it('keeps empty session markdown actionable', () => {
     const markdown = buildPracticeSessionReportMarkdown([], progress(), NOW)
 
@@ -538,6 +558,8 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('等待生成失分禁区')
     expect(markdown).toContain('## 本轮二次提交稿')
     expect(markdown).toContain('等待生成二次提交稿')
+    expect(markdown).toContain('## 本轮通过门槛')
+    expect(markdown).toContain('等待生成通过门槛')
     expect(markdown).toContain('## 下一轮训练建议')
     expect(markdown).toContain('先做一次模拟面试')
     expect(markdown).toContain('暂无题目')

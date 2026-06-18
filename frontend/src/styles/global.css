@@ -8923,6 +8923,143 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-pass-gate {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+}
+
+.practice-session-report-pass-gate.status-blocked {
+  background: #FFFBEB;
+  border-color: #FCD34D;
+}
+
+.practice-session-report-pass-gate.status-ready {
+  background: #F0FDFA;
+  border-color: #99F6E4;
+}
+
+.practice-session-report-pass-gate-head {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-pass-gate-head span {
+  color: #92400E;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-pass-gate.status-ready .practice-session-report-pass-gate-head span {
+  color: #0F766E;
+}
+
+.practice-session-report-pass-gate-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-pass-gate-head small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-pass-gate p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.practice-session-report-pass-gate-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.practice-session-report-pass-gate-list article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+}
+
+.practice-session-report-pass-gate-list article.status-blocked {
+  border-color: #FBBF24;
+}
+
+.practice-session-report-pass-gate-list article.status-ready {
+  border-color: #5EEAD4;
+}
+
+.practice-session-report-pass-gate-list article > div {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.practice-session-report-pass-gate-list strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-pass-gate-list em {
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  color: #92400E;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
+  background: #FEF3C7;
+  border-radius: 999px;
+}
+
+.practice-session-report-pass-gate-list article.status-ready em {
+  color: #0F766E;
+  background: #CCFBF1;
+}
+
+.practice-session-report-pass-gate-list span,
+.practice-session-report-pass-gate-list small,
+.practice-session-report-pass-gate-list b {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-pass-gate-list b {
+  color: #334155;
+  font-weight: 800;
+}
+
+.practice-session-report-pass-gate .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;
@@ -9561,6 +9698,7 @@ p {
   .practice-answer-readiness-items,
   .practice-script-answer-acceptance-panel,
   .practice-script-answer-acceptance-items,
+  .practice-session-report-pass-gate-list,
   .free-promise-band,
   .practice-feedback-lists {
     grid-template-columns: 1fr;
