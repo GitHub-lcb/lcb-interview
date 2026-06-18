@@ -23,6 +23,7 @@ import {
   buildPracticeSessionDailyCompletion,
   buildPracticeSessionAbilityRadar,
   buildPracticeSessionFollowUpDefense,
+  buildPracticeSessionInterviewerDecision,
   buildPracticeSessionMaterialVault,
   buildPracticeSessionMistakeLedger,
   buildPracticeSessionNextTrainingQueue,
@@ -98,6 +99,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionAbilityRadar = useMemo(
     () => buildPracticeSessionAbilityRadar(queue, progress),
+    [progress, queue],
+  )
+  const sessionInterviewerDecision = useMemo(
+    () => buildPracticeSessionInterviewerDecision(queue, progress),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -426,6 +431,41 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionAbilityRadar.primaryAction.to)}
         >
           {sessionAbilityRadar.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-interviewer-decision status-${sessionInterviewerDecision.status}`}
+        aria-label="本轮面试官决策卡"
+      >
+        <div className="practice-session-report-interviewer-decision-head">
+          <span>本轮面试官决策卡</span>
+          <strong>{sessionInterviewerDecision.verdict}</strong>
+          <small>{sessionInterviewerDecision.summary}</small>
+        </div>
+        <div className="practice-session-report-interviewer-decision-evidence">
+          {sessionInterviewerDecision.evidence.map(item => (
+            <div key={item.key}>
+              <span>{item.label}</span>
+              <strong>{item.key === 'answered' ? item.value.replace(' / ', '/') : item.value}</strong>
+              <small>{item.detail}</small>
+            </div>
+          ))}
+        </div>
+        <div className="practice-session-report-interviewer-decision-blockers">
+          <span>阻断项</span>
+          {(sessionInterviewerDecision.blockers.length > 0
+            ? sessionInterviewerDecision.blockers
+            : ['暂无硬阻断']).map(blocker => (
+              <strong key={blocker}>{blocker}</strong>
+            ))}
+        </div>
+        <Button
+          size="small"
+          icon={<WarningOutlined />}
+          onClick={() => onNavigate(sessionInterviewerDecision.primaryAction.to)}
+        >
+          {sessionInterviewerDecision.primaryAction.label}
         </Button>
       </div>
 

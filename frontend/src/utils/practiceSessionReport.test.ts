@@ -348,6 +348,24 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('主行动：回炉场景细节')
   })
 
+  it('exports interviewer decision for the current session queue', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1), question(2)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 62, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+          2: [attempt(2, 72, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+        },
+      }),
+      NOW,
+    )
+
+    expect(markdown).toContain('## 本轮面试官决策卡')
+    expect(markdown).toContain('暂不建议通过')
+    expect(markdown).toContain('阻断项：场景细节平均 55 分')
+    expect(markdown).toContain('主行动：补齐决策阻断')
+  })
+
   it('keeps empty session markdown actionable', () => {
     const markdown = buildPracticeSessionReportMarkdown([], progress(), NOW)
 
@@ -368,6 +386,8 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('等待建立验收样本')
     expect(markdown).toContain('## 本轮薄弱能力雷达')
     expect(markdown).toContain('等待本轮开口样本')
+    expect(markdown).toContain('## 本轮面试官决策卡')
+    expect(markdown).toContain('等待面试样本')
     expect(markdown).toContain('## 下一轮训练建议')
     expect(markdown).toContain('先做一次模拟面试')
     expect(markdown).toContain('暂无题目')

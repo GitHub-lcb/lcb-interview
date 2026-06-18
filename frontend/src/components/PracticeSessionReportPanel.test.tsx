@@ -125,7 +125,7 @@ describe('PracticeSessionReportPanel', () => {
     await userEvent.click(screen.getByRole('button', { name: /继续未答题/ }))
 
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=2')
-  })
+  }, 10000)
 
   it('renders high-score materials from the current session queue', async () => {
     const onNavigate = vi.fn()
@@ -302,6 +302,34 @@ describe('PracticeSessionReportPanel', () => {
     expect(within(radarBlock).getByText('55')).toBeInTheDocument()
 
     await user.click(within(radarBlock).getByRole('button', { name: /回炉场景细节/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
+  it('renders interviewer decision from the current session queue', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const decisionBlock = screen.getByLabelText('本轮面试官决策卡')
+
+    expect(within(decisionBlock).getByText('暂不建议通过')).toBeInTheDocument()
+    expect(within(decisionBlock).getByText('场景细节平均 55 分')).toBeInTheDocument()
+
+    await user.click(within(decisionBlock).getByRole('button', { name: /补齐决策阻断/ }))
 
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })

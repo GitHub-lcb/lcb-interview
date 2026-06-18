@@ -10,6 +10,7 @@ import type {
   NextTrainingQueue,
   PracticeSessionAbilityRadar,
   PracticeSessionAbilityRadarItem,
+  PracticeSessionInterviewerDecision,
   PracticeQueueItem,
   PracticeSessionReport,
   PracticeSessionReportAction,
@@ -175,6 +176,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionMistakeLedger(queue, progress),
     renderSessionRecoveryAcceptance(queue, progress),
     renderSessionAbilityRadar(queue, progress),
+    renderSessionInterviewerDecision(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -331,6 +333,44 @@ export function buildPracticeSessionAbilityRadar(
     weakestItem,
     items,
     primaryAction: buildAbilityRadarPrimaryAction(status, weakestItem, attemptItems),
+  }
+}
+
+export function buildPracticeSessionInterviewerDecision(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): PracticeSessionInterviewerDecision {
+  const report = buildPracticeSessionReport(queue, progress)
+  const radar = buildPracticeSessionAbilityRadar(queue, progress)
+
+  if (report.totalCount === 0 || report.answeredCount === 0) {
+    return {
+      status: 'empty',
+      title: '等待面试样本',
+      verdict: '等待面试样本',
+      summary: '还没有足够的本轮开口记录，面试官视角暂时无法判断通过信号。',
+      evidence: buildDecisionEvidence(report, radar),
+      blockers: ['等待面试样本'],
+      primaryAction: {
+        kind: 'start',
+        label: '建立面试样本',
+        description: '先完成一次模拟面试，让系统产生可判断的面试证据。',
+        to: '/practice',
+      },
+    }
+  }
+
+  const status = resolveInterviewerDecisionStatus(report, radar)
+  const blockers = buildInterviewerDecisionBlockers(report, radar)
+
+  return {
+    status,
+    title: titleForInterviewerDecisionStatus(status),
+    verdict: verdictForInterviewerDecisionStatus(status),
+    summary: summaryForInterviewerDecisionStatus(status, report, radar),
+    evidence: buildDecisionEvidence(report, radar),
+    blockers,
+    primaryAction: buildInterviewerDecisionAction(status, report, radar, blockers),
   }
 }
 
@@ -613,6 +653,22 @@ function renderSessionAbilityRadar(queue: PracticeQueueItem[], progress: StudyPr
   })
 
   return [...lines, ''].join('\n')
+}
+
+function renderSessionInterviewerDecision(queue: PracticeQueueItem[], progress: StudyProgress): string {
+  const decision = buildPracticeSessionInterviewerDecision(queue, progress)
+  const blockers = decision.blockers.length > 0 ? decision.blockers : ['暂无硬阻断']
+
+  return [
+    '## 本轮面试官决策卡',
+    `- 结论：${decision.verdict}`,
+    `- 状态：${decision.title}`,
+    `- 摘要：${decision.summary}`,
+    ...decision.evidence.map(item => `- 证据：${item.label} ${item.value}，${item.detail}`),
+    ...blockers.map(blocker => `- 阻断项：${blocker}`),
+    `- 主行动：${decision.primaryAction.label}，${decision.primaryAction.description}（${decision.primaryAction.to}）`,
+    '',
+  ].join('\n')
 }
 
 function renderSessionNextTraining(
@@ -927,6 +983,166 @@ function buildAbilityRadarPrimaryAction(
   }
 }
 
+function resolveInterviewerDecisionStatus(
+  report: PracticeSessionReport,
+  radar: PracticeSessionAbilityRadar,
+): PracticeSessionInterviewerDecision['status'] {
+  if (report.answeredCount === 0) {
+    return 'empty'
+  }
+  if (report.averageScore < PASSING_SCORE || report.weakQuestionIds.length > 0 || radar.status === 'risk') {
+    return 'reject-risk'
+  }
+  if (report.answeredCount < report.totalCount || report.averageScore < STRONG_SESSION_SCORE) {
+    return 'hold'
+  }
+  if (report.averageScore >= 88 && radar.status === 'stable') {
+    return 'strong-pass'
+  }
+  return 'pass'
+}
+
+function titleForInterviewerDecisionStatus(status: PracticeSessionInterviewerDecision['status']): string {
+  if (status === 'empty') {
+    return '等待面试样本'
+  }
+  if (status === 'reject-risk') {
+    return '面试官会先卡阻断项'
+  }
+  if (status === 'hold') {
+    return '还需要更多稳定证据'
+  }
+  if (status === 'strong-pass') {
+    return '强通过信号'
+  }
+  return '通过信号'
+}
+
+function verdictForInterviewerDecisionStatus(status: PracticeSessionInterviewerDecision['status']): string {
+  if (status === 'empty') {
+    return '等待面试样本'
+  }
+  if (status === 'reject-risk') {
+    return '暂不建议通过'
+  }
+  if (status === 'hold') {
+    return '待观察'
+  }
+  if (status === 'strong-pass') {
+    return '强通过信号'
+  }
+  return '通过信号'
+}
+
+function summaryForInterviewerDecisionStatus(
+  status: PracticeSessionInterviewerDecision['status'],
+  report: PracticeSessionReport,
+  radar: PracticeSessionAbilityRadar,
+): string {
+  if (status === 'reject-risk') {
+    return `平均 ${report.averageScore} 分，最低维度 ${radar.weakestItem?.label ?? '暂无'}，当前更像“需要补证据”的面试表现。`
+  }
+  if (status === 'hold') {
+    return `已有 ${report.answeredCount}/${report.totalCount} 道样本，但还需要补齐未答题或把平均分拉到 ${STRONG_SESSION_SCORE} 分以上。`
+  }
+  if (status === 'strong-pass') {
+    return '本轮回答完整、均分高、四项能力稳定，适合继续做更高压追问。'
+  }
+  return '本轮回答已形成通过信号，继续沉淀高分素材并准备连续追问。'
+}
+
+function buildDecisionEvidence(
+  report: PracticeSessionReport,
+  radar: PracticeSessionAbilityRadar,
+): PracticeSessionInterviewerDecision['evidence'] {
+  return [
+    {
+      key: 'answered',
+      label: '已答',
+      value: `${report.answeredCount} / ${report.totalCount}`,
+      detail: report.answeredCount === report.totalCount ? '本轮样本完整' : '样本仍需补齐',
+    },
+    {
+      key: 'average',
+      label: '均分',
+      value: `${report.averageScore}`,
+      detail: report.averageScore >= PASSING_SCORE ? '达到基础通过线' : '低于基础通过线',
+    },
+    {
+      key: 'pass',
+      label: '通过题',
+      value: `${report.passCount}`,
+      detail: `${PASSING_SCORE} 分以上计为通过`,
+    },
+    {
+      key: 'weakest',
+      label: '最弱维度',
+      value: radar.weakestItem ? `${radar.weakestItem.label} ${radar.weakestItem.averageScore}` : '暂无',
+      detail: radar.weakestItem?.summary ?? '等待评分样本',
+    },
+  ]
+}
+
+function buildInterviewerDecisionBlockers(
+  report: PracticeSessionReport,
+  radar: PracticeSessionAbilityRadar,
+): string[] {
+  const blockers: string[] = []
+
+  if (radar.weakestItem && radar.weakestItem.averageScore < PASSING_SCORE) {
+    blockers.push(`${radar.weakestItem.label}平均 ${radar.weakestItem.averageScore} 分`)
+  }
+  if (report.answeredCount < report.totalCount) {
+    blockers.push(`还有 ${report.totalCount - report.answeredCount} 道题没有形成面试样本`)
+  }
+  if (report.weakQuestionIds.length > 0) {
+    blockers.push(`${report.weakQuestionIds.length} 道低分/薄弱题仍会阻断通过`)
+  }
+  if (report.averageScore < PASSING_SCORE) {
+    blockers.push(`整轮平均 ${report.averageScore} 分低于通过线`)
+  }
+
+  return uniqueTexts(blockers)
+}
+
+function buildInterviewerDecisionAction(
+  status: PracticeSessionInterviewerDecision['status'],
+  report: PracticeSessionReport,
+  radar: PracticeSessionAbilityRadar,
+  blockers: string[],
+): PracticeSessionReportAction {
+  if (status === 'reject-risk') {
+    return {
+      kind: 'repair',
+      label: '补齐决策阻断',
+      description: blockers[0] ?? '先补齐当前最影响通过结论的阻断项。',
+      to: radar.weakestItem?.to ?? report.primaryAction.to,
+    }
+  }
+  if (status === 'hold') {
+    return {
+      kind: 'continue',
+      label: '补齐观察样本',
+      description: '先补齐未答题或把平均分推到稳定通过线以上。',
+      to: report.primaryAction.to,
+    }
+  }
+  if (status === 'empty') {
+    return {
+      kind: 'start',
+      label: '建立面试样本',
+      description: '先完成一次模拟面试，让系统产生可判断的面试证据。',
+      to: '/practice',
+    }
+  }
+  return {
+    kind: 'continue',
+    label: '继续加压追问',
+    description: '把通过信号升级为更稳定的高压追问表现。',
+    to: radar.primaryAction.to,
+  }
+}
+
 function buildRepairActions(
   items: SessionAttemptItem[],
   progress: StudyProgress,
@@ -1055,6 +1271,21 @@ function buildQueuePath(questionIds: number[]): string {
 function uniqueNumbers(values: number[]): number[] {
   const seen = new Set<number>()
   const result: number[] = []
+
+  for (const value of values) {
+    if (seen.has(value)) {
+      continue
+    }
+    seen.add(value)
+    result.push(value)
+  }
+
+  return result
+}
+
+function uniqueTexts(values: string[]): string[] {
+  const seen = new Set<string>()
+  const result: string[] = []
 
   for (const value of values) {
     if (seen.has(value)) {

@@ -778,6 +778,25 @@ export interface PracticeSessionAbilityRadar {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionInterviewerDecisionStatus = 'empty' | 'reject-risk' | 'hold' | 'pass' | 'strong-pass'
+
+export interface PracticeSessionInterviewerDecisionEvidence {
+  key: 'answered' | 'average' | 'pass' | 'weakest'
+  label: string
+  value: string
+  detail: string
+}
+
+export interface PracticeSessionInterviewerDecision {
+  status: PracticeSessionInterviewerDecisionStatus
+  title: string
+  verdict: string
+  summary: string
+  evidence: PracticeSessionInterviewerDecisionEvidence[]
+  blockers: string[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'
