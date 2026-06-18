@@ -25,6 +25,7 @@ import {
   buildPracticeSessionDailyCompletion,
   buildPracticeSessionAbilityRadar,
   buildPracticeSessionEvidenceGaps,
+  buildPracticeSessionFirstQuestionRehearsal,
   buildPracticeSessionFollowUpDefense,
   buildPracticeSessionInterviewerDecision,
   buildPracticeSessionLaunchChecklist,
@@ -188,6 +189,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionLaunchChecklist = useMemo(
     () => buildPracticeSessionLaunchChecklist(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionFirstQuestionRehearsal = useMemo(
+    () => buildPracticeSessionFirstQuestionRehearsal(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1124,6 +1129,43 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionLaunchChecklist.primaryAction.to)}
         >
           {sessionLaunchChecklist.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-first-rehearsal status-${sessionFirstQuestionRehearsal.status}`}
+        aria-label="首题预演卡"
+      >
+        <div className="practice-session-report-first-rehearsal-head">
+          <div>
+            <span>首题预演卡</span>
+            <strong>{sessionFirstQuestionRehearsal.title}</strong>
+            <small>{sessionFirstQuestionRehearsal.summary}</small>
+          </div>
+        </div>
+        <div className="practice-session-report-first-rehearsal-body">
+          <article>
+            <span>首题</span>
+            <strong>{sessionFirstQuestionRehearsal.questionTitle}</strong>
+            <small>{sessionFirstQuestionRehearsal.reason}</small>
+          </article>
+          <dl>
+            <dt>开场提示</dt>
+            <dd>{sessionFirstQuestionRehearsal.openingPrompt}</dd>
+            <dt>通过信号</dt>
+            <dd>{sessionFirstQuestionRehearsal.passSignal}</dd>
+            <dt>证据要求</dt>
+            <dd>{sessionFirstQuestionRehearsal.evidenceRequirement}</dd>
+          </dl>
+        </div>
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionFirstQuestionRehearsal.status === 'repair'}
+          icon={sessionFirstQuestionRehearsal.status === 'repair' ? <ReloadOutlined /> : <PlayCircleOutlined />}
+          onClick={() => onNavigate(sessionFirstQuestionRehearsal.primaryAction.to)}
+        >
+          {sessionFirstQuestionRehearsal.primaryAction.label}
         </Button>
       </div>
 

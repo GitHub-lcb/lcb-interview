@@ -17,6 +17,7 @@ import type {
   PracticeSessionEvidenceGapItem,
   PracticeSessionEvidenceGaps,
   PracticeSessionInterviewerDecision,
+  PracticeSessionFirstQuestionRehearsal,
   PracticeSessionLaunchChecklist,
   PracticeSessionLaunchChecklistItem,
   PracticeSessionLaunchPacket,
@@ -53,6 +54,7 @@ import type {
   PracticeSessionQueueProfile,
   PracticeSessionRepairAction,
   QuestionSnapshot,
+  NextTrainingQueueItem,
   StudyProgress,
 } from '../types'
 import { buildDailyPlanCompletion } from './dailyPlanCompletion'
@@ -236,6 +238,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionAdvanceGate(queue, progress, now),
     renderSessionLaunchPacket(queue, progress, now),
     renderSessionLaunchChecklist(queue, progress, now),
+    renderSessionFirstQuestionRehearsal(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1287,6 +1290,94 @@ export function buildPracticeSessionLaunchChecklist(
   }
 }
 
+export function buildPracticeSessionFirstQuestionRehearsal(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionFirstQuestionRehearsal {
+  const checklist = buildPracticeSessionLaunchChecklist(queue, progress, now)
+  const nextQueue = buildPracticeSessionNextTrainingQueue(queue, progress, now, 5)
+
+  if (checklist.status === 'empty' || checklist.items.length === 0) {
+    return {
+      status: 'empty',
+      title: '等待首题预演',
+      summary: '先生成启动执行清单，再把下一步动作压缩成可开口的首题预演。',
+      questionTitle: '暂无首题',
+      reason: '缺少启动执行清单，暂时无法判断第一题或第一项回修动作。',
+      openingPrompt: '先完成一次模拟面试，让系统生成启动执行清单。',
+      passSignal: '启动执行清单生成后，再进入首题预演。',
+      evidenceRequirement: '暂无证据要求。',
+      primaryAction: {
+        kind: checklist.primaryAction.kind,
+        label: '建立首题预演',
+        description: '先完成一次模拟面试并生成启动执行清单。',
+        to: checklist.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = checklist.status === 'repair'
+  const firstChecklistItem = checklist.items[0]
+
+  if (repairMode) {
+    return {
+      status: 'repair',
+      title: '回修首题预演',
+      summary: '准入仍未放行，先把启动清单第一项当成本轮回修首题。',
+      questionTitle: firstChecklistItem.phase,
+      reason: `准入闸门还在阻断状态，先处理「${firstChecklistItem.phase}」，避免把缺口带入下一轮。`,
+      openingPrompt: buildFirstQuestionRepairOpeningPrompt(firstChecklistItem),
+      passSignal: firstChecklistItem.completionRule,
+      evidenceRequirement: firstChecklistItem.evidenceTemplate,
+      primaryAction: {
+        kind: 'repair',
+        label: '启动回修预演',
+        description: '进入回修入口，先完成第一项可核销动作。',
+        to: firstChecklistItem.to,
+      },
+    }
+  }
+
+  const firstNextItem = nextQueue.items[0]
+
+  if (!firstNextItem) {
+    return {
+      status: 'empty',
+      title: '等待首题预演',
+      summary: '启动执行清单已经生成，但下一轮训练队列暂时没有题目。',
+      questionTitle: '暂无首题',
+      reason: '下一轮训练队列为空，暂时无法生成首题开场。',
+      openingPrompt: '先把题目加入今日计划或完成一次新的模拟面试。',
+      passSignal: '下一轮队列出现第一道题后，再生成开场预演。',
+      evidenceRequirement: '暂无证据要求。',
+      primaryAction: {
+        kind: checklist.primaryAction.kind,
+        label: '生成首题预演',
+        description: '先进入训练入口，让系统生成下一轮题目。',
+        to: checklist.primaryAction.to,
+      },
+    }
+  }
+
+  return {
+    status: 'ready',
+    title: '下一轮首题预演',
+    summary: '已把下一轮第一题转成开场提示、通过信号和证据要求。',
+    questionTitle: firstNextItem.title,
+    reason: `${firstNextItem.sourceLabel}：${firstNextItem.reason}`,
+    openingPrompt: buildFirstQuestionOpeningPrompt(firstNextItem),
+    passSignal: buildFirstQuestionPassSignal(firstNextItem),
+    evidenceRequirement: buildFirstQuestionEvidenceRequirement(firstNextItem),
+    primaryAction: {
+      kind: 'continue',
+      label: '开始首题预演',
+      description: '进入下一轮第一题，先留下新的评分样本。',
+      to: firstNextItem.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -2149,6 +2240,32 @@ function renderSessionLaunchChecklist(
   })
 
   return [...lines, ''].join('\n')
+}
+
+function renderSessionFirstQuestionRehearsal(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const rehearsal = buildPracticeSessionFirstQuestionRehearsal(queue, progress, now)
+  const lines = [
+    '## 首题预演卡',
+    `- 状态：${rehearsal.title}`,
+    `- 摘要：${rehearsal.summary}`,
+    `- 首题：${rehearsal.questionTitle}`,
+    `- 选择原因：${rehearsal.reason}`,
+    `- 开场提示：${rehearsal.openingPrompt}`,
+    `- 通过信号：${rehearsal.passSignal}`,
+    `- 证据要求：${rehearsal.evidenceRequirement}`,
+    `- 主行动：${rehearsal.primaryAction.label}，${rehearsal.primaryAction.description}（${rehearsal.primaryAction.to}）`,
+    '',
+  ]
+
+  if (rehearsal.status === 'empty') {
+    lines.push('- 等待首题预演。先生成启动执行清单和下一轮训练队列。', '')
+  }
+
+  return lines.join('\n')
 }
 
 function renderSessionNextTraining(
@@ -3580,6 +3697,26 @@ function buildLaunchReviewQuestion(priority: number, repairMode: boolean): strin
   }
 
   return repairMode ? '我是否重新验收准入闸门，并看到阻断项减少？' : '我是否已经留下第一条评分样本？'
+}
+
+function buildFirstQuestionRepairOpeningPrompt(item: PracticeSessionLaunchChecklistItem): string {
+  return `我先处理「${item.phase}」，本次只验证一件事：${item.completionRule}`
+}
+
+function buildFirstQuestionOpeningPrompt(item: NextTrainingQueueItem): string {
+  return `我先回答「${item.title}」。结论先行说明核心方案，再补充适用场景、关键边界和验证方式。`
+}
+
+function buildFirstQuestionPassSignal(item: NextTrainingQueueItem): string {
+  const scoreSignal = typeof item.score === 'number'
+    ? `最近 ${item.score} 分，本次要补到 ${STRONG_SESSION_SCORE} 分以上。`
+    : `本次要形成 ${STRONG_SESSION_SCORE} 分以上的可评分样本。`
+
+  return `${scoreSignal} 回答后能说清结论、原因、场景证据和风险边界。`
+}
+
+function buildFirstQuestionEvidenceRequirement(item: NextTrainingQueueItem): string {
+  return `完成「${item.title}」后保留一次评分样本，并记录来源「${item.sourceLabel}」、原因「${item.reason}」。`
 }
 
 function buildPracticeSessionScriptCommandItem(

@@ -859,6 +859,37 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders first question rehearsal before the next session round', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const rehearsal = screen.getByLabelText('首题预演卡')
+
+    expect(within(rehearsal).getByText('首题预演卡')).toBeInTheDocument()
+    expect(within(rehearsal).getByText('回修首题预演')).toBeInTheDocument()
+    expect(within(rehearsal).getByText('开场提示')).toBeInTheDocument()
+    expect(within(rehearsal).getByText('通过信号')).toBeInTheDocument()
+    expect(within(rehearsal).getByText('证据要求')).toBeInTheDocument()
+
+    await user.click(within(rehearsal).getByRole('button', { name: /启动回修预演/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

@@ -10271,6 +10271,137 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-first-rehearsal {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #F8FAFC;
+  border: 1px solid #C7D2FE;
+  border-radius: 8px;
+}
+
+.practice-session-report-first-rehearsal.status-repair {
+  background: #FFF7ED;
+  border-color: #FDBA74;
+}
+
+.practice-session-report-first-rehearsal.status-ready {
+  background: #EEF2FF;
+  border-color: #C7D2FE;
+}
+
+.practice-session-report-first-rehearsal-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.practice-session-report-first-rehearsal-head > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-first-rehearsal-head span {
+  color: #4338CA;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-first-rehearsal.status-repair .practice-session-report-first-rehearsal-head span {
+  color: #C2410C;
+}
+
+.practice-session-report-first-rehearsal-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-first-rehearsal-head small {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.practice-session-report-first-rehearsal-body {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+  gap: 8px;
+}
+
+.practice-session-report-first-rehearsal-body article,
+.practice-session-report-first-rehearsal-body dl {
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #C7D2FE;
+  border-radius: 8px;
+}
+
+.practice-session-report-first-rehearsal.status-repair .practice-session-report-first-rehearsal-body article,
+.practice-session-report-first-rehearsal.status-repair .practice-session-report-first-rehearsal-body dl {
+  border-color: #FED7AA;
+}
+
+.practice-session-report-first-rehearsal-body article {
+  display: grid;
+  gap: 5px;
+  align-content: start;
+}
+
+.practice-session-report-first-rehearsal-body article span,
+.practice-session-report-first-rehearsal-body dt {
+  color: #4338CA;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-first-rehearsal.status-repair .practice-session-report-first-rehearsal-body article span,
+.practice-session-report-first-rehearsal.status-repair .practice-session-report-first-rehearsal-body dt {
+  color: #9A3412;
+}
+
+.practice-session-report-first-rehearsal-body article strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-first-rehearsal-body article small,
+.practice-session-report-first-rehearsal-body dd {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.practice-session-report-first-rehearsal-body dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 5px 8px;
+  margin: 0;
+}
+
+.practice-session-report-first-rehearsal-body dd {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-first-rehearsal .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;
@@ -10919,6 +11050,7 @@ p {
   .practice-session-report-advance-gate-list,
   .practice-session-report-launch-packet-list,
   .practice-session-report-launch-checklist-list,
+  .practice-session-report-first-rehearsal-body,
   .free-promise-band,
   .practice-feedback-lists {
     grid-template-columns: 1fr;
