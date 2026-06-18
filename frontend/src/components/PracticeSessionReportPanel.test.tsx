@@ -277,6 +277,35 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders ability radar from the current session queue', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const radarBlock = screen.getByLabelText('本轮薄弱能力雷达')
+
+    expect(within(radarBlock).getByText('本轮薄弱能力雷达')).toBeInTheDocument()
+    expect(within(radarBlock).getByText('场景细节')).toBeInTheDocument()
+    expect(within(radarBlock).getByText('55')).toBeInTheDocument()
+
+    await user.click(within(radarBlock).getByRole('button', { name: /回炉场景细节/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

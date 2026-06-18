@@ -8,6 +8,8 @@ import type {
   InterviewMistakeLedger,
   InterviewRecoveryAcceptance,
   NextTrainingQueue,
+  PracticeSessionAbilityRadar,
+  PracticeSessionAbilityRadarItem,
   PracticeQueueItem,
   PracticeSessionReport,
   PracticeSessionReportAction,
@@ -172,6 +174,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionScriptCommand(queue, progress),
     renderSessionMistakeLedger(queue, progress),
     renderSessionRecoveryAcceptance(queue, progress),
+    renderSessionAbilityRadar(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -285,6 +288,50 @@ export function buildPracticeSessionRecoveryAcceptance(
   const ledger = buildInterviewMistakeLedger(scopedProgress)
 
   return buildInterviewRecoveryAcceptance(scopedProgress, ledger)
+}
+
+export function buildPracticeSessionAbilityRadar(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): PracticeSessionAbilityRadar {
+  const attemptItems = queue
+    .map(question => ({
+      question,
+      attempt: latestAttemptForQuestion(progress, question.id),
+    }))
+    .filter((item): item is SessionAttemptItem & { attempt: InterviewAttempt } => Boolean(item.attempt))
+
+  if (attemptItems.length === 0) {
+    return {
+      status: 'empty',
+      title: '等待本轮开口样本',
+      summary: '完成一次模拟面试后，系统会按覆盖度、结构化、场景细节和风险意识定位本轮短板。',
+      answeredCount: 0,
+      items: [],
+      primaryAction: {
+        kind: 'start',
+        label: '开始模拟面试',
+        description: '先完成一次开口作答，建立本轮能力雷达样本。',
+        to: '/practice',
+      },
+    }
+  }
+
+  const answeredQuestionIds = attemptItems.map(item => item.question.id)
+  const items = buildAbilityRadarItems(attemptItems, answeredQuestionIds)
+  const weakestItem = [...items]
+    .sort((a, b) => a.averageScore - b.averageScore || b.lowScoreQuestionIds.length - a.lowScoreQuestionIds.length)[0]
+  const status = resolveAbilityRadarStatus(items)
+
+  return {
+    status,
+    title: titleForAbilityRadarStatus(status, weakestItem),
+    summary: summaryForAbilityRadarStatus(status, weakestItem),
+    answeredCount: attemptItems.length,
+    weakestItem,
+    items,
+    primaryAction: buildAbilityRadarPrimaryAction(status, weakestItem, attemptItems),
+  }
 }
 
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
@@ -533,6 +580,41 @@ function renderSessionRecoveryAcceptance(queue: PracticeQueueItem[], progress: S
   ].join('\n')
 }
 
+function renderSessionAbilityRadar(queue: PracticeQueueItem[], progress: StudyProgress): string {
+  const radar = buildPracticeSessionAbilityRadar(queue, progress)
+  const weakestItem = radar.weakestItem
+  const lines = [
+    '## 本轮薄弱能力雷达',
+    `- 状态：${radar.title}`,
+    `- 摘要：${radar.summary}`,
+    `- 已答：${radar.answeredCount}`,
+    `- 最弱维度：${weakestItem?.label ?? '暂无'}`,
+    `- 平均分：${weakestItem?.averageScore ?? 0}`,
+    `- 影响题：${formatQuestionIds(weakestItem?.lowScoreQuestionIds ?? [])}`,
+    `- 主行动：${radar.primaryAction.label}，${radar.primaryAction.description}（${radar.primaryAction.to}）`,
+    '',
+  ]
+
+  if (radar.items.length === 0) {
+    return [
+      ...lines,
+      '- 暂无维度明细。先完成一次模拟面试后，战报会自动生成能力雷达。',
+      '',
+    ].join('\n')
+  }
+
+  lines.push('维度明细：')
+  radar.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}：${item.averageScore} 分，${item.attempts} 次，影响题 ${formatQuestionIds(item.lowScoreQuestionIds)}`,
+      `   - 建议：${item.summary}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
 function renderSessionNextTraining(
   queue: PracticeQueueItem[],
   progress: StudyProgress,
@@ -717,6 +799,134 @@ function summarizeWeakestCriterion(items: SessionAttemptItem[]): WeakestCriterio
     .sort((a, b) => a.averageScore - b.averageScore)[0]
 }
 
+function buildAbilityRadarItems(
+  items: Array<SessionAttemptItem & { attempt: InterviewAttempt }>,
+  fallbackQuestionIds: number[],
+): PracticeSessionAbilityRadarItem[] {
+  const buckets = new Map<InterviewCriterionKey, {
+    label: string
+    totalScore: number
+    attempts: number
+    lowScoreQuestionIds: number[]
+  }>()
+
+  for (const item of items) {
+    for (const criterion of item.attempt.feedback.criteria) {
+      const bucket = buckets.get(criterion.key) ?? {
+        label: criterion.label,
+        totalScore: 0,
+        attempts: 0,
+        lowScoreQuestionIds: [],
+      }
+      bucket.totalScore += criterion.score
+      bucket.attempts += 1
+      if (criterion.score < PASSING_SCORE) {
+        bucket.lowScoreQuestionIds.push(item.question.id)
+      }
+      buckets.set(criterion.key, bucket)
+    }
+  }
+
+  return [...buckets.entries()]
+    .map(([key, bucket]) => {
+      const lowScoreQuestionIds = uniqueNumbers(bucket.lowScoreQuestionIds)
+
+      return {
+        key,
+        label: bucket.label,
+        averageScore: Math.round(bucket.totalScore / bucket.attempts),
+        attempts: bucket.attempts,
+        lowScoreQuestionIds,
+        summary: actionForCriterion(key),
+        actionLabel: `回炉${bucket.label}`,
+        to: buildQueuePath(lowScoreQuestionIds.length > 0 ? lowScoreQuestionIds : fallbackQuestionIds),
+      }
+    })
+    .sort(compareAbilityRadarItems)
+}
+
+function compareAbilityRadarItems(
+  a: PracticeSessionAbilityRadarItem,
+  b: PracticeSessionAbilityRadarItem,
+): number {
+  return a.averageScore - b.averageScore || b.lowScoreQuestionIds.length - a.lowScoreQuestionIds.length
+}
+
+function resolveAbilityRadarStatus(items: PracticeSessionAbilityRadarItem[]): PracticeSessionAbilityRadar['status'] {
+  const weakestScore = items[0]?.averageScore ?? 0
+
+  if (items.length === 0) {
+    return 'empty'
+  }
+  if (weakestScore < 60) {
+    return 'risk'
+  }
+  if (weakestScore < PASSING_SCORE) {
+    return 'watch'
+  }
+  return 'stable'
+}
+
+function titleForAbilityRadarStatus(
+  status: PracticeSessionAbilityRadar['status'],
+  weakestItem?: PracticeSessionAbilityRadarItem,
+): string {
+  if (status === 'empty') {
+    return '等待本轮开口样本'
+  }
+  if (status === 'risk') {
+    return `${weakestItem?.label ?? '能力维度'}明显拖后`
+  }
+  if (status === 'watch') {
+    return `${weakestItem?.label ?? '能力维度'}需要盯防`
+  }
+  return '四项能力本轮过线'
+}
+
+function summaryForAbilityRadarStatus(
+  status: PracticeSessionAbilityRadar['status'],
+  weakestItem?: PracticeSessionAbilityRadarItem,
+): string {
+  if (!weakestItem) {
+    return '先完成一次模拟面试，系统会自动聚合四个评分维度。'
+  }
+  if (status === 'stable') {
+    return `最低维度「${weakestItem.label}」也达到 ${weakestItem.averageScore} 分，可以继续做追问加压。`
+  }
+  return `最低维度「${weakestItem.label}」平均 ${weakestItem.averageScore} 分，先处理 ${weakestItem.lowScoreQuestionIds.length} 道受影响题。`
+}
+
+function buildAbilityRadarPrimaryAction(
+  status: PracticeSessionAbilityRadar['status'],
+  weakestItem: PracticeSessionAbilityRadarItem | undefined,
+  items: Array<SessionAttemptItem & { attempt: InterviewAttempt }>,
+): PracticeSessionReportAction {
+  if (!weakestItem) {
+    return {
+      kind: 'start',
+      label: '开始模拟面试',
+      description: '先完成一次开口作答，建立本轮能力雷达样本。',
+      to: '/practice',
+    }
+  }
+
+  if (status === 'stable') {
+    return {
+      kind: 'continue',
+      label: '继续加压',
+      description: '四个能力维度均已过线，继续用本轮题目做高压追问。',
+      to: buildQueuePath(items.map(item => item.question.id)),
+    }
+  }
+
+  return {
+    kind: 'repair',
+    label: weakestItem.actionLabel,
+    description: weakestItem.summary,
+    to: weakestItem.to,
+  }
+}
+
 function buildRepairActions(
   items: SessionAttemptItem[],
   progress: StudyProgress,
@@ -840,6 +1050,21 @@ function buildQueuePath(questionIds: number[]): string {
     return '/practice'
   }
   return `/practice?queue=${questionIds.join(',')}`
+}
+
+function uniqueNumbers(values: number[]): number[] {
+  const seen = new Set<number>()
+  const result: number[] = []
+
+  for (const value of values) {
+    if (seen.has(value)) {
+      continue
+    }
+    seen.add(value)
+    result.push(value)
+  }
+
+  return result
 }
 
 function buildPracticeSessionScriptCommandItem(

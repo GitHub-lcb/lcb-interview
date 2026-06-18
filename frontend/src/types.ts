@@ -755,6 +755,29 @@ export interface InterviewCriterion {
   summary: string
 }
 
+export type PracticeSessionAbilityRadarStatus = 'empty' | 'risk' | 'watch' | 'stable'
+
+export interface PracticeSessionAbilityRadarItem {
+  key: InterviewCriterionKey
+  label: string
+  averageScore: number
+  attempts: number
+  lowScoreQuestionIds: number[]
+  summary: string
+  actionLabel: string
+  to: string
+}
+
+export interface PracticeSessionAbilityRadar {
+  status: PracticeSessionAbilityRadarStatus
+  title: string
+  summary: string
+  answeredCount: number
+  weakestItem?: PracticeSessionAbilityRadarItem
+  items: PracticeSessionAbilityRadarItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

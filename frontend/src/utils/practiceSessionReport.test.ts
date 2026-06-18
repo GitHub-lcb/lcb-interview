@@ -329,6 +329,25 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('主行动：继续复测')
   })
 
+  it('exports ability radar for the current session queue', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1), question(2)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 62, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+          2: [attempt(2, 72, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+        },
+      }),
+      NOW,
+    )
+
+    expect(markdown).toContain('## 本轮薄弱能力雷达')
+    expect(markdown).toContain('最弱维度：场景细节')
+    expect(markdown).toContain('平均分：55')
+    expect(markdown).toContain('影响题：1, 2')
+    expect(markdown).toContain('主行动：回炉场景细节')
+  })
+
   it('keeps empty session markdown actionable', () => {
     const markdown = buildPracticeSessionReportMarkdown([], progress(), NOW)
 
@@ -347,6 +366,8 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('暂无本轮错因账本')
     expect(markdown).toContain('## 本轮错因验收')
     expect(markdown).toContain('等待建立验收样本')
+    expect(markdown).toContain('## 本轮薄弱能力雷达')
+    expect(markdown).toContain('等待本轮开口样本')
     expect(markdown).toContain('## 下一轮训练建议')
     expect(markdown).toContain('先做一次模拟面试')
     expect(markdown).toContain('暂无题目')

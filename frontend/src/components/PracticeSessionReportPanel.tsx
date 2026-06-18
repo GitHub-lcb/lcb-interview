@@ -21,6 +21,7 @@ import type {
 import { formatNextTrainingQueueItemMeta } from '../utils/nextTrainingQueue'
 import {
   buildPracticeSessionDailyCompletion,
+  buildPracticeSessionAbilityRadar,
   buildPracticeSessionFollowUpDefense,
   buildPracticeSessionMaterialVault,
   buildPracticeSessionMistakeLedger,
@@ -93,6 +94,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionRecoveryAcceptance = useMemo(
     () => buildPracticeSessionRecoveryAcceptance(queue, progress),
+    [progress, queue],
+  )
+  const sessionAbilityRadar = useMemo(
+    () => buildPracticeSessionAbilityRadar(queue, progress),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -372,6 +377,55 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionRecoveryAcceptance.primaryAction.to)}
         >
           {sessionRecoveryAcceptance.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-ability-radar status-${sessionAbilityRadar.status}`}
+        aria-label="本轮薄弱能力雷达"
+      >
+        <div className="practice-session-report-ability-radar-head">
+          <span>本轮薄弱能力雷达</span>
+          <strong>{sessionAbilityRadar.title}</strong>
+          <small>{sessionAbilityRadar.summary}</small>
+        </div>
+        <div className="practice-session-report-ability-radar-focus">
+          <div>
+            <span>最弱维度</span>
+            <strong>{sessionAbilityRadar.weakestItem?.label ?? '暂无'}</strong>
+          </div>
+          <div>
+            <span>平均分</span>
+            <strong>{sessionAbilityRadar.weakestItem?.averageScore ?? 0}</strong>
+          </div>
+          <div>
+            <span>影响题</span>
+            <strong>{sessionAbilityRadar.weakestItem?.lowScoreQuestionIds.length ?? 0}</strong>
+          </div>
+        </div>
+        {sessionAbilityRadar.items.length === 0 ? (
+          <p>暂无维度明细。先完成一次模拟面试后，战报会自动生成能力雷达。</p>
+        ) : (
+          <div className="practice-session-report-ability-radar-items">
+            {sessionAbilityRadar.items.map(item => (
+              <div key={item.key}>
+                <span>维度：{item.label}</span>
+                <strong>均分 {item.averageScore}</strong>
+                <small>
+                  {item.lowScoreQuestionIds.length > 0
+                    ? `${item.lowScoreQuestionIds.length} 道低分题`
+                    : '本轮已过线'}
+                </small>
+              </div>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          icon={<ThunderboltOutlined />}
+          onClick={() => onNavigate(sessionAbilityRadar.primaryAction.to)}
+        >
+          {sessionAbilityRadar.primaryAction.label}
         </Button>
       </div>
 

@@ -7885,6 +7885,128 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-ability-radar {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+}
+
+.practice-session-report-ability-radar.status-risk {
+  background: #FFF7ED;
+  border-color: #FDBA74;
+}
+
+.practice-session-report-ability-radar.status-watch {
+  background: #FFFBEB;
+  border-color: #FDE68A;
+}
+
+.practice-session-report-ability-radar.status-stable {
+  background: #EFF6FF;
+  border-color: #BFDBFE;
+}
+
+.practice-session-report-ability-radar-head {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-ability-radar-head span {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-ability-radar.status-risk .practice-session-report-ability-radar-head span {
+  color: #9A3412;
+}
+
+.practice-session-report-ability-radar.status-watch .practice-session-report-ability-radar-head span {
+  color: #92400E;
+}
+
+.practice-session-report-ability-radar.status-stable .practice-session-report-ability-radar-head span {
+  color: #1D4ED8;
+}
+
+.practice-session-report-ability-radar-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-ability-radar-head small,
+.practice-session-report-ability-radar p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-ability-radar-focus {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(72px, 0.8fr) minmax(72px, 0.8fr);
+  gap: 6px;
+}
+
+.practice-session-report-ability-radar-focus div,
+.practice-session-report-ability-radar-items div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 7px 8px;
+  background: #FFFFFF;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  border-radius: 8px;
+}
+
+.practice-session-report-ability-radar-focus span,
+.practice-session-report-ability-radar-items span {
+  overflow: hidden;
+  color: #64748B;
+  font-size: 11px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-ability-radar-focus strong,
+.practice-session-report-ability-radar-items strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-ability-radar-items {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.practice-session-report-ability-radar-items small {
+  overflow: hidden;
+  color: #64748B;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-ability-radar .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;
