@@ -30,6 +30,8 @@ import type {
   PracticeSessionRetryDrafts,
   PracticeSessionRiskGuardrailItem,
   PracticeSessionRiskGuardrails,
+  PracticeSessionScheduleChecklist,
+  PracticeSessionScheduleChecklistItem,
   PracticeSessionTrainingContract,
   PracticeSessionTrainingContractItem,
   PracticeSessionTrainingSchedule,
@@ -212,6 +214,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionPassEvidence(queue, progress),
     renderSessionTrainingContract(queue, progress, now),
     renderSessionTrainingSchedule(queue, progress, now),
+    renderSessionScheduleChecklist(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -1011,6 +1014,44 @@ export function buildPracticeSessionTrainingSchedule(
   }
 }
 
+export function buildPracticeSessionScheduleChecklist(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionScheduleChecklist {
+  const schedule = buildPracticeSessionTrainingSchedule(queue, progress, now)
+
+  if (schedule.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待生成打卡清单',
+      summary: '先生成下一轮训练日程，再把每个时间块转成可核销的打卡证据。',
+      items: [],
+      primaryAction: {
+        kind: schedule.primaryAction.kind,
+        label: '建立打卡样本',
+        description: '先完成一次模拟面试并生成训练日程。',
+        to: schedule.primaryAction.to,
+      },
+    }
+  }
+
+  const items = schedule.items.map(item => buildScheduleChecklistItem(item, schedule.status))
+
+  return {
+    status: schedule.status,
+    title: schedule.status === 'repair' ? '修复打卡清单' : '推进打卡清单',
+    summary: `已把 ${items.length} 个时间块转成完成口径、证据模板和复盘问题。`,
+    items,
+    primaryAction: {
+      kind: schedule.primaryAction.kind,
+      label: '按清单打卡',
+      description: '按清单逐项留下完成证据，再进入下一轮判断。',
+      to: schedule.primaryAction.to,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -1661,6 +1702,41 @@ function renderSessionTrainingSchedule(
       `   - 时间：${item.timeRange}`,
       `   - 任务：${item.task}`,
       `   - 验收：${item.acceptance}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionScheduleChecklist(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const checklist = buildPracticeSessionScheduleChecklist(queue, progress, now)
+  const lines = [
+    '## 训练日程打卡清单',
+    `- 状态：${checklist.title}`,
+    `- 摘要：${checklist.summary}`,
+    `- 主行动：${checklist.primaryAction.label}，${checklist.primaryAction.description}（${checklist.primaryAction.to}）`,
+    '',
+  ]
+
+  if (checklist.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待生成打卡清单。先生成下一轮训练日程后，系统会把每个时间块转成可核销证据。',
+      '',
+    ].join('\n')
+  }
+
+  checklist.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.phase}：${item.checkLabel}`,
+      `   - 完成口径：${item.completionRule}`,
+      `   - 证据模板：${item.evidenceTemplate}`,
+      `   - 复盘问题：${item.reviewQuestion}`,
       `   - 入口：${item.to}`,
     )
   })
@@ -2840,6 +2916,46 @@ function buildTrainingScheduleItems({
       priority: 3,
     },
   ]
+}
+
+function buildScheduleChecklistItem(
+  item: PracticeSessionTrainingScheduleItem,
+  status: PracticeSessionScheduleChecklist['status'],
+): PracticeSessionScheduleChecklistItem {
+  return {
+    id: item.id,
+    phase: item.phase,
+    checkLabel: `${item.title}已完成`,
+    completionRule: item.acceptance,
+    evidenceTemplate: buildScheduleEvidenceTemplate(item, status),
+    reviewQuestion: buildScheduleReviewQuestion(item.phase, status),
+    to: item.to,
+    priority: item.priority,
+  }
+}
+
+function buildScheduleEvidenceTemplate(
+  item: PracticeSessionTrainingScheduleItem,
+  status: PracticeSessionScheduleChecklist['status'],
+): string {
+  const modeLabel = status === 'repair' ? '修复' : '推进'
+
+  return `【${modeLabel}-${item.phase}】${item.title}：我已完成「${item.task}」，结果证据是：`
+}
+
+function buildScheduleReviewQuestion(
+  phase: string,
+  status: PracticeSessionScheduleChecklist['status'],
+): string {
+  if (phase === '预热') {
+    return status === 'repair' ? '我是否能说清本轮最先修哪一个缺口？' : '我是否能说清下一轮第一题为什么被选中？'
+  }
+
+  if (phase === '限时作答') {
+    return status === 'repair' ? '我是否真的开口重答，而不是只看稿？' : '每道题是否都留下了评分样本？'
+  }
+
+  return status === 'repair' ? '三项通过门槛是否都达标？' : '新证据包是否足够支撑继续加题？'
 }
 
 function buildPracticeSessionScriptCommandItem(

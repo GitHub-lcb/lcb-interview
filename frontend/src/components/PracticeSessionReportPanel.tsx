@@ -39,6 +39,7 @@ import {
   buildPracticeSessionReportMarkdown,
   buildPracticeSessionRetryDrafts,
   buildPracticeSessionRiskGuardrails,
+  buildPracticeSessionScheduleChecklist,
   buildPracticeSessionScriptCommand,
   buildPracticeSessionTrainingContract,
   buildPracticeSessionTrainingSchedule,
@@ -158,6 +159,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionTrainingSchedule = useMemo(
     () => buildPracticeSessionTrainingSchedule(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionScheduleChecklist = useMemo(
+    () => buildPracticeSessionScheduleChecklist(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -882,6 +887,47 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionTrainingSchedule.primaryAction.to)}
         >
           {sessionTrainingSchedule.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className={`practice-session-report-schedule-checklist status-${sessionScheduleChecklist.status}`} aria-label="训练日程打卡清单">
+        <div className="practice-session-report-schedule-checklist-head">
+          <div>
+            <span>训练日程打卡清单</span>
+            <strong>{sessionScheduleChecklist.title}</strong>
+            <small>{sessionScheduleChecklist.summary}</small>
+          </div>
+        </div>
+        {sessionScheduleChecklist.items.length === 0 ? (
+          <p>等待生成打卡清单。先生成下一轮训练日程后，系统会把每个时间块转成可核销证据。</p>
+        ) : (
+          <div className="practice-session-report-schedule-checklist-list">
+            {sessionScheduleChecklist.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <span>{item.phase}</span>
+                  <strong>{item.checkLabel}</strong>
+                </div>
+                <dl>
+                  <dt>完成口径</dt>
+                  <dd>{item.completionRule}</dd>
+                  <dt>证据模板</dt>
+                  <dd>{item.evidenceTemplate}</dd>
+                  <dt>复盘问题</dt>
+                  <dd>{item.reviewQuestion}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionScheduleChecklist.status === 'repair'}
+          icon={sessionScheduleChecklist.status === 'repair' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionScheduleChecklist.primaryAction.to)}
+        >
+          {sessionScheduleChecklist.primaryAction.label}
         </Button>
       </div>
 

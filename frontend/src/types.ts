@@ -1039,6 +1039,27 @@ export interface PracticeSessionTrainingSchedule {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionScheduleChecklistStatus = 'empty' | 'repair' | 'advance'
+
+export interface PracticeSessionScheduleChecklistItem {
+  id: string
+  phase: string
+  checkLabel: string
+  completionRule: string
+  evidenceTemplate: string
+  reviewQuestion: string
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionScheduleChecklist {
+  status: PracticeSessionScheduleChecklistStatus
+  title: string
+  summary: string
+  items: PracticeSessionScheduleChecklistItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'
