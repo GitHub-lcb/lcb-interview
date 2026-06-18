@@ -1354,6 +1354,40 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders first question reuse review handoff before the next session round', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const handoff = screen.getByLabelText('首题复用复盘回流清单')
+
+    expect(within(handoff).getByText('首题复用复盘回流清单')).toBeInTheDocument()
+    expect(within(handoff).getByText('回修复用复盘回流清单')).toBeInTheDocument()
+    expect(within(handoff).getByText('分数回流')).toBeInTheDocument()
+    expect(within(handoff).getByText('证据带入')).toBeInTheDocument()
+    expect(within(handoff).getByText('阻断处置')).toBeInTheDocument()
+    expect(within(handoff).getByText('下一题启动')).toBeInTheDocument()
+    expect(within(handoff).getAllByText('开场提示').length).toBeGreaterThan(0)
+    expect(within(handoff).getAllByText('回退动作').length).toBeGreaterThan(0)
+
+    await user.click(within(handoff).getByRole('button', { name: /执行复盘回流/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

@@ -35,6 +35,7 @@ import {
   buildPracticeSessionFirstQuestionReuseReleaseGate,
   buildPracticeSessionFirstQuestionReuseReviewAcceptance,
   buildPracticeSessionFirstQuestionReuseReviewArchive,
+  buildPracticeSessionFirstQuestionReuseReviewHandoff,
   buildPracticeSessionFirstQuestionReuseReviewTemplate,
   buildPracticeSessionFirstQuestionReviewAcceptance,
   buildPracticeSessionFirstQuestionReviewArchive,
@@ -263,6 +264,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionFirstQuestionReuseReviewArchive = useMemo(
     () => buildPracticeSessionFirstQuestionReuseReviewArchive(queue, progress, progress.updatedAt),
+    [progress, queue],
+  )
+  const sessionFirstQuestionReuseReviewHandoff = useMemo(
+    () => buildPracticeSessionFirstQuestionReuseReviewHandoff(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -1834,6 +1839,50 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionFirstQuestionReuseReviewArchive.primaryAction.to)}
         >
           {sessionFirstQuestionReuseReviewArchive.primaryAction.label}
+        </Button>
+      </div>
+
+      <div
+        className={`practice-session-report-first-reuse-review-handoff status-${sessionFirstQuestionReuseReviewHandoff.status}`}
+        aria-label="首题复用复盘回流清单"
+      >
+        <div className="practice-session-report-first-reuse-review-handoff-head">
+          <div>
+            <span>首题复用复盘回流清单</span>
+            <strong>{sessionFirstQuestionReuseReviewHandoff.title}</strong>
+            <small>{sessionFirstQuestionReuseReviewHandoff.summary}</small>
+          </div>
+        </div>
+        {sessionFirstQuestionReuseReviewHandoff.items.length === 0 ? (
+          <p>等待首题复用复盘回流。先生成首题复用复盘归档包后，系统会给出回流动作。</p>
+        ) : (
+          <div className="practice-session-report-first-reuse-review-handoff-list">
+            {sessionFirstQuestionReuseReviewHandoff.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.action}</strong>
+                </div>
+                <dl>
+                  <dt>开场提示</dt>
+                  <dd>{item.openingPrompt}</dd>
+                  <dt>验收规则</dt>
+                  <dd>{item.acceptanceRule}</dd>
+                  <dt>回退动作</dt>
+                  <dd>{item.fallbackAction}</dd>
+                </dl>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionFirstQuestionReuseReviewHandoff.status === 'repair'}
+          icon={sessionFirstQuestionReuseReviewHandoff.status === 'repair' ? <ReloadOutlined /> : <CheckCircleOutlined />}
+          onClick={() => onNavigate(sessionFirstQuestionReuseReviewHandoff.primaryAction.to)}
+        >
+          {sessionFirstQuestionReuseReviewHandoff.primaryAction.label}
         </Button>
       </div>
 

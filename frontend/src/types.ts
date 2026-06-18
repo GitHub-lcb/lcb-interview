@@ -1451,6 +1451,26 @@ export interface PracticeSessionFirstQuestionReuseReviewArchive {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionFirstQuestionReuseReviewHandoffStatus = 'empty' | 'repair' | 'ready'
+
+export interface PracticeSessionFirstQuestionReuseReviewHandoffItem {
+  id: string
+  label: string
+  action: string
+  openingPrompt: string
+  acceptanceRule: string
+  fallbackAction: string
+  priority: number
+}
+
+export interface PracticeSessionFirstQuestionReuseReviewHandoff {
+  status: PracticeSessionFirstQuestionReuseReviewHandoffStatus
+  title: string
+  summary: string
+  items: PracticeSessionFirstQuestionReuseReviewHandoffItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'
