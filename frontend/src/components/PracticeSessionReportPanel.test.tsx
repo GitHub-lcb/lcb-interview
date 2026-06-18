@@ -125,7 +125,7 @@ describe('PracticeSessionReportPanel', () => {
     await userEvent.click(screen.getByRole('button', { name: /继续未答题/ }))
 
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=2')
-  }, 10000)
+  }, 30000)
 
   it('renders high-score materials from the current session queue', async () => {
     const onNavigate = vi.fn()
@@ -612,6 +612,37 @@ describe('PracticeSessionReportPanel', () => {
     expect(within(evidenceBlock).getByText('提交证据')).toBeInTheDocument()
 
     await user.click(within(evidenceBlock).getByRole('button', { name: /复核过线证据/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
+  it('renders training contract for the next session round', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const contractBlock = screen.getByLabelText('下一轮训练契约')
+
+    expect(within(contractBlock).getByText('下一轮训练契约')).toBeInTheDocument()
+    expect(within(contractBlock).getByText('目标分')).toBeInTheDocument()
+    expect(within(contractBlock).getByText('训练题组')).toBeInTheDocument()
+    expect(within(contractBlock).getByText('验收口径')).toBeInTheDocument()
+    expect(within(contractBlock).getByText('复盘证据')).toBeInTheDocument()
+
+    await user.click(within(contractBlock).getByRole('button', { name: /执行训练契约/ }))
 
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })

@@ -30,6 +30,8 @@ import type {
   PracticeSessionRetryDrafts,
   PracticeSessionRiskGuardrailItem,
   PracticeSessionRiskGuardrails,
+  PracticeSessionTrainingContract,
+  PracticeSessionTrainingContractItem,
   PracticeSessionReport,
   PracticeSessionReportAction,
   PracticeSessionReportLevel,
@@ -206,6 +208,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionRetryDrafts(queue, progress),
     renderSessionPassGate(queue, progress),
     renderSessionPassEvidence(queue, progress),
+    renderSessionTrainingContract(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -893,6 +896,60 @@ export function buildPracticeSessionPassEvidence(
   }
 }
 
+export function buildPracticeSessionTrainingContract(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = new Date().toISOString(),
+): PracticeSessionTrainingContract {
+  const report = buildPracticeSessionReport(queue, progress)
+  const passGate = buildPracticeSessionPassGate(queue, progress)
+  const passEvidence = buildPracticeSessionPassEvidence(queue, progress)
+  const nextQueue = buildPracticeSessionNextTrainingQueue(queue, progress, now, 5)
+
+  if (passGate.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待生成训练契约',
+      summary: '先完成一次模拟面试，系统才能把本轮表现转成下一轮训练契约。',
+      items: [],
+      primaryAction: {
+        kind: passGate.primaryAction.kind,
+        label: '建立契约样本',
+        description: '先完成一次开口作答，再生成下一轮训练契约。',
+        to: passGate.primaryAction.to,
+      },
+    }
+  }
+
+  const repairMode = passGate.status === 'blocked'
+  const targetScore = Math.max(STRONG_SESSION_SCORE, report.averageScore + 8)
+  const contractQueuePath = repairMode ? report.queueProfile.queuePath : nextQueue.primaryAction.to
+  const evidenceFocus = passEvidence.items[0]?.label ?? '评分证据'
+  const items = buildTrainingContractItems({
+    report,
+    targetScore,
+    queueSize: repairMode ? report.totalCount : nextQueue.items.length,
+    queuePath: contractQueuePath,
+    evidenceFocus,
+    repairMode,
+  })
+
+  return {
+    status: repairMode ? 'repair' : 'advance',
+    title: repairMode ? '先签修复契约' : '可以签下一轮契约',
+    summary: repairMode
+      ? `下一轮先回到本轮 ${report.totalCount} 道题，把均分补到 ${targetScore} 分并清掉弱项。`
+      : `下一轮进入 ${nextQueue.items.length} 道个性化题组，保持 ${targetScore} 分以上强通过。`,
+    items,
+    primaryAction: {
+      kind: repairMode ? 'repair' : 'continue',
+      label: '执行训练契约',
+      description: repairMode ? '按契约回到本轮队列修复低分和弱项。' : '按契约进入下一轮个性化训练。',
+      to: contractQueuePath,
+    },
+  }
+}
+
 export function buildPracticeSessionRepairDraft(action: PracticeSessionRepairAction): string {
   const hints = repairDraftHints(action.criterionKey)
   const criterionScore = typeof action.criterionScore === 'number' ? ` ${action.criterionScore} 分` : ''
@@ -1475,6 +1532,39 @@ function renderSessionPassEvidence(queue: PracticeQueueItem[], progress: StudyPr
       `   - 解释：${item.explanation}`,
       `   - 动作：${item.action}`,
       `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionTrainingContract(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const contract = buildPracticeSessionTrainingContract(queue, progress, now)
+  const lines = [
+    '## 下一轮训练契约',
+    `- 状态：${contract.title}`,
+    `- 摘要：${contract.summary}`,
+    `- 主行动：${contract.primaryAction.label}，${contract.primaryAction.description}（${contract.primaryAction.to}）`,
+    '',
+  ]
+
+  if (contract.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待生成训练契约。先完成一次模拟面试后，系统会给出下一轮目标、题组和验收口径。',
+      '',
+    ].join('\n')
+  }
+
+  contract.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 值：${item.value}`,
+      `   - 说明：${item.detail}`,
     )
   })
 
@@ -2517,6 +2607,55 @@ function buildPassEvidenceItems(
         : '二次提交稿仍处在修复状态，需要先替换高风险表达。',
       action: retryDrafts.status === 'ready' ? '带着稳定稿进入下一轮。' : '先使用二次提交稿完成一次重答。',
       to: retryDrafts.primaryAction.to,
+      priority: 4,
+    },
+  ]
+}
+
+function buildTrainingContractItems({
+  report,
+  targetScore,
+  queueSize,
+  queuePath,
+  evidenceFocus,
+  repairMode,
+}: {
+  report: PracticeSessionReport
+  targetScore: number
+  queueSize: number
+  queuePath: string
+  evidenceFocus: string
+  repairMode: boolean
+}): PracticeSessionTrainingContractItem[] {
+  return [
+    {
+      id: 'target-score',
+      label: '目标分',
+      value: `${targetScore} 分以上`,
+      detail: repairMode
+        ? `当前均分 ${report.averageScore} 分，下一轮先补到强通过线。`
+        : `当前已满足推进条件，下一轮继续保持 ${targetScore} 分以上。`,
+      priority: 1,
+    },
+    {
+      id: 'training-queue',
+      label: '训练题组',
+      value: `${queueSize} 道题，入口 ${queuePath}`,
+      detail: repairMode ? '先回到本轮队列修复低分题和薄弱题。' : '进入系统生成的下一轮个性化训练队列。',
+      priority: 2,
+    },
+    {
+      id: 'acceptance-rule',
+      label: '验收口径',
+      value: '均分达标、弱项清零、提交稿可复述',
+      detail: '下一轮结束后继续用通过门槛验收，避免只刷题不闭环。',
+      priority: 3,
+    },
+    {
+      id: 'evidence-reference',
+      label: '复盘证据',
+      value: evidenceFocus,
+      detail: '下一轮复盘时先对照这条证据，确认短板是否真的被修掉。',
       priority: 4,
     },
   ]

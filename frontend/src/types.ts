@@ -999,6 +999,24 @@ export interface PracticeSessionPassEvidence {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionTrainingContractStatus = 'empty' | 'repair' | 'advance'
+
+export interface PracticeSessionTrainingContractItem {
+  id: string
+  label: string
+  value: string
+  detail: string
+  priority: number
+}
+
+export interface PracticeSessionTrainingContract {
+  status: PracticeSessionTrainingContractStatus
+  title: string
+  summary: string
+  items: PracticeSessionTrainingContractItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

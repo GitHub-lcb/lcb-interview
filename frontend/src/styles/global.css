@@ -9190,6 +9190,130 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-training-contract {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #F0F9FF;
+  border: 1px solid #7DD3FC;
+  border-radius: 8px;
+}
+
+.practice-session-report-training-contract.status-repair {
+  background: #FFF7ED;
+  border-color: #FDBA74;
+}
+
+.practice-session-report-training-contract.status-advance {
+  background: #F0FDF4;
+  border-color: #86EFAC;
+}
+
+.practice-session-report-training-contract-head {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-training-contract-head span {
+  color: #0369A1;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-training-contract.status-repair .practice-session-report-training-contract-head span {
+  color: #C2410C;
+}
+
+.practice-session-report-training-contract.status-advance .practice-session-report-training-contract-head span {
+  color: #15803D;
+}
+
+.practice-session-report-training-contract-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-training-contract-head small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-training-contract p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.practice-session-report-training-contract-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.practice-session-report-training-contract-list article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #BAE6FD;
+  border-radius: 8px;
+}
+
+.practice-session-report-training-contract.status-repair .practice-session-report-training-contract-list article {
+  border-color: #FED7AA;
+}
+
+.practice-session-report-training-contract.status-advance .practice-session-report-training-contract-list article {
+  border-color: #BBF7D0;
+}
+
+.practice-session-report-training-contract-list strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-training-contract-list span,
+.practice-session-report-training-contract-list small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-training-contract-list span {
+  color: #075985;
+  font-weight: 800;
+}
+
+.practice-session-report-training-contract.status-repair .practice-session-report-training-contract-list span {
+  color: #9A3412;
+}
+
+.practice-session-report-training-contract.status-advance .practice-session-report-training-contract-list span {
+  color: #166534;
+}
+
+.practice-session-report-training-contract .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;
@@ -9830,6 +9954,7 @@ p {
   .practice-script-answer-acceptance-items,
   .practice-session-report-pass-gate-list,
   .practice-session-report-pass-evidence-list,
+  .practice-session-report-training-contract-list,
   .free-promise-band,
   .practice-feedback-lists {
     grid-template-columns: 1fr;

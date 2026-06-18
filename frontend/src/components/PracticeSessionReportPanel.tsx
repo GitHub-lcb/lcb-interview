@@ -40,6 +40,7 @@ import {
   buildPracticeSessionRetryDrafts,
   buildPracticeSessionRiskGuardrails,
   buildPracticeSessionScriptCommand,
+  buildPracticeSessionTrainingContract,
 } from '../utils/practiceSessionReport'
 import { buildInterviewRecoveryPlan } from '../utils/interviewRecoveryPlan'
 
@@ -148,6 +149,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionPassEvidence = useMemo(
     () => buildPracticeSessionPassEvidence(queue, progress),
+    [progress, queue],
+  )
+  const sessionTrainingContract = useMemo(
+    () => buildPracticeSessionTrainingContract(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -805,6 +810,36 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionPassEvidence.primaryAction.to)}
         >
           {sessionPassEvidence.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className={`practice-session-report-training-contract status-${sessionTrainingContract.status}`} aria-label="下一轮训练契约">
+        <div className="practice-session-report-training-contract-head">
+          <span>下一轮训练契约</span>
+          <strong>{sessionTrainingContract.title}</strong>
+          <small>{sessionTrainingContract.summary}</small>
+        </div>
+        {sessionTrainingContract.items.length === 0 ? (
+          <p>等待生成训练契约。先完成一次模拟面试后，系统会给出下一轮目标、题组和验收口径。</p>
+        ) : (
+          <div className="practice-session-report-training-contract-list">
+            {sessionTrainingContract.items.map(item => (
+              <article key={item.id}>
+                <strong>{item.label}</strong>
+                <span>{item.value}</span>
+                <small>{item.detail}</small>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          danger={sessionTrainingContract.status === 'repair'}
+          icon={sessionTrainingContract.status === 'repair' ? <ReloadOutlined /> : <PlayCircleOutlined />}
+          onClick={() => onNavigate(sessionTrainingContract.primaryAction.to)}
+        >
+          {sessionTrainingContract.primaryAction.label}
         </Button>
       </div>
 
