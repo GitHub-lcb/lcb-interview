@@ -20,6 +20,7 @@ import type {
 } from '../types'
 import { formatNextTrainingQueueItemMeta } from '../utils/nextTrainingQueue'
 import {
+  buildPracticeSessionActionPriorities,
   buildPracticeSessionDailyCompletion,
   buildPracticeSessionAbilityRadar,
   buildPracticeSessionFollowUpDefense,
@@ -103,6 +104,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionInterviewerDecision = useMemo(
     () => buildPracticeSessionInterviewerDecision(queue, progress),
+    [progress, queue],
+  )
+  const sessionActionPriorities = useMemo(
+    () => buildPracticeSessionActionPriorities(queue, progress, progress.updatedAt),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -466,6 +471,38 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionInterviewerDecision.primaryAction.to)}
         >
           {sessionInterviewerDecision.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className="practice-session-report-action-priorities" aria-label="本轮行动优先级">
+        <div className="practice-session-report-action-priorities-head">
+          <span>本轮行动优先级</span>
+          <strong>{sessionActionPriorities.title}</strong>
+          <small>{sessionActionPriorities.summary}</small>
+        </div>
+        {sessionActionPriorities.items.length === 0 ? (
+          <p>等待建立行动队列。先完成一次模拟面试后，系统会自动排序本轮动作。</p>
+        ) : (
+          <div className="practice-session-report-action-priorities-list">
+            {sessionActionPriorities.items.map((item, index) => (
+              <article key={item.id}>
+                <em>{index + 1}</em>
+                <div>
+                  <strong>{item.label}</strong>
+                  <span>{item.reason}</span>
+                  <small>{item.description}</small>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          icon={<ThunderboltOutlined />}
+          onClick={() => onNavigate(sessionActionPriorities.primaryAction.to)}
+        >
+          {sessionActionPriorities.primaryAction.label}
         </Button>
       </div>
 

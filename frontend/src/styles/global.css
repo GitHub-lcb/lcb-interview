@@ -8142,6 +8142,116 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-action-priorities {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 8px;
+}
+
+.practice-session-report-action-priorities-head {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-action-priorities-head span {
+  color: #1D4ED8;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-action-priorities-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-action-priorities-head small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-action-priorities p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.practice-session-report-action-priorities-list {
+  display: grid;
+  gap: 6px;
+}
+
+.practice-session-report-action-priorities-list article {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 8px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #BFDBFE;
+  border-radius: 8px;
+}
+
+.practice-session-report-action-priorities-list em {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: #DBEAFE;
+  color: #1D4ED8;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.practice-session-report-action-priorities-list div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.practice-session-report-action-priorities-list strong,
+.practice-session-report-action-priorities-list span,
+.practice-session-report-action-priorities-list small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-action-priorities-list strong {
+  color: #0F172A;
+  font-size: 13px;
+}
+
+.practice-session-report-action-priorities-list span {
+  color: #1E40AF;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.practice-session-report-action-priorities-list small {
+  color: #64748B;
+  font-size: 12px;
+}
+
+.practice-session-report-action-priorities .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;

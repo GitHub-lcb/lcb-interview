@@ -797,6 +797,24 @@ export interface PracticeSessionInterviewerDecision {
   primaryAction: PracticeSessionReportAction
 }
 
+export interface PracticeSessionActionPriorityItem {
+  id: string
+  kind: PracticeSessionReportActionKind
+  label: string
+  description: string
+  reason: string
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionActionPriorities {
+  title: string
+  summary: string
+  totalCount: number
+  items: PracticeSessionActionPriorityItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'

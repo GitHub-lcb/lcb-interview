@@ -334,6 +334,36 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
   })
 
+  it('renders action priorities from the current session queue', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 62, 72, { coverage: 76, structure: 72, specificity: 50, risk: 74 })],
+            2: [attempt(2, 72, 74, { coverage: 78, structure: 74, specificity: 60, risk: 76 })],
+          },
+        }}
+        onNavigate={onNavigate}
+      />
+    )
+
+    const prioritiesBlock = screen.getByLabelText('本轮行动优先级')
+
+    expect(within(prioritiesBlock).getByText('本轮行动优先级')).toBeInTheDocument()
+    expect(within(prioritiesBlock).getAllByText('补齐决策阻断').length).toBeGreaterThan(0)
+    expect(within(prioritiesBlock).getByText('继续复测')).toBeInTheDocument()
+    expect(within(prioritiesBlock).getByText('回炉场景细节')).toBeInTheDocument()
+
+    await user.click(within(prioritiesBlock).getByRole('button', { name: /补齐决策阻断/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+  })
+
   it('keeps the queue profile actionable for empty sessions', () => {
     render(
       <PracticeSessionReportPanel

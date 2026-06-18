@@ -8,6 +8,8 @@ import type {
   InterviewMistakeLedger,
   InterviewRecoveryAcceptance,
   NextTrainingQueue,
+  PracticeSessionActionPriorities,
+  PracticeSessionActionPriorityItem,
   PracticeSessionAbilityRadar,
   PracticeSessionAbilityRadarItem,
   PracticeSessionInterviewerDecision,
@@ -177,6 +179,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionRecoveryAcceptance(queue, progress),
     renderSessionAbilityRadar(queue, progress),
     renderSessionInterviewerDecision(queue, progress),
+    renderSessionActionPriorities(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -371,6 +374,95 @@ export function buildPracticeSessionInterviewerDecision(
     evidence: buildDecisionEvidence(report, radar),
     blockers,
     primaryAction: buildInterviewerDecisionAction(status, report, radar, blockers),
+  }
+}
+
+export function buildPracticeSessionActionPriorities(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now = progress.updatedAt,
+): PracticeSessionActionPriorities {
+  const decision = buildPracticeSessionInterviewerDecision(queue, progress)
+  const acceptance = buildPracticeSessionRecoveryAcceptance(queue, progress)
+  const radar = buildPracticeSessionAbilityRadar(queue, progress)
+  const nextQueue = buildPracticeSessionNextTrainingQueue(queue, progress, now, 3)
+
+  if (decision.status === 'empty') {
+    return {
+      title: '等待建立行动队列',
+      summary: '先完成一次模拟面试，系统才能把战报信号压缩成行动顺序。',
+      totalCount: 0,
+      items: [],
+      primaryAction: decision.primaryAction,
+    }
+  }
+
+  const candidates: PracticeSessionActionPriorityItem[] = []
+
+  if (decision.status === 'reject-risk' || decision.status === 'hold') {
+    candidates.push({
+      id: 'decision',
+      kind: decision.primaryAction.kind,
+      label: decision.primaryAction.label,
+      description: decision.primaryAction.description,
+      reason: `面试官结论：${decision.verdict}`,
+      to: decision.primaryAction.to,
+      priority: 100,
+    })
+  }
+
+  if (['failed', 'pending', 'testing'].includes(acceptance.status)) {
+    candidates.push({
+      id: 'recovery-acceptance',
+      kind: 'repair',
+      label: acceptance.primaryAction.label,
+      description: acceptance.primaryAction.description,
+      reason: acceptance.summary,
+      to: acceptance.primaryAction.to,
+      priority: 90,
+    })
+  }
+
+  if (radar.status === 'risk' || radar.status === 'watch') {
+    candidates.push({
+      id: 'ability-radar',
+      kind: 'repair',
+      label: radar.primaryAction.label,
+      description: radar.primaryAction.description,
+      reason: radar.summary,
+      to: radar.primaryAction.to,
+      priority: 80,
+    })
+  }
+
+  candidates.push({
+    id: 'next-training',
+    kind: 'continue',
+    label: nextQueue.primaryAction.label,
+    description: nextQueue.primaryAction.description,
+    reason: nextQueue.summary,
+    to: nextQueue.primaryAction.to,
+    priority: 10,
+  })
+
+  const items = uniquePriorityItems(candidates)
+    .sort((a, b) => b.priority - a.priority)
+    .slice(0, 3)
+  const primaryItem = items[0]
+
+  return {
+    title: '已生成执行队列',
+    summary: `已把战报信号压缩成 ${items.length} 个动作，按顺序执行即可。`,
+    totalCount: items.length,
+    items,
+    primaryAction: primaryItem
+      ? {
+        kind: primaryItem.kind,
+        label: primaryItem.label,
+        description: primaryItem.description,
+        to: primaryItem.to,
+      }
+      : decision.primaryAction,
   }
 }
 
@@ -669,6 +761,40 @@ function renderSessionInterviewerDecision(queue: PracticeQueueItem[], progress: 
     `- 主行动：${decision.primaryAction.label}，${decision.primaryAction.description}（${decision.primaryAction.to}）`,
     '',
   ].join('\n')
+}
+
+function renderSessionActionPriorities(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  now: string,
+): string {
+  const priorities = buildPracticeSessionActionPriorities(queue, progress, now)
+  const lines = [
+    '## 本轮行动优先级',
+    `- 状态：${priorities.title}`,
+    `- 摘要：${priorities.summary}`,
+    `- 主行动：${priorities.primaryAction.label}，${priorities.primaryAction.description}（${priorities.primaryAction.to}）`,
+    '',
+  ]
+
+  if (priorities.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待建立行动队列。先完成一次模拟面试后，系统会自动排序本轮动作。',
+      '',
+    ].join('\n')
+  }
+
+  priorities.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.label}`,
+      `   - 原因：${item.reason}`,
+      `   - 动作：${item.description}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
 }
 
 function renderSessionNextTraining(
@@ -1293,6 +1419,21 @@ function uniqueTexts(values: string[]): string[] {
     }
     seen.add(value)
     result.push(value)
+  }
+
+  return result
+}
+
+function uniquePriorityItems(items: PracticeSessionActionPriorityItem[]): PracticeSessionActionPriorityItem[] {
+  const seen = new Set<string>()
+  const result: PracticeSessionActionPriorityItem[] = []
+
+  for (const item of items) {
+    if (seen.has(item.label)) {
+      continue
+    }
+    seen.add(item.label)
+    result.push(item)
   }
 
   return result
