@@ -8366,6 +8366,120 @@ p {
   justify-self: start;
 }
 
+.practice-session-report-replay-cards {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #F0FDFA;
+  border: 1px solid #99F6E4;
+  border-radius: 8px;
+}
+
+.practice-session-report-replay-cards-head {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.practice-session-report-replay-cards-head span {
+  color: #0F766E;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.practice-session-report-replay-cards-head strong {
+  overflow: hidden;
+  color: #0F172A;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-replay-cards-head small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #0F766E;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-replay-cards p {
+  margin: 0;
+  color: #0F766E;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.practice-session-report-replay-cards-list {
+  display: grid;
+  gap: 6px;
+}
+
+.practice-session-report-replay-cards-list article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #99F6E4;
+  border-radius: 8px;
+}
+
+.practice-session-report-replay-cards-list article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.practice-session-report-replay-cards-list strong,
+.practice-session-report-replay-cards-list span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-session-report-replay-cards-list strong {
+  min-width: 0;
+  color: #0F172A;
+  font-size: 13px;
+}
+
+.practice-session-report-replay-cards-list span {
+  flex: 0 0 auto;
+  max-width: 128px;
+  padding: 3px 6px;
+  color: #0F766E;
+  font-size: 12px;
+  font-weight: 900;
+  background: #CCFBF1;
+  border-radius: 6px;
+}
+
+.practice-session-report-replay-cards-list small,
+.practice-session-report-replay-cards-list em {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #475569;
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.practice-session-report-replay-cards-list small:first-of-type {
+  color: #115E59;
+  font-weight: 800;
+}
+
+.practice-session-report-replay-cards .ant-btn {
+  justify-self: start;
+}
+
 .practice-session-report-next-training {
   display: grid;
   gap: 8px;

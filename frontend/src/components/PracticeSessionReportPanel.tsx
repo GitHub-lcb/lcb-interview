@@ -30,6 +30,7 @@ import {
   buildPracticeSessionMistakeLedger,
   buildPracticeSessionNextTrainingQueue,
   buildPracticeSessionRecoveryAcceptance,
+  buildPracticeSessionReplayCards,
   buildPracticeSessionReport,
   buildPracticeSessionReportMarkdown,
   buildPracticeSessionScriptCommand,
@@ -113,6 +114,10 @@ export default function PracticeSessionReportPanel({
   )
   const sessionEvidenceGaps = useMemo(
     () => buildPracticeSessionEvidenceGaps(queue, progress),
+    [progress, queue],
+  )
+  const sessionReplayCards = useMemo(
+    () => buildPracticeSessionReplayCards(queue, progress),
     [progress, queue],
   )
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
@@ -541,6 +546,39 @@ export default function PracticeSessionReportPanel({
           onClick={() => onNavigate(sessionEvidenceGaps.primaryAction.to)}
         >
           {sessionEvidenceGaps.primaryAction.label}
+        </Button>
+      </div>
+
+      <div className="practice-session-report-replay-cards" aria-label="本轮 60 秒复述卡">
+        <div className="practice-session-report-replay-cards-head">
+          <span>本轮 60 秒复述卡</span>
+          <strong>{sessionReplayCards.title}</strong>
+          <small>{sessionReplayCards.summary}</small>
+        </div>
+        {sessionReplayCards.items.length === 0 ? (
+          <p>等待生成复述卡。先完成一次模拟面试后，系统会自动生成可开口的 60 秒重答脚本。</p>
+        ) : (
+          <div className="practice-session-report-replay-cards-list">
+            {sessionReplayCards.items.map(item => (
+              <article key={item.id}>
+                <div>
+                  <strong>{item.title}</strong>
+                  <span>{item.focus}</span>
+                </div>
+                <small>{item.openingLine}</small>
+                <small>{item.evidenceLine}</small>
+                <em>{item.boundaryLine}</em>
+              </article>
+            ))}
+          </div>
+        )}
+        <Button
+          size="small"
+          type="primary"
+          icon={<PlayCircleOutlined />}
+          onClick={() => onNavigate(sessionReplayCards.primaryAction.to)}
+        >
+          {sessionReplayCards.primaryAction.label}
         </Button>
       </div>
 

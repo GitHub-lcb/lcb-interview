@@ -16,6 +16,8 @@ import type {
   PracticeSessionEvidenceGaps,
   PracticeSessionInterviewerDecision,
   PracticeQueueItem,
+  PracticeSessionReplayCardItem,
+  PracticeSessionReplayCards,
   PracticeSessionReport,
   PracticeSessionReportAction,
   PracticeSessionReportLevel,
@@ -185,6 +187,7 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionInterviewerDecision(queue, progress),
     renderSessionActionPriorities(queue, progress, now),
     renderSessionEvidenceGaps(queue, progress),
+    renderSessionReplayCards(queue, progress),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
     renderSessionQueue(queue, progress),
@@ -537,6 +540,69 @@ export function buildPracticeSessionEvidenceGaps(
       label: '修补证据缺口',
       description: `${items[0].criterionLabel} ${items[0].score} 分，先补可被追问的项目证据。`,
       to: buildQueuePath(primaryQuestionIds),
+    },
+  }
+}
+
+export function buildPracticeSessionReplayCards(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+): PracticeSessionReplayCards {
+  const evidenceGaps = buildPracticeSessionEvidenceGaps(queue, progress)
+
+  if (evidenceGaps.status === 'empty') {
+    return {
+      status: 'empty',
+      title: '等待生成复述卡',
+      summary: '先完成一次模拟面试，系统才能把证据缺口改写成 60 秒复述卡。',
+      totalCount: 0,
+      items: [],
+      primaryAction: {
+        kind: 'start',
+        label: '建立复述样本',
+        description: '先完成一次开口作答，再生成可复述的修复脚本。',
+        to: evidenceGaps.primaryAction.to,
+      },
+    }
+  }
+
+  if (evidenceGaps.items.length > 0) {
+    const items = evidenceGaps.items.slice(0, 3).map(buildReplayCardFromGap)
+
+    return {
+      status: 'repair',
+      title: '按缺口重答',
+      summary: `已把 ${items.length} 个证据缺口压缩成 60 秒复述卡，照着开口即可。`,
+      totalCount: items.length,
+      items,
+      primaryAction: {
+        kind: 'repair',
+        label: '开始60秒复述',
+        description: '按复述卡重答首要证据缺口。',
+        to: evidenceGaps.primaryAction.to,
+      },
+    }
+  }
+
+  const answeredItems = queue
+    .map(question => ({
+      question,
+      attempt: latestAttemptForQuestion(progress, question.id),
+    }))
+    .filter((item): item is SessionAttemptItem & { attempt: InterviewAttempt } => Boolean(item.attempt))
+  const items = answeredItems.slice(0, 3).map(buildStableReplayCard)
+
+  return {
+    status: 'ready',
+    title: '稳定复述保持手感',
+    summary: `本轮暂无高危证据缺口，已生成 ${items.length} 张稳定复述卡用于保持通过表现。`,
+    totalCount: items.length,
+    items,
+    primaryAction: {
+      kind: 'continue',
+      label: '继续60秒复述',
+      description: '用稳定卡继续复述，保持结论、证据和边界完整。',
+      to: buildQueuePath(queue.map(item => item.id)),
     },
   }
 }
@@ -897,6 +963,39 @@ function renderSessionEvidenceGaps(queue: PracticeQueueItem[], progress: StudyPr
       `   - 证据缺口：${item.gap}`,
       `   - 面试官追问：${item.interviewerProbe}`,
       `   - 修复提示：${item.repairHint}`,
+      `   - 入口：${item.to}`,
+    )
+  })
+
+  return [...lines, ''].join('\n')
+}
+
+function renderSessionReplayCards(queue: PracticeQueueItem[], progress: StudyProgress): string {
+  const cards = buildPracticeSessionReplayCards(queue, progress)
+  const lines = [
+    '## 本轮 60 秒复述卡',
+    `- 状态：${cards.title}`,
+    `- 摘要：${cards.summary}`,
+    `- 主行动：${cards.primaryAction.label}，${cards.primaryAction.description}（${cards.primaryAction.to}）`,
+    '',
+  ]
+
+  if (cards.items.length === 0) {
+    return [
+      ...lines,
+      '- 等待生成复述卡。先完成一次模拟面试后，系统会自动生成可开口的 60 秒重答脚本。',
+      '',
+    ].join('\n')
+  }
+
+  cards.items.forEach((item, index) => {
+    lines.push(
+      `${index + 1}. ${item.title}`,
+      `   - 焦点：${item.focus}`,
+      `   - 开场句：${item.openingLine}`,
+      `   - 证据句：${item.evidenceLine}`,
+      `   - 边界句：${item.boundaryLine}`,
+      `   - 复述提示：${item.rehearsalPrompt}`,
       `   - 入口：${item.to}`,
     )
   })
@@ -1626,6 +1725,75 @@ function evidenceRepairHintForCriterion(key: InterviewCriterionKey): string {
     return '补一个项目场景、触发条件、量化指标和你本人负责的动作。'
   }
   return '补失败场景、监控信号、降级策略和为什么这样取舍。'
+}
+
+function buildReplayCardFromGap(gap: PracticeSessionEvidenceGapItem): PracticeSessionReplayCardItem {
+  const script = replayScriptForCriterion(gap.criterionKey)
+
+  return {
+    id: gap.id,
+    questionId: gap.questionId,
+    title: gap.title,
+    focus: `${gap.criterionLabel} ${gap.score} 分`,
+    openingLine: script.openingLine,
+    evidenceLine: script.evidenceLine,
+    boundaryLine: script.boundaryLine,
+    rehearsalPrompt: `请用 60 秒重答「${gap.title}」，必须包含${gap.criterionLabel}证据和可追问边界。`,
+    to: gap.to,
+    priority: gap.priority,
+  }
+}
+
+function buildStableReplayCard(item: SessionAttemptItem & { attempt: InterviewAttempt }): PracticeSessionReplayCardItem {
+  const weakestCriterion = [...item.attempt.feedback.criteria].sort((a, b) => a.score - b.score)[0]
+  const criterionKey = weakestCriterion?.key ?? 'structure'
+  const script = replayScriptForCriterion(criterionKey)
+
+  return {
+    id: `${item.question.id}-stable-replay`,
+    questionId: item.question.id,
+    title: item.question.title,
+    focus: `稳定复述 ${item.attempt.feedback.score} 分`,
+    openingLine: script.openingLine,
+    evidenceLine: script.evidenceLine,
+    boundaryLine: script.boundaryLine,
+    rehearsalPrompt: `请用 60 秒复述「${item.question.title}」，保持结论、证据和边界完整。`,
+    to: buildQueuePath([item.question.id]),
+    priority: item.attempt.feedback.score,
+  }
+}
+
+function replayScriptForCriterion(key: InterviewCriterionKey): {
+  openingLine: string
+  evidenceLine: string
+  boundaryLine: string
+} {
+  if (key === 'coverage') {
+    return {
+      openingLine: '我先给结论：这题要先把定义和核心机制讲完整。',
+      evidenceLine: '补关键步骤、前置条件和至少一个替代方案差异。',
+      boundaryLine: '最后补适用边界和容易误用的场景，避免只背概念。',
+    }
+  }
+  if (key === 'structure') {
+    return {
+      openingLine: '我先给结论：这题按背景、方案、结果和边界四段回答。',
+      evidenceLine: '补方案选择、执行步骤、结果指标和复盘结论。',
+      boundaryLine: '最后补什么时候适用、什么时候不适用，保证结构闭环。',
+    }
+  }
+  if (key === 'specificity') {
+    return {
+      openingLine: '我先给结论：这题要落到真实项目场景里说明。',
+      evidenceLine: '补项目规模、触发条件、量化指标和我负责的动作。',
+      boundaryLine: '最后补验证方式、监控指标和回滚方案，避免只讲经验不讲边界。',
+    }
+  }
+  return {
+    openingLine: '我先给结论：这题要把方案收益和风险边界一起讲清楚。',
+    evidenceLine: '补失败场景、监控信号、降级策略和取舍依据。',
+    boundaryLine: '最后说明为什么这样兜底，以及什么情况下会换方案。',
+  }
 }
 
 function buildPracticeSessionScriptCommandItem(

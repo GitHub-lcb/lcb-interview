@@ -841,6 +841,30 @@ export interface PracticeSessionEvidenceGaps {
   primaryAction: PracticeSessionReportAction
 }
 
+export type PracticeSessionReplayCardStatus = 'empty' | 'repair' | 'ready'
+
+export interface PracticeSessionReplayCardItem {
+  id: string
+  questionId: number
+  title: string
+  focus: string
+  openingLine: string
+  evidenceLine: string
+  boundaryLine: string
+  rehearsalPrompt: string
+  to: string
+  priority: number
+}
+
+export interface PracticeSessionReplayCards {
+  status: PracticeSessionReplayCardStatus
+  title: string
+  summary: string
+  totalCount: number
+  items: PracticeSessionReplayCardItem[]
+  primaryAction: PracticeSessionReportAction
+}
+
 export interface InterviewFeedback {
   score: number
   level: 'strong' | 'pass' | 'needs-work'
