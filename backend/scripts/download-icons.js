@@ -283,8 +283,6 @@ async function main() {
   const data = await res.json();
   const allBanks = data.data.records;
 
-  const updates = [];
-
   for (const bank of BANKS) {
     const match = allBanks.find(b => b.id === bank.id);
     const pictureUrl = match ? match.picture : null;
@@ -301,32 +299,13 @@ async function main() {
     try {
       const bytes = await downloadImage(pictureUrl, filePath);
       console.log(`  ${bank.name}: ${fileName} (${bytes} bytes)`);
-      updates.push({ name: bank.name, slug: bank.slug, icon: `/icons/${fileName}` });
     } catch (err) {
       console.log(`  ${bank.name}: download failed - ${err.message}`);
     }
   }
 
-  // Generate an SQL update script for the icon column
-  if (updates.length > 0) {
-    const sqlPath = path.resolve(__dirname, 'sql/update-icons.sql');
-    const sqlLines = [
-      '-- =============================================',
-      '-- 更新分类图标（从 mianshiya 下载）',
-      `-- 生成时间: ${new Date().toISOString()}`,
-      '-- =============================================',
-      '',
-    ];
-    for (const u of updates) {
-      sqlLines.push(
-        `UPDATE category SET icon = '${u.icon}' WHERE name = '${u.name}';`
-      );
-    }
-    fs.writeFileSync(sqlPath, sqlLines.join('\n'), 'utf-8');
-    console.log(`\nSQL 更新脚本: ${sqlPath}`);
-  }
-
   console.log(`\n图标已下载到: ${ICON_DIR}`);
+  console.log('分类图标路径已包含在 backend/scripts/sql/init.sql 中。');
 }
 
 main().catch(err => { console.error('Fatal:', err); process.exit(1); });

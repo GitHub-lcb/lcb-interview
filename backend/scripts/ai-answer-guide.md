@@ -57,6 +57,6 @@ WHERE id = (SELECT id FROM question WHERE title = 'Java 中的序列化和反序
 
 ## 执行顺序
 
-1. 先执行 `sql/insert-draft.sql` 插入 DRAFT 数据
-2. 再执行 `sql/ai-update-answers.sql` 填充答案
-3. 最后将 DRAFT 状态改为 PUBLISHED
+1. 先执行 `backend/scripts/sql/init.sql` 初始化表结构、分类、标签和 DRAFT 题目
+2. 再执行 `sql/ai-update-answers.sql` 填充答案，或直接使用管理后台 `/admin/ai-generate` 流式补答案
+3. 确认 `summary`、`content` 等核心字段已填充后，再将 DRAFT 状态改为 PUBLISHED

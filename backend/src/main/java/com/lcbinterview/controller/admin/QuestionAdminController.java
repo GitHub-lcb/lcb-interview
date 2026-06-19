@@ -71,6 +71,13 @@ public class QuestionAdminController {
      */
     @PostMapping("/draft/{id}/approve")
     public ResponseEntity<ApiResponse<Void>> approve(@PathVariable Long id) {
+        Question existing = questionMapper.selectById(id);
+        if (existing == null) {
+            return ResponseEntity.ok(ApiResponse.error(404, "题目不存在"));
+        }
+        if (isContentBlank(existing)) {
+            return ResponseEntity.ok(ApiResponse.error(400, "题目答案为空，不能发布"));
+        }
         Question q = new Question();
         q.setId(id);
         q.setStatus("PUBLISHED");
@@ -98,10 +105,20 @@ public class QuestionAdminController {
         if (ids == null || ids.isEmpty()) {
             return ResponseEntity.ok(ApiResponse.error(400, "ID 列表不能为空"));
         }
+        List<Question> drafts = questionMapper.selectBatchIds(ids);
+        boolean hasBlankContent = drafts.stream()
+                .filter(q -> "DRAFT".equals(q.getStatus()))
+                .anyMatch(this::isContentBlank);
+        if (hasBlankContent) {
+            return ResponseEntity.ok(ApiResponse.error(400, "存在答案为空的草稿，不能批量发布"));
+        }
         questionMapper.update(null, new LambdaUpdateWrapper<Question>()
                 .set(Question::getStatus, "PUBLISHED")
                 .in(Question::getId, ids)
-                .eq(Question::getStatus, "DRAFT"));
+                .eq(Question::getStatus, "DRAFT")
+                // 校验和更新都限制非空内容，避免并发窗口把空答案发布出去。
+                .isNotNull(Question::getContent)
+                .apply("TRIM(content) <> ''"));
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
@@ -118,5 +135,10 @@ public class QuestionAdminController {
                 .in(Question::getId, ids)
                 .eq(Question::getStatus, "DRAFT"));
         return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    private boolean isContentBlank(Question question) {
+        String content = question.getContent();
+        return content == null || content.isBlank();
     }
 }

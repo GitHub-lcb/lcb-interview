@@ -111,4 +111,41 @@ public interface QuestionMapper extends BaseMapper<Question> {
     IPage<Question> searchFulltext(Page<?> page, @Param("keyword") String keyword,
                                     @Param("categoryId") Long categoryId,
                                     @Param("difficulty") String difficulty);
+
+    /**
+     * LIKE 兜底搜索题目（仅已发布）。用于 FULLTEXT 未命中英文短词或中英混合关键词时保证可检索。
+     */
+    @Select("""
+            <script>
+            SELECT id, category_id, title, summary, content, principle,
+                   comparison, scenario, risk, project_exp,
+                   code_examples, diagrams, related_ids,
+                   difficulty, view_count, status, source,
+                   create_time, update_time
+            FROM question
+            WHERE status = 'PUBLISHED' AND is_deleted = 0
+              AND (
+                title LIKE CONCAT('%', #{keyword}, '%')
+                OR summary LIKE CONCAT('%', #{keyword}, '%')
+                OR content LIKE CONCAT('%', #{keyword}, '%')
+                OR principle LIKE CONCAT('%', #{keyword}, '%')
+                OR comparison LIKE CONCAT('%', #{keyword}, '%')
+                OR scenario LIKE CONCAT('%', #{keyword}, '%')
+                OR risk LIKE CONCAT('%', #{keyword}, '%')
+                OR project_exp LIKE CONCAT('%', #{keyword}, '%')
+              )
+              <if test="categoryId != null">
+              AND category_id = #{categoryId}
+              </if>
+              <if test="difficulty != null and difficulty != ''">
+              AND difficulty = #{difficulty}
+              </if>
+            ORDER BY
+              CASE WHEN title LIKE CONCAT('%', #{keyword}, '%') THEN 0 ELSE 1 END,
+              view_count DESC
+            </script>
+            """)
+    IPage<Question> searchLike(Page<?> page, @Param("keyword") String keyword,
+                               @Param("categoryId") Long categoryId,
+                               @Param("difficulty") String difficulty);
 }

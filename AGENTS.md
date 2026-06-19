@@ -166,7 +166,7 @@ node fetch-questions.js
 
 从 mianshiya.com API 抓取 46 个分类的题目，输出：
 - `data/{slug}.json` — 每分类的题目数据（标题、难度、标签、来源 URL）
-- `sql/insert-draft.sql` — DRAFT 状态的 INSERT SQL（含题目-标签关联）
+- `sql/insert-draft.sql` — 抓取过程的临时 DRAFT SQL 片段；正式初始化只保留并执行 `sql/init.sql`
 
 ### 2. 初始化数据库（一站式）
 

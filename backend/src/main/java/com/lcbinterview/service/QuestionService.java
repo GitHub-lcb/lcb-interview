@@ -53,7 +53,13 @@ public class QuestionService {
 
         if (StringUtils.isNotBlank(keyword)) {
             log.info("全文搜索 keyword={}, categoryId={}, difficulty={}", keyword, categoryId, difficulty);
-            return questionMapper.searchFulltext(mpPage, keyword, categoryId, difficulty);
+            IPage<Question> fulltextResult = questionMapper.searchFulltext(mpPage, keyword, categoryId, difficulty);
+            if (!fulltextResult.getRecords().isEmpty()) {
+                return fulltextResult;
+            }
+            // MySQL FULLTEXT 对英文短词和部分混合词不稳定，兜底 LIKE 保证用户能搜到标题中的显式关键词。
+            log.info("全文搜索未命中，使用 LIKE 兜底搜索 keyword={}", keyword);
+            return questionMapper.searchLike(new Page<>(page + 1, size), keyword, categoryId, difficulty);
         }
 
         LambdaQueryWrapper<Question> wrapper = new LambdaQueryWrapper<Question>()

@@ -26,12 +26,12 @@ export default function DraftReview() {
   useEffect(() => { load(0) }, [load])
 
   const handleApprove = async (id: number) => {
-    try { await approveDraft(id); message.success('已通过'); load(current) }
+    try { await approveDraft(id); message.success('已通过'); load(current - 1) }
     catch { message.error('操作失败') }
   }
 
   const handleReject = async (id: number) => {
-    try { await rejectDraft(id); message.success('已驳回'); load(current) }
+    try { await rejectDraft(id); message.success('已驳回'); load(current - 1) }
     catch { message.error('操作失败') }
   }
 

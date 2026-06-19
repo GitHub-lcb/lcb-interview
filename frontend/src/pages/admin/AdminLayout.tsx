@@ -1,12 +1,15 @@
-import { useState } from 'react'
-import { Layout, Menu, Drawer, Button, Grid } from 'antd'
+import { useEffect, useState } from 'react'
+import { Layout, Menu, Drawer, Button, Grid, Spin } from 'antd'
 import { Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom'
+import axios from 'axios'
 import {
   DashboardOutlined, RobotOutlined, FileSearchOutlined, MenuOutlined
 } from '@ant-design/icons'
 
 const { Content, Sider } = Layout
 const { useBreakpoint } = Grid
+
+type AuthStatus = 'checking' | 'verified' | 'unauthorized'
 
 const menuItems = [
   { key: '/admin/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
@@ -20,10 +23,61 @@ export default function AdminLayout() {
   const screens = useBreakpoint()
   const isMobile = !screens.lg
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [authStatus, setAuthStatus] = useState<AuthStatus>(() =>
+    localStorage.getItem('adminToken') ? 'checking' : 'unauthorized'
+  )
 
-  const token = localStorage.getItem('adminToken')
-  if (!token) {
+  useEffect(() => {
+    const token = localStorage.getItem('adminToken')
+    if (!token) {
+      setAuthStatus('unauthorized')
+      return
+    }
+
+    let cancelled = false
+    setAuthStatus('checking')
+
+    axios.get('/api/admin/verify', {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((res) => {
+      if (cancelled) {
+        return
+      }
+      if (res.data?.code === 200) {
+        setAuthStatus('verified')
+        return
+      }
+      localStorage.removeItem('adminToken')
+      setAuthStatus('unauthorized')
+    }).catch(() => {
+      if (cancelled) {
+        return
+      }
+      localStorage.removeItem('adminToken')
+      setAuthStatus('unauthorized')
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  if (authStatus === 'unauthorized') {
     return <Navigate to="/admin/login" replace state={{ from: location.pathname }} />
+  }
+
+  if (authStatus === 'checking') {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#FAFAF9',
+      }}>
+        <Spin />
+      </div>
+    )
   }
 
   const menuComponent = (

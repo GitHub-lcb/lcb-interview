@@ -21,6 +21,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -96,6 +97,39 @@ class QuestionServiceTest {
         assertThat(result.total()).isEqualTo(7);
         assertThat(result.content().getFirst().categoryName()).isEqualTo("JVM");
         assertThat(result.content().getFirst().tags()).containsExactly("JVM");
+    }
+
+    @Test
+    void searchVoFallsBackToLikeWhenFulltextMissesEnglishKeyword() {
+        Page<Question> emptyFulltextPage = new Page<>(1, 20);
+        emptyFulltextPage.setRecords(List.of());
+        emptyFulltextPage.setTotal(0);
+
+        Question question = question(12L, 3L, "Java 中的序列化和反序列化是什么？");
+        Page<Question> likePage = new Page<>(1, 20);
+        likePage.setRecords(List.of(question));
+        likePage.setTotal(1);
+
+        Category category = new Category();
+        category.setId(3L);
+        category.setName("Java 基础");
+
+        when(questionMapper.searchFulltext(any(Page.class), eq("Java"), isNull(), isNull()))
+                .thenReturn(emptyFulltextPage);
+        when(questionMapper.searchLike(any(Page.class), eq("Java"), isNull(), isNull()))
+                .thenReturn(likePage);
+        when(categoryMapper.selectBatchIds(List.of(3L))).thenReturn(List.of(category));
+        when(questionMapper.selectTagNamesByQuestionIds(List.of(12L))).thenReturn(List.of(
+                new QuestionTagName(12L, "Java")
+        ));
+
+        PageResult<QuestionVO> result = questionService.searchVo(null, null, "Java", null, 0, 20);
+
+        verify(questionMapper).searchLike(any(Page.class), eq("Java"), isNull(), isNull());
+        assertThat(result.total()).isEqualTo(1);
+        assertThat(result.content().getFirst().title()).isEqualTo("Java 中的序列化和反序列化是什么？");
+        assertThat(result.content().getFirst().categoryName()).isEqualTo("Java 基础");
+        assertThat(result.content().getFirst().tags()).containsExactly("Java");
     }
 
     @Test
