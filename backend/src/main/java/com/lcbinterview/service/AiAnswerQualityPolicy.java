@@ -136,7 +136,7 @@ public class AiAnswerQualityPolicy {
                 "project_exp 项目经验缺失或过短", 15);
 
         String content = answer.path("content").asText("");
-        score -= requireContains(issues, content, "30 秒口述版", "content 缺少 30 秒口述版", 5);
+        score -= requireNormalizedContains(issues, content, "30 秒口述版", "content 缺少 30 秒口述版", 5);
         score -= requireContains(issues, content, "标准答案", "content 缺少标准答案", 5);
         score -= requireContains(issues, content, "面试官评分点", "content 缺少面试官评分点", 5);
         score -= requireContains(issues, content, "高频追问", "content 缺少高频追问", 5);
@@ -209,6 +209,14 @@ public class AiAnswerQualityPolicy {
 
     private int requireContains(List<String> issues, String value, String keyword, String issue, int penalty) {
         if (value == null || !value.contains(keyword)) {
+            issues.add(issue);
+            return penalty;
+        }
+        return 0;
+    }
+
+    private int requireNormalizedContains(List<String> issues, String value, String keyword, String issue, int penalty) {
+        if (value == null || !value.replaceAll("\\s+", "").contains(keyword.replaceAll("\\s+", ""))) {
             issues.add(issue);
             return penalty;
         }

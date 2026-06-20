@@ -110,6 +110,36 @@ class AiAnswerQualityPolicyTest {
     }
 
     @Test
+    void evaluateAcceptsCompactOralSectionTitle() throws Exception {
+        Question question = question();
+        JsonNode answer = objectMapper.readTree("""
+                {
+                  "summary": "线程池参数配置要从任务类型、吞吐量、延迟目标和系统资源出发，先确定核心线程、队列和拒绝策略，再通过压测验证。",
+                  "content": "## 30秒口述版\\n线程池配置不能只看核心线程数，要先判断任务是 CPU 密集还是 I/O 密集，再结合 QPS、平均耗时、机器 CPU 核数和下游容量估算并发。生产里我会重点控制核心线程数、最大线程数、队列长度和拒绝策略，并配合监控观察队列堆积、拒绝次数、任务耗时。\\n\\n## 标准答案\\nCPU 密集任务线程数通常接近 CPU 核数，避免上下文切换；I/O 密集任务可以适当放大，因为线程经常等待外部资源。队列必须有界，不能使用无界队列掩盖堆积。拒绝策略不能静默丢任务，核心链路要降级、限流或返回明确错误。配置后还要通过压测验证峰值流量下的队列长度、P95 耗时和拒绝次数。如果任务是调用外部 HTTP、数据库或 MQ，下游连接池容量也要纳入估算，否则线程开多了只会把瓶颈转移到下游。\\n\\n## 面试官评分点\\n能说清任务类型、容量估算、队列选择、拒绝策略、监控压测和降级方案，说明不是背参数，而是知道生产配置方法。优秀回答还会主动提到线程隔离、任务超时、上下文传递、异常告警和灰度压测。\\n\\n## 高频追问\\n如果队列已经堆积但 CPU 不高，应该优先排查下游耗时、锁竞争或连接池瓶颈，而不是盲目增加线程。为什么不能用无界队列？因为最大线程数可能永远不会生效，内存会被堆积任务拖垮。如何处理拒绝？核心链路可以限流或返回明确错误，异步链路可以写补偿表并由后台任务重试。",
+                  "principle": "ThreadPoolExecutor 的执行流程是先尝试创建核心线程，核心线程满后任务进入阻塞队列，队列满后再尝试创建非核心线程，达到最大线程数后触发拒绝策略。因此 corePoolSize、workQueue 和 maximumPoolSize 是联动关系，不是孤立参数。队列越长，削峰能力越强，但延迟越高；线程越多，并发处理能力可能提高，但上下文切换和资源竞争也会上升。",
+                  "comparison": "固定线程池适合稳定负载，但无界队列风险高；缓存线程池弹性强，但高峰期可能创建过多线程；自定义 ThreadPoolExecutor 可以显式设置有界队列、命名线程、拒绝策略和监控指标，更适合生产业务。",
+                  "scenario": "适合异步通知、批量导入、报表生成、消息消费等可异步处理的任务。对于支付扣款、库存扣减等强一致链路，需要谨慎使用异步线程池，并补充幂等、补偿和告警。如果下游服务不稳定，还要配合限流、熔断和重试退避，避免线程池把故障进一步放大。",
+                  "risk": "常见坑包括使用 Executors.newFixedThreadPool 导致无界队列堆积、拒绝策略使用 DiscardPolicy 静默丢任务、线程池被多个业务混用导致互相拖垮、只配置参数不做监控。生产上应使用独立线程池隔离业务，并记录拒绝次数和队列长度。",
+                  "project_exp": "在订单超时取消项目中，我会把扫描任务和通知任务拆成两个线程池。扫描线程池控制数据库分页读取并发，通知线程池处理 MQ 或 HTTP 调用。队列设置为有界容量，拒绝时写入补偿表并打告警。上线前用压测模拟峰值订单量，观察队列长度、P95 耗时和拒绝次数，避免高峰期把数据库连接池打满。",
+                  "code_examples": [
+                    {
+                      "lang": "java",
+                      "title": "生产线程池配置示例",
+                      "code": "new ThreadPoolExecutor(8, 16, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(500), namedFactory, new ThreadPoolExecutor.CallerRunsPolicy());",
+                      "description": "使用有界队列和明确拒绝策略，避免任务无限堆积。"
+                    }
+                  ]
+                }
+                """);
+
+        AiAnswerQualityPolicy.QualityReport report =
+                policy.evaluate(question, "Java 并发", List.of("线程池", "并发"), answer);
+
+        assertThat(report.issues()).doesNotContain("content 缺少 30 秒口述版");
+        assertThat(report.passed()).isTrue();
+    }
+
+    @Test
     void evaluateGeneratedQuestionRejectsWeakQuestionBeforeSaving() {
         Question generated = new Question();
         generated.setTitle("线程池");
