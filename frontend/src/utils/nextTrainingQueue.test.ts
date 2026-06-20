@@ -139,6 +139,27 @@ describe('buildNextTrainingQueue', () => {
     })
   })
 
+  it('drops invalid daily plan ids before building plan queue items', () => {
+    const progress = {
+      ...createDefaultProgress(NOW),
+      dailyPlan: [10, 0, -1, 2.5, 10, Number.NaN, Number.POSITIVE_INFINITY],
+    }
+
+    const queue = buildNextTrainingQueue(progress, NOW)
+    const markdown = buildNextTrainingQueueMarkdown(progress, NOW)
+
+    expect(queue.items.map(item => item.questionId)).toEqual([10])
+    expect(queue.items[0]).toMatchObject({
+      questionId: 10,
+      source: 'plan',
+      to: '/practice?queue=10',
+    })
+    expect(queue.primaryAction.to).toBe('/practice?queue=10')
+    expect(markdown).toContain('题目 #10')
+    expect(markdown).not.toContain('题目 #2.5')
+    expect(markdown).not.toContain('题目 #NaN')
+  })
+
   it('routes mastered score impacts to answer material sediment instead of practice', () => {
     const progress = {
       ...createDefaultProgress(NOW),

@@ -1,5 +1,6 @@
 import { ArrowRightOutlined, CopyOutlined, QuestionCircleOutlined, ThunderboltOutlined } from '@ant-design/icons'
-import { Button, message } from 'antd'
+import { Button } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import { useMemo } from 'react'
 import type { InterviewFollowUpDefense, InterviewFollowUpDefenseItem, StudyProgress } from '../types'
 import { buildInterviewFollowUpDefense, buildInterviewFollowUpDefenseMarkdown } from '../utils/interviewFollowUpDefense'
@@ -35,12 +36,12 @@ export default function InterviewFollowUpDefensePanel({
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('追问防线已复制')
+      emitFeedbackSuccess('追问防线已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 防线')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 防线')
   }
 
   return (

@@ -1,4 +1,5 @@
-import { Button, message } from 'antd'
+import { Button } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import { ArrowRightOutlined, CopyOutlined, ThunderboltOutlined } from '@ant-design/icons'
 import { useMemo } from 'react'
 import type { InterviewFeedback, PracticeQueueItem } from '../types'
@@ -27,12 +28,12 @@ export default function FollowUpDrillPanel({
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('追问训练包已复制')
+      emitFeedbackSuccess('追问训练包已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(question.title))
-    message.warning('剪贴板不可用，已下载 Markdown 追问训练包')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 追问训练包')
   }
 
   return (

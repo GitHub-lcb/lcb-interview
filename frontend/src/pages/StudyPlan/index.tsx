@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Empty, InputNumber, message, Progress, Select } from 'antd'
+import { Button, Empty, InputNumber, Progress, Select } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../../utils/feedbackMessage'
 import {
   ArrowRightOutlined,
   BookOutlined,
@@ -25,11 +26,29 @@ import InterviewMaterialVaultPanel from '../../components/InterviewMaterialVault
 import InterviewFollowUpDefensePanel from '../../components/InterviewFollowUpDefensePanel'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { getHotQuestions } from '../../api/question'
-import type { Question, ReviewDueStatus } from '../../types'
+import type { Question, ReviewDueStatus, StudyProgress } from '../../types'
 import { buildReviewScheduleMarkdown, buildScheduledReviewQueue, summarizeReviewSchedule } from '../../utils/reviewSchedule'
-import { buildDailyPlan, resolvePlanQuestions, summarizeProgress } from '../../utils/studyProgress'
+import { buildDailyPlan, getQuestionState, resolvePlanQuestions, summarizeProgress } from '../../utils/studyProgress'
 import { buildPaceFilledDailyPlan } from '../../utils/studyPacePlan'
 import { buildDailyPracticePath } from '../../utils/practiceRoute'
+
+interface FirstRunCompletionMaterial {
+  questionId: number
+  title: string
+  categoryName: string
+  score?: number
+  excerpt: string
+}
+
+interface FirstRunCompletionReport {
+  completedCount: number
+  averageScore?: number
+  bestScore?: number
+  latestCompletedAt?: string
+  priorityMaterial: FirstRunCompletionMaterial
+  rehearsalQueueIds: number[]
+  materials: FirstRunCompletionMaterial[]
+}
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
 const roleOptions = [
@@ -78,6 +97,7 @@ export default function StudyPlan() {
   const planQuestions = useMemo(() => resolvePlanQuestions(progress, hotQuestions, 8), [hotQuestions, progress])
   const reviewQueue = useMemo(() => buildScheduledReviewQueue(progress, new Date().toISOString(), 12), [progress])
   const reviewSummary = useMemo(() => summarizeReviewSchedule(reviewQueue), [reviewQueue])
+  const firstRunCompletionReport = useMemo(() => buildFirstRunCompletionReport(progress), [progress])
   const trackedCount = Object.keys(progress.questionStates).length
   const canGeneratePlan = generatedPlanIds.length > 0
   const canFillPacePlan = hotQuestions.length > 0 || Object.keys(progress.questionSnapshots).length > 0
@@ -85,7 +105,7 @@ export default function StudyPlan() {
   useEffect(() => {
     let ignore = false
 
-    getHotQuestions(12)
+    getHotQuestions(12, { silentGlobalError: true })
       .then(questions => {
         if (ignore) {
           return
@@ -122,16 +142,16 @@ export default function StudyPlan() {
     const nextPlanKey = nextPlanIds.join(',')
 
     if (nextPlanIds.length === 0) {
-      message.warning('暂无可补齐的题目，先进入题库添加题目')
+      emitFeedbackWarning('暂无可补齐的题目，先进入题库添加题目')
       return
     }
     if (nextPlanKey === currentPlanKey) {
-      message.warning('暂无可补齐的新增题目，先进入题库补充题源')
+      emitFeedbackWarning('暂无可补齐的新增题目，先进入题库补充题源')
       return
     }
 
     setDailyPlan(nextPlanIds)
-    message.success(`已按配速补齐到 ${nextPlanIds.length} 道今日计划`)
+    emitFeedbackSuccess(`已按配速补齐到 ${nextPlanIds.length} 道今日计划`)
   }
 
   const handleCopyReviewSchedule = async () => {
@@ -139,12 +159,28 @@ export default function StudyPlan() {
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('智能复习队列已复制')
+      emitFeedbackSuccess('智能复习队列已复制')
       return
     }
 
     downloadMarkdown(markdown, buildReviewScheduleFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 队列')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 队列')
+  }
+
+  const handleCopyFirstRunCompletion = async () => {
+    if (!firstRunCompletionReport) {
+      return
+    }
+    const markdown = buildFirstRunCompletionMarkdown(firstRunCompletionReport, progress.targetRole)
+    const copied = await copyMarkdown(markdown)
+
+    if (copied) {
+      emitFeedbackSuccess('首练成果战报已复制')
+      return
+    }
+
+    downloadMarkdown(markdown, buildFirstRunCompletionFileName(progress.targetRole))
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 战报')
   }
 
   return (
@@ -218,6 +254,83 @@ export default function StudyPlan() {
       />
       <DailyPlanBriefPanel progress={progress} candidates={hotQuestions} />
       <DailyPlanCompletionPanel progress={progress} />
+      {firstRunCompletionReport && (
+        <section className="first-run-completion-report" aria-label="首练成果沉淀">
+          <div className="first-run-completion-head">
+            <div>
+              <div className="dashboard-kicker">首练战报</div>
+              <h2>今日首练已过线</h2>
+              <p>
+                {firstRunCompletionReport.completedCount} 道首练已过线，先把高分回答沉淀成可复述素材，再决定是否加练下一组高频题。
+              </p>
+            </div>
+            <div className="first-run-completion-actions">
+              <Button icon={<CopyOutlined />} onClick={handleCopyFirstRunCompletion}>
+                复制首练战报
+              </Button>
+              <Button
+                type="primary"
+                icon={<PlayCircleOutlined />}
+                onClick={() => navigate(buildDailyPracticePath(firstRunCompletionReport.rehearsalQueueIds))}
+              >
+                抽查复述
+              </Button>
+            </div>
+          </div>
+          <div className="first-run-completion-metrics">
+            <article>
+              <span>完成题数</span>
+              <strong>{firstRunCompletionReport.completedCount} 道首练已过线</strong>
+              <small>今日计划全部掌握</small>
+            </article>
+            <article>
+              <span>平均表现</span>
+              <strong>{firstRunCompletionReport.averageScore === undefined ? '暂无评分' : `平均 ${firstRunCompletionReport.averageScore} 分`}</strong>
+              <small>来自首练模拟评分</small>
+            </article>
+            <article>
+              <span>最高分</span>
+              <strong>{firstRunCompletionReport.bestScore === undefined ? '暂无' : `${firstRunCompletionReport.bestScore} 分`}</strong>
+              <small>{formatCompletionTime(firstRunCompletionReport.latestCompletedAt)}</small>
+            </article>
+          </div>
+          <div className="first-run-completion-priority" aria-label="首练复述优先题">
+            <div>
+              <span>复述优先题</span>
+              <strong>{firstRunCompletionReport.priorityMaterial.title}</strong>
+              <p>先复述分数最低的已过线答案，确认结论、项目证据和风险边界都能脱稿说清。</p>
+            </div>
+            <div className="first-run-completion-priority-action">
+              <em>
+                {firstRunCompletionReport.priorityMaterial.categoryName}
+                {firstRunCompletionReport.priorityMaterial.score === undefined ? '' : ` · ${firstRunCompletionReport.priorityMaterial.score} 分`}
+              </em>
+              <Button
+                type="primary"
+                icon={<PlayCircleOutlined />}
+                onClick={() => navigate(buildDailyPracticePath(firstRunCompletionReport.rehearsalQueueIds))}
+              >
+                优先复述
+              </Button>
+            </div>
+          </div>
+          <div className="first-run-completion-materials">
+            {firstRunCompletionReport.materials.map(material => (
+              <button key={material.questionId} type="button" onClick={() => navigate(`/question/${material.questionId}`)}>
+                <div>
+                  <div className="first-run-completion-material-top">
+                    <strong>{material.title}</strong>
+                    <em>{material.categoryName}{material.score === undefined ? '' : ` · ${material.score} 分`}</em>
+                  </div>
+                  <p>{material.excerpt}</p>
+                  <small>回看首练素材</small>
+                </div>
+                <ArrowRightOutlined />
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
       <NextTrainingQueuePanel progress={progress} />
       <InterviewEmergencyKitPanel progress={progress} />
       <InterviewLastMinuteBriefPanel progress={progress} />
@@ -295,7 +408,18 @@ export default function StudyPlan() {
               {planQuestions.map(question => {
                 const state = getState(question.id)
                 return (
-                  <article key={question.id} className="study-question-item" onClick={() => navigate(`/question/${question.id}`)}>
+                  <article
+                    key={question.id}
+                    className="study-question-item"
+                    tabIndex={0}
+                    onClick={() => navigate(`/question/${question.id}`)}
+                    onKeyDown={(event) => {
+                      if (event.target !== event.currentTarget || event.key !== 'Enter') {
+                        return
+                      }
+                      navigate(`/question/${question.id}`)
+                    }}
+                  >
                     <div>
                       <h3>{question.title}</h3>
                       <div className="study-question-meta">
@@ -341,7 +465,7 @@ export default function StudyPlan() {
               {reviewQueue.map(item => {
                 const state = getState(item.id)
                 return (
-                  <button key={item.id} onClick={() => navigate(`/question/${item.id}`)}>
+                  <button type="button" key={item.id} onClick={() => navigate(`/question/${item.id}`)}>
                     <div>
                       <div className="review-queue-item-top">
                         <span className={`review-due-badge ${item.dueStatus}`}>{dueStatusLabels[item.dueStatus]}</span>
@@ -390,4 +514,119 @@ function downloadMarkdown(markdown: string, fileName: string): void {
 function buildReviewScheduleFileName(targetRole: string): string {
   const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
   return `${safeRole || '岗位'}-智能复习队列.md`
+}
+
+function buildFirstRunCompletionFileName(targetRole: string): string {
+  const safeRole = targetRole.trim().replace(/[\\/:*?"<>|]/g, '-')
+  return `${safeRole || '岗位'}-首练成果战报.md`
+}
+
+function buildFirstRunCompletionMarkdown(report: FirstRunCompletionReport, targetRole: string): string {
+  return [
+    `# ${targetRole} 首练成果战报`,
+    '',
+    '## 概览',
+    `- 完成题数：${report.completedCount}`,
+    `- 平均分：${report.averageScore === undefined ? '暂无评分' : report.averageScore}`,
+    `- 最高分：${report.bestScore === undefined ? '暂无' : report.bestScore}`,
+    `- 最近完成：${formatCompletionTime(report.latestCompletedAt)}`,
+    '',
+    '## 复述优先题',
+    `- 题目：${report.priorityMaterial.title}`,
+    `- 分类：${report.priorityMaterial.categoryName}`,
+    `- 分数：${report.priorityMaterial.score === undefined ? '暂无评分' : report.priorityMaterial.score}`,
+    '- 原因：全队列中分数最低的已过线答案，最适合先做脱稿抽查。',
+    `- 入口：/question/${report.priorityMaterial.questionId}`,
+    '',
+    '## 可复述素材',
+    ...report.materials.flatMap(material => [
+      `### ${material.title}`,
+      `- 分类：${material.categoryName}`,
+      `- 分数：${material.score === undefined ? '暂无评分' : material.score}`,
+      `- 回答片段：${material.excerpt}`,
+      `- 入口：/question/${material.questionId}`,
+      '',
+    ]),
+    '## 下一步',
+    '- 抽查复述：从复述优先题开始，按低分到高分完成脱稿验证。',
+    '- 素材复用：把高分回答片段整理进简历项目或面试自我介绍。',
+  ].join('\n')
+}
+
+function buildFirstRunCompletionReport(progress: StudyProgress): FirstRunCompletionReport | null {
+  const planIds = [...new Set(progress.dailyPlan.filter(id => Number.isFinite(id) && id > 0))]
+  if (planIds.length === 0) {
+    return null
+  }
+  const allMastered = planIds.every(questionId => getQuestionState(progress, questionId).status === 'mastered')
+  if (!allMastered) {
+    return null
+  }
+
+  const materials = planIds.map(questionId => {
+    const snapshot = progress.questionSnapshots[questionId]
+    const latestAttempt = latestAttemptForQuestion(progress, questionId)
+    return {
+      questionId,
+      title: snapshot?.title ?? `题目 #${questionId}`,
+      categoryName: snapshot?.categoryName ?? '未分组',
+      score: latestAttempt?.feedback.score,
+      excerpt: latestAttempt ? buildAnswerExcerpt(latestAttempt.answer) : '这道题已标记掌握，建议回看题目补一段可复述项目证据。',
+    }
+  })
+  const rehearsalMaterials = [...materials].sort((left, right) => {
+    const scoreDiff = scoreForRehearsalPriority(left.score) - scoreForRehearsalPriority(right.score)
+    if (scoreDiff !== 0) {
+      return scoreDiff
+    }
+    return planIds.indexOf(left.questionId) - planIds.indexOf(right.questionId)
+  })
+  const scores = materials
+    .map(material => material.score)
+    .filter((score): score is number => typeof score === 'number')
+  const latestCompletedAt = planIds
+    .map(questionId => getQuestionState(progress, questionId).lastReviewedAt)
+    .filter((value): value is string => Boolean(value))
+    .sort((left, right) => right.localeCompare(left))[0]
+
+  return {
+    completedCount: planIds.length,
+    averageScore: scores.length === 0 ? undefined : Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length),
+    bestScore: scores.length === 0 ? undefined : Math.max(...scores),
+    latestCompletedAt,
+    priorityMaterial: rehearsalMaterials[0],
+    rehearsalQueueIds: rehearsalMaterials.map(material => material.questionId),
+    materials: rehearsalMaterials.slice(0, 3),
+  }
+}
+
+function scoreForRehearsalPriority(score?: number): number {
+  return score === undefined ? Number.POSITIVE_INFINITY : score
+}
+
+function latestAttemptForQuestion(
+  progress: StudyProgress,
+  questionId: number,
+) {
+  return [...(progress.interviewAttempts[questionId] ?? [])]
+    .sort((left, right) => right.createdAt.localeCompare(left.createdAt))[0]
+}
+
+function buildAnswerExcerpt(answer: string): string {
+  const normalized = answer.replace(/\s+/g, ' ').trim()
+  if (normalized.length <= 78) {
+    return normalized
+  }
+  return `${normalized.slice(0, 78)}...`
+}
+
+function formatCompletionTime(value?: string): string {
+  if (!value) {
+    return '等待模拟评分沉淀'
+  }
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return '等待模拟评分沉淀'
+  }
+  return `最近完成 ${date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}`
 }

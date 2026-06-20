@@ -1,4 +1,5 @@
-import { Button, message, Progress } from 'antd'
+import { Button, Progress } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import { ArrowRightOutlined, CopyOutlined, LineChartOutlined, WarningOutlined } from '@ant-design/icons'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -53,12 +54,12 @@ export default function InterviewReviewPanel({ progress, compact = false }: Inte
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('模拟面试复盘已复制')
+      emitFeedbackSuccess('模拟面试复盘已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 复盘')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 复盘')
   }
 
   if (summary.totalAttempts === 0) {
@@ -139,7 +140,7 @@ export default function InterviewReviewPanel({ progress, compact = false }: Inte
             <div className="interview-review-recent">
               <span>最近记录</span>
               {summary.recentAttempts.map(attempt => (
-                <button key={`${attempt.questionId}-${attempt.createdAt}`} onClick={() => navigate(`/question/${attempt.questionId}`)}>
+                <button type="button" key={`${attempt.questionId}-${attempt.createdAt}`} onClick={() => navigate(`/question/${attempt.questionId}`)}>
                   <strong>{attempt.question?.title}</strong>
                   <small>{attempt.feedback.score} 分 · {formatAttemptTime(attempt.createdAt)}</small>
                 </button>

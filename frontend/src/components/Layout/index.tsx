@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { Layout } from 'antd'
 import AppHeader from './Header'
+import GlobalRecoveryDock from '../GlobalRecoveryDock'
 
 const { Content } = Layout
 
@@ -15,6 +16,7 @@ export default function AppLayout() {
         width: '100%',
         margin: '0 auto',
       }}>
+        <GlobalRecoveryDock />
         <Outlet />
       </Content>
     </Layout>

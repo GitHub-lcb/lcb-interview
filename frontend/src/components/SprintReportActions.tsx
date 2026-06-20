@@ -1,4 +1,5 @@
-import { Button, message } from 'antd'
+import { Button } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import { CopyOutlined } from '@ant-design/icons'
 import { prepRoutes } from '../data/freeSuperiority'
 import type { StudyProgress } from '../types'
@@ -14,12 +15,12 @@ export default function SprintReportActions({ progress }: SprintReportActionsPro
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('面试冲刺报告已复制')
+      emitFeedbackSuccess('面试冲刺报告已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 报告')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 报告')
   }
 
   return (

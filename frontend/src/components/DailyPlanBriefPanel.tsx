@@ -1,5 +1,6 @@
 import { ArrowRightOutlined, CopyOutlined, FieldTimeOutlined, ThunderboltOutlined } from '@ant-design/icons'
-import { Button, message } from 'antd'
+import { Button } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Question, StudyProgress } from '../types'
@@ -28,12 +29,12 @@ export default function DailyPlanBriefPanel({
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('今日作战简报已复制')
+      emitFeedbackSuccess('今日作战简报已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 简报')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 简报')
   }
 
   return (

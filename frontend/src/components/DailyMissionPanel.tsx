@@ -1,4 +1,5 @@
-import { Button, message } from 'antd'
+import { Button } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import {
   ArrowRightOutlined,
   CalendarOutlined,
@@ -31,12 +32,12 @@ export default function DailyMissionPanel() {
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('今日冲刺任务已复制')
+      emitFeedbackSuccess('今日冲刺任务已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 任务')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 任务')
   }
 
   return (

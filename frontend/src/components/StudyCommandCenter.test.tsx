@@ -1,11 +1,24 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import type { InterviewFeedback, StudyProgress } from '../types'
 import { createDefaultProgress, STUDY_PROGRESS_STORAGE_KEY } from '../utils/studyProgress'
+import { writePracticeAnswerDraft } from '../utils/practiceAnswerDraftStore'
 import StudyCommandCenter from './StudyCommandCenter'
+
+const { navigate } = vi.hoisted(() => ({
+  navigate: vi.fn(),
+}))
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  return {
+    ...actual,
+    useNavigate: () => navigate,
+  }
+})
 
 function attempt(score: number): InterviewFeedback {
   return {
@@ -42,6 +55,7 @@ function progress(): StudyProgress {
 
 describe('StudyCommandCenter', () => {
   beforeEach(() => {
+    navigate.mockReset()
     window.localStorage.setItem(STUDY_PROGRESS_STORAGE_KEY, JSON.stringify(progress()))
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
@@ -74,6 +88,25 @@ describe('StudyCommandCenter', () => {
     expect(screen.getByRole('button', { name: /开始下一轮训练/ })).toBeInTheDocument()
     expect(screen.getByText('Java 并发题')).toBeInTheDocument()
     expect(screen.getByText(/薄弱题/)).toBeInTheDocument()
+  })
+
+  it('prioritizes unsubmitted answer drafts inside the command center', async () => {
+    writePracticeAnswerDraft(2, 'MySQL 索引草稿回答', '2026-06-18T09:30:00.000Z')
+
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <StudyCommandCenter />
+      </MemoryRouter>,
+    )
+
+    const recovery = screen.getByLabelText('备考指挥未提交回答')
+    expect(within(recovery).getByRole('heading', { name: '先恢复未提交回答' })).toBeInTheDocument()
+    expect(within(recovery).getByText('MySQL 索引题')).toBeInTheDocument()
+    expect(within(recovery).getByText('1 份草稿待评分')).toBeInTheDocument()
+
+    await userEvent.click(within(recovery).getByRole('button', { name: /恢复 1 份草稿/ }))
+
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=2')
   })
 
   it('copies study command center markdown', async () => {

@@ -1,33 +1,76 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Alert, Button } from 'antd'
 import { ArrowLeftOutlined, PlayCircleOutlined } from '@ant-design/icons'
 import { getQuestionById } from '../../api/question'
 import AnswerQualityPanel from '../../components/AnswerQualityPanel'
+import InterviewAnswerScriptPanel from '../../components/InterviewAnswerScriptPanel'
 import StudyActionButtons from '../../components/StudyActionButtons'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import ContentView from './ContentView'
 import Skeleton from './Skeleton'
-import type { Question } from '../../types'
+import type { InterviewAttempt, InterviewCriterion, Question } from '../../types'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
 
+function parseQuestionRouteId(id?: string): number | null {
+  const questionId = Number(id)
+  if (!Number.isInteger(questionId) || questionId <= 0) {
+    return null
+  }
+  return questionId
+}
+
+interface PracticeCalibrationSummary {
+  score: number
+  weakestLabel?: string
+}
+
+function resolveWeakestCriterion(criteria: InterviewCriterion[]): InterviewCriterion | undefined {
+  return criteria.reduce<InterviewCriterion | undefined>((weakest, item) => {
+    if (!weakest || item.score < weakest.score) {
+      return item
+    }
+
+    return weakest
+  }, undefined)
+}
+
+function resolvePracticeCalibrationSummary(attempt?: InterviewAttempt): PracticeCalibrationSummary | undefined {
+  if (!attempt) {
+    return undefined
+  }
+
+  const weakest = resolveWeakestCriterion(attempt.feedback.criteria)
+
+  return {
+    score: attempt.feedback.score,
+    weakestLabel: weakest?.label,
+  }
+}
+
 export default function QuestionDetail() {
   const { id } = useParams()
+  const questionId = parseQuestionRouteId(id)
   const [q, setQ] = useState<Question | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const navigate = useNavigate()
-  const { getState, rememberQuestion, setInPlan, setStatus } = useStudyProgress()
+  const location = useLocation()
+  const { progress, getState, rememberQuestion, setInPlan, setStatus } = useStudyProgress()
+  const isPracticeCalibrationReturn = new URLSearchParams(location.search).get('from') === 'practice-calibration'
 
   const fetchQuestion = () => {
-    if (!id) {
+    if (questionId === null) {
+      setQ(null)
+      setError(false)
+      setLoading(false)
       return
     }
     setLoading(true)
     setError(false)
-    getQuestionById(Number(id))
+    getQuestionById(questionId, { silentGlobalError: true })
       .then(data => {
         setQ(data)
         rememberQuestion(data)
@@ -41,7 +84,34 @@ export default function QuestionDetail() {
 
   useEffect(() => {
     fetchQuestion()
-  }, [id])
+  }, [questionId])
+
+  useEffect(() => {
+    if (!q || location.hash !== '#answer-script') {
+      return undefined
+    }
+
+    const scrollTimer = window.setTimeout(() => {
+      const scriptPanel = document.getElementById('answer-script')
+      scriptPanel?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+      scriptPanel?.focus({ preventScroll: true })
+    }, 0)
+
+    return () => window.clearTimeout(scrollTimer)
+  }, [location.hash, q])
+
+  if (questionId === null) {
+    return (
+      <div className="detail-state-card">
+        <Alert
+          type="error"
+          message="题目地址无效"
+          showIcon
+          action={<Button onClick={() => navigate('/banks')} size="small">返回题库</Button>}
+        />
+      </div>
+    )
+  }
 
   if (loading) {
     return <Skeleton />
@@ -69,10 +139,14 @@ export default function QuestionDetail() {
   }
 
   const studyState = getState(q.id)
+  const latestPracticeAttempt = progress.interviewAttempts[q.id]?.[0]
+  const practiceCalibrationSummary = isPracticeCalibrationReturn
+    ? resolvePracticeCalibrationSummary(latestPracticeAttempt)
+    : undefined
 
   return (
     <article className="question-detail-page">
-      <button className="detail-back-button" onClick={() => window.history.back()}>
+      <button type="button" className="detail-back-button" onClick={() => window.history.back()}>
         <ArrowLeftOutlined />
         返回
       </button>
@@ -111,6 +185,12 @@ export default function QuestionDetail() {
             </div>
             <div className="detail-free-cue">本题答案、追问、质量评分和模拟面试均免费开放。</div>
           </header>
+
+          <InterviewAnswerScriptPanel
+            question={q}
+            isPracticeCalibrationReturn={isPracticeCalibrationReturn}
+            practiceCalibrationSummary={practiceCalibrationSummary}
+          />
 
           <div className="content-card">
             <ContentView question={q} />

@@ -1,4 +1,5 @@
-import { Button, message } from 'antd'
+import { Button } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import {
   ArrowRightOutlined,
   BookOutlined,
@@ -50,12 +51,12 @@ export default function InterviewBriefPanel({ progress }: InterviewBriefPanelPro
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('冲刺简报已复制')
+      emitFeedbackSuccess('冲刺简报已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 简报')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 简报')
   }
 
   return (

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { InterviewFeedback, Question } from '../types'
+import type { InterviewFeedback, Question, StudyProgress } from '../types'
 import {
   appendDailyPlanQuestions,
   buildDailyPlan,
@@ -67,6 +67,14 @@ describe('studyProgress', () => {
     expect(progress.interviewAttempts).toEqual({})
   })
 
+  it('drops invalid persisted daily plan ids', () => {
+    const progress = parseStudyProgress(JSON.stringify({
+      dailyPlan: [10, 0, -1, 2.5, 10, null, '11'],
+    }))
+
+    expect(progress.dailyPlan).toEqual([10])
+  })
+
   it('updates question status and review metadata immutably', () => {
     const progress = createDefaultProgress()
     const next = updateQuestionStatus(progress, 10, 'weak', '2026-06-15T10:00:00')
@@ -90,6 +98,32 @@ describe('studyProgress', () => {
     expect(addedAgain.questionStates[10].addedToPlan).toBe(true)
     expect(removed.dailyPlan).toEqual([])
     expect(removed.questionStates[10].addedToPlan).toBe(false)
+  })
+
+  it('treats daily plan membership as the source of truth for stale question states', () => {
+    const progress: StudyProgress = {
+      ...createDefaultProgress('2026-06-15T00:00:00'),
+      dailyPlan: [10],
+      questionStates: {
+        10: { status: 'new', addedToPlan: false, reviewCount: 0 },
+      },
+    }
+
+    const state = getQuestionState(progress, 10)
+    const summary = summarizeQuestionSetProgress(progress, [10])
+
+    expect(state).toMatchObject({ status: 'learning', addedToPlan: true })
+    expect(summary).toMatchObject({ planned: 1, tracked: 1, allPlanned: true })
+  })
+
+  it('normalizes daily plan ids before replacing and appending', () => {
+    let progress = createDefaultProgress()
+
+    progress = replaceDailyPlan(progress, [10, 0, -1, 2.5, 10], '2026-06-15T10:00:00')
+    progress = appendDailyPlanQuestions(progress, [11, Number.NaN, Number.POSITIVE_INFINITY], '2026-06-15T11:00:00')
+
+    expect(progress.dailyPlan).toEqual([10, 11])
+    expect(Object.keys(progress.questionStates)).toEqual(['10', '11'])
   })
 
   it('replaces the daily plan and keeps study states in sync', () => {
@@ -205,6 +239,23 @@ describe('studyProgress', () => {
     expect(resolved[0].categoryName).toBe('Redis')
   })
 
+  it('resolves planned placeholder questions when snapshots are missing', () => {
+    const progress = {
+      ...createDefaultProgress('2026-06-15T00:00:00'),
+      dailyPlan: [90],
+    }
+
+    const resolved = resolvePlanQuestions(progress, [], 5)
+
+    expect(resolved).toHaveLength(1)
+    expect(resolved[0]).toMatchObject({
+      id: 90,
+      difficulty: 'MEDIUM',
+      viewCount: 0,
+      tags: [],
+    })
+  })
+
   it('builds a review queue with weak questions before learning questions', () => {
     let progress = createDefaultProgress()
     progress = rememberQuestions(progress, [
@@ -272,6 +323,22 @@ describe('studyProgress', () => {
     expect(queue.map(item => item.source)).toEqual(['new', 'new'])
   })
 
+  it('keeps daily plan questions practiceable when snapshots are missing', () => {
+    const progress = {
+      ...createDefaultProgress('2026-06-15T00:00:00'),
+      dailyPlan: [90],
+    }
+
+    const queue = buildPracticeQueue(progress, [], 2)
+
+    expect(queue).toHaveLength(1)
+    expect(queue[0]).toMatchObject({
+      id: 90,
+      status: 'learning',
+      source: 'plan',
+    })
+  })
+
   it('prioritizes scoped page questions for direct practice', () => {
     let progress = createDefaultProgress()
     const candidates = [
@@ -290,6 +357,21 @@ describe('studyProgress', () => {
     expect(queue.map(item => item.source)).toEqual(['page', 'page', 'review', 'new'])
   })
 
+  it('keeps scoped practice links usable when question snapshots are missing', () => {
+    const progress = createDefaultProgress()
+
+    const queue = buildScopedPracticeQueue(progress, [], [90, 91, 90], null, 5)
+
+    expect(queue.map(item => item.id)).toEqual([90, 91])
+    expect(queue.map(item => item.source)).toEqual(['page', 'page'])
+    expect(queue[0]).toMatchObject({
+      title: '题目 #90',
+      categoryName: '未分组',
+      difficulty: 'MEDIUM',
+      status: 'new',
+    })
+  })
+
   it('keeps a focused question first inside a scoped practice queue', () => {
     let progress = createDefaultProgress()
     const candidates = [
@@ -303,6 +385,19 @@ describe('studyProgress', () => {
 
     expect(queue.map(item => item.id)).toEqual([62, 60, 61])
     expect(queue[0].source).toBe('page')
+  })
+
+  it('keeps a focused scoped placeholder question first when details are missing', () => {
+    const progress = createDefaultProgress()
+
+    const queue = buildScopedPracticeQueue(progress, [], [90, 91], 91, 5)
+
+    expect(queue.map(item => item.id)).toEqual([91, 90])
+    expect(queue[0]).toMatchObject({
+      title: '题目 #91',
+      source: 'page',
+      status: 'new',
+    })
   })
 
   it('moves a focused practice question to the front of the queue', () => {

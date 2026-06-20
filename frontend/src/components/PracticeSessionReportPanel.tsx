@@ -9,7 +9,8 @@ import {
   ThunderboltOutlined,
   WarningOutlined,
 } from '@ant-design/icons'
-import { Button, message } from 'antd'
+import { Button } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import { useMemo } from 'react'
 import type {
   PracticeQueueItem,
@@ -292,12 +293,12 @@ export default function PracticeSessionReportPanel({
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('本轮模拟面试战报已复制')
+      emitFeedbackSuccess('本轮模拟面试战报已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 战报')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 战报')
   }
 
   const handleRepairAction = (action: PracticeSessionRepairAction) => {

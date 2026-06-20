@@ -1,8 +1,10 @@
-import { Button, message, Progress } from 'antd'
+import { Button, Progress } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import {
   ArrowRightOutlined,
   CompassOutlined,
   CopyOutlined,
+  EditOutlined,
   ExclamationCircleOutlined,
   FieldTimeOutlined,
 } from '@ant-design/icons'
@@ -10,6 +12,7 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStudyProgress } from '../hooks/useStudyProgress'
 import { buildNextTrainingQueue, formatNextTrainingQueueItemMeta } from '../utils/nextTrainingQueue'
+import { buildPracticeDraftRecovery } from '../utils/practiceDraftRecovery'
 import { buildStudyCommandMarkdown, buildStudyStrategy } from '../utils/studyStrategy'
 import type { StudyStrategyAction } from '../types'
 
@@ -22,18 +25,19 @@ export default function StudyCommandCenter() {
   const { progress } = useStudyProgress()
   const strategy = useMemo(() => buildStudyStrategy(progress), [progress])
   const nextTrainingQueue = useMemo(() => buildNextTrainingQueue(progress, new Date().toISOString(), 3), [progress])
+  const draftRecovery = useMemo(() => buildPracticeDraftRecovery(progress, { limit: 3 }), [progress])
 
   const handleCopyCommand = async () => {
     const markdown = buildStudyCommandMarkdown(progress)
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('备考指挥中心已复制')
+      emitFeedbackSuccess('备考指挥中心已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 指挥中心')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 指挥中心')
   }
 
   return (
@@ -75,6 +79,37 @@ export default function StudyCommandCenter() {
             </div>
           ))}
         </div>
+
+        {draftRecovery.items.length > 0 && (
+          <div className="command-draft-recovery" aria-label="备考指挥未提交回答">
+            <div className="command-draft-recovery-head">
+              <div>
+                <h3>先恢复未提交回答</h3>
+                <p>
+                  <strong>{draftRecovery.items.length} 份草稿待评分</strong>
+                  <span>已经开始的回答优先补完，才能形成连续评分样本。</span>
+                </p>
+              </div>
+              <Button
+                size="small"
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={() => navigate(draftRecovery.primaryPath)}
+              >
+                恢复 {draftRecovery.items.length} 份草稿
+                <ArrowRightOutlined />
+              </Button>
+            </div>
+            <div className="command-draft-recovery-list">
+              {draftRecovery.items.map(item => (
+                <button key={item.id} type="button" onClick={() => navigate(item.to)}>
+                  <strong>{item.title}</strong>
+                  <span>{item.meta}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="command-next-training" aria-label="下一轮训练">
           <div className="command-next-training-head">

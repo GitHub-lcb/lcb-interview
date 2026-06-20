@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useSearchParams, useNavigate } from 'react-router-dom'
+import { Link, useSearchParams, useNavigate } from 'react-router-dom'
 import { Input, Select, Pagination, Skeleton, Empty, Alert, Button } from 'antd'
 import { FilterOutlined, PlayCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { getQuestions } from '../../api/question'
@@ -46,7 +46,7 @@ export default function SearchResult() {
     }
     setLoading(true)
     setError(false)
-    getQuestions({ keyword, difficulty, page: page - 1, size: 20 })
+    getQuestions({ keyword, difficulty, page: page - 1, size: 20 }, { silentGlobalError: true })
       .then(res => {
         if (requestId !== requestSeq.current) {
           return
@@ -79,7 +79,13 @@ export default function SearchResult() {
     const nextKeyword = value.trim()
     if (nextKeyword) {
       setSearchParams({ q: nextKeyword })
+      return
     }
+    setSearchParams({})
+    setQuestions([])
+    setTotal(0)
+    setError(false)
+    setLoading(false)
   }
 
   const pageQuestionIds = questions.map(question => question.id)
@@ -184,9 +190,25 @@ export default function SearchResult() {
       )}
 
       {!loading && !error && keyword && questions.length === 0 && (
-        <Empty description={`未找到与 "${keyword}" 相关的题目`}>
-          <Button type="primary" ghost onClick={() => navigate('/banks')}>浏览全部题目</Button>
-        </Empty>
+        <div className="search-result-empty" role="status" aria-live="polite">
+          {difficulty ? (
+            <Empty description="当前筛选暂无题目">
+              <Button
+                type="primary"
+                onClick={() => {
+                  setDifficulty(undefined)
+                  setPage(1)
+                }}
+              >
+                清除难度筛选
+              </Button>
+            </Empty>
+          ) : (
+            <Empty description={`未找到与 "${keyword}" 相关的题目`}>
+              <Button type="primary" ghost onClick={() => navigate('/banks')}>浏览全部题目</Button>
+            </Empty>
+          )}
+        </div>
       )}
 
       {!loading && !error && !keyword && (
@@ -205,10 +227,26 @@ export default function SearchResult() {
               <article
                 key={q.id}
                 className="search-result-card"
+                tabIndex={0}
                 onClick={() => navigate(`/question/${q.id}`)}
+                onKeyDown={(event) => {
+                  if (event.target !== event.currentTarget || event.key !== 'Enter') {
+                    return
+                  }
+                  navigate(`/question/${q.id}`)
+                }}
               >
                 <div className="search-result-main">
-                  <h2>{q.title}</h2>
+                  <h2>
+                    <Link
+                      className="search-result-title-link"
+                      to={`/question/${q.id}`}
+                      aria-label={`打开题目 ${q.title}`}
+                      onClick={event => event.stopPropagation()}
+                    >
+                      {q.title}
+                    </Link>
+                  </h2>
                   {preview && <p>{preview}</p>}
                   <div className="search-card-meta">
                     <span>{q.categoryName}</span>

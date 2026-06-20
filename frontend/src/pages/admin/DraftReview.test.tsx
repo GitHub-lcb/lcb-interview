@@ -2,6 +2,7 @@ import { cleanup, render, screen, waitFor, within } from '@testing-library/react
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import DraftReview from './DraftReview'
 import * as adminApi from '../../api/admin'
 import type { QuestionAdmin } from '../../types'
@@ -28,6 +29,14 @@ function draft(id: number, title: string): QuestionAdmin {
     source: 'AI_GENERATED',
     createTime: '2026-06-19T10:00:00',
   }
+}
+
+function renderDraftReview(initialEntry = '/admin/draft-review') {
+  return render(
+    <MemoryRouter initialEntries={[initialEntry]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <DraftReview />
+    </MemoryRouter>,
+  )
 }
 
 describe('DraftReview', () => {
@@ -78,7 +87,7 @@ describe('DraftReview', () => {
     }))
     vi.mocked(adminApi.approveDraft).mockResolvedValue({} as never)
 
-    render(<DraftReview />)
+    renderDraftReview()
 
     expect(await screen.findByText('第一页草稿题')).toBeInTheDocument()
     await user.click(screen.getByTitle('2'))
@@ -90,6 +99,54 @@ describe('DraftReview', () => {
     await user.click(within(row as HTMLElement).getByRole('button', { name: /通\s*过/ }))
 
     await waitFor(() => expect(adminApi.approveDraft).toHaveBeenCalledWith(21))
-    await waitFor(() => expect(listDrafts).toHaveBeenCalledWith(1))
+    await waitFor(() => expect(listDrafts).toHaveBeenCalledWith(1, 20, {}, { silentGlobalError: true }))
+  })
+
+  it('applies the risk filter from the URL and renders quality warning tags', async () => {
+    const listDrafts = vi.mocked(adminApi.listDrafts)
+    listDrafts.mockResolvedValue({
+      records: [draft(31, '空答案草稿')],
+      total: 1,
+      current: 1,
+      pages: 1,
+    })
+
+    renderDraftReview('/admin/draft-review?risk=EMPTY_ANSWER')
+
+    expect(await screen.findByText('空答案草稿')).toBeInTheDocument()
+    await waitFor(() => expect(listDrafts).toHaveBeenCalledWith(
+      0,
+      20,
+      { riskType: 'EMPTY_ANSWER' },
+      { silentGlobalError: true },
+    ))
+    expect(screen.getAllByText('空答案').length).toBeGreaterThan(0)
+  })
+
+  it('shows a recoverable inline error when the draft list fails silently', async () => {
+    const user = userEvent.setup()
+    const listDrafts = vi.mocked(adminApi.listDrafts)
+    listDrafts
+      .mockRejectedValueOnce(new Error('network down'))
+      .mockResolvedValueOnce({
+        records: [draft(51, '恢复后的草稿')],
+        total: 1,
+        current: 1,
+        pages: 1,
+      })
+
+    renderDraftReview()
+
+    await waitFor(() => {
+      expect(listDrafts).toHaveBeenCalledWith(0, 20, {}, { silentGlobalError: true })
+    })
+    expect(await screen.findByText('草稿列表加载失败')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /重\s*试/ }))
+
+    await waitFor(() => expect(listDrafts).toHaveBeenCalledTimes(2))
+    expect(listDrafts).toHaveBeenLastCalledWith(0, 20, {}, { silentGlobalError: true })
+    expect(await screen.findByText('恢复后的草稿')).toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByText('草稿列表加载失败')).not.toBeInTheDocument())
   })
 })

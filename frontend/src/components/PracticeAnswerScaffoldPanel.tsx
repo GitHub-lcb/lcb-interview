@@ -1,4 +1,5 @@
-import { Button, message } from 'antd'
+import { Button } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import { CopyOutlined, EditOutlined, FormOutlined } from '@ant-design/icons'
 import { useMemo } from 'react'
 import type { PracticeQueueItem } from '../types'
@@ -28,12 +29,12 @@ export default function PracticeAnswerScaffoldPanel({
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('答题脚手架已复制')
+      emitFeedbackSuccess('答题脚手架已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(question.title))
-    message.warning('剪贴板不可用，已下载 Markdown 脚手架')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 脚手架')
   }
 
   return (

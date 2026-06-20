@@ -37,6 +37,10 @@ export default function AppHeader() {
     const keyword = value.trim()
     if (keyword) {
       navigate(`/search?q=${encodeURIComponent(keyword)}`)
+      return
+    }
+    if (location.pathname === '/search') {
+      navigate('/search')
     }
   }
 

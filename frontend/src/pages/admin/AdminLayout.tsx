@@ -12,7 +12,7 @@ const { useBreakpoint } = Grid
 type AuthStatus = 'checking' | 'verified' | 'unauthorized'
 
 const menuItems = [
-  { key: '/admin/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
+  { key: '/admin/dashboard', icon: <DashboardOutlined />, label: '运营总览' },
   { key: '/admin/ai-generate', icon: <RobotOutlined />, label: '生成题目' },
   { key: '/admin/draft-review', icon: <FileSearchOutlined />, label: '审核草稿' },
 ]

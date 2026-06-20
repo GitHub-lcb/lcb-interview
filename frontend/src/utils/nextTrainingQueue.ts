@@ -101,6 +101,14 @@ function createQueueBuilder(): { items: Map<number, RankedQueueItem>; order: num
   }
 }
 
+function uniquePositiveIds(questionIds: number[]): number[] {
+  return [
+    ...new Set(
+      questionIds.filter(questionId => Number.isInteger(questionId) && questionId > 0),
+    ),
+  ]
+}
+
 function addScoreImpactItems(
   builder: { items: Map<number, RankedQueueItem>; order: number },
   progress: StudyProgress,
@@ -191,10 +199,10 @@ function addStatusItems(
   const items = Object.entries(progress.questionStates)
     .filter(([, state]) => state.status === status)
     .map(([questionIdText]) => Number(questionIdText))
-    .filter(questionId => Number.isFinite(questionId) && questionId > 0)
+  const questionIds = uniquePositiveIds(items)
     .sort((left, right) => left - right)
 
-  for (const questionId of items) {
+  for (const questionId of questionIds) {
     const snapshot = resolveSnapshot(progress, questionId)
     const isWeak = status === 'weak'
     pushQueueItem(builder, {
@@ -219,8 +227,7 @@ function addPlanItems(
   builder: { items: Map<number, RankedQueueItem>; order: number },
   progress: StudyProgress,
 ): void {
-  const planIds = [...new Set(progress.dailyPlan)]
-    .filter(questionId => Number.isFinite(questionId) && questionId > 0)
+  const planIds = uniquePositiveIds(progress.dailyPlan)
 
   for (const questionId of planIds) {
     const state = getQuestionState(progress, questionId)

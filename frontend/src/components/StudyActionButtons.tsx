@@ -25,6 +25,8 @@ export default function StudyActionButtons({
         size={compact ? 'small' : 'middle'}
         icon={<PlusOutlined />}
         type={state.addedToPlan ? 'primary' : 'default'}
+        aria-label={state.addedToPlan ? '已在今日计划' : '加入今日计划'}
+        aria-pressed={state.addedToPlan}
         onClick={(event) => {
           event.stopPropagation()
           onPlanChange(questionId, !state.addedToPlan)
@@ -36,6 +38,8 @@ export default function StudyActionButtons({
         size={compact ? 'small' : 'middle'}
         icon={<WarningOutlined />}
         danger={state.status === 'weak'}
+        aria-label="标记薄弱"
+        aria-pressed={state.status === 'weak'}
         onClick={(event) => {
           event.stopPropagation()
           onMarkWeak(questionId)
@@ -46,6 +50,8 @@ export default function StudyActionButtons({
       <Button
         size={compact ? 'small' : 'middle'}
         icon={<CheckOutlined />}
+        aria-label="已掌握"
+        aria-pressed={state.status === 'mastered'}
         onClick={(event) => {
           event.stopPropagation()
           onMarkMastered(questionId)

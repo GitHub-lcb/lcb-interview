@@ -1,61 +1,130 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Table, Button, Modal, Tag, message, Space, Alert } from 'antd'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Table, Button, Modal, Tag, Space, Alert, Select, Input } from 'antd'
+import { emitFeedbackError, emitFeedbackSuccess, emitFeedbackWarning } from '../../utils/feedbackMessage'
+import { useSearchParams } from 'react-router-dom'
 import { listDrafts, getDraft, approveDraft, rejectDraft, batchApproveDrafts, batchRejectDrafts } from '../../api/admin'
 import ContentView from '../QuestionDetail/ContentView'
-import type { QuestionAdmin } from '../../types'
+import { getDraftQualityWarnings } from './draftQuality'
+import type { DraftReviewFilters, DraftRiskType, QuestionAdmin } from '../../types'
 import type { ColumnsType } from 'antd/es/table'
 
+const riskOptions: { label: string; value: DraftRiskType }[] = [
+  { label: '空答案', value: 'EMPTY_ANSWER' },
+  { label: '短答案', value: 'SHORT_ANSWER' },
+  { label: '缺摘要', value: 'MISSING_SUMMARY' },
+  { label: '缺原理', value: 'MISSING_PRINCIPLE' },
+  { label: '缺对比', value: 'MISSING_COMPARISON' },
+  { label: '缺场景', value: 'MISSING_SCENARIO' },
+  { label: '缺风险', value: 'MISSING_RISK' },
+  { label: '缺项目', value: 'MISSING_PROJECT_EXP' },
+  { label: '缺代码', value: 'MISSING_CODE_EXAMPLES' },
+  { label: '缺结构段', value: 'MISSING_CONTENT_SECTIONS' },
+  { label: '难度异常', value: 'INVALID_DIFFICULTY' },
+]
+
 export default function DraftReview() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [data, setData] = useState<QuestionAdmin[]>([])
   const [total, setTotal] = useState(0)
   const [current, setCurrent] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [loadError, setLoadError] = useState(false)
   const [preview, setPreview] = useState<QuestionAdmin | null>(null)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
+  const [riskType, setRiskType] = useState<DraftRiskType | undefined>(() =>
+    normalizeRiskType(searchParams.get('risk'))
+  )
+  const [keyword, setKeyword] = useState(() => searchParams.get('keyword') || '')
+  const [categoryId] = useState(() => {
+    const value = Number(searchParams.get('categoryId'))
+    return Number.isFinite(value) && value > 0 ? value : undefined
+  })
+
+  const filters = useMemo(
+    () => buildDraftFilters(riskType, keyword, categoryId),
+    [riskType, keyword, categoryId],
+  )
 
   const load = useCallback((p: number) => {
     setLoading(true)
-    listDrafts(p).then((res: any) => {
+    setLoadError(false)
+    listDrafts(p, 20, filters, { silentGlobalError: true }).then((res: any) => {
       setData((res.records || res.content) as QuestionAdmin[])
       setTotal(res.total)
+      setLoadError(false)
+    }).catch(() => {
+      setData([])
+      setTotal(0)
+      setLoadError(true)
+    }).finally(() => {
       setLoading(false)
-    }).catch(() => { setLoading(false); setData([]) })
-  }, [])
+    })
+  }, [filters])
 
   useEffect(() => { load(0) }, [load])
 
+  const syncSearchParams = (nextRiskType: DraftRiskType | undefined, nextKeyword: string) => {
+    const next = new URLSearchParams()
+    if (nextRiskType) { next.set('risk', nextRiskType) }
+    if (nextKeyword.trim()) { next.set('keyword', nextKeyword.trim()) }
+    if (categoryId) { next.set('categoryId', String(categoryId)) }
+    setSearchParams(next, { replace: true })
+  }
+
+  const handleRiskChange = (value?: DraftRiskType) => {
+    setRiskType(value)
+    setCurrent(1)
+    setSelectedIds([])
+    syncSearchParams(value, keyword)
+  }
+
+  const handleSearch = (value: string) => {
+    setKeyword(value)
+    setCurrent(1)
+    setSelectedIds([])
+    syncSearchParams(riskType, value)
+  }
+
+  const handleClearFilters = () => {
+    setRiskType(undefined)
+    setKeyword('')
+    setCurrent(1)
+    setSelectedIds([])
+    syncSearchParams(undefined, '')
+  }
+
   const handleApprove = async (id: number) => {
-    try { await approveDraft(id); message.success('已通过'); load(current - 1) }
-    catch { message.error('操作失败') }
+    try { await approveDraft(id); emitFeedbackSuccess('已通过'); load(current - 1) }
+    catch (error) { showActionFailure(error, '操作失败') }
   }
 
   const handleReject = async (id: number) => {
-    try { await rejectDraft(id); message.success('已驳回'); load(current - 1) }
-    catch { message.error('操作失败') }
+    try { await rejectDraft(id); emitFeedbackSuccess('已驳回'); load(current - 1) }
+    catch (error) { showActionFailure(error, '操作失败') }
   }
 
   const handlePreview = async (id: number) => {
     try { const q = await getDraft(id); setPreview(q); setPreviewOpen(true) }
-    catch { message.error('加载失败') }
+    catch { emitFeedbackError('加载失败') }
   }
 
   const handleBatchApprove = async () => {
-    if (selectedIds.length === 0) { message.warning('请先选择题目'); return }
+    if (selectedIds.length === 0) { emitFeedbackWarning('请先选择题目'); return }
     try {
       await batchApproveDrafts(selectedIds)
-      message.success(`已通过 ${selectedIds.length} 道题`)
+      emitFeedbackSuccess(`已通过 ${selectedIds.length} 道题`)
       setSelectedIds([]); load(current - 1)
-    } catch { message.error('批量操作失败') }
+    } catch (error) { showActionFailure(error, '批量操作失败') }
   }
 
   const handleBatchReject = async () => {
-    if (selectedIds.length === 0) { message.warning('请先选择题目'); return }
+    if (selectedIds.length === 0) { emitFeedbackWarning('请先选择题目'); return }
     try {
       await batchRejectDrafts(selectedIds)
-      message.success(`已驳回 ${selectedIds.length} 道题`)
+      emitFeedbackSuccess(`已驳回 ${selectedIds.length} 道题`)
       setSelectedIds([]); load(current - 1)
-    } catch { message.error('批量操作失败') }
+    } catch (error) { showActionFailure(error, '批量操作失败') }
   }
 
   const handlePageChange = (p: number) => {
@@ -73,6 +142,11 @@ export default function DraftReview() {
         const txt = r.summary || (r.content || r.answer || '').replace(/<[^>]*>/g, '').replace(/```[\s\S]*?```/g, '').slice(0, 120)
         return txt ? <span style={{ color: '#71717A', fontSize: 13 }}>{txt}...</span> : <Tag color="warning">无内容</Tag>
       },
+    },
+    {
+      title: '质量',
+      width: 230,
+      render: (_: any, r: QuestionAdmin) => <Space wrap size={[4, 4]}>{renderQualityTags(r)}</Space>,
     },
     { title: '难度', dataIndex: 'difficulty', width: 80,
       render: (v: string) => <Tag>{v}</Tag>,
@@ -93,7 +167,26 @@ export default function DraftReview() {
 
   return (
     <>
-      <Space style={{ marginBottom: 12 }}>
+      <Space style={{ marginBottom: 12 }} wrap>
+        <Select
+          allowClear
+          placeholder="质量风险"
+          style={{ width: 160 }}
+          options={riskOptions}
+          value={riskType}
+          onChange={handleRiskChange}
+        />
+        <Input.Search
+          allowClear
+          placeholder="搜索标题/摘要"
+          value={keyword}
+          onChange={(event) => setKeyword(event.target.value)}
+          onSearch={handleSearch}
+          style={{ width: 240 }}
+        />
+        {(riskType || keyword || categoryId) && (
+          <Button onClick={handleClearFilters}>清空筛选</Button>
+        )}
         <span>已选 {selectedIds.length} 题</span>
         <Button type="primary" onClick={handleBatchApprove}
                 disabled={selectedIds.length === 0}>批量通过</Button>
@@ -103,6 +196,16 @@ export default function DraftReview() {
       {selectedIds.length > 50 && (
         <Alert type="warning" showIcon message={`已选 ${selectedIds.length} 题，批量操作可能较慢`}
                style={{ marginBottom: 12 }} />
+      )}
+      {loadError && (
+        <Alert
+          type="error"
+          showIcon
+          message="草稿列表加载失败"
+          description="当前筛选条件下的草稿暂时无法加载，重试后会按当前筛选条件重新获取列表。"
+          action={<Button size="small" loading={loading} onClick={() => load(current - 1)}>重试</Button>}
+          style={{ marginBottom: 12 }}
+        />
       )}
       <Table
         rowKey="id"
@@ -127,4 +230,45 @@ export default function DraftReview() {
       </Modal>
     </>
   )
+}
+
+function buildDraftFilters(
+  riskType: DraftRiskType | undefined,
+  keyword: string,
+  categoryId?: number,
+): DraftReviewFilters {
+  const filters: DraftReviewFilters = {}
+  if (riskType) { filters.riskType = riskType }
+  if (keyword.trim()) { filters.keyword = keyword.trim() }
+  if (categoryId) { filters.categoryId = categoryId }
+  return filters
+}
+
+function normalizeRiskType(value: string | null): DraftRiskType | undefined {
+  return riskOptions.some(option => option.value === value) ? value as DraftRiskType : undefined
+}
+
+function renderQualityTags(question: QuestionAdmin) {
+  const warnings = getDraftQualityWarnings(question)
+
+  if (warnings.length === 0) {
+    return <Tag color="success">完整</Tag>
+  }
+  const visibleWarnings = warnings.slice(0, 5)
+  return [
+    ...visibleWarnings.map(warning => (
+      <Tag key={warning.label} color={warning.color}>{warning.label}</Tag>
+    )),
+    warnings.length > visibleWarnings.length
+      ? <Tag key="more" color="default">+{warnings.length - visibleWarnings.length}</Tag>
+      : null,
+  ]
+}
+
+function showActionFailure(error: unknown, fallback: string) {
+  // Axios 拦截器已经展示后端业务错误，这里只兜底非标准异常，避免覆盖具体原因。
+  if (error instanceof Error && error.message) {
+    return
+  }
+  emitFeedbackError(fallback)
 }

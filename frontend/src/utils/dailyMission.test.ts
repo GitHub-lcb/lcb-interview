@@ -106,6 +106,47 @@ describe('dailyMission', () => {
     expect(targets.length).toBe(new Set(targets).size)
   })
 
+  it('routes only unfinished daily plan questions into the plan mission', () => {
+    const progress: StudyProgress = {
+      ...createDefaultProgress(),
+      dailyPlan: [1, 2],
+      questionStates: {
+        1: { status: 'mastered', addedToPlan: true, reviewCount: 3 },
+        2: { status: 'learning', addedToPlan: true, reviewCount: 1 },
+      },
+    }
+
+    const mission = buildDailyMissionPlan(prepRoutes, progress, '2026-06-17T09:00:00')
+      .missions
+      .find(item => item.kind === 'plan')
+
+    expect(mission).toMatchObject({
+      id: 'plan-continue',
+      to: '/practice?queue=2',
+      metric: expect.stringContaining('1'),
+    })
+  })
+
+  it('routes completed daily plans to the study closeout instead of more practice', () => {
+    const progress: StudyProgress = {
+      ...createDefaultProgress(),
+      dailyPlan: [1],
+      questionStates: {
+        1: { status: 'mastered', addedToPlan: true, reviewCount: 3, lastReviewedAt: '2026-06-17T08:00:00' },
+      },
+    }
+
+    const mission = buildDailyMissionPlan(prepRoutes, progress, '2026-06-17T09:00:00')
+      .missions
+      .find(item => item.kind === 'plan')
+
+    expect(mission).toMatchObject({
+      id: 'plan-complete',
+      to: '/study',
+      metric: expect.stringContaining('1'),
+    })
+  })
+
   it('exports daily missions as portable markdown', () => {
     const progress: StudyProgress = {
       ...createDefaultProgress(),

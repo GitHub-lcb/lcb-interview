@@ -1,3 +1,4 @@
+import type { AxiosRequestConfig } from 'axios'
 import api from './index'
 
 export const batchGenerate = (params: {
@@ -12,8 +13,28 @@ export const getBatchStatus = () =>
   api.get<{ data: import('../types').BatchProgress }>('/admin/ai/batch/status')
     .then(res => res.data.data)
 
-export const listDrafts = (page = 0, size = 20) =>
-  api.get<{ data: { records: import('../types').QuestionAdmin[], total: number, current: number, pages: number } }>('/admin/questions/draft', { params: { page, size } })
+export const getAdminQualitySummary = (options: AxiosRequestConfig = {}) =>
+  api.get<{ data: import('../types').AdminQualitySummary }>('/admin/dashboard/quality-summary', options)
+    .then(res => res.data.data)
+
+export const listDrafts = (
+  page = 0,
+  size = 20,
+  filters: import('../types').DraftReviewFilters = {},
+  options: AxiosRequestConfig = {},
+) =>
+  api.get<{ data: { records: import('../types').QuestionAdmin[], total: number, current: number, pages: number } }>(
+    '/admin/questions/draft',
+    {
+      ...options,
+      params: {
+        page,
+        size,
+        ...filters,
+        ...options.params,
+      },
+    },
+  )
     .then(res => res.data.data)
 
 export const getDraft = (id: number) =>

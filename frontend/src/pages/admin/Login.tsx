@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Input, Button, message } from 'antd'
+import { Input, Button } from 'antd'
+import { emitFeedbackError, emitFeedbackSuccess } from '../../utils/feedbackMessage'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
@@ -17,13 +18,13 @@ export default function AdminLogin() {
       })
       if (res.data.code === 200) {
         localStorage.setItem('adminToken', token)
-        message.success('登录成功')
+        emitFeedbackSuccess('登录成功')
         navigate('/admin/dashboard')
       } else {
-        message.error('验证失败')
+        emitFeedbackError('验证失败')
       }
     } catch {
-      message.error('验证失败')
+      emitFeedbackError('验证失败')
     } finally {
       setLoading(false)
     }

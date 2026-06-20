@@ -1,4 +1,5 @@
-import { Button, message } from 'antd'
+import { Button } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../../utils/feedbackMessage'
 import { ArrowRightOutlined, BulbOutlined, CopyOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { experienceSets } from '../../data/freeSuperiority'
@@ -14,12 +15,12 @@ export default function Experiences() {
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('真实面试场景包已复制')
+      emitFeedbackSuccess('真实面试场景包已复制')
       return
     }
 
     downloadMarkdown(markdown, buildExperiencePlaybookFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 场景包')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 场景包')
   }
 
   return (

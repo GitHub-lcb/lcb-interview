@@ -3,6 +3,7 @@ import type { AbilityMapItem, DailyMissionItem, DailyMissionPlan, StudyProgress 
 import { buildAbilityMap } from './abilityMap'
 import { buildInterviewReviewSummary } from './interviewReview'
 import { buildScheduledReviewQueue, summarizeReviewSchedule } from './reviewSchedule'
+import { getQuestionState } from './studyProgress'
 
 const MISSION_LIMIT = 4
 
@@ -182,16 +183,32 @@ function buildInterviewMission(progress: StudyProgress): DailyMissionItem {
 }
 
 function buildPlanMission(progress: StudyProgress): DailyMissionItem {
-  if (progress.dailyPlan.length > 0) {
+  const planIds = uniquePositiveIds(progress.dailyPlan)
+  const unfinishedPlanIds = planIds.filter(questionId => getQuestionState(progress, questionId).status !== 'mastered')
+
+  if (unfinishedPlanIds.length > 0) {
     return {
       id: 'plan-continue',
       kind: 'plan',
       title: '推进今日计划',
-      description: `今日计划还有 ${progress.dailyPlan.length} 道题，按队列进入训练。`,
+      description: `今日计划还有 ${unfinishedPlanIds.length} 道题，按队列进入训练。`,
       reason: '来自今日学习计划',
-      to: `/practice?queue=${progress.dailyPlan.slice(0, 12).join(',')}`,
+      to: `/practice?queue=${unfinishedPlanIds.slice(0, 12).join(',')}`,
       priority: 65,
-      metric: `${progress.dailyPlan.length} 道`,
+      metric: `${unfinishedPlanIds.length} 道`,
+    }
+  }
+
+  if (planIds.length > 0) {
+    return {
+      id: 'plan-complete',
+      kind: 'plan',
+      title: '复盘今日计划',
+      description: `今日 ${planIds.length} 道计划题已全部掌握，回到学习计划完成收口。`,
+      reason: '来自今日学习计划',
+      to: '/study',
+      priority: 64,
+      metric: `${planIds.length} 道已完成`,
     }
   }
 
@@ -213,6 +230,10 @@ function buildPlanSummary(progress: StudyProgress): string {
     return '先建立学习轨迹，再由系统自动安排复习、短板训练和模拟面试。'
   }
   return '系统已根据复习到期、岗位短板、面试表现和今日计划排好优先级。'
+}
+
+function uniquePositiveIds(questionIds: number[]): number[] {
+  return [...new Set(questionIds.filter(id => Number.isInteger(id) && id > 0))]
 }
 
 function dedupeByTarget(missions: DailyMissionItem[]): DailyMissionItem[] {

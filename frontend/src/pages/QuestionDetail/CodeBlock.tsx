@@ -34,6 +34,7 @@ export default function CodeBlock({ examples }: Props) {
         <div style={{ display: 'flex', gap: 2 }}>
           {examples.map((ex, i) => (
             <button
+              type="button"
               key={i}
               onClick={() => setActiveTab(i)}
               style={{

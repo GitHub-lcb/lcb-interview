@@ -1,4 +1,5 @@
-import { Button, Progress, message } from 'antd'
+import { Button, Progress } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import { AuditOutlined, CopyOutlined } from '@ant-design/icons'
 import { useMemo } from 'react'
 import type { Question } from '../types'
@@ -17,12 +18,12 @@ export default function AnswerGapPanel({ question, answer }: AnswerGapPanelProps
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('答案差距校准已复制')
+      emitFeedbackSuccess('答案差距校准已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(question.title))
-    message.warning('剪贴板不可用，已下载 Markdown 校准')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 校准')
   }
 
   return (

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { Button, Empty, Input, Progress, Spin } from 'antd'
 import {
   ArrowRightOutlined,
@@ -18,6 +18,7 @@ import PracticeAnswerScaffoldPanel from '../../components/PracticeAnswerScaffold
 import PracticeAttemptDeltaPanel from '../../components/PracticeAttemptDeltaPanel'
 import PracticeFeedbackClosurePanel from '../../components/PracticeFeedbackClosurePanel'
 import PracticeInterviewerScriptPanel from '../../components/PracticeInterviewerScriptPanel'
+import PracticePostScoreNextStepPanel from '../../components/PracticePostScoreNextStepPanel'
 import PracticeScriptAnswerAcceptancePanel from '../../components/PracticeScriptAnswerAcceptancePanel'
 import PracticeSessionReportPanel from '../../components/PracticeSessionReportPanel'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
@@ -26,6 +27,11 @@ import { evaluateInterviewAnswerRemote } from '../../api/interview'
 import { getHotQuestions, getQuestionById } from '../../api/question'
 import type { InterviewFeedback, PracticeQueueItem, PracticeSessionRepairAction, Question } from '../../types'
 import { evaluateInterviewAnswer } from '../../utils/interviewCoach'
+import {
+  clearPracticeAnswerDraft,
+  readPracticeAnswerDraft,
+  writePracticeAnswerDraft,
+} from '../../utils/practiceAnswerDraftStore'
 import { buildPracticeSessionRepairDraft } from '../../utils/practiceSessionReport'
 import { buildScopedPracticeQueue, describeInterviewStatusSync, summarizeProgress } from '../../utils/studyProgress'
 
@@ -50,6 +56,7 @@ const feedbackSourceLabels: Record<NonNullable<InterviewFeedback['source']>, str
 }
 
 const scopedQuestionDetailCache = new Map<number, Promise<Question>>()
+const FIRST_RUN_SCOPED_BASELINE_STORAGE_PREFIX = 'lcb-first-run-scoped-baseline:'
 
 function getScopedQuestionById(questionId: number): Promise<Question> {
   const cached = scopedQuestionDetailCache.get(questionId)
@@ -57,7 +64,7 @@ function getScopedQuestionById(questionId: number): Promise<Question> {
     return cached
   }
 
-  const request = getQuestionById(questionId).catch(error => {
+  const request = getQuestionById(questionId, { silentGlobalError: true }).catch(error => {
     scopedQuestionDetailCache.delete(questionId)
     throw error
   })
@@ -91,6 +98,55 @@ function resolveScoreHint(score?: number) {
   return '需要补强'
 }
 
+function resolveNextPracticeIndex(
+  queue: PracticeQueueItem[],
+  currentIndex: number,
+  answeredQuestionIds: Set<number>,
+): number {
+  if (queue.length <= 1) {
+    return 0
+  }
+
+  for (let offset = 1; offset < queue.length; offset += 1) {
+    const nextIndex = (currentIndex + offset) % queue.length
+    if (!answeredQuestionIds.has(queue[nextIndex].id)) {
+      return nextIndex
+    }
+  }
+
+  return (currentIndex + 1) % queue.length
+}
+
+function readFirstRunScopedAttemptBaseline(sessionKey: string, questionIds: number[]): Map<number, number> | null {
+  try {
+    const raw = window.sessionStorage.getItem(`${FIRST_RUN_SCOPED_BASELINE_STORAGE_PREFIX}${sessionKey}`)
+    if (!raw) {
+      return null
+    }
+    const parsed = JSON.parse(raw) as { counts?: Record<string, number> }
+    if (!parsed.counts || typeof parsed.counts !== 'object') {
+      return null
+    }
+    return new Map(questionIds.map(questionId => {
+      const count = parsed.counts?.[String(questionId)]
+      return [questionId, typeof count === 'number' && count >= 0 ? count : 0]
+    }))
+  } catch {
+    return null
+  }
+}
+
+function writeFirstRunScopedAttemptBaseline(sessionKey: string, counts: Map<number, number>): void {
+  try {
+    window.sessionStorage.setItem(
+      `${FIRST_RUN_SCOPED_BASELINE_STORAGE_PREFIX}${sessionKey}`,
+      JSON.stringify({ counts: Object.fromEntries(counts) }),
+    )
+  } catch {
+    // sessionStorage 不可用时仍保留内存基线，避免阻断练习主流程。
+  }
+}
+
 export default function Practice() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -117,24 +173,60 @@ export default function Practice() {
   const scopedRequestIdsRef = useRef<Set<number>>(new Set())
   const latestQueueParamRef = useRef<string | null>(null)
   const pendingSessionRepairDraftRef = useRef<{ questionId: number; draft: string } | null>(null)
+  const answerPanelRef = useRef<HTMLElement | null>(null)
+  const firstRunSessionAttemptBaselineRef = useRef<{ key: string; counts: Map<number, number> }>({
+    key: '',
+    counts: new Map(),
+  })
   const searchParamKey = searchParams.toString()
   const focusQuestionParam = searchParams.get('question')
   const queueParam = searchParams.get('queue')
+  const practiceHandoffSource = searchParams.get('from')
   latestQueueParamRef.current = queueParam
   const focusQuestionId = useMemo(() => {
     const value = Number(focusQuestionParam)
-    return Number.isFinite(value) && value > 0 ? value : null
+    return Number.isInteger(value) && value > 0 ? value : null
   }, [focusQuestionParam])
   const scopedQuestionIds = useMemo(() => {
     if (!queueParam) {
       return []
     }
-    return queueParam
+    return [...new Set(queueParam
       .split(',')
       .map(value => Number(value))
-      .filter(value => Number.isFinite(value) && value > 0)
+      .filter(value => Number.isInteger(value) && value > 0))]
       .slice(0, 30)
   }, [queueParam])
+  const isFirstRunHandoffSource = practiceHandoffSource === 'first-run' && scopedQuestionIds.length > 0
+  const isFirstRunRepairHandoffSource = practiceHandoffSource === 'first-run-repair' && scopedQuestionIds.length > 0
+  const isFirstRunRehearsalHandoffSource = practiceHandoffSource === 'first-run-rehearsal'
+    && scopedQuestionIds.length > 0
+  const isFirstRunScopedHandoffSource = isFirstRunHandoffSource
+    || isFirstRunRepairHandoffSource
+    || isFirstRunRehearsalHandoffSource
+  const isFirstRunBaselineHandoffSource = isFirstRunRepairHandoffSource || isFirstRunRehearsalHandoffSource
+  const firstRunSessionKey = isFirstRunBaselineHandoffSource
+    ? `${practiceHandoffSource}:${scopedQuestionIds.join(',')}`
+    : ''
+  if (firstRunSessionAttemptBaselineRef.current.key !== firstRunSessionKey) {
+    const storedBaseline = firstRunSessionKey
+      ? readFirstRunScopedAttemptBaseline(firstRunSessionKey, scopedQuestionIds)
+      : null
+    const counts = storedBaseline ?? new Map(
+      scopedQuestionIds.map(questionId => [
+        questionId,
+        progress.interviewAttempts[questionId]?.length ?? 0,
+      ]),
+    )
+    firstRunSessionAttemptBaselineRef.current = {
+      key: firstRunSessionKey,
+      counts,
+    }
+    if (firstRunSessionKey && !storedBaseline) {
+      writeFirstRunScopedAttemptBaseline(firstRunSessionKey, counts)
+    }
+  }
+  const practiceQueueLimit = isFirstRunScopedHandoffSource ? scopedQuestionIds.length : 12
   const candidateQuestions = useMemo(() => {
     const candidates = [
       ...(focusedQuestion ? [focusedQuestion] : []),
@@ -171,15 +263,15 @@ export default function Practice() {
   }, [queueParam, scopedQuestionIds])
 
   const queue = useMemo(
-    () => buildScopedPracticeQueue(progress, candidateQuestions, scopedQuestionIds, focusQuestionId, 12),
-    [candidateQuestions, focusQuestionId, progress, scopedQuestionIds],
+    () => buildScopedPracticeQueue(progress, candidateQuestions, scopedQuestionIds, focusQuestionId, practiceQueueLimit),
+    [candidateQuestions, focusQuestionId, practiceQueueLimit, progress, scopedQuestionIds],
   )
   const summary = useMemo(() => summarizeProgress(progress), [progress])
 
   useEffect(() => {
     let ignore = false
 
-    getHotQuestions(12)
+    getHotQuestions(12, { silentGlobalError: true })
       .then(questions => {
         if (ignore) {
           return
@@ -262,7 +354,7 @@ export default function Practice() {
     let ignore = false
     setIsLoadingFocus(true)
 
-    getQuestionById(focusQuestionId)
+    getQuestionById(focusQuestionId, { silentGlobalError: true })
       .then(question => {
         if (ignore) {
           return
@@ -311,31 +403,136 @@ export default function Practice() {
   const latestAttempt = current ? progress.interviewAttempts[current.id]?.[0] : undefined
   const currentAttempts = current ? progress.interviewAttempts[current.id] ?? [] : []
   const progressPercent = queue.length === 0 ? 0 : Math.round(((currentIndex + 1) / queue.length) * 100)
-  const answeredInQueue = queue.filter(item => (progress.interviewAttempts[item.id]?.length ?? 0) > 0).length
+  const currentQuestionId = current?.id
+  const hasCurrentFeedback = feedback !== null && currentQuestionId !== undefined
+  const answeredQuestionIds = useMemo(() => {
+    if (isFirstRunBaselineHandoffSource) {
+      const questionIds = new Set(
+        scopedQuestionIds.filter(questionId => {
+          const baselineCount = firstRunSessionAttemptBaselineRef.current.counts.get(questionId) ?? 0
+          return (progress.interviewAttempts[questionId]?.length ?? 0) > baselineCount
+        }),
+      )
+      if (hasCurrentFeedback && currentQuestionId !== undefined) {
+        questionIds.add(currentQuestionId)
+      }
+      return questionIds
+    }
+
+    const questionIds = new Set(
+      Object.entries(progress.interviewAttempts)
+        .filter(([, attempts]) => attempts.length > 0)
+        .map(([questionId]) => Number(questionId)),
+    )
+    if (hasCurrentFeedback && currentQuestionId !== undefined) {
+      questionIds.add(currentQuestionId)
+    }
+    return questionIds
+  }, [
+    currentQuestionId,
+    hasCurrentFeedback,
+    isFirstRunBaselineHandoffSource,
+    progress.interviewAttempts,
+    scopedQuestionIds,
+  ])
+  const answeredInQueue = queue.filter(item => answeredQuestionIds.has(item.id)).length
   const latestScore = feedback?.score ?? latestAttempt?.feedback.score
   const latestScoreTone = resolveScoreTone(latestScore)
   const latestScoreText = latestScore === undefined ? '待评分' : `${latestScore} 分`
   const feedbackStatusSync = feedback ? describeInterviewStatusSync(feedback.score) : null
+  const isFocusedQuestionPractice = focusQuestionId === currentQuestionId
+  const isScriptHandoffPractice = isFocusedQuestionPractice && practiceHandoffSource === 'script'
+  const isFirstRunLaunchpadPractice = !focusQuestionId && isFirstRunHandoffSource
+  const isFirstRunRepairPractice = !focusQuestionId && isFirstRunRepairHandoffSource
+  const isFirstRunRehearsalPractice = !focusQuestionId && isFirstRunRehearsalHandoffSource
+  const currentQuestionDetailPath = current
+    ? `/question/${current.id}${isScriptHandoffPractice ? '?from=practice-calibration#answer-script' : ''}`
+    : ''
+  const scopedQueueSourceLabel = isFirstRunRepairPractice
+    ? '首练补弱'
+    : isFirstRunRehearsalPractice ? '首练复述' : isFirstRunLaunchpadPractice ? '首练队列' : undefined
+  const currentSourceLabel = current ? scopedQueueSourceLabel ?? sourceLabels[current.source] : ''
+  const hasSavedDraft = !feedback && answerDraft.trim().length > 0
+
+  const updateAnswerDraft = useCallback((nextDraft: string) => {
+    setAnswerDraft(nextDraft)
+    if (currentQuestionId) {
+      writePracticeAnswerDraft(currentQuestionId, nextDraft)
+    }
+  }, [currentQuestionId])
+
+  const focusAnswerEditor = useCallback(() => {
+    window.setTimeout(() => {
+      answerPanelRef.current?.scrollIntoView?.({ block: 'start', behavior: 'smooth' })
+      answerPanelRef.current?.querySelector('textarea')?.focus()
+    }, 0)
+  }, [])
+
+  const useDraftTemplate = useCallback((template: string) => {
+    updateAnswerDraft(template)
+    setFeedback(null)
+    focusAnswerEditor()
+  }, [focusAnswerEditor, updateAnswerDraft])
 
   useEffect(() => {
     const pendingDraft = pendingSessionRepairDraftRef.current
-    if (current?.id && pendingDraft?.questionId === current.id) {
+    if (currentQuestionId && pendingDraft?.questionId === currentQuestionId) {
       setAnswerDraft(pendingDraft.draft)
+      writePracticeAnswerDraft(currentQuestionId, pendingDraft.draft)
       pendingSessionRepairDraftRef.current = null
+      focusAnswerEditor()
+    } else if (currentQuestionId) {
+      setAnswerDraft(readPracticeAnswerDraft(currentQuestionId) ?? '')
     } else {
       setAnswerDraft('')
     }
     setFeedback(null)
-  }, [current?.id])
+  }, [currentQuestionId, focusAnswerEditor])
+
+  useEffect(() => {
+    if (
+      isScriptHandoffPractice
+      || isFirstRunLaunchpadPractice
+      || isFirstRunRepairPractice
+      || isFirstRunRehearsalPractice
+    ) {
+      focusAnswerEditor()
+    }
+  }, [
+    focusAnswerEditor,
+    isFirstRunLaunchpadPractice,
+    isFirstRunRehearsalPractice,
+    isFirstRunRepairPractice,
+    isScriptHandoffPractice,
+  ])
 
   const moveNext = () => {
     setCurrentIndex(index => {
-      if (queue.length <= 1) {
-        return 0
-      }
-      return (index + 1) % queue.length
+      return resolveNextPracticeIndex(queue, index, answeredQuestionIds)
     })
   }
+
+  const firstRunProgress = (() => {
+    if (
+      (!isFirstRunLaunchpadPractice && !isFirstRunRepairPractice && !isFirstRunRehearsalPractice)
+      || queue.length === 0
+    ) {
+      return undefined
+    }
+
+    const nextIndex = resolveNextPracticeIndex(queue, currentIndex, answeredQuestionIds)
+    const nextQuestion = queue[nextIndex]
+    const variant = isFirstRunRepairPractice
+      ? 'repair' as const
+      : isFirstRunRehearsalPractice ? 'rehearsal' as const : 'launchpad' as const
+    return {
+      answeredCount: answeredInQueue,
+      totalCount: queue.length,
+      nextQuestionTitle: nextQuestion?.id !== currentQuestionId ? nextQuestion?.title : undefined,
+      onContinue: moveNext,
+      variant,
+    }
+  })()
 
   const markWeak = () => {
     if (!current) {
@@ -354,7 +551,7 @@ export default function Practice() {
   }
 
   const submitAnswer = async () => {
-    if (!current || !answerDraft.trim()) {
+    if (!current || !answerDraft.trim() || isEvaluating) {
       return
     }
     setIsEvaluating(true)
@@ -372,6 +569,19 @@ export default function Practice() {
     }
   }
 
+  const handleAnswerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key !== 'Enter' || (!event.ctrlKey && !event.metaKey)) {
+      return
+    }
+
+    event.preventDefault()
+    if (!answerDraft.trim() || isEvaluating) {
+      return
+    }
+
+    void submitAnswer()
+  }
+
   const persistFeedback = (nextFeedback: InterviewFeedback) => {
     if (!current) {
       return
@@ -383,36 +593,31 @@ export default function Practice() {
       feedback: nextFeedback,
       createdAt: new Date().toISOString(),
     })
+    clearPracticeAnswerDraft(current.id)
   }
 
   const startFollowUpAnswer = (prompt: string) => {
-    setAnswerDraft(`追问：${prompt}\n\n我的回答：`)
-    setFeedback(null)
+    useDraftTemplate(`追问：${prompt}\n\n我的回答：`)
   }
 
   const startClosureAnswer = (prompt: string) => {
-    setAnswerDraft(`${prompt}\n\n我的回答：`)
-    setFeedback(null)
+    useDraftTemplate(`${prompt}\n\n我的回答：`)
   }
 
   const useAnswerScaffold = (template: string) => {
-    setAnswerDraft(template)
-    setFeedback(null)
+    useDraftTemplate(template)
   }
 
   const useRepairTemplate = (template: string) => {
-    setAnswerDraft(template)
-    setFeedback(null)
+    useDraftTemplate(template)
   }
 
   const startAttemptDeltaAnswer = (prompt: string) => {
-    setAnswerDraft(`${prompt}\n\n我的回答：`)
-    setFeedback(null)
+    useDraftTemplate(`${prompt}\n\n我的回答：`)
   }
 
   const startInterviewerScriptAnswer = (prompt: string) => {
-    setAnswerDraft(`追问：${prompt}\n\n我的回答：`)
-    setFeedback(null)
+    useDraftTemplate(`追问：${prompt}\n\n我的回答：`)
   }
 
   const startSessionRepairAnswer = (action: PracticeSessionRepairAction) => {
@@ -423,7 +628,7 @@ export default function Practice() {
 
     if (targetIndex >= 0) {
       if (targetIndex === currentIndex) {
-        setAnswerDraft(draft)
+        useDraftTemplate(draft)
         pendingSessionRepairDraftRef.current = null
         return
       }
@@ -479,7 +684,7 @@ export default function Practice() {
           </div>
           <div>
             <span>当前来源</span>
-            <strong>{sourceLabels[current.source]}</strong>
+            <strong>{currentSourceLabel}</strong>
             <small>{current.categoryName}</small>
           </div>
           <div className={`score-${latestScoreTone}`}>
@@ -491,9 +696,78 @@ export default function Practice() {
 
         <article className="practice-question">
           <div className="practice-question-top">
-            <div className={`practice-source source-${current.source}`}>{sourceLabels[current.source]}</div>
+            <div className={`practice-source source-${current.source}`}>{currentSourceLabel}</div>
             <span>{focusQuestionId === current.id ? '当前题' : `Q${currentIndex + 1}`}</span>
           </div>
+          {isFirstRunLaunchpadPractice ? (
+            <div className="practice-question-focus-context" aria-label="首练队列上下文">
+              <div>
+                <span>首练队列</span>
+                <strong>先完成这 {queue.length} 道高频题</strong>
+                <small>不用再选题，提交评分后系统会生成补弱和复习队列。</small>
+              </div>
+              <Button
+                size="small"
+                icon={<BookOutlined />}
+                onClick={() => navigate('/')}
+              >
+                回到启动台
+              </Button>
+            </div>
+          ) : null}
+          {isFirstRunRepairPractice ? (
+            <div className="practice-question-focus-context" aria-label="首练补弱队列上下文">
+              <div>
+                <span>首练补弱队列</span>
+                <strong>先修复这 {queue.length} 道首练风险题</strong>
+                <small>来自首练战报，按最低分和复习债重新作答，不再重新选题。</small>
+              </div>
+              <Button
+                size="small"
+                icon={<BookOutlined />}
+                onClick={() => navigate('/')}
+              >
+                回到启动台
+              </Button>
+            </div>
+          ) : null}
+          {isFirstRunRehearsalPractice ? (
+            <div className="practice-question-focus-context" aria-label="首练过线复述上下文">
+              <div>
+                <span>首练过线复述</span>
+                <strong>先复述这 {queue.length} 道已过线题</strong>
+                <small>来自首页低分优先队列，目标是脱稿验证，不是重新刷题。</small>
+              </div>
+              <Button
+                size="small"
+                icon={<BookOutlined />}
+                onClick={() => navigate('/')}
+              >
+                回到启动台
+              </Button>
+            </div>
+          ) : null}
+          {isFocusedQuestionPractice ? (
+            <div className="practice-question-focus-context" aria-label="同题模拟面试上下文">
+              <div>
+                <span>{isScriptHandoffPractice ? '口径盲练完成' : '同题模拟'}</span>
+                <strong>{isScriptHandoffPractice ? '现在进入无提示模拟' : '先脱稿回答这道题'}</strong>
+                <small>
+                  {isScriptHandoffPractice
+                    ? '刚完成 60 秒口径盲练，现在按面试节奏无提示作答。'
+                    : '刚从题目详情进入，先按当前题完成一轮无提示回答。'}
+                </small>
+              </div>
+              <Button
+                size="small"
+                icon={<BookOutlined />}
+                aria-label="回到题目详情"
+                onClick={() => navigate(currentQuestionDetailPath)}
+              >
+                回到题目详情
+              </Button>
+            </div>
+          ) : null}
           <h2>{current.title}</h2>
           <div className="practice-meta">
             <span>{current.categoryName}</span>
@@ -515,19 +789,24 @@ export default function Practice() {
           onUseTemplate={useAnswerScaffold}
         />
 
-        <section className="practice-answer-panel">
+        <section className="practice-answer-panel" ref={answerPanelRef}>
           <div className="practice-answer-title">
             <span>模拟面试回答</span>
-            {latestAttempt && (
-              <small className={`practice-latest-score score-${resolveScoreTone(latestAttempt.feedback.score)}`}>
-                最近 {latestAttempt.feedback.score} 分
-                {latestAttempt.feedback.source ? ` · ${feedbackSourceLabels[latestAttempt.feedback.source]}` : ''}
-              </small>
-            )}
+            <div className="practice-answer-title-meta">
+              {hasSavedDraft && <small className="practice-draft-saved" aria-live="polite">草稿已本地保存</small>}
+              {latestAttempt && (
+                <small className={`practice-latest-score score-${resolveScoreTone(latestAttempt.feedback.score)}`}>
+                  最近 {latestAttempt.feedback.score} 分
+                  {latestAttempt.feedback.source ? ` · ${feedbackSourceLabels[latestAttempt.feedback.source]}` : ''}
+                </small>
+              )}
+            </div>
           </div>
           <Input.TextArea
+            aria-label="模拟面试回答"
             value={answerDraft}
-            onChange={(event) => setAnswerDraft(event.target.value)}
+            onChange={(event) => updateAnswerDraft(event.target.value)}
+            onKeyDown={handleAnswerKeyDown}
             placeholder="写下你会在面试中说出的答案..."
             autoSize={{ minRows: 5, maxRows: 9 }}
             maxLength={1600}
@@ -548,6 +827,7 @@ export default function Practice() {
             <Button
               type="primary"
               icon={<SendOutlined />}
+              aria-label="提交评分"
               loading={isEvaluating}
               disabled={!answerDraft.trim()}
               onClick={submitAnswer}
@@ -600,6 +880,12 @@ export default function Practice() {
                 </div>
               </div>
             </section>
+            <PracticePostScoreNextStepPanel
+              queue={queue}
+              progress={progress}
+              firstRunProgress={firstRunProgress}
+              onNavigate={navigate}
+            />
             <PracticeFeedbackClosurePanel
               question={current}
               answer={answerDraft}
@@ -607,7 +893,8 @@ export default function Practice() {
               onUsePrompt={startClosureAnswer}
               onMarkWeak={markWeak}
               onMarkMastered={markMastered}
-              onOpenAnswer={() => navigate(`/question/${current.id}`)}
+              onOpenAnswer={() => navigate(currentQuestionDetailPath)}
+              answerActionLabel={isScriptHandoffPractice ? '回到口径校准' : undefined}
               onNext={moveNext}
             />
             <FollowUpDrillPanel
@@ -623,16 +910,37 @@ export default function Practice() {
         )}
 
         <div className="practice-actions">
-          <Button type="primary" icon={<ArrowRightOutlined />} onClick={() => navigate(`/question/${current.id}`)}>
+          <Button
+            type="primary"
+            icon={<ArrowRightOutlined />}
+            aria-label="打开答案"
+            onClick={() => navigate(`/question/${current.id}`)}
+          >
             打开答案
           </Button>
-          <Button icon={<WarningOutlined />} danger onClick={markWeak}>
+          <Button
+            icon={<WarningOutlined />}
+            danger
+            aria-label="标记薄弱"
+            aria-pressed={currentState.status === 'weak'}
+            onClick={markWeak}
+          >
             标记薄弱
           </Button>
-          <Button icon={<CheckOutlined />} onClick={markMastered}>
+          <Button
+            icon={<CheckOutlined />}
+            aria-label="已掌握"
+            aria-pressed={currentState.status === 'mastered'}
+            onClick={markMastered}
+          >
             已掌握
           </Button>
-          <Button icon={<PlusOutlined />} onClick={() => setInPlan(current.id, !currentState.addedToPlan)}>
+          <Button
+            icon={<PlusOutlined />}
+            aria-label={currentState.addedToPlan ? '移出计划' : '加入计划'}
+            aria-pressed={currentState.addedToPlan}
+            onClick={() => setInPlan(current.id, !currentState.addedToPlan)}
+          >
             {currentState.addedToPlan ? '移出计划' : '加入计划'}
           </Button>
           <Button onClick={moveNext}>
@@ -688,6 +996,7 @@ export default function Practice() {
           </div>
           {queue.map((item, index) => (
             <button
+              type="button"
               key={`${item.source}-${item.id}`}
               className={item.id === current.id ? 'active' : ''}
               aria-current={item.id === current.id ? 'step' : undefined}
@@ -696,7 +1005,7 @@ export default function Practice() {
               <span className={`queue-index source-${item.source}`}>{index + 1}</span>
               <div>
                 <strong>{item.title}</strong>
-                <small>{sourceLabels[item.source]} · {item.categoryName}</small>
+                <small>{scopedQueueSourceLabel ?? sourceLabels[item.source]} · {item.categoryName}</small>
               </div>
             </button>
           ))}

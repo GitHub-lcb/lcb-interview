@@ -1,5 +1,6 @@
 import { ArrowRightOutlined, CopyOutlined, HighlightOutlined, StarOutlined } from '@ant-design/icons'
-import { Button, message } from 'antd'
+import { Button } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import { useMemo } from 'react'
 import type { InterviewMaterialSnippet, InterviewMaterialVault, StudyProgress } from '../types'
 import { buildInterviewMaterialVault, buildInterviewMaterialVaultMarkdown } from '../utils/interviewMaterialVault'
@@ -32,12 +33,12 @@ export default function InterviewMaterialVaultPanel({
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('高分素材库已复制')
+      emitFeedbackSuccess('高分素材库已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 素材库')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 素材库')
   }
 
   return (

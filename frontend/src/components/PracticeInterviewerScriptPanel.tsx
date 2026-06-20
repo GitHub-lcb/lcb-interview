@@ -1,5 +1,6 @@
 import { ClockCircleOutlined, CopyOutlined, ThunderboltOutlined } from '@ant-design/icons'
-import { Button, message, Progress } from 'antd'
+import { Button, Progress } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import { useMemo } from 'react'
 import type { InterviewAttempt, PracticeQueueItem } from '../types'
 import type { PracticeInterviewerScriptLevel } from '../utils/practiceInterviewerScript'
@@ -54,12 +55,12 @@ export default function PracticeInterviewerScriptPanel({
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('本题面试官脚本已复制')
+      emitFeedbackSuccess('本题面试官脚本已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(question.title))
-    message.warning('剪贴板不可用，已下载 Markdown 脚本')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 脚本')
   }
 
   const handleCopyProgress = async () => {
@@ -67,12 +68,12 @@ export default function PracticeInterviewerScriptPanel({
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('本题脚本进度已复制')
+      emitFeedbackSuccess('本题脚本进度已复制')
       return
     }
 
     downloadMarkdown(markdown, buildProgressFileName(question.title))
-    message.warning('剪贴板不可用，已下载 Markdown 进度')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 进度')
   }
 
   const handleUseNextPrompt = () => {

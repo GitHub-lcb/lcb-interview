@@ -1,5 +1,6 @@
 import { ArrowRightOutlined, ClockCircleOutlined, CopyOutlined, ThunderboltOutlined } from '@ant-design/icons'
-import { Button, message } from 'antd'
+import { Button } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { StudyProgress } from '../types'
@@ -25,12 +26,12 @@ export default function InterviewEmergencyKitPanel({
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('面试急救包已复制')
+      emitFeedbackSuccess('面试急救包已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 急救包')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 急救包')
   }
 
   return (

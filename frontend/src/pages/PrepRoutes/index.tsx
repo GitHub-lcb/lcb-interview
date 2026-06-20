@@ -1,4 +1,5 @@
-import { Button, message, Progress } from 'antd'
+import { Button, Progress } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../../utils/feedbackMessage'
 import { ArrowRightOutlined, CheckCircleOutlined, CopyOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { prepRoutes } from '../../data/freeSuperiority'
@@ -15,12 +16,12 @@ export default function PrepRoutes() {
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('备考路线战术包已复制')
+      emitFeedbackSuccess('备考路线战术包已复制')
       return
     }
 
     downloadMarkdown(markdown, buildRoutePlaybookFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 路线包')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 路线包')
   }
 
   return (

@@ -15,6 +15,11 @@ describe('buildDailyPracticePath', () => {
       .toBe('/practice?queue=1,5')
   })
 
+  it('drops fractional question ids before building query string', () => {
+    expect(buildDailyPracticePath([2.5, 2, 3.1, 2, 4]))
+      .toBe('/practice?queue=2,4')
+  })
+
   it('truncates the queue to the configured limit', () => {
     expect(buildDailyPracticePath([1, 2, 3, 4, 5], 3)).toBe('/practice?queue=1,2,3')
   })

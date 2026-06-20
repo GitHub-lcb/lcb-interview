@@ -1,6 +1,6 @@
 package com.lcbinterview.controller.admin;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,6 +8,7 @@ import com.lcbinterview.common.ApiResponse;
 import com.lcbinterview.dto.QuestionAdminVO;
 import com.lcbinterview.mapper.QuestionMapper;
 import com.lcbinterview.model.Question;
+import com.lcbinterview.service.AiAnswerQualityPolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class QuestionAdminController {
 
+    private static final int SHORT_ANSWER_MIN_CHARS = 500;
+    private static final int SUMMARY_MIN_CHARS = 40;
+    private static final int PRINCIPLE_MIN_CHARS = 120;
+    private static final int DETAIL_MIN_CHARS = 80;
+
     private final QuestionMapper questionMapper;
+    private final AiAnswerQualityPolicy aiAnswerQualityPolicy;
 
     /**
      * 草稿分页列表。
@@ -31,16 +38,94 @@ public class QuestionAdminController {
     @GetMapping("/draft")
     public ResponseEntity<ApiResponse<IPage<QuestionAdminVO>>> listDrafts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        Page<Question> mpPage = new Page<>(Math.max(1, page + 1), size);
-        LambdaQueryWrapper<Question> wrapper = new LambdaQueryWrapper<Question>()
-                .eq(Question::getStatus, "DRAFT")
-                .orderByAsc(Question::getId)
-                .orderByDesc(Question::getUpdateTime);
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String difficulty,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String riskType) {
+        Page<Question> mpPage = new Page<>(Math.max(1, page + 1), Math.min(100, Math.max(1, size)));
+        QueryWrapper<Question> wrapper = new QueryWrapper<Question>()
+                .eq("status", "DRAFT")
+                .orderByAsc("id")
+                .orderByDesc("update_time");
+        applyDraftFilters(wrapper, categoryId, difficulty, keyword, riskType);
         IPage<Question> result = questionMapper.selectPage(mpPage, wrapper);
         Page<QuestionAdminVO> voPage = new Page<>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream().map(QuestionAdminVO::from).toList());
         return ResponseEntity.ok(ApiResponse.success(voPage));
+    }
+
+    private void applyDraftFilters(
+            QueryWrapper<Question> wrapper,
+            Long categoryId,
+            String difficulty,
+            String keyword,
+            String riskType) {
+        if (categoryId != null) {
+            wrapper.eq("category_id", categoryId);
+        }
+        if (!isBlank(difficulty)) {
+            wrapper.eq("difficulty", difficulty.trim());
+        }
+        if (!isBlank(keyword)) {
+            String normalizedKeyword = keyword.trim();
+            wrapper.and(q -> q.like("title", normalizedKeyword)
+                    .or()
+                    .like("summary", normalizedKeyword)
+                    .or()
+                    .like("content", normalizedKeyword));
+        }
+        applyRiskFilter(wrapper, riskType);
+    }
+
+    private void applyRiskFilter(QueryWrapper<Question> wrapper, String riskType) {
+        if (isBlank(riskType)) {
+            return;
+        }
+        switch (riskType.trim().toUpperCase()) {
+            case "EMPTY_ANSWER" -> wrapper.and(q -> q.isNull("content").or().apply("TRIM(content) = ''"));
+            case "SHORT_ANSWER" -> wrapper.apply(
+                    "content IS NOT NULL AND TRIM(content) <> '' AND CHAR_LENGTH(content) < {0}",
+                    SHORT_ANSWER_MIN_CHARS);
+            case "MISSING_SUMMARY" -> applyShortTextFilter(wrapper, "summary", SUMMARY_MIN_CHARS);
+            case "MISSING_PRINCIPLE" -> applyShortTextFilter(wrapper, "principle", PRINCIPLE_MIN_CHARS);
+            case "MISSING_COMPARISON" -> applyShortTextFilter(wrapper, "comparison", DETAIL_MIN_CHARS);
+            case "MISSING_SCENARIO" -> applyShortTextFilter(wrapper, "scenario", DETAIL_MIN_CHARS);
+            case "MISSING_RISK" -> applyShortTextFilter(wrapper, "risk", DETAIL_MIN_CHARS);
+            case "MISSING_PROJECT_EXP" -> applyShortTextFilter(wrapper, "project_exp", DETAIL_MIN_CHARS);
+            case "MISSING_CODE_EXAMPLES" -> applyMissingFieldFilter(wrapper, "code_examples");
+            case "MISSING_CONTENT_SECTIONS" -> wrapper.and(q -> q.notLike("content", "30 秒口述版")
+                    .or()
+                    .notLike("content", "标准答案")
+                    .or()
+                    .notLike("content", "面试官评分点")
+                    .or()
+                    .notLike("content", "高频追问"));
+            case "INVALID_DIFFICULTY" -> wrapper.and(q -> q.isNull("difficulty")
+                    .or()
+                    .notIn("difficulty", "EASY", "MEDIUM", "HARD"));
+            default -> {
+                // 未识别的风险类型不参与过滤，避免前端旧参数导致列表不可用。
+            }
+        }
+    }
+
+    private void applyShortTextFilter(QueryWrapper<Question> wrapper, String column, int minLength) {
+        wrapper.and(q -> q.isNull(column)
+                .or()
+                .apply("TRIM(" + column + ") = ''")
+                .or()
+                .apply("CHAR_LENGTH(" + column + ") < {0}", minLength));
+    }
+
+    private void applyMissingFieldFilter(QueryWrapper<Question> wrapper, String column) {
+        wrapper.and(q -> q.isNull(column)
+                .or()
+                .apply("TRIM(" + column + ") = ''")
+                .or()
+                .apply("TRIM(" + column + ") = '[]'")
+                .or()
+                .apply("TRIM(" + column + ") = 'null'"));
     }
 
     /**
@@ -78,6 +163,10 @@ public class QuestionAdminController {
         if (isContentBlank(existing)) {
             return ResponseEntity.ok(ApiResponse.error(400, "题目答案为空，不能发布"));
         }
+        AiAnswerQualityPolicy.QualityReport qualityReport = evaluateDraftQuality(existing);
+        if (!qualityReport.passed()) {
+            return ResponseEntity.ok(ApiResponse.error(400, "题目质量未达标：" + summarizeQualityIssues(qualityReport)));
+        }
         Question q = new Question();
         q.setId(id);
         q.setStatus("PUBLISHED");
@@ -112,6 +201,15 @@ public class QuestionAdminController {
         if (hasBlankContent) {
             return ResponseEntity.ok(ApiResponse.error(400, "存在答案为空的草稿，不能批量发布"));
         }
+        for (Question draft : drafts) {
+            if ("DRAFT".equals(draft.getStatus())) {
+                AiAnswerQualityPolicy.QualityReport qualityReport = evaluateDraftQuality(draft);
+                if (!qualityReport.passed()) {
+                    return ResponseEntity.ok(ApiResponse.error(400,
+                            "存在质量未达标的草稿：" + draftTitle(draft) + "；" + summarizeQualityIssues(qualityReport)));
+                }
+            }
+        }
         questionMapper.update(null, new LambdaUpdateWrapper<Question>()
                 .set(Question::getStatus, "PUBLISHED")
                 .in(Question::getId, ids)
@@ -140,5 +238,31 @@ public class QuestionAdminController {
     private boolean isContentBlank(Question question) {
         String content = question.getContent();
         return content == null || content.isBlank();
+    }
+
+    private AiAnswerQualityPolicy.QualityReport evaluateDraftQuality(Question question) {
+        AiAnswerQualityPolicy.QualityReport report = aiAnswerQualityPolicy.evaluateGeneratedQuestion("未知分类", question);
+        if (report == null) {
+            return new AiAnswerQualityPolicy.QualityReport(0, List.of("质量策略未返回评估结果"));
+        }
+        return report;
+    }
+
+    private String summarizeQualityIssues(AiAnswerQualityPolicy.QualityReport report) {
+        if (!report.issues().isEmpty()) {
+            return String.join("；", report.issues().stream().limit(3).toList());
+        }
+        return "质量分 " + report.score() + "，低于发布门槛";
+    }
+
+    private String draftTitle(Question question) {
+        if (question.getTitle() == null || question.getTitle().isBlank()) {
+            return "ID " + question.getId();
+        }
+        return question.getTitle();
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }

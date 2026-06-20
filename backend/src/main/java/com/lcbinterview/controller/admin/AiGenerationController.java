@@ -5,6 +5,7 @@ import com.lcbinterview.dto.BatchGenerationRequest;
 import com.lcbinterview.dto.BatchProgressVO;
 import com.lcbinterview.dto.FillAnswersRequest;
 import com.lcbinterview.dto.GenerationRequest;
+import com.lcbinterview.service.AiGenerationRequestPolicy;
 import com.lcbinterview.service.AiQuestionService;
 import com.lcbinterview.service.BatchGenerationRunner;
 import jakarta.validation.Valid;
@@ -25,6 +26,7 @@ public class AiGenerationController {
 
     private final AiQuestionService aiQuestionService;
     private final BatchGenerationRunner batchRunner;
+    private final AiGenerationRequestPolicy requestPolicy;
 
     /**
      * SSE 流式生成单道题。实时推送 AI 思考过程（reasoning_content）和内容。
@@ -42,7 +44,7 @@ public class AiGenerationController {
             @RequestParam(defaultValue = "1") int count,
             @RequestParam(required = false) String topic) {
         SseEmitter emitter = new SseEmitter(600000L);
-        GenerationRequest req = new GenerationRequest(category, difficulty, count, topic);
+        GenerationRequest req = new GenerationRequest(category, difficulty, requestPolicy.clampCount(count), topic);
         aiQuestionService.streamGenerate(req, emitter);
         return emitter;
     }
@@ -55,7 +57,7 @@ public class AiGenerationController {
             @RequestParam(required = false) Long categoryId,
             @RequestParam(defaultValue = "5") int count) {
         SseEmitter emitter = new SseEmitter(600000L);
-        aiQuestionService.streamFillAnswer(categoryId, Math.min(count, 20), emitter);
+        aiQuestionService.streamFillAnswer(categoryId, requestPolicy.clampCount(count), emitter);
         return emitter;
     }
 

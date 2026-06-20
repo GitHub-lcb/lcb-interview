@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Select, Pagination, Skeleton, Empty, Alert, Button } from 'antd'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeftOutlined, FilterOutlined, PlayCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { getQuestions } from '../../api/question'
 import { getCategoryById } from '../../api/category'
@@ -12,8 +12,17 @@ import type { Question, Category } from '../../types'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
 
+function parseCategoryRouteId(id?: string): number | null {
+  const categoryId = Number(id)
+  if (!Number.isInteger(categoryId) || categoryId <= 0) {
+    return null
+  }
+  return categoryId
+}
+
 export default function QuestionList() {
   const { id } = useParams()
+  const categoryId = parseCategoryRouteId(id)
   const [category, setCategory] = useState<Category | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
@@ -28,15 +37,19 @@ export default function QuestionList() {
   const fetch = () => {
     const requestId = requestSeq.current + 1
     requestSeq.current = requestId
-    if (!id) {
+    if (categoryId === null) {
+      setCategory(null)
+      setQuestions([])
+      setTotal(0)
+      setError(false)
       setLoading(false)
       return
     }
     setLoading(true)
     setError(false)
     Promise.all([
-      getCategoryById(Number(id)).catch(() => undefined),
-      getQuestions({ category: Number(id), difficulty, page: page - 1, size: 20 }),
+      getCategoryById(categoryId, { silentGlobalError: true }).catch(() => undefined),
+      getQuestions({ category: categoryId, difficulty, page: page - 1, size: 20 }, { silentGlobalError: true }),
     ]).then(([nextCategory, res]) => {
       if (requestId !== requestSeq.current) {
         return
@@ -61,7 +74,18 @@ export default function QuestionList() {
 
   useEffect(() => {
     fetch()
-  }, [id, difficulty, page])
+  }, [categoryId, difficulty, page])
+
+  if (categoryId === null) {
+    return (
+      <Alert
+        type="error"
+        message="分类地址无效"
+        showIcon
+        action={<Button onClick={() => navigate('/banks')} size="small">返回题库</Button>}
+      />
+    )
+  }
 
   if (error) {
     return (
@@ -99,6 +123,7 @@ export default function QuestionList() {
   return (
     <div className="question-list-page">
       <button
+        type="button"
         className="detail-back-button"
         onClick={() => navigate('/banks')}
       >
@@ -165,7 +190,27 @@ export default function QuestionList() {
           ))}
         </div>
       ) : questions.length === 0 ? (
-        <Empty description="该分类暂无题目" />
+        <div className="question-list-empty" role="status" aria-live="polite">
+          {difficulty ? (
+            <Empty description="当前筛选暂无题目">
+              <Button
+                type="primary"
+                onClick={() => {
+                  setDifficulty(undefined)
+                  setPage(1)
+                }}
+              >
+                清除难度筛选
+              </Button>
+            </Empty>
+          ) : (
+            <Empty description="该分类暂无题目">
+              <Button type="primary" ghost onClick={() => navigate('/banks')}>
+                返回题库
+              </Button>
+            </Empty>
+          )}
+        </div>
       ) : (
         <>
           <div className="question-list-stack">
@@ -175,10 +220,26 @@ export default function QuestionList() {
                 <article
                   key={q.id}
                   className="question-list-card"
+                  tabIndex={0}
                   onClick={() => navigate(`/question/${q.id}`)}
+                  onKeyDown={(event) => {
+                    if (event.target !== event.currentTarget || event.key !== 'Enter') {
+                      return
+                    }
+                    navigate(`/question/${q.id}`)
+                  }}
                 >
                   <div className="question-list-card-main">
-                    <h2>{q.title}</h2>
+                    <h2>
+                      <Link
+                        className="question-list-title-link"
+                        to={`/question/${q.id}`}
+                        aria-label={`打开题目 ${q.title}`}
+                        onClick={event => event.stopPropagation()}
+                      >
+                        {q.title}
+                      </Link>
+                    </h2>
                     <div className="question-list-card-meta">
                       <span className={`difficulty-tag ${q.difficulty.toLowerCase()}`}>
                         {difficultyLabels[q.difficulty] || q.difficulty}

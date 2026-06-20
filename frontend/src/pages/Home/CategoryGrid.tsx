@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Skeleton, Empty, Alert, Button, Row, Col } from 'antd'
 import { ArrowRightOutlined } from '@ant-design/icons'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { getCategories } from '../../api/category'
 import { getCategoryIcon } from '../../utils/categoryIcons'
 import type { Category } from '../../types'
@@ -10,12 +10,11 @@ export default function CategoryGrid() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const navigate = useNavigate()
 
   const fetch = () => {
     setLoading(true)
     setError(false)
-    getCategories().then(data => {
+    getCategories({ silentGlobalError: true }).then(data => {
       setCategories(data)
       setLoading(false)
     }).catch(() => {
@@ -61,13 +60,12 @@ export default function CategoryGrid() {
     <Row gutter={[14, 14]} className="category-grid">
       {categories.map((cat, index) => (
         <Col xs={24} sm={12} lg={8} xl={6} key={cat.id}>
-          <button
-            type="button"
+          <Link
             className={`category-card fade-in-up stagger-${(index % 6) + 1}`}
-            onClick={() => navigate(`/bank/${cat.id}`)}
+            to={`/bank/${cat.id}`}
           >
             <div className="category-card-main">
-              <div className="category-card-icon">
+              <div className="category-card-icon" aria-hidden="true">
                 {getCategoryIcon(cat.icon, 40)}
               </div>
               <div>
@@ -78,9 +76,9 @@ export default function CategoryGrid() {
 
             <div className="category-card-footer">
               <span>浏览题库</span>
-              <ArrowRightOutlined />
+              <ArrowRightOutlined aria-hidden="true" />
             </div>
-          </button>
+          </Link>
         </Col>
       ))}
     </Row>

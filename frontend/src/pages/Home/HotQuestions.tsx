@@ -1,6 +1,6 @@
 import { Skeleton, Empty, Alert, Button } from 'antd'
 import { RightOutlined } from '@ant-design/icons'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import type { Question } from '../../types'
@@ -15,7 +15,6 @@ interface Props {
 }
 
 export default function HotQuestions({ questions, loading = false, error = false, onRetry }: Props) {
-  const navigate = useNavigate()
   const { getState } = useStudyProgress()
 
   if (loading) {
@@ -50,12 +49,12 @@ export default function HotQuestions({ questions, loading = false, error = false
       {questions.map((q, index) => {
         const state = getState(q.id)
         return (
-          <button
-            type="button"
+          <Link
             key={q.id}
             className="hot-question-row fade-in-up"
             style={{ animationDelay: `${0.1 + index * 0.05}s` }}
-            onClick={() => navigate(`/question/${q.id}`)}
+            to={`/question/${q.id}`}
+            aria-label={`打开热门题目 ${q.title}`}
           >
             <div
               className={`hot-question-rank ${index < 3 ? `rank-${index + 1}` : ''}`}
@@ -75,8 +74,8 @@ export default function HotQuestions({ questions, loading = false, error = false
               </div>
             </div>
 
-            <RightOutlined className="hot-question-arrow" />
-          </button>
+            <RightOutlined className="hot-question-arrow" aria-hidden="true" />
+          </Link>
         )
       })}
     </div>

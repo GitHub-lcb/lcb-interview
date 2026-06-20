@@ -22,6 +22,14 @@ const MAX_ATTEMPTS_PER_QUESTION = 5
 const INTERVIEW_PASS_SCORE = 70
 const INTERVIEW_MASTERED_SCORE = 80
 
+function isValidQuestionId(questionId: unknown): questionId is number {
+  return typeof questionId === 'number' && Number.isInteger(questionId) && questionId > 0
+}
+
+function normalizeQuestionIds(questionIds: unknown[]): number[] {
+  return [...new Set(questionIds.filter(isValidQuestionId))]
+}
+
 export interface QuestionSetProgressSummary {
   total: number
   tracked: number
@@ -69,7 +77,7 @@ export function parseStudyProgress(raw: string | null): StudyProgress {
         ? parsed.interviewAttempts as Record<number, InterviewAttempt[]>
         : {},
       dailyPlan: Array.isArray(parsed.dailyPlan)
-        ? [...new Set(parsed.dailyPlan.filter(id => typeof id === 'number'))]
+        ? normalizeQuestionIds(parsed.dailyPlan)
         : [],
       updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : new Date().toISOString(),
     }
@@ -88,10 +96,16 @@ export function writeStudyProgress(progress: StudyProgress, storage: Storage = w
 }
 
 export function getQuestionState(progress: StudyProgress, questionId: number): QuestionStudyState {
-  return progress.questionStates[questionId] ?? {
+  const planned = progress.dailyPlan.includes(questionId)
+  const current = progress.questionStates[questionId] ?? {
     status: 'new',
-    addedToPlan: progress.dailyPlan.includes(questionId),
+    addedToPlan: planned,
     reviewCount: 0,
+  }
+  return {
+    ...current,
+    addedToPlan: current.addedToPlan || planned,
+    status: current.status === 'new' && planned ? 'learning' : current.status,
   }
 }
 
@@ -147,7 +161,7 @@ export function replaceDailyPlan(
   questionIds: number[],
   now = new Date().toISOString(),
 ): StudyProgress {
-  const dailyPlan = [...new Set(questionIds.filter(id => typeof id === 'number'))]
+  const dailyPlan = normalizeQuestionIds(questionIds)
   const planIds = new Set(dailyPlan)
   const affectedIds = new Set([...progress.dailyPlan, ...dailyPlan])
   const questionStates = { ...progress.questionStates }
@@ -182,7 +196,7 @@ export function summarizeQuestionSetProgress(
   progress: StudyProgress,
   questionIds: number[],
 ): QuestionSetProgressSummary {
-  const uniqueIds = [...new Set(questionIds.filter(id => typeof id === 'number'))]
+  const uniqueIds = normalizeQuestionIds(questionIds)
   const states = uniqueIds.map(questionId => getQuestionState(progress, questionId))
   const planned = states.filter(state => state.addedToPlan).length
   const tracked = states.filter(state => state.status !== 'new' || state.addedToPlan).length
@@ -335,8 +349,7 @@ export function resolvePlanQuestions(
     ...candidateSnapshots,
   }
   return buildDailyPlan(progress, candidates, limit)
-    .map(id => snapshots[id])
-    .filter((question): question is QuestionSnapshot => Boolean(question))
+    .map(id => snapshots[id] ?? fallbackSnapshot(id))
 }
 
 function rankQuestion(progress: StudyProgress, question: Question): number {
@@ -400,8 +413,7 @@ export function buildPracticeQueue(
   }
 
   const planItems = progress.dailyPlan
-    .map(id => snapshots[id])
-    .filter((question): question is QuestionSnapshot => Boolean(question))
+    .map(id => snapshots[id] ?? fallbackSnapshot(id))
 
   for (const item of planItems) {
     const state = getQuestionState(progress, item.id)
@@ -473,7 +485,7 @@ export function buildScopedPracticeQueue(
   limit = 10,
 ): PracticeQueueItem[] {
   const baseQueue = buildFocusedPracticeQueue(progress, candidates, focusQuestionId, limit)
-  const scopedIds = [...new Set(scopedQuestionIds.filter(id => typeof id === 'number'))]
+  const scopedIds = normalizeQuestionIds(scopedQuestionIds)
   if (scopedIds.length === 0) {
     return baseQueue
   }
@@ -486,17 +498,12 @@ export function buildScopedPracticeQueue(
     ...candidateSnapshots,
   }
   const scopedItems = scopedIds
-    .map(id => snapshots[id])
-    .filter((question): question is QuestionSnapshot => Boolean(question))
+    .map(id => snapshots[id] ?? fallbackSnapshot(id))
     .map(question => ({
       ...question,
       status: getQuestionState(progress, question.id).status,
       source: 'page' as const,
     }))
-
-  if (scopedItems.length === 0) {
-    return baseQueue
-  }
 
   const scopedSet = new Set(scopedItems.map(item => item.id))
   const queue = [

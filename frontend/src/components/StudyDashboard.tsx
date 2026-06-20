@@ -1,4 +1,5 @@
-import { Button, message, Progress } from 'antd'
+import { Button, Progress } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import {
   CalendarOutlined,
   CopyOutlined,
@@ -45,12 +46,12 @@ export default function StudyDashboard({ hotQuestions }: Props) {
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('备考工作台日报已复制')
+      emitFeedbackSuccess('备考工作台日报已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 工作台日报')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 工作台日报')
   }
 
   return (
@@ -121,7 +122,7 @@ export default function StudyDashboard({ hotQuestions }: Props) {
                 const state = getState(q.id)
                 const isPlanned = state.addedToPlan || progress.dailyPlan.includes(q.id)
                 return (
-                  <button key={q.id} onClick={() => navigate(`/question/${q.id}`)}>
+                  <button type="button" key={q.id} onClick={() => navigate(`/question/${q.id}`)}>
                     <span>{index + 1}</span>
                     <div className="daily-plan-content">
                       <b>{q.title}</b>

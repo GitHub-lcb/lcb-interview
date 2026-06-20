@@ -38,6 +38,65 @@ export interface QuestionAdmin extends Question {
   source: 'AI_GENERATED' | 'MANUAL'
 }
 
+export type DraftRiskType =
+  | 'EMPTY_ANSWER'
+  | 'SHORT_ANSWER'
+  | 'MISSING_SUMMARY'
+  | 'MISSING_PRINCIPLE'
+  | 'MISSING_COMPARISON'
+  | 'MISSING_SCENARIO'
+  | 'MISSING_RISK'
+  | 'MISSING_PROJECT_EXP'
+  | 'MISSING_CODE_EXAMPLES'
+  | 'MISSING_CONTENT_SECTIONS'
+  | 'INVALID_DIFFICULTY'
+
+export interface DraftReviewFilters {
+  categoryId?: number
+  difficulty?: string
+  keyword?: string
+  riskType?: DraftRiskType
+}
+
+export interface AdminCategoryQuality {
+  categoryId: number | null
+  categoryName: string
+  total: number
+  published: number
+  draft: number
+  rejected: number
+  emptyAnswer: number
+  shortAnswer: number
+  missingPrinciple: number
+  missingRisk: number
+  missingProjectExp: number
+  missingCodeExamples: number
+  completionRate: number
+  riskScore: number
+}
+
+export interface AdminQualityTodo {
+  type: 'EMPTY_ANSWER' | 'QUALITY_RISK' | 'DRAFT_REVIEW' | 'REJECTED_REPAIR' | 'QUALITY_HEALTHY' | string
+  title: string
+  detail: string
+  categoryId: number | null
+  categoryName: string | null
+  count: number
+  tone: 'danger' | 'warning' | 'default' | 'success' | string
+}
+
+export interface AdminQualitySummary {
+  totalQuestions: number
+  publishedQuestions: number
+  draftQuestions: number
+  rejectedQuestions: number
+  emptyAnswerQuestions: number
+  qualityRiskQuestions: number
+  completionRate: number
+  categories: AdminCategoryQuality[]
+  todos: AdminQualityTodo[]
+}
+
 export interface CodeExample {
   lang: string
   title: string

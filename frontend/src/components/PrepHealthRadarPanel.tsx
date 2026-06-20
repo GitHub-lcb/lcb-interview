@@ -1,4 +1,5 @@
-import { Button, message, Progress } from 'antd'
+import { Button, Progress } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import {
   ArrowRightOutlined,
   CopyOutlined,
@@ -51,12 +52,12 @@ export default function PrepHealthRadarPanel() {
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('备考健康雷达已复制')
+      emitFeedbackSuccess('备考健康雷达已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 雷达')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 雷达')
   }
 
   return (

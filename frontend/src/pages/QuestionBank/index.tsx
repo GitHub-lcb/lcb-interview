@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Row, Col, Skeleton, Empty, Alert, Button, Segmented } from 'antd'
 import { ArrowRightOutlined, CalendarOutlined, PlayCircleOutlined } from '@ant-design/icons'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getCategories } from '../../api/category'
 import { getCategoryIcon } from '../../utils/categoryIcons'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
@@ -46,7 +46,7 @@ export default function QuestionBank() {
   const fetch = () => {
     setLoading(true)
     setError(false)
-    getCategories().then(data => {
+    getCategories({ silentGlobalError: true }).then(data => {
       setCategories(data)
       setLoading(false)
     }).catch(() => {
@@ -119,10 +119,10 @@ export default function QuestionBank() {
             <h1>全部题库</h1>
             <p>按岗位方向快速定位题库，优先处理已跟踪和今日计划里的题。</p>
             <div className="bank-hero-actions">
-              <Button type="primary" icon={<PlayCircleOutlined />} onClick={() => navigate('/practice')}>
+              <Button type="primary" icon={<PlayCircleOutlined />} aria-label="继续训练" onClick={() => navigate('/practice')}>
                 继续训练
               </Button>
-              <Button icon={<CalendarOutlined />} onClick={() => navigate('/study')}>
+              <Button icon={<CalendarOutlined />} aria-label="学习计划" onClick={() => navigate('/study')}>
                 学习计划
               </Button>
             </div>
@@ -152,25 +152,34 @@ export default function QuestionBank() {
           <strong>{visibleCategories.length} 个方向</strong>
         </div>
         <Segmented
+          aria-label="岗位方向筛选"
           value={trackFilter}
           onChange={value => setTrackFilter(String(value))}
           options={trackFilters}
         />
       </div>
 
-      <Row gutter={[14, 14]} className="category-grid">
-        {visibleCategories.map((cat, index) => {
+      {visibleCategories.length === 0 ? (
+        <div className="category-filter-empty" role="status" aria-live="polite">
+          <Empty description="该方向暂无题库">
+            <Button type="primary" onClick={() => setTrackFilter('ALL')}>
+              查看全部方向
+            </Button>
+          </Empty>
+        </div>
+      ) : (
+        <Row gutter={[14, 14]} className="category-grid">
+          {visibleCategories.map((cat, index) => {
           const track = resolveTrack(cat)
           const trackedCount = trackedByCategory[cat.name] ?? 0
           return (
           <Col xs={24} sm={12} md={8} key={cat.id}>
-            <button
-              type="button"
+            <Link
               className={`category-card fade-in-up stagger-${(index % 6) + 1}`}
-              onClick={() => navigate(`/bank/${cat.id}`)}
+              to={`/bank/${cat.id}`}
             >
               <div className="category-card-main">
-                <div className="category-card-icon">
+                <div className="category-card-icon" aria-hidden="true">
                   {getCategoryIcon(cat.icon, 40)}
                 </div>
                 <div>
@@ -183,13 +192,14 @@ export default function QuestionBank() {
               </div>
               <div className="category-card-footer">
                 <span>{trackedCount > 0 ? `${trackedCount} 道已跟踪` : '进入专项'}</span>
-                <ArrowRightOutlined />
+                <ArrowRightOutlined aria-hidden="true" />
               </div>
-            </button>
+            </Link>
           </Col>
           )
-        })}
-      </Row>
+          })}
+        </Row>
+      )}
     </div>
   )
 }

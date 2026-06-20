@@ -8,7 +8,8 @@ import {
   ForwardOutlined,
   QuestionCircleOutlined,
 } from '@ant-design/icons'
-import { Button, message } from 'antd'
+import { Button } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import { useMemo } from 'react'
 import type {
   InterviewFeedback,
@@ -26,6 +27,7 @@ interface PracticeFeedbackClosurePanelProps {
   onMarkWeak: () => void
   onMarkMastered: () => void
   onOpenAnswer: () => void
+  answerActionLabel?: string
   onNext: () => void
 }
 
@@ -46,6 +48,7 @@ export default function PracticeFeedbackClosurePanel({
   onMarkWeak,
   onMarkMastered,
   onOpenAnswer,
+  answerActionLabel,
   onNext,
 }: PracticeFeedbackClosurePanelProps) {
   const closure = useMemo(
@@ -80,12 +83,12 @@ export default function PracticeFeedbackClosurePanel({
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('单题评分闭环已复制')
+      emitFeedbackSuccess('单题评分闭环已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(question.title))
-    message.warning('剪贴板不可用，已下载 Markdown 闭环')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 闭环')
   }
 
   return (
@@ -115,18 +118,22 @@ export default function PracticeFeedbackClosurePanel({
       </div>
 
       <div className="practice-feedback-closure-actions">
-        {closure.actions.map(action => (
-          <Button
-            key={action.kind}
-            type={action.tone === 'primary' || action.tone === 'success' ? 'primary' : 'default'}
-            danger={action.tone === 'danger'}
-            icon={actionIcons[action.kind]}
-            onClick={() => handleAction(action)}
-          >
-            {action.label}
-            <ArrowRightOutlined />
-          </Button>
-        ))}
+        {closure.actions.map(action => {
+          const actionLabel = action.kind === 'answer' && answerActionLabel ? answerActionLabel : action.label
+
+          return (
+            <Button
+              key={action.kind}
+              type={action.tone === 'primary' || action.tone === 'success' ? 'primary' : 'default'}
+              danger={action.tone === 'danger'}
+              icon={actionIcons[action.kind]}
+              onClick={() => handleAction(action)}
+            >
+              {actionLabel}
+              <ArrowRightOutlined />
+            </Button>
+          )
+        })}
       </div>
     </section>
   )

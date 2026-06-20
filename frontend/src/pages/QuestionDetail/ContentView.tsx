@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useId, useState, type ReactNode } from 'react'
 import { DownOutlined } from '@ant-design/icons'
 import Markdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
@@ -43,10 +43,14 @@ function Section({
   defaultOpen?: boolean
 }) {
   const [open, setOpen] = useState(defaultOpen ?? false)
+  const panelId = useId()
   return (
     <div className="answer-section">
       <button
+        type="button"
         className="answer-section-toggle"
+        aria-expanded={open}
+        aria-controls={panelId}
         onClick={() => setOpen(!open)}
       >
         <span className="answer-section-label">
@@ -58,7 +62,7 @@ function Section({
         </span>
       </button>
       {open && (
-        <div className="answer-section-body">
+        <div id={panelId} className="answer-section-body">
           {children}
         </div>
       )}

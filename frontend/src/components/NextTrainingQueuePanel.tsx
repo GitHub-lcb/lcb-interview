@@ -1,5 +1,6 @@
-import { ArrowRightOutlined, CopyOutlined, PlayCircleOutlined, ThunderboltOutlined } from '@ant-design/icons'
-import { Button, message } from 'antd'
+import { ArrowRightOutlined, CopyOutlined, EditOutlined, PlayCircleOutlined, ThunderboltOutlined } from '@ant-design/icons'
+import { Button } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { StudyProgress } from '../types'
@@ -8,6 +9,7 @@ import {
   buildNextTrainingQueueMarkdown,
   formatNextTrainingQueueItemMeta,
 } from '../utils/nextTrainingQueue'
+import { buildPracticeDraftRecovery } from '../utils/practiceDraftRecovery'
 
 interface NextTrainingQueuePanelProps {
   progress: StudyProgress
@@ -23,18 +25,22 @@ export default function NextTrainingQueuePanel({
     () => buildNextTrainingQueue(progress, now),
     [now, progress],
   )
+  const draftRecovery = useMemo(
+    () => buildPracticeDraftRecovery(progress),
+    [progress],
+  )
 
   const handleCopyQueue = async () => {
     const markdown = buildNextTrainingQueueMarkdown(progress, now)
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('下一轮训练队列已复制')
+      emitFeedbackSuccess('下一轮训练队列已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 队列')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 队列')
   }
 
   return (
@@ -76,6 +82,32 @@ export default function NextTrainingQueuePanel({
           <span>{queue.primaryAction.description}</span>
         </div>
       </div>
+
+      {draftRecovery.items.length > 0 && (
+        <div className="next-training-draft-recovery" aria-label="未提交回答草稿">
+          <div className="next-training-draft-recovery-head">
+            <div>
+              <h3>继续未提交回答</h3>
+              <p>
+                <strong>{draftRecovery.items.length} 份草稿待评分</strong>
+                <span>先完成这些半截回答，避免练习记录断档。</span>
+              </p>
+            </div>
+            <Button type="primary" icon={<EditOutlined />} onClick={() => navigate(draftRecovery.primaryPath)}>
+              恢复 {draftRecovery.items.length} 份草稿
+              <ArrowRightOutlined />
+            </Button>
+          </div>
+          <div className="next-training-draft-list">
+            {draftRecovery.items.map(item => (
+              <button key={item.id} type="button" onClick={() => navigate(item.to)}>
+                <strong>{item.title}</strong>
+                <span>{item.meta}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {queue.items.length === 0 ? (
         <div className="next-training-queue-empty">

@@ -1,4 +1,5 @@
-import { Button, message, Progress } from 'antd'
+import { Button, Progress } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import { CopyOutlined } from '@ant-design/icons'
 import type { Question } from '../types'
 import {
@@ -21,12 +22,12 @@ export default function AnswerQualityPanel({ question }: Props) {
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('答案质量卡已复制')
+      emitFeedbackSuccess('答案质量卡已复制')
       return
     }
 
     downloadMarkdown(markdown, buildFileName(question.title))
-    message.warning('剪贴板不可用，已下载 Markdown 质量卡')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 质量卡')
   }
 
   return (

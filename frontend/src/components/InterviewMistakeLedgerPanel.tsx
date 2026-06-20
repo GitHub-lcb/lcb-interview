@@ -1,4 +1,5 @@
-import { Button, message, Progress } from 'antd'
+import { Button, Progress } from 'antd'
+import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import {
   ArrowRightOutlined,
   BookOutlined,
@@ -119,12 +120,12 @@ export default function InterviewMistakeLedgerPanel({ progress }: InterviewMista
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
-      message.success('错因修复计划已复制')
+      emitFeedbackSuccess('错因修复计划已复制')
       return
     }
 
     downloadMarkdown(markdown, buildRecoveryFileName(progress.targetRole))
-    message.warning('剪贴板不可用，已下载 Markdown 计划')
+    emitFeedbackWarning('剪贴板不可用，已下载 Markdown 计划')
   }
 
   if (ledger.level === 'empty') {

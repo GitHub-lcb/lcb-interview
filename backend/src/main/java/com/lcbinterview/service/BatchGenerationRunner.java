@@ -130,7 +130,7 @@ public class BatchGenerationRunner {
             long existing = questionMapper.selectCount(
                     new LambdaQueryWrapper<Question>()
                             .eq(Question::getCategoryId, cat.getId())
-                            .eq(Question::getStatus, "PUBLISHED"));
+                            .in(Question::getStatus, List.of("DRAFT", "PUBLISHED")));
             if (existing < countPerCategory) {
                 totalToGenerate += (int) (countPerCategory - existing);
             }
@@ -152,7 +152,7 @@ public class BatchGenerationRunner {
             long existingCount = questionMapper.selectCount(
                     new LambdaQueryWrapper<Question>()
                             .eq(Question::getCategoryId, cat.getId())
-                            .eq(Question::getStatus, "PUBLISHED"));
+                            .in(Question::getStatus, List.of("DRAFT", "PUBLISHED")));
 
             if (existingCount >= countPerCategory) {
                 log.info("[{}/{}] 分类 '{}' 已有 {} 道题 >= {}，跳过",

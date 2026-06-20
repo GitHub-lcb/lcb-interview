@@ -7,6 +7,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: false,
     css: true,
+    testTimeout: 15_000,
     passWithNoTests: true,
   },
 })

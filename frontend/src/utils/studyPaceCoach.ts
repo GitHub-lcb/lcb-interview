@@ -6,13 +6,16 @@ import type {
   StudyProgress,
 } from '../types'
 import { buildScheduledReviewQueue, summarizeReviewSchedule } from './reviewSchedule'
+import { getQuestionState } from './studyProgress'
 
 export function buildStudyPaceCoach(
   progress: StudyProgress,
   now = new Date().toISOString(),
 ): StudyPaceCoach {
   const trackedCount = Object.keys(progress.questionStates).length
-  const plannedCount = progress.dailyPlan.length
+  const dailyPlanIds = uniquePositiveIds(progress.dailyPlan)
+  const unfinishedPlanIds = dailyPlanIds.filter(questionId => getQuestionState(progress, questionId).status !== 'mastered')
+  const plannedCount = dailyPlanIds.length
   const dailyQuestionTarget = resolveDailyTarget(progress.sprintDays)
   const reviewSummary = summarizeReviewSchedule(buildScheduledReviewQueue(progress, now, 1000))
   const reviewDueCount = reviewSummary.overdue + reviewSummary.dueToday
@@ -31,7 +34,7 @@ export function buildStudyPaceCoach(
     dailyQuestionTarget,
     reviewDueCount,
     interviewAttemptCount,
-    dailyPlan: progress.dailyPlan,
+    practiceQuestionIds: unfinishedPlanIds,
   })
   const primaryAction = actions[0]
 
@@ -190,7 +193,7 @@ function buildActions(input: {
   dailyQuestionTarget: number
   reviewDueCount: number
   interviewAttemptCount: number
-  dailyPlan: number[]
+  practiceQuestionIds: number[]
 }): StudyPaceAction[] {
   if (input.trackedCount === 0) {
     return [{
@@ -226,14 +229,34 @@ function buildActions(input: {
       to: '/practice',
     })
   }
-  actions.push({
-    key: 'practice',
-    label: '按今日计划训练',
-    description: '计划、复习和面试样本都具备后，直接进入今日队列。',
-    to: input.dailyPlan.length > 0 ? `/practice?queue=${input.dailyPlan.slice(0, 12).join(',')}` : '/practice',
-  })
+  if (input.practiceQuestionIds.length > 0) {
+    actions.push({
+      key: 'practice',
+      label: '按今日计划训练',
+      description: '计划、复习和面试样本都具备后，直接进入今日队列。',
+      to: `/practice?queue=${input.practiceQuestionIds.slice(0, 12).join(',')}`,
+    })
+  } else if (input.plannedCount > 0) {
+    actions.push({
+      key: 'plan',
+      label: '收口今日计划',
+      description: '今日计划题已经完成，回到学习计划页沉淀复盘和下一步安排。',
+      to: '/study',
+    })
+  } else {
+    actions.push({
+      key: 'practice',
+      label: '进入自由训练',
+      description: '暂无今日队列时，先从练习页补一个可评分样本。',
+      to: '/practice',
+    })
+  }
 
   return actions
+}
+
+function uniquePositiveIds(questionIds: number[]): number[] {
+  return [...new Set(questionIds.filter(id => Number.isInteger(id) && id > 0))]
 }
 
 function buildMetrics(

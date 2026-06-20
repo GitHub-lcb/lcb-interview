@@ -1,13 +1,17 @@
-import { useState, useEffect, useRef } from 'react'
-import { Card, Form, Select, InputNumber, Input, Button, Progress, Alert, message, Segmented, Tag, Divider, Statistic, Row, Col, Collapse, List, Badge, Space } from 'antd'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { Card, Form, Select, InputNumber, Input, Button, Progress, Alert, Segmented, Tag, Divider, Statistic, Row, Col, Collapse, List, Badge, Space } from 'antd'
+import { emitFeedbackError, emitFeedbackSuccess } from '../../utils/feedbackMessage'
 import { batchGenerate, getBatchStatus, streamGenerate, streamFillAnswer } from '../../api/admin'
 import { getCategories } from '../../api/category'
 import { listDrafts } from '../../api/admin'
 import type { Category, BatchProgress, StreamEvent } from '../../types'
+import { getStreamResultMeta } from './aiGenerateResult'
 
 export default function AIGenerate() {
   const [mode, setMode] = useState<'batch' | 'stream' | 'streamFill'>('stream')
   const [categories, setCategories] = useState<Category[]>([])
+  const [categoryLoadError, setCategoryLoadError] = useState(false)
+  const [categoryLoading, setCategoryLoading] = useState(false)
   const [batchProgress, setBatchProgress] = useState<BatchProgress | null>(null)
   const [draftCount, setDraftCount] = useState(0)
 
@@ -22,11 +26,28 @@ export default function AIGenerate() {
 
   const [batchLoading, setBatchLoading] = useState(false)
 
+  const loadCategories = useCallback(() => {
+    setCategoryLoading(true)
+    setCategoryLoadError(false)
+    getCategories({ silentGlobalError: true })
+      .then(data => {
+        setCategories(data)
+        setCategoryLoadError(false)
+      })
+      .catch(() => {
+        setCategories([])
+        setCategoryLoadError(true)
+      })
+      .finally(() => {
+        setCategoryLoading(false)
+      })
+  }, [])
+
   useEffect(() => {
-    getCategories().then(setCategories).catch(() => {})
+    loadCategories()
     getBatchStatus().then(p => setBatchProgress(p as any)).catch(() => {})
     listDrafts(0, 1).then((res: any) => setDraftCount(res.total || 0)).catch(() => {})
-  }, [])
+  }, [loadCategories])
 
   const categoryOptions = categories.map(c => ({ value: c.name, label: c.name }))
 
@@ -34,9 +55,9 @@ export default function AIGenerate() {
     setBatchLoading(true)
     try {
       await batchGenerate({ countPerCategory: values.countPerCategory ?? 10, categoryName: values.categoryName, delaySeconds: values.delaySeconds ?? 3 })
-      message.success('批量任务已启动')
+      emitFeedbackSuccess('批量任务已启动')
       pollBatchStatus()
-    } catch { message.error('启动失败'); setBatchLoading(false) }
+    } catch { emitFeedbackError('启动失败'); setBatchLoading(false) }
   }
 
   const pollBatchStatus = () => {
@@ -44,7 +65,7 @@ export default function AIGenerate() {
       try {
         const p = await getBatchStatus()
         setBatchProgress(p)
-        if (p.status === 'IDLE') { clearInterval(timer); setBatchLoading(false); message.success('批量任务完成') }
+        if (p.status === 'IDLE') { clearInterval(timer); setBatchLoading(false); emitFeedbackSuccess('批量任务完成') }
       } catch { clearInterval(timer); setBatchLoading(false) }
     }, 3000)
   }
@@ -84,11 +105,11 @@ export default function AIGenerate() {
       case 'done':
         setStreamStatus('done')
         setStreamDoneResult(JSON.parse(event.data))
-        message.success(`全部完成！成功 ${JSON.parse(event.data).success} 题`)
+        emitFeedbackSuccess(`全部完成！成功 ${JSON.parse(event.data).success} 题`)
         break
       case 'error':
         setStreamStatus('error')
-        message.error(event.data)
+        emitFeedbackError(event.data)
         break
       case 'info':
         break
@@ -157,15 +178,28 @@ export default function AIGenerate() {
           size="small"
           header={<div>已完成题目</div>}
           dataSource={streamResults}
-          renderItem={item => (
-            <List.Item>
-              <Badge status={item.status === 'completed' ? 'success' : 'error'} />
-              <span style={{ marginLeft: 8 }}>
-                <Tag color="blue">#{item.current}</Tag>
-                {item.title || `题目 ID: ${item.questionId}`}
-              </span>
-            </List.Item>
-          )}
+          renderItem={item => {
+            const meta = getStreamResultMeta(item)
+            return (
+              <List.Item>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, width: '100%' }}>
+                  <Badge status={item.status === 'completed' ? 'success' : 'error'} style={{ marginTop: 6 }} />
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div>
+                      <Tag color="blue">#{item.current}</Tag>
+                      <span>{meta.title}</span>
+                      {meta.qualityText && <Tag color={meta.qualityColor} style={{ marginLeft: 8 }}>{meta.qualityText}</Tag>}
+                    </div>
+                    {meta.detail && (
+                      <div style={{ color: '#A16207', marginTop: 4, fontSize: 13, lineHeight: 1.5 }}>
+                        {meta.detail}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </List.Item>
+            )
+          }}
           style={{ marginBottom: 12 }}
         />
       )}
@@ -195,7 +229,7 @@ export default function AIGenerate() {
   )
 
   return (
-    <Card title="AI 题目生成 — 1M上下文 + Max模式">
+    <Card title="AI 题目生成 — 质量门禁 + 草稿审核">
       <Segmented
         value={mode}
         onChange={v => setMode(v as any)}
@@ -206,6 +240,17 @@ export default function AIGenerate() {
         ]}
         style={{ marginBottom: 24 }}
       />
+
+      {categoryLoadError && (
+        <Alert
+          type="warning"
+          showIcon
+          message="分类加载失败"
+          description="分类下拉框暂时不可用，可重试加载；不指定分类的批量生成和补答案流程仍可继续。"
+          action={<Button size="small" loading={categoryLoading} onClick={loadCategories}>重试加载分类</Button>}
+          style={{ marginBottom: 16 }}
+        />
+      )}
 
       {/* 流式生成 */}
       {mode === 'stream' && (
@@ -315,7 +360,7 @@ export default function AIGenerate() {
             description={<ul style={{ margin: 0, paddingLeft: 20 }}>
               <li>每个分类调用一次 AI 接口，间隔时间防止限流</li>
               <li>已有足够题目的分类自动跳过</li>
-              <li>生成的题目直接发布（PUBLISHED），无需审核</li>
+              <li>生成的题目进入草稿（DRAFT），通过审核后再发布</li>
             </ul>} />
         </>
       )}

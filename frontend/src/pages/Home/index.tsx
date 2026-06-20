@@ -3,7 +3,9 @@ import { Alert } from 'antd'
 import CategoryGrid from './CategoryGrid'
 import HotQuestions from './HotQuestions'
 import AbilityMapPanel from '../../components/AbilityMapPanel'
+import DailyPlanCompletionPanel from '../../components/DailyPlanCompletionPanel'
 import DailyMissionPanel from '../../components/DailyMissionPanel'
+import FirstRunLaunchpad from '../../components/FirstRunLaunchpad'
 import InterviewReviewPanel from '../../components/InterviewReviewPanel'
 import PrepHealthRadarPanel from '../../components/PrepHealthRadarPanel'
 import StudyCommandCenter from '../../components/StudyCommandCenter'
@@ -22,7 +24,7 @@ export default function Home() {
   const fetchHotQuestions = () => {
     setHotLoading(true)
     setHotError(false)
-    getHotQuestions(10)
+    getHotQuestions(10, { silentGlobalError: true })
       .then(data => {
         setHotQuestions(data)
         rememberQuestions(data)
@@ -40,6 +42,10 @@ export default function Home() {
 
   return (
     <div className="home-page">
+      <FirstRunLaunchpad hotQuestions={hotQuestions} loading={hotLoading} />
+
+      <DailyPlanCompletionPanel progress={progress} />
+
       <StudyDashboard hotQuestions={hotQuestions} />
 
       <StudyCommandCenter />

@@ -23,8 +23,7 @@ export function buildDailyPlanBrief(
       .filter(item => item.dueStatus !== 'upcoming')
       .map(item => [item.id, item]),
   )
-  const items = [...new Set(progress.dailyPlan)]
-    .filter(questionId => typeof questionId === 'number')
+  const items = uniquePositiveIds(progress.dailyPlan)
     .map(questionId => buildBriefItem(progress, snapshots, reviewDebtById, questionId))
   const reviewDebtCount = items.filter(item => item.source === 'review-debt').length
   const weakCount = items.filter(item => item.status === 'weak').length
@@ -181,6 +180,10 @@ function buildSnapshotMap(
     ...progress.questionSnapshots,
     ...candidateSnapshots,
   }
+}
+
+function uniquePositiveIds(questionIds: number[]): number[] {
+  return [...new Set(questionIds.filter(questionId => Number.isInteger(questionId) && questionId > 0))]
 }
 
 function sourceFromStatus(status: StudyQuestionStatus): DailyPlanBriefItemSource {

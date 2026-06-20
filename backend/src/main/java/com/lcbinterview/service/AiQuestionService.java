@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lcbinterview.dto.GenerationRequest;
+import com.lcbinterview.dto.QuestionTagName;
 import com.lcbinterview.mapper.CategoryMapper;
 import com.lcbinterview.mapper.QuestionMapper;
 import com.lcbinterview.model.Category;
@@ -22,7 +23,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 /**
  * AI 题目生成服务。调用 DeepSeek API 流式生成/补全面试题目。
@@ -36,8 +36,12 @@ public class AiQuestionService {
 
     private final QuestionMapper questionMapper;
     private final CategoryMapper categoryMapper;
+    private final AiAnswerQualityPolicy answerQualityPolicy;
+    private final QuestionTitleDeduplicator titleDeduplicator;
+    private final AiGenerationRequestPolicy requestPolicy;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+    private static final int ANSWER_QUALITY_MAX_ATTEMPTS = 3;
 
     @Value("${ai.deepseek.api-key}")
     private String apiKey;
@@ -57,31 +61,47 @@ public class AiQuestionService {
      * 同步生成题目（供 BatchGenerationRunner 调用）。
      */
     public List<Long> generateSync(GenerationRequest req, Long categoryId) {
+        GenerationRequest safeReq = new GenerationRequest(
+                req.category(), req.difficulty(), requestPolicy.clampCount(req.count()), req.topic());
         log.info("同步生成: category='{}', categoryId={}, count={}, topic='{}', 模型={}, maxTokens={}",
-                req.category(), categoryId, req.count(), req.topic(), model, maxTokens);
+                safeReq.category(), categoryId, safeReq.count(), safeReq.topic(), model, maxTokens);
 
-        String prompt = buildPrompt(req);
+        String prompt = answerQualityPolicy.buildQuestionPrompt(safeReq);
         log.info("调用 DeepSeek, prompt长度={}字符", prompt.length());
         long t = System.currentTimeMillis();
 
         String responseJson = callDeepSeek(prompt);
         logResponseUsage(responseJson);
         List<Question> questions = parseQuestions(responseJson);
+        List<Question> existingQuestions = loadComparableQuestions(categoryId);
 
         List<Long> ids = new ArrayList<>();
-        int toSave = Math.min(questions.size(), req.count());
+        int toSave = Math.min(questions.size(), safeReq.count());
         for (int i = 0; i < toSave; i++) {
             Question q = questions.get(i);
-            q.setStatus("PUBLISHED");
+            AiAnswerQualityPolicy.QualityReport qualityReport =
+                    answerQualityPolicy.evaluateGeneratedQuestion(safeReq.category(), q);
+            if (!qualityReport.passed()) {
+                log.warn("同步生成跳过低质量题目 [{}/{}]: title='{}', {}",
+                        i + 1, toSave, truncate(q.getTitle(), 50), formatQualityIssues(qualityReport));
+                continue;
+            }
+            if (titleDeduplicator.isDuplicate(q.getTitle(), existingQuestions)) {
+                log.warn("同步生成跳过重复题目 [{}/{}]: title='{}'", i + 1, toSave, truncate(q.getTitle(), 50));
+                continue;
+            }
+
+            q.setStatus("DRAFT");
             q.setSource("AI_GENERATED");
             q.setCategoryId(categoryId);
             questionMapper.insert(q);
             ids.add(q.getId());
+            existingQuestions.add(q);
             log.info("同步保存 [{}/{}]: id={}, title='{}'", i + 1, toSave, q.getId(), truncate(q.getTitle(), 50));
         }
 
         long elapsed = System.currentTimeMillis() - t;
-        log.info("同步生成完成: category='{}', 成功={}道, 耗时={}ms", req.category(), ids.size(), elapsed);
+        log.info("同步生成完成: category='{}', 成功={}道, 耗时={}ms", safeReq.category(), ids.size(), elapsed);
         return ids;
     }
 
@@ -91,15 +111,19 @@ public class AiQuestionService {
      * 流式生成题目 — 每道题独立发送一次请求，逐题展示进度和 AI 思考过程。
      */
     public void streamGenerate(GenerationRequest req, SseEmitter emitter) {
+        GenerationRequest safeReq = new GenerationRequest(
+                req.category(), req.difficulty(), requestPolicy.clampCount(req.count()), req.topic());
         log.info("流式生成启动: category='{}', difficulty={}, topic='{}', count={}, 模型={}, maxTokens={}",
-                req.category(), req.difficulty(), req.topic(), req.count(), model, maxTokens);
+                safeReq.category(), safeReq.difficulty(), safeReq.topic(), safeReq.count(), model, maxTokens);
 
         scheduler.submit(() -> {
             long totalStart = System.currentTimeMillis();
-            int total = Math.min(req.count(), 20);
+            int total = safeReq.count();
             int success = 0;
             int fail = 0;
             List<Map<String, Object>> results = new ArrayList<>();
+            Long categoryId = resolveCategoryId(safeReq.category());
+            List<Question> existingQuestions = loadComparableQuestions(categoryId);
 
             try {
                 for (int i = 0; i < total; i++) {
@@ -110,53 +134,80 @@ public class AiQuestionService {
                     progressData.put("status", "generating");
                     sendEmitterJson(emitter, "progress", progressData);
 
-                    GenerationRequest singleReq = new GenerationRequest(
-                            req.category(), req.difficulty(), 1, req.topic());
-                    String prompt = buildPrompt(singleReq);
-                    log.info("流式生成 [{}/{}]: 调用 DeepSeek, prompt={}字符", i + 1, total, prompt.length());
+                    Question q = null;
+                    String reasoning = "";
+                    AiAnswerQualityPolicy.QualityReport qualityReport = null;
+                    String lastError = null;
 
-                    StreamResult sr = callDeepSeekStreamInternal(prompt, emitter);
-                    log.info("流式生成 [{}/{}]: 收到响应, content={}字符, reasoning={}字符, chunks={}",
-                            i + 1, total, sr.content().length(), sr.reasoning().length(), sr.chunkCount());
+                    for (int attempt = 1; attempt <= ANSWER_QUALITY_MAX_ATTEMPTS; attempt++) {
+                        GenerationRequest singleReq = new GenerationRequest(
+                                safeReq.category(), safeReq.difficulty(), 1, safeReq.topic());
+                        String prompt = answerQualityPolicy.buildQuestionPrompt(singleReq);
+                        if (qualityReport != null) {
+                            prompt = prompt + buildQualityRetryInstruction(qualityReport);
+                        }
+                        log.info("流式生成 [{}/{}]: 第 {} 次调用 DeepSeek, prompt={}字符",
+                                i + 1, total, attempt, prompt.length());
 
-                    String jsonContent = sr.content().replaceAll("(?s)^```json\\s*", "")
-                            .replaceAll("(?s)\\s*```$", "").trim();
-                    int start = jsonContent.indexOf('[');
-                    int end = jsonContent.lastIndexOf(']');
-                    if (start >= 0 && end > start) {
-                        jsonContent = jsonContent.substring(start, end + 1);
+                        try {
+                            StreamResult sr = callDeepSeekStreamInternal(prompt, emitter);
+                            reasoning = sr.reasoning();
+                            log.info("流式生成 [{}/{}]: 第 {} 次收到响应, content={}字符, reasoning={}字符, chunks={}",
+                                    i + 1, total, attempt, sr.content().length(), sr.reasoning().length(), sr.chunkCount());
+
+                            JsonNode questionsArray = parseQuestionArray(sr.content());
+                            if (!questionsArray.isArray() || questionsArray.isEmpty()) {
+                                lastError = "响应中无有效题目";
+                                log.warn("流式生成 [{}/{}]: 第 {} 次响应中无有效题目", i + 1, total, attempt);
+                                continue;
+                            }
+
+                            q = toQuestion(questionsArray.get(0));
+                            qualityReport = answerQualityPolicy.evaluateGeneratedQuestion(safeReq.category(), q);
+                            if (!qualityReport.passed()) {
+                                lastError = formatQualityIssues(qualityReport);
+                                log.warn("流式生成 [{}/{}]: 第 {} 次质量未达标, {}",
+                                        i + 1, total, attempt, lastError);
+                                continue;
+                            }
+                            if (titleDeduplicator.isDuplicate(q.getTitle(), existingQuestions)) {
+                                qualityReport = new AiAnswerQualityPolicy.QualityReport(
+                                        0, List.of("title 与已有题目重复"));
+                                lastError = formatQualityIssues(qualityReport);
+                                log.warn("流式生成 [{}/{}]: 第 {} 次标题重复, title='{}'",
+                                        i + 1, total, attempt, truncate(q.getTitle(), 50));
+                                continue;
+                            }
+
+                            break;
+                        } catch (Exception e) {
+                            lastError = e.getMessage();
+                            log.warn("流式生成 [{}/{}]: 第 {} 次生成异常, error={}",
+                                    i + 1, total, attempt, e.getMessage());
+                        }
                     }
 
-                    JsonNode questionsArray = objectMapper.readTree(jsonContent);
-                    if (!questionsArray.isArray() || questionsArray.size() == 0) {
+                    if (q == null || qualityReport == null || !qualityReport.passed()
+                            || titleDeduplicator.isDuplicate(q.getTitle(), existingQuestions)) {
                         fail++;
-                        log.warn("流式生成 [{}/{}]: 响应中无有效题目", i + 1, total);
                         Map<String, Object> errData = new HashMap<>(progressData);
                         errData.put("status", "failed");
-                        errData.put("error", "响应中无有效题目");
+                        errData.put("error", lastError == null ? "题目质量未达标" : lastError);
+                        if (qualityReport != null) {
+                            errData.put("qualityScore", qualityReport.score());
+                            errData.put("qualityIssues", qualityReport.issues());
+                        }
                         sendEmitterJson(emitter, "question_result", errData);
                         continue;
                     }
 
-                    JsonNode item = questionsArray.get(0);
-                    Question q = new Question();
-                    q.setTitle(item.path("title").asText("未命名题目"));
-                    q.setSummary(nullIfEmpty(item.path("summary").asText()));
-                    q.setContent(item.path("content").asText(""));
-                    q.setAnswer(item.path("content").asText(""));
-                    q.setPrinciple(nullIfEmpty(item.path("principle").asText()));
-                    q.setComparison(nullIfEmpty(item.path("comparison").asText()));
-                    q.setScenario(nullIfEmpty(item.path("scenario").asText()));
-                    q.setRisk(nullIfEmpty(item.path("risk").asText()));
-                    q.setProjectExp(nullIfEmpty(item.path("project_exp").asText()));
-                    q.setCodeExamples(nullIfEmpty(item.path("code_examples").toString()));
-                    q.setDifficulty(item.path("difficulty").asText("MEDIUM"));
                     q.setStatus("DRAFT");
                     q.setSource("AI_GENERATED");
-                    q.setCategoryId(resolveCategoryId(req.category()));
+                    q.setCategoryId(categoryId);
 
                     questionMapper.insert(q);
                     success++;
+                    existingQuestions.add(q);
 
                     long iterTime = System.currentTimeMillis() - iterStart;
                     log.info("=== 流式生成 [{}/{}] 保存成功: id={}, title='{}', 耗时={}ms ===",
@@ -166,7 +217,8 @@ public class AiQuestionService {
                     qResult.put("status", "completed");
                     qResult.put("questionId", q.getId());
                     qResult.put("title", q.getTitle());
-                    qResult.put("reasoning", sr.reasoning());
+                    qResult.put("qualityScore", qualityReport.score());
+                    qResult.put("reasoning", reasoning);
                     sendEmitterJson(emitter, "question_result", qResult);
 
                     results.add(qResult);
@@ -196,7 +248,8 @@ public class AiQuestionService {
      * 流式补答案 — 逐题发送，实时进度和 AI 思考过程。
      */
     public void streamFillAnswer(Long categoryId, int count, SseEmitter emitter) {
-        log.info("流式补答案启动: categoryId={}, count={}", categoryId, count);
+        int safeCount = requestPolicy.clampCount(count);
+        log.info("流式补答案启动: categoryId={}, count={}", categoryId, safeCount);
 
         scheduler.submit(() -> {
             long totalStart = System.currentTimeMillis();
@@ -205,7 +258,7 @@ public class AiQuestionService {
                         .eq(Question::getStatus, "DRAFT")
                         .and(w -> w.isNull(Question::getContent).or().eq(Question::getContent, ""))
                         .orderByAsc(Question::getId)
-                        .last("LIMIT " + count);
+                        .last("LIMIT " + safeCount);
                 if (categoryId != null) {
                     wrapper.eq(Question::getCategoryId, categoryId);
                 }
@@ -237,35 +290,52 @@ public class AiQuestionService {
 
                     log.info("流式补答案 [{}/{}]: id={}, title='{}'", i + 1, total, q.getId(), truncate(q.getTitle(), 50));
 
-                    String prompt = buildFillPrompt(q.getTitle());
-                    StreamResult sr = callDeepSeekStreamInternal(prompt, emitter);
-                    log.info("流式补答案 [{}/{}]: 收到响应, content={}字符, reasoning={}字符",
-                            i + 1, total, sr.content().length(), sr.reasoning().length());
+                    FillContext context = loadFillContext(q);
+                    Question update = null;
+                    String reasoning = "";
+                    AiAnswerQualityPolicy.QualityReport qualityReport = null;
+                    String lastError = null;
 
-                    String jsonContent = sr.content().replaceAll("(?s)^```(?:json)?\\s*", "")
-                            .replaceAll("(?s)\\s*```$", "").trim();
-                    JsonNode parsed;
-                    if (jsonContent.startsWith("[")) {
-                        parsed = objectMapper.readTree(jsonContent).get(0);
-                    } else {
-                        parsed = objectMapper.readTree(jsonContent);
+                    for (int attempt = 1; attempt <= ANSWER_QUALITY_MAX_ATTEMPTS; attempt++) {
+                        String prompt = answerQualityPolicy.buildFillPrompt(q, context.categoryName(), context.tags());
+                        if (qualityReport != null) {
+                            prompt = prompt + buildQualityRetryInstruction(qualityReport);
+                        }
+                        log.info("流式补答案 [{}/{}]: 第 {} 次生成, prompt={}字符",
+                                i + 1, total, attempt, prompt.length());
+
+                        try {
+                            StreamResult sr = callDeepSeekStreamInternal(prompt, emitter);
+                            reasoning = sr.reasoning();
+                            log.info("流式补答案 [{}/{}]: 第 {} 次收到响应, content={}字符, reasoning={}字符",
+                                    i + 1, total, attempt, sr.content().length(), sr.reasoning().length());
+
+                            JsonNode parsed = parseAnswerObject(sr.content());
+                            if (parsed == null) {
+                                lastError = "响应中无有效答案对象";
+                                log.warn("流式补答案 [{}/{}]: 第 {} 次解析失败, id={}",
+                                        i + 1, total, attempt, q.getId());
+                                continue;
+                            }
+
+                            qualityReport = answerQualityPolicy.evaluate(q, context.categoryName(), context.tags(), parsed);
+                            if (!qualityReport.passed()) {
+                                lastError = formatQualityIssues(qualityReport);
+                                log.warn("流式补答案 [{}/{}]: 第 {} 次质量未达标, id={}, {}",
+                                        i + 1, total, attempt, q.getId(), lastError);
+                                continue;
+                            }
+
+                            update = toQuestionUpdate(q.getId(), parsed);
+                            break;
+                        } catch (Exception e) {
+                            lastError = e.getMessage();
+                            log.warn("流式补答案 [{}/{}]: 第 {} 次生成异常, id={}, error={}",
+                                    i + 1, total, attempt, q.getId(), e.getMessage());
+                        }
                     }
 
-                    if (parsed != null) {
-                        Question update = new Question();
-                        update.setId(q.getId());
-                        update.setSummary(nullIfEmpty(parsed.path("summary").asText()));
-                        update.setContent(parsed.path("content").asText(""));
-                        update.setAnswer(parsed.path("content").asText(""));
-                        update.setPrinciple(nullIfEmpty(parsed.path("principle").asText()));
-                        update.setComparison(nullIfEmpty(parsed.path("comparison").asText()));
-                        update.setScenario(nullIfEmpty(parsed.path("scenario").asText()));
-                        update.setRisk(nullIfEmpty(parsed.path("risk").asText()));
-                        update.setProjectExp(nullIfEmpty(parsed.path("project_exp").asText()));
-                        update.setCodeExamples(nullIfEmpty(parsed.path("code_examples").toString()));
-                        if (parsed.has("difficulty") && !parsed.path("difficulty").asText().isBlank()) {
-                            update.setDifficulty(parsed.path("difficulty").asText());
-                        }
+                    if (update != null) {
                         questionMapper.updateById(update);
                         success++;
 
@@ -276,15 +346,21 @@ public class AiQuestionService {
                         Map<String, Object> qResult = new HashMap<>(progressData);
                         qResult.put("status", "completed");
                         qResult.put("questionId", q.getId());
-                        qResult.put("reasoning", sr.reasoning());
+                        qResult.put("qualityScore", qualityReport == null ? null : qualityReport.score());
+                        qResult.put("reasoning", reasoning);
                         sendEmitterJson(emitter, "question_result", qResult);
                         results.add(qResult);
                     } else {
                         fail++;
-                        log.warn("流式补答案 [{}/{}]: 解析失败, id={}", i + 1, total, q.getId());
+                        log.warn("流式补答案 [{}/{}]: 多次生成后仍未达标, id={}, error={}",
+                                i + 1, total, q.getId(), lastError);
                         Map<String, Object> errData = new HashMap<>(progressData);
                         errData.put("status", "failed");
-                        errData.put("error", "解析响应失败");
+                        errData.put("error", lastError == null ? "答案质量未达标" : lastError);
+                        if (qualityReport != null) {
+                            errData.put("qualityScore", qualityReport.score());
+                            errData.put("qualityIssues", qualityReport.issues());
+                        }
                         sendEmitterJson(emitter, "question_result", errData);
                     }
                 }
@@ -312,6 +388,98 @@ public class AiQuestionService {
     // ==================== 内部方法 ====================
 
     private record StreamResult(String content, String reasoning, int chunkCount) {}
+
+    private record FillContext(String categoryName, List<String> tags) {}
+
+    private FillContext loadFillContext(Question question) {
+        String categoryName = "未知分类";
+        if (question.getCategoryId() != null) {
+            Category category = categoryMapper.selectById(question.getCategoryId());
+            if (category != null && category.getName() != null && !category.getName().isBlank()) {
+                categoryName = category.getName();
+            }
+        }
+
+        List<String> tags = List.of();
+        if (question.getId() != null) {
+            tags = questionMapper.selectTagNamesByQuestionIds(List.of(question.getId()))
+                    .stream()
+                    .map(QuestionTagName::tagName)
+                    .filter(name -> name != null && !name.isBlank())
+                    .toList();
+        }
+        return new FillContext(categoryName, tags);
+    }
+
+    private JsonNode parseAnswerObject(String content) throws Exception {
+        String jsonContent = content.replaceAll("(?s)^```(?:json)?\\s*", "")
+                .replaceAll("(?s)\\s*```$", "").trim();
+        if (jsonContent.startsWith("[")) {
+            JsonNode array = objectMapper.readTree(jsonContent);
+            return array.isArray() && !array.isEmpty() ? array.get(0) : null;
+        }
+        return objectMapper.readTree(jsonContent);
+    }
+
+    private JsonNode parseQuestionArray(String content) throws Exception {
+        String jsonContent = content.replaceAll("(?s)^```(?:json)?\\s*", "")
+                .replaceAll("(?s)\\s*```$", "").trim();
+        int start = jsonContent.indexOf('[');
+        int end = jsonContent.lastIndexOf(']');
+        if (start >= 0 && end > start) {
+            jsonContent = jsonContent.substring(start, end + 1);
+        }
+        return objectMapper.readTree(jsonContent);
+    }
+
+    private Question toQuestion(JsonNode item) {
+        Question q = new Question();
+        q.setTitle(item.path("title").asText("未命名题目"));
+        q.setSummary(nullIfEmpty(item.path("summary").asText()));
+        q.setContent(item.path("content").asText(""));
+        q.setAnswer(item.path("content").asText(""));
+        q.setPrinciple(nullIfEmpty(item.path("principle").asText()));
+        q.setComparison(nullIfEmpty(item.path("comparison").asText()));
+        q.setScenario(nullIfEmpty(item.path("scenario").asText()));
+        q.setRisk(nullIfEmpty(item.path("risk").asText()));
+        q.setProjectExp(nullIfEmpty(item.path("project_exp").asText()));
+        q.setCodeExamples(nullIfEmpty(item.path("code_examples").toString()));
+        q.setDifficulty(item.path("difficulty").asText("MEDIUM"));
+        return q;
+    }
+
+    private Question toQuestionUpdate(Long questionId, JsonNode parsed) {
+        Question update = new Question();
+        update.setId(questionId);
+        update.setSummary(nullIfEmpty(parsed.path("summary").asText()));
+        update.setContent(parsed.path("content").asText(""));
+        update.setAnswer(parsed.path("content").asText(""));
+        update.setPrinciple(nullIfEmpty(parsed.path("principle").asText()));
+        update.setComparison(nullIfEmpty(parsed.path("comparison").asText()));
+        update.setScenario(nullIfEmpty(parsed.path("scenario").asText()));
+        update.setRisk(nullIfEmpty(parsed.path("risk").asText()));
+        update.setProjectExp(nullIfEmpty(parsed.path("project_exp").asText()));
+        update.setCodeExamples(nullIfEmpty(parsed.path("code_examples").toString()));
+        if (parsed.has("difficulty") && !parsed.path("difficulty").asText().isBlank()) {
+            update.setDifficulty(parsed.path("difficulty").asText());
+        }
+        return update;
+    }
+
+    private String buildQualityRetryInstruction(AiAnswerQualityPolicy.QualityReport report) {
+        return """
+
+                ## 上一版质量检查未通过
+                质量分：%d
+                问题列表：%s
+
+                请针对以上问题完整重写答案，不要只局部补丁。
+                """.formatted(report.score(), String.join("；", report.issues()));
+    }
+
+    private String formatQualityIssues(AiAnswerQualityPolicy.QualityReport report) {
+        return "质量分 " + report.score() + "，问题：" + String.join("；", report.issues());
+    }
 
     /** 安全发送 SSE 事件，emitter 已完成后静默忽略。 */
     private void sendEmitterEvent(SseEmitter emitter, String name, String data) {
@@ -473,50 +641,6 @@ public class AiQuestionService {
         }
     }
 
-    private String buildPrompt(GenerationRequest req) {
-        return """
-            请生成 %d 道 %s 面试题，难度 %s。
-            %s
-            
-            以 JSON 数组格式返回，每个元素包含以下字段：
-            - title: 面试题目（字符串）
-            - summary: 一句话摘要（50-100字）
-            - content: 标准答案（Markdown 格式，详细完整）
-            - principle: 原理解析（Markdown，深入底层机制）
-            - comparison: 对比分析（Markdown，与同类技术对比，如无可为 null）
-            - scenario: 适用场景（Markdown，如无可为 null）
-            - risk: 风险与避坑（Markdown，如无可为 null）
-            - project_exp: 项目实战经验（Markdown，如无可为 null）
-            - code_examples: 代码示例数组，每个元素包含 lang（语言名）、title（标题）、code（代码）、description（说明），如无需为空数组
-            - difficulty: 难度 EASY/MEDIUM/HARD
-            
-            只返回 JSON 数组，不要包含其他文字。
-            """.formatted(req.count(), req.category(),
-                    req.difficulty() != null ? req.difficulty() : "MEDIUM",
-                    req.topic() != null ? "主题方向：" + req.topic() : "");
-    }
-
-    private String buildFillPrompt(String title) {
-        return """
-            请为以下面试题生成完整的结构化答案。
-            
-            题目：%s
-            
-            以 JSON 格式返回，包含以下字段：
-            - summary: 一句话摘要（50-100字纯文本）
-            - content: 标准答案（Markdown 格式，500-1500字，详细完整）
-            - principle: 原理解析（Markdown，深入底层机制，200-800字）
-            - comparison: 对比分析（Markdown，与同类技术对比，如无可为 null）
-            - scenario: 适用场景（Markdown，如无可为 null）
-            - risk: 风险与避坑（Markdown，如无可为 null）
-            - project_exp: 项目实战经验（Markdown，如无可为 null）
-            - code_examples: 代码示例数组 [{lang,title,code,description}]，如无需为空数组
-            - difficulty: 难度 EASY/MEDIUM/HARD
-            
-            只返回 JSON 对象，不要包含其他文字。
-            """.formatted(title);
-    }
-
     private void logResponseUsage(String responseJson) {
         try {
             JsonNode root = objectMapper.readTree(responseJson);
@@ -545,31 +669,12 @@ public class AiQuestionService {
             int totalTokens = root.path("usage").path("total_tokens").asInt(0);
             log.info("解析响应: content={}字符, total_tokens={}", content.length(), totalTokens);
 
-            content = content.replaceAll("(?s)^```json\\s*", "").replaceAll("(?s)\\s*```$", "").trim();
-            int start = content.indexOf('[');
-            int end = content.lastIndexOf(']');
-            if (start >= 0 && end > start) {
-                content = content.substring(start, end + 1);
-            }
-
-            JsonNode questionsArray = objectMapper.readTree(content);
+            JsonNode questionsArray = parseQuestionArray(content);
             List<Question> questions = new ArrayList<>();
 
             if (questionsArray.isArray()) {
                 for (JsonNode item : questionsArray) {
-                    Question q = new Question();
-                    q.setTitle(item.path("title").asText("未命名题目"));
-                    q.setSummary(nullIfEmpty(item.path("summary").asText()));
-                    q.setContent(item.path("content").asText(""));
-                    q.setAnswer(item.path("content").asText(""));
-                    q.setPrinciple(nullIfEmpty(item.path("principle").asText()));
-                    q.setComparison(nullIfEmpty(item.path("comparison").asText()));
-                    q.setScenario(nullIfEmpty(item.path("scenario").asText()));
-                    q.setRisk(nullIfEmpty(item.path("risk").asText()));
-                    q.setProjectExp(nullIfEmpty(item.path("project_exp").asText()));
-                    q.setCodeExamples(nullIfEmpty(item.path("code_examples").toString()));
-                    q.setDifficulty(item.path("difficulty").asText("MEDIUM"));
-                    questions.add(q);
+                    questions.add(toQuestion(item));
                 }
             }
             log.info("解析完成: {} 道有效题目", questions.size());
@@ -579,6 +684,17 @@ public class AiQuestionService {
             log.debug("原始响应前500字符: {}", responseJson.substring(0, Math.min(500, responseJson.length())));
             throw new RuntimeException("解析 AI 返回结果失败: " + e.getMessage(), e);
         }
+    }
+
+    private List<Question> loadComparableQuestions(Long categoryId) {
+        if (categoryId == null) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(questionMapper.selectList(
+                new LambdaQueryWrapper<Question>()
+                        .select(Question::getId, Question::getTitle)
+                        .eq(Question::getCategoryId, categoryId)
+                        .in(Question::getStatus, List.of("DRAFT", "PUBLISHED"))));
     }
 
     /**

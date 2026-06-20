@@ -120,7 +120,23 @@ describe('buildStudyPaceCoach', () => {
 
     expect(coach.level).toBe('balanced')
     expect(coach.primaryAction.key).toBe('practice')
-    expect(coach.primaryAction.to).toBe('/practice?queue=1,2,3,4,5,6')
+    expect(coach.primaryAction.to).toBe('/practice?queue=4,5,6')
+  })
+
+  it('routes completed daily plans to study closeout instead of another practice queue', () => {
+    const progress = emptyProgress()
+    for (let id = 1; id <= 6; id += 1) {
+      addQuestion(progress, id, 'mastered')
+    }
+    progress.dailyPlan = [1, 2, 3, 4, 5, 6]
+    progress.interviewAttempts[1] = [interviewAttempt(1)]
+
+    const coach = buildStudyPaceCoach(progress, NOW)
+
+    expect(coach.primaryAction).toMatchObject({
+      key: 'plan',
+      to: '/study',
+    })
   })
 
   it('marks pacing as ahead when the daily plan exceeds the target and interview samples exist', () => {

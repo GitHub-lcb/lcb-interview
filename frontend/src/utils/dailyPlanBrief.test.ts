@@ -73,7 +73,7 @@ describe('buildDailyPlanBrief', () => {
     expect(brief.weakCount).toBe(2)
   })
 
-  it('classifies new and mastered questions and falls back when snapshots are missing', () => {
+  it('classifies planned and mastered questions and falls back when snapshots are missing', () => {
     let progress = createDefaultProgress(NOW)
     progress = {
       ...progress,
@@ -84,17 +84,33 @@ describe('buildDailyPlanBrief', () => {
     const brief = buildDailyPlanBrief(progress, [question(4, 'MySQL')], NOW)
 
     expect(brief.items.map(item => item.questionId)).toEqual([5, 4, 6])
-    expect(brief.items.map(item => item.source)).toEqual(['new', 'new', 'mastered'])
+    expect(brief.items.map(item => item.source)).toEqual(['learning', 'learning', 'mastered'])
     expect(brief.items[0]).toMatchObject({
       title: '题目 #5',
       categoryName: '未分组',
-      actionLabel: '建立首轮记忆',
+      actionLabel: '继续巩固',
     })
     expect(brief.items[1]).toMatchObject({
       title: 'Question 4',
       categoryName: 'MySQL',
     })
-    expect(brief.newCount).toBe(2)
+    expect(brief.newCount).toBe(0)
+  })
+
+  it('drops invalid daily plan ids before building the brief', () => {
+    const progress = {
+      ...createDefaultProgress(NOW),
+      dailyPlan: [10, 0, -1, 2.5, 10, Number.NaN, Number.POSITIVE_INFINITY],
+    }
+
+    const brief = buildDailyPlanBrief(progress, [], NOW)
+    const markdown = buildDailyPlanBriefMarkdown(progress, [], NOW)
+
+    expect(brief.items.map(item => item.questionId)).toEqual([10])
+    expect(brief.totalCount).toBe(1)
+    expect(markdown).toContain('题目 #10')
+    expect(markdown).not.toContain('题目 #0')
+    expect(markdown).not.toContain('题目 #NaN')
   })
 
   it('exports planned daily brief as portable markdown', () => {
