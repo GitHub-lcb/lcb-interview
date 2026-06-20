@@ -42,6 +42,7 @@ public class AiQuestionService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
     private static final int ANSWER_QUALITY_MAX_ATTEMPTS = 3;
+    private static final int STREAM_HEARTBEAT_CHUNK_INTERVAL = 120;
 
     @Value("${ai.deepseek.api-key}")
     private String apiKey;
@@ -151,10 +152,10 @@ public class AiQuestionService {
                                 i + 1, total, attempt, prompt.length());
 
                         try {
-                            StreamResult sr = callDeepSeekStreamInternal(prompt, session);
+                            StreamResult sr = callDeepSeekStreamInternal(prompt, session, StreamPushMode.FULL);
                             reasoning = sr.reasoning();
                             log.info("流式生成 [{}/{}]: 第 {} 次收到响应, content={}字符, reasoning={}字符, chunks={}",
-                                    i + 1, total, attempt, sr.content().length(), sr.reasoning().length(), sr.chunkCount());
+                                    i + 1, total, attempt, sr.content().length(), sr.reasoningLength(), sr.chunkCount());
 
                             JsonNode questionsArray = parseQuestionArray(sr.content());
                             if (!questionsArray.isArray() || questionsArray.isEmpty()) {
@@ -280,8 +281,8 @@ public class AiQuestionService {
                 int total = drafts.size();
                 int success = 0;
                 int fail = 0;
-                List<Map<String, Object>> results = new ArrayList<>();
-                sendEventOrStop(session, "total", String.valueOf(total));
+                int resultCount = 0;
+                sendEventBestEffort(session, "total", String.valueOf(total));
 
                 for (int i = 0; i < total; i++) {
                     long iterStart = System.currentTimeMillis();
@@ -292,13 +293,13 @@ public class AiQuestionService {
                     progressData.put("total", total);
                     progressData.put("title", q.getTitle());
                     progressData.put("status", "generating");
-                    sendJsonOrStop(session, "progress", progressData);
+                    sendJsonBestEffort(session, "progress", progressData);
 
                     log.info("流式补答案 [{}/{}]: id={}, title='{}'", i + 1, total, q.getId(), truncate(q.getTitle(), 50));
 
                     FillContext context = loadFillContext(q);
                     Question update = null;
-                    String reasoning = "";
+                    int reasoningLength = 0;
                     AiAnswerQualityPolicy.QualityReport qualityReport = null;
                     String lastError = null;
 
@@ -311,10 +312,10 @@ public class AiQuestionService {
                                 i + 1, total, attempt, prompt.length());
 
                         try {
-                            StreamResult sr = callDeepSeekStreamInternal(prompt, session);
-                            reasoning = sr.reasoning();
+                            StreamResult sr = callDeepSeekStreamInternal(prompt, session, StreamPushMode.HEARTBEAT_ONLY);
+                            reasoningLength = sr.reasoningLength();
                             log.info("流式补答案 [{}/{}]: 第 {} 次收到响应, content={}字符, reasoning={}字符",
-                                    i + 1, total, attempt, sr.content().length(), sr.reasoning().length());
+                                    i + 1, total, attempt, sr.content().length(), sr.reasoningLength());
 
                             JsonNode parsed = parseAnswerObject(sr.content());
                             if (parsed == null) {
@@ -355,9 +356,9 @@ public class AiQuestionService {
                         qResult.put("status", "completed");
                         qResult.put("questionId", q.getId());
                         qResult.put("qualityScore", qualityReport == null ? null : qualityReport.score());
-                        qResult.put("reasoning", reasoning);
-                        sendJsonOrStop(session, "question_result", qResult);
-                        results.add(qResult);
+                        qResult.put("reasoningLength", reasoningLength);
+                        sendJsonBestEffort(session, "question_result", qResult);
+                        resultCount++;
                     } else {
                         fail++;
                         log.warn("流式补答案 [{}/{}]: 多次生成后仍未达标, id={}, error={}",
@@ -369,7 +370,8 @@ public class AiQuestionService {
                             errData.put("qualityScore", qualityReport.score());
                             errData.put("qualityIssues", qualityReport.issues());
                         }
-                        sendJsonOrStop(session, "question_result", errData);
+                        sendJsonBestEffort(session, "question_result", errData);
+                        resultCount++;
                     }
                 }
 
@@ -380,9 +382,9 @@ public class AiQuestionService {
                 doneData.put("total", total);
                 doneData.put("success", success);
                 doneData.put("fail", fail);
-                doneData.put("results", results);
+                doneData.put("resultCount", resultCount);
                 doneData.put("totalTime", totalTime);
-                sendJsonOrStop(session, "done", doneData);
+                sendJsonBestEffort(session, "done", doneData);
                 session.complete();
 
             } catch (SseStreamClosedException e) {
@@ -397,9 +399,22 @@ public class AiQuestionService {
 
     // ==================== 内部方法 ====================
 
-    private record StreamResult(String content, String reasoning, int chunkCount) {}
+    private record StreamResult(String content, String reasoning, int reasoningLength, int chunkCount) {}
 
     private record FillContext(String categoryName, List<String> tags) {}
+
+    private enum StreamPushMode {
+        FULL(true, true),
+        HEARTBEAT_ONLY(false, false);
+
+        private final boolean stopOnClosed;
+        private final boolean captureReasoning;
+
+        StreamPushMode(boolean stopOnClosed, boolean captureReasoning) {
+            this.stopOnClosed = stopOnClosed;
+            this.captureReasoning = captureReasoning;
+        }
+    }
 
     private static class SseStreamClosedException extends RuntimeException {
         private SseStreamClosedException(String message) {
@@ -509,9 +524,28 @@ public class AiQuestionService {
         }
     }
 
+    private void sendEventBestEffort(SseStreamSession session, String name, String data) {
+        session.sendEvent(name, data);
+    }
+
+    private void sendJsonBestEffort(SseStreamSession session, String name, Object body) {
+        session.sendJson(name, body, objectMapper);
+    }
+
+    private void pushStreamDelta(SseStreamSession session, StreamPushMode pushMode,
+                                 String name, String data, int chunkCount) {
+        if (pushMode == StreamPushMode.FULL) {
+            sendEventOrStop(session, name, data);
+            return;
+        }
+        if (chunkCount % STREAM_HEARTBEAT_CHUNK_INTERVAL == 0) {
+            sendEventBestEffort(session, "info", "AI 正在生成，已接收 " + chunkCount + " 个片段");
+        }
+    }
+
     /** 流式调用 DeepSeek，将 thinking/content 实时推送到 emitter。 */
-    private StreamResult callDeepSeekStreamInternal(String prompt, SseStreamSession session) {
-        if (!session.isOpen()) {
+    private StreamResult callDeepSeekStreamInternal(String prompt, SseStreamSession session, StreamPushMode pushMode) {
+        if (pushMode.stopOnClosed && !session.isOpen()) {
             throw new SseStreamClosedException("SSE 连接已关闭");
         }
 
@@ -554,13 +588,14 @@ public class AiQuestionService {
 
             StringBuilder fullContent = new StringBuilder();
             StringBuilder fullReasoning = new StringBuilder();
+            int reasoningLength = 0;
             int chunkCount = 0;
 
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if (!session.isOpen()) {
+                    if (pushMode.stopOnClosed && !session.isOpen()) {
                         throw new SseStreamClosedException("SSE 连接已关闭");
                     }
                     if (line.isEmpty()) { continue; }
@@ -578,14 +613,17 @@ public class AiQuestionService {
                         JsonNode delta = choice.path("delta");
                         String reasoning = delta.path("reasoning_content").asText(null);
                         if (reasoning != null && !reasoning.isEmpty()) {
-                            fullReasoning.append(reasoning);
-                            sendEventOrStop(session, "thinking", reasoning);
+                            reasoningLength += reasoning.length();
+                            if (pushMode.captureReasoning) {
+                                fullReasoning.append(reasoning);
+                            }
+                            pushStreamDelta(session, pushMode, "thinking", reasoning, chunkCount);
                         }
 
                         String content = delta.path("content").asText(null);
                         if (content != null && !content.isEmpty()) {
                             fullContent.append(content);
-                            sendEventOrStop(session, "content", content);
+                            pushStreamDelta(session, pushMode, "content", content, chunkCount);
                         }
                     } catch (SseStreamClosedException e) {
                         throw e;
@@ -595,7 +633,7 @@ public class AiQuestionService {
                 }
             }
 
-            return new StreamResult(fullContent.toString().trim(), fullReasoning.toString(), chunkCount);
+            return new StreamResult(fullContent.toString().trim(), fullReasoning.toString(), reasoningLength, chunkCount);
 
         } catch (RuntimeException e) {
             throw e;
