@@ -113,6 +113,7 @@ public class AiQuestionService {
     public void streamGenerate(GenerationRequest req, SseEmitter emitter) {
         GenerationRequest safeReq = new GenerationRequest(
                 req.category(), req.difficulty(), requestPolicy.clampCount(req.count()), req.topic());
+        SseStreamSession session = SseStreamSession.open(emitter);
         log.info("流式生成启动: category='{}', difficulty={}, topic='{}', count={}, 模型={}, maxTokens={}",
                 safeReq.category(), safeReq.difficulty(), safeReq.topic(), safeReq.count(), model, maxTokens);
 
@@ -132,7 +133,7 @@ public class AiQuestionService {
                     progressData.put("current", i + 1);
                     progressData.put("total", total);
                     progressData.put("status", "generating");
-                    sendEmitterJson(emitter, "progress", progressData);
+                    sendJsonOrStop(session, "progress", progressData);
 
                     Question q = null;
                     String reasoning = "";
@@ -150,7 +151,7 @@ public class AiQuestionService {
                                 i + 1, total, attempt, prompt.length());
 
                         try {
-                            StreamResult sr = callDeepSeekStreamInternal(prompt, emitter);
+                            StreamResult sr = callDeepSeekStreamInternal(prompt, session);
                             reasoning = sr.reasoning();
                             log.info("流式生成 [{}/{}]: 第 {} 次收到响应, content={}字符, reasoning={}字符, chunks={}",
                                     i + 1, total, attempt, sr.content().length(), sr.reasoning().length(), sr.chunkCount());
@@ -180,6 +181,8 @@ public class AiQuestionService {
                             }
 
                             break;
+                        } catch (SseStreamClosedException e) {
+                            throw e;
                         } catch (Exception e) {
                             lastError = e.getMessage();
                             log.warn("流式生成 [{}/{}]: 第 {} 次生成异常, error={}",
@@ -197,7 +200,7 @@ public class AiQuestionService {
                             errData.put("qualityScore", qualityReport.score());
                             errData.put("qualityIssues", qualityReport.issues());
                         }
-                        sendEmitterJson(emitter, "question_result", errData);
+                        sendJsonOrStop(session, "question_result", errData);
                         continue;
                     }
 
@@ -219,7 +222,7 @@ public class AiQuestionService {
                     qResult.put("title", q.getTitle());
                     qResult.put("qualityScore", qualityReport.score());
                     qResult.put("reasoning", reasoning);
-                    sendEmitterJson(emitter, "question_result", qResult);
+                    sendJsonOrStop(session, "question_result", qResult);
 
                     results.add(qResult);
                 }
@@ -233,13 +236,15 @@ public class AiQuestionService {
                 doneData.put("fail", fail);
                 doneData.put("results", results);
                 doneData.put("totalTime", totalTime);
-                sendEmitterJson(emitter, "done", doneData);
-                try { emitter.complete(); } catch (Exception ignored) {}
+                sendJsonOrStop(session, "done", doneData);
+                session.complete();
 
+            } catch (SseStreamClosedException e) {
+                log.info("流式生成连接已关闭，停止后台任务: {}", e.getMessage());
             } catch (Exception e) {
                 log.error("流式生成异常", e);
-                sendEmitterEvent(emitter, "error", e.getMessage());
-                try { emitter.completeWithError(e); } catch (Exception ignored) {}
+                session.sendEvent("error", e.getMessage());
+                session.completeWithError(e);
             }
         });
     }
@@ -249,6 +254,7 @@ public class AiQuestionService {
      */
     public void streamFillAnswer(Long categoryId, int count, SseEmitter emitter) {
         int safeCount = requestPolicy.clampCount(count);
+        SseStreamSession session = SseStreamSession.open(emitter);
         log.info("流式补答案启动: categoryId={}, count={}", categoryId, safeCount);
 
         scheduler.submit(() -> {
@@ -266,8 +272,8 @@ public class AiQuestionService {
                 List<Question> drafts = questionMapper.selectList(wrapper);
                 if (drafts.isEmpty()) {
                     log.warn("流式补答案: 没有待补题目, categoryId={}", categoryId);
-                    sendEmitterEvent(emitter, "error", "没有待补题目");
-                    try { emitter.complete(); } catch (Exception ignored) {}
+                    session.sendEvent("error", "没有待补题目");
+                    session.complete();
                     return;
                 }
 
@@ -275,7 +281,7 @@ public class AiQuestionService {
                 int success = 0;
                 int fail = 0;
                 List<Map<String, Object>> results = new ArrayList<>();
-                sendEmitterEvent(emitter, "total", String.valueOf(total));
+                sendEventOrStop(session, "total", String.valueOf(total));
 
                 for (int i = 0; i < total; i++) {
                     long iterStart = System.currentTimeMillis();
@@ -286,7 +292,7 @@ public class AiQuestionService {
                     progressData.put("total", total);
                     progressData.put("title", q.getTitle());
                     progressData.put("status", "generating");
-                    sendEmitterJson(emitter, "progress", progressData);
+                    sendJsonOrStop(session, "progress", progressData);
 
                     log.info("流式补答案 [{}/{}]: id={}, title='{}'", i + 1, total, q.getId(), truncate(q.getTitle(), 50));
 
@@ -305,7 +311,7 @@ public class AiQuestionService {
                                 i + 1, total, attempt, prompt.length());
 
                         try {
-                            StreamResult sr = callDeepSeekStreamInternal(prompt, emitter);
+                            StreamResult sr = callDeepSeekStreamInternal(prompt, session);
                             reasoning = sr.reasoning();
                             log.info("流式补答案 [{}/{}]: 第 {} 次收到响应, content={}字符, reasoning={}字符",
                                     i + 1, total, attempt, sr.content().length(), sr.reasoning().length());
@@ -328,6 +334,8 @@ public class AiQuestionService {
 
                             update = toQuestionUpdate(q.getId(), parsed);
                             break;
+                        } catch (SseStreamClosedException e) {
+                            throw e;
                         } catch (Exception e) {
                             lastError = e.getMessage();
                             log.warn("流式补答案 [{}/{}]: 第 {} 次生成异常, id={}, error={}",
@@ -348,7 +356,7 @@ public class AiQuestionService {
                         qResult.put("questionId", q.getId());
                         qResult.put("qualityScore", qualityReport == null ? null : qualityReport.score());
                         qResult.put("reasoning", reasoning);
-                        sendEmitterJson(emitter, "question_result", qResult);
+                        sendJsonOrStop(session, "question_result", qResult);
                         results.add(qResult);
                     } else {
                         fail++;
@@ -361,7 +369,7 @@ public class AiQuestionService {
                             errData.put("qualityScore", qualityReport.score());
                             errData.put("qualityIssues", qualityReport.issues());
                         }
-                        sendEmitterJson(emitter, "question_result", errData);
+                        sendJsonOrStop(session, "question_result", errData);
                     }
                 }
 
@@ -374,13 +382,15 @@ public class AiQuestionService {
                 doneData.put("fail", fail);
                 doneData.put("results", results);
                 doneData.put("totalTime", totalTime);
-                sendEmitterJson(emitter, "done", doneData);
-                try { emitter.complete(); } catch (Exception ignored) {}
+                sendJsonOrStop(session, "done", doneData);
+                session.complete();
 
+            } catch (SseStreamClosedException e) {
+                log.info("流式补答案连接已关闭，停止后台任务: {}", e.getMessage());
             } catch (Exception e) {
                 log.error("流式补答案异常", e);
-                sendEmitterEvent(emitter, "error", e.getMessage());
-                try { emitter.completeWithError(e); } catch (Exception ignored) {}
+                session.sendEvent("error", e.getMessage());
+                session.completeWithError(e);
             }
         });
     }
@@ -390,6 +400,12 @@ public class AiQuestionService {
     private record StreamResult(String content, String reasoning, int chunkCount) {}
 
     private record FillContext(String categoryName, List<String> tags) {}
+
+    private static class SseStreamClosedException extends RuntimeException {
+        private SseStreamClosedException(String message) {
+            super(message);
+        }
+    }
 
     private FillContext loadFillContext(Question question) {
         String categoryName = "未知分类";
@@ -481,29 +497,24 @@ public class AiQuestionService {
         return "质量分 " + report.score() + "，问题：" + String.join("；", report.issues());
     }
 
-    /** 安全发送 SSE 事件，emitter 已完成后静默忽略。 */
-    private void sendEmitterEvent(SseEmitter emitter, String name, String data) {
-        try {
-            emitter.send(SseEmitter.event().name(name).data(data));
-        } catch (IllegalStateException e) {
-            log.warn("发送 SSE 事件 '{}/{}' 失败: {}", name, truncate(data, 50), e.getMessage());
-        } catch (Exception e) {
-            log.warn("发送 SSE 事件 '{}/{}' 异常: {}", name, truncate(data, 50), e.getMessage());
+    private void sendEventOrStop(SseStreamSession session, String name, String data) {
+        if (!session.sendEvent(name, data)) {
+            throw new SseStreamClosedException("发送事件失败: " + name);
         }
     }
 
-    /** 安全发送 SSE 事件（JSON body）。 */
-    private void sendEmitterJson(SseEmitter emitter, String name, Object body) {
-        try {
-            String json = objectMapper.writeValueAsString(body);
-            sendEmitterEvent(emitter, name, json);
-        } catch (Exception e) {
-            log.warn("序列化 SSE 事件 '{}' 失败: {}", name, e.getMessage());
+    private void sendJsonOrStop(SseStreamSession session, String name, Object body) {
+        if (!session.sendJson(name, body, objectMapper)) {
+            throw new SseStreamClosedException("发送事件失败: " + name);
         }
     }
 
     /** 流式调用 DeepSeek，将 thinking/content 实时推送到 emitter。 */
-    private StreamResult callDeepSeekStreamInternal(String prompt, SseEmitter emitter) {
+    private StreamResult callDeepSeekStreamInternal(String prompt, SseStreamSession session) {
+        if (!session.isOpen()) {
+            throw new SseStreamClosedException("SSE 连接已关闭");
+        }
+
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", model);
         requestBody.put("messages", List.of(
@@ -515,10 +526,11 @@ public class AiQuestionService {
         requestBody.put("max_tokens", maxTokens);
         requestBody.put("stream", true);
 
+        HttpURLConnection conn = null;
         try {
             String json = objectMapper.writeValueAsString(requestBody);
 
-            HttpURLConnection conn = (HttpURLConnection) URI.create(apiUrl).toURL().openConnection();
+            conn = (HttpURLConnection) URI.create(apiUrl).toURL().openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("Authorization", "Bearer " + apiKey);
@@ -536,7 +548,7 @@ public class AiQuestionService {
                 String errorBody = new String(
                         conn.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
                 log.error("DeepSeek 流式 API 错误: status={}, body={}", status, truncate(errorBody, 500));
-                sendEmitterEvent(emitter, "error", "API 错误: " + status);
+                sendEventOrStop(session, "error", "API 错误: " + status);
                 throw new RuntimeException("DeepSeek API 错误: " + status);
             }
 
@@ -548,6 +560,9 @@ public class AiQuestionService {
                     new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
+                    if (!session.isOpen()) {
+                        throw new SseStreamClosedException("SSE 连接已关闭");
+                    }
                     if (line.isEmpty()) { continue; }
                     if (!line.startsWith("data: ")) { continue; }
 
@@ -564,14 +579,16 @@ public class AiQuestionService {
                         String reasoning = delta.path("reasoning_content").asText(null);
                         if (reasoning != null && !reasoning.isEmpty()) {
                             fullReasoning.append(reasoning);
-                            sendEmitterEvent(emitter, "thinking", reasoning);
+                            sendEventOrStop(session, "thinking", reasoning);
                         }
 
                         String content = delta.path("content").asText(null);
                         if (content != null && !content.isEmpty()) {
                             fullContent.append(content);
-                            sendEmitterEvent(emitter, "content", content);
+                            sendEventOrStop(session, "content", content);
                         }
+                    } catch (SseStreamClosedException e) {
+                        throw e;
                     } catch (Exception e) {
                         log.warn("解析 chunk 失败: {} — {}", truncate(line, 100), e.getMessage());
                     }
@@ -585,6 +602,10 @@ public class AiQuestionService {
         } catch (Exception e) {
             log.error("DeepSeek 流式调用异常", e);
             throw new RuntimeException("流式调用失败: " + e.getMessage(), e);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
     }
 

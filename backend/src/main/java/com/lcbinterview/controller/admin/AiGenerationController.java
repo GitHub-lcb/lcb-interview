@@ -24,6 +24,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 public class AiGenerationController {
 
+    private static final long SSE_TIMEOUT_NEVER = 0L;
+
     private final AiQuestionService aiQuestionService;
     private final BatchGenerationRunner batchRunner;
     private final AiGenerationRequestPolicy requestPolicy;
@@ -43,7 +45,7 @@ public class AiGenerationController {
             @RequestParam(required = false) String difficulty,
             @RequestParam(defaultValue = "1") int count,
             @RequestParam(required = false) String topic) {
-        SseEmitter emitter = new SseEmitter(600000L);
+        SseEmitter emitter = new SseEmitter(SSE_TIMEOUT_NEVER);
         GenerationRequest req = new GenerationRequest(category, difficulty, requestPolicy.clampCount(count), topic);
         aiQuestionService.streamGenerate(req, emitter);
         return emitter;
@@ -56,7 +58,7 @@ public class AiGenerationController {
     public SseEmitter fillAnswerStream(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(defaultValue = "5") int count) {
-        SseEmitter emitter = new SseEmitter(600000L);
+        SseEmitter emitter = new SseEmitter(SSE_TIMEOUT_NEVER);
         aiQuestionService.streamFillAnswer(categoryId, requestPolicy.clampCount(count), emitter);
         return emitter;
     }
