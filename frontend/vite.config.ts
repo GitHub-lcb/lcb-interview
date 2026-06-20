@@ -1,8 +1,16 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { manualChunks } from './src/build/manualChunks'
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks,
+      },
+    },
+  },
   server: {
     port: 3000,
     proxy: {
