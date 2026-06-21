@@ -98,7 +98,7 @@ function buildAbilityNextStep(item: AbilityMapItem): string {
   if (item.nextQuestionIds.length === 0) {
     return '/routes'
   }
-  return `/practice?queue=${item.nextQuestionIds.join(',')}`
+  return `/practice?queue=${item.nextQuestionIds.join(',')}&from=ability-gap`
 }
 
 function formatMarkdownDate(value: string): string {

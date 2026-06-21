@@ -2,8 +2,10 @@ import { Button } from 'antd'
 import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import {
   ArrowRightOutlined,
+  BulbOutlined,
   CalendarOutlined,
   CopyOutlined,
+  EditOutlined,
   FireOutlined,
   RadarChartOutlined,
   SoundOutlined,
@@ -16,8 +18,10 @@ import type { DailyMissionKind } from '../types'
 import { buildDailyMissionMarkdown, buildDailyMissionPlan } from '../utils/dailyMission'
 
 const missionIcons: Record<DailyMissionKind, JSX.Element> = {
+  draft: <EditOutlined />,
   review: <FireOutlined />,
   ability: <RadarChartOutlined />,
+  experience: <BulbOutlined />,
   interview: <SoundOutlined />,
   plan: <CalendarOutlined />,
 }
@@ -68,7 +72,7 @@ export default function DailyMissionPanel() {
             <p>{mission.description}</p>
             <small>{mission.reason}</small>
             <Button type={index === 0 ? 'primary' : 'default'} icon={<ArrowRightOutlined />} onClick={() => navigate(mission.to)}>
-              开始执行
+              {mission.actionLabel}
             </Button>
           </article>
         ))}

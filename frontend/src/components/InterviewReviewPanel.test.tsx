@@ -7,6 +7,16 @@ import type { InterviewCriterionKey, InterviewFeedback, StudyProgress } from '..
 import { createDefaultProgress } from '../utils/studyProgress'
 import InterviewReviewPanel from './InterviewReviewPanel'
 
+const navigate = vi.fn()
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  return {
+    ...actual,
+    useNavigate: () => navigate,
+  }
+})
+
 function criterion(key: InterviewCriterionKey, score: number) {
   const labels: Record<InterviewCriterionKey, string> = {
     coverage: '覆盖度',
@@ -61,6 +71,7 @@ function progressWithAttempts(): StudyProgress {
 
 describe('InterviewReviewPanel', () => {
   beforeEach(() => {
+    navigate.mockReset()
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
       value: vi.fn().mockImplementation(query => ({
@@ -99,5 +110,59 @@ describe('InterviewReviewPanel', () => {
     expect(writeText.mock.calls[0][0]).toContain('# Java 后端 模拟面试复盘')
     expect(writeText.mock.calls[0][0]).toContain('## 复盘概览')
     expect(writeText.mock.calls[0][0]).toContain('入口：/question/1')
+  })
+
+  it('starts retrospective practice from the lowest scoring recent answer', async () => {
+    const progress: StudyProgress = {
+      ...progressWithAttempts(),
+      questionSnapshots: {
+        1: {
+          id: 1,
+          title: 'HashMap 为什么线程不安全？',
+          difficulty: 'MEDIUM',
+          categoryName: 'Java 集合',
+          tags: ['Java'],
+          viewCount: 100,
+        },
+        2: {
+          id: 2,
+          title: 'Redis 缓存击穿怎么处理？',
+          difficulty: 'HARD',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 120,
+        },
+      },
+      interviewAttempts: {
+        1: [
+          {
+            questionId: 1,
+            answer: '回答内容',
+            feedback: feedback(82),
+            createdAt: '2026-06-17T12:00:00',
+          },
+        ],
+        2: [
+          {
+            questionId: 2,
+            answer: '回答内容',
+            feedback: feedback(58),
+            createdAt: '2026-06-17T11:00:00',
+          },
+        ],
+      },
+    }
+
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <InterviewReviewPanel progress={progress} />
+      </MemoryRouter>
+    )
+
+    expect(screen.getByLabelText('模拟面试复盘')).toHaveTextContent('Redis 缓存击穿怎么处理？')
+
+    await userEvent.click(screen.getByRole('button', { name: /重答低分题/ }))
+
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=2&from=interview-retrospective')
   })
 })

@@ -34,6 +34,12 @@ import java.util.Objects;
 @Transactional(readOnly = true)
 public class QuestionService {
 
+    private static final int MIN_PAGE_SIZE = 1;
+    private static final int MAX_PAGE_SIZE = 100;
+    private static final String SORT_HOT = "hot";
+    private static final String SORT_LATEST = "latest";
+    private static final String SORT_RELEVANCE = "relevance";
+
     private final QuestionMapper questionMapper;
     private final ViewCountService viewCountService;
     private final CategoryMapper categoryMapper;
@@ -44,32 +50,58 @@ public class QuestionService {
      */
     public IPage<Question> search(Long categoryId, String difficulty, String keyword,
                                    Long tagId, int page, int size) {
-        Page<Question> mpPage = new Page<>(page + 1, size);
+        return search(categoryId, difficulty, keyword, tagId, page, size, null);
+    }
+
+    /**
+     * 分页搜索题目，并按安全白名单解析排序方式。
+     *
+     * @param categoryId 分类 ID，可选
+     * @param difficulty 难度，可选
+     * @param keyword    搜索关键词，可选
+     * @param tagId      标签 ID，可选
+     * @param page       页码，从 0 开始
+     * @param size       每页条数
+     * @param sort       排序方式：latest / hot / relevance
+     * @return MyBatis-Plus 分页结果
+     */
+    public IPage<Question> search(Long categoryId, String difficulty, String keyword,
+                                   Long tagId, int page, int size, String sort) {
+        int safePage = normalizePage(page);
+        int safeSize = normalizeSize(size);
+        String safeSort = normalizeSort(sort, StringUtils.isNotBlank(keyword));
+        Page<Question> mpPage = new Page<>(safePage + 1L, safeSize);
 
         if (tagId != null) {
-            log.info("按标签筛选题目，tagId={}, page={}, size={}", tagId, page, size);
-            return questionMapper.selectPageByTagId(mpPage, tagId);
+            log.info("按标签筛选题目，tagId={}, page={}, size={}", tagId, safePage, safeSize);
+            return questionMapper.selectPageByTagId(mpPage, tagId, safeSort);
         }
 
         if (StringUtils.isNotBlank(keyword)) {
             log.info("全文搜索 keyword={}, categoryId={}, difficulty={}", keyword, categoryId, difficulty);
-            IPage<Question> fulltextResult = questionMapper.searchFulltext(mpPage, keyword, categoryId, difficulty);
+            IPage<Question> fulltextResult = questionMapper.searchFulltext(mpPage, keyword, categoryId, difficulty, safeSort);
             if (!fulltextResult.getRecords().isEmpty()) {
                 return fulltextResult;
             }
             // MySQL FULLTEXT 对英文短词和部分混合词不稳定，兜底 LIKE 保证用户能搜到标题中的显式关键词。
             log.info("全文搜索未命中，使用 LIKE 兜底搜索 keyword={}", keyword);
-            return questionMapper.searchLike(new Page<>(page + 1, size), keyword, categoryId, difficulty);
+            return questionMapper.searchLike(new Page<>(safePage + 1L, safeSize), keyword, categoryId, difficulty, safeSort);
         }
 
         LambdaQueryWrapper<Question> wrapper = new LambdaQueryWrapper<Question>()
                 .eq(Question::getStatus, "PUBLISHED")
                 .eq(categoryId != null, Question::getCategoryId, categoryId)
-                .eq(StringUtils.isNotBlank(difficulty), Question::getDifficulty, difficulty)
-                .orderByDesc(Question::getCreateTime);
+                .eq(StringUtils.isNotBlank(difficulty), Question::getDifficulty, difficulty);
+
+        if (SORT_HOT.equals(safeSort)) {
+            wrapper.orderByDesc(Question::getViewCount)
+                    .orderByDesc(Question::getCreateTime);
+        } else {
+            wrapper.orderByDesc(Question::getCreateTime);
+        }
 
         log.info("搜索题目: categoryId={}, difficulty={}, keyword={}, page={}, size={}",
-                categoryId, difficulty, keyword, page, size);
+                categoryId, difficulty, keyword, safePage, safeSize);
         return questionMapper.selectPage(mpPage, wrapper);
     }
 
@@ -86,7 +118,24 @@ public class QuestionService {
      */
     public PageResult<QuestionVO> searchVo(Long categoryId, String difficulty, String keyword,
                                            Long tagId, int page, int size) {
-        IPage<Question> result = search(categoryId, difficulty, keyword, tagId, page, size);
+        return searchVo(categoryId, difficulty, keyword, tagId, page, size, null);
+    }
+
+    /**
+     * 分页搜索题目并按排序方式组装 VO。
+     *
+     * @param categoryId 分类 ID，可选
+     * @param difficulty 难度，可选
+     * @param keyword    搜索关键词，可选
+     * @param tagId      标签 ID，可选
+     * @param page       页码，从 0 开始
+     * @param size       每页条数
+     * @param sort       排序方式：latest / hot / relevance
+     * @return 题目分页 VO
+     */
+    public PageResult<QuestionVO> searchVo(Long categoryId, String difficulty, String keyword,
+                                           Long tagId, int page, int size, String sort) {
+        IPage<Question> result = search(categoryId, difficulty, keyword, tagId, page, size, sort);
         return PageResult.of(result, toVos(result.getRecords()));
     }
 
@@ -96,11 +145,7 @@ public class QuestionService {
      * @throws BusinessException 题目不存在时抛 404
      */
     public Question getById(Long id) {
-        Question question = questionMapper.selectById(id);
-        if (question == null) {
-            log.warn("题目不存在，id={}", id);
-            throw new BusinessException(404, "题目不存在");
-        }
+        Question question = loadQuestionOrThrow(id);
         viewCountService.increment(id);
         log.info("查看题目详情，id={}, title={}", id, question.getTitle());
         return question;
@@ -113,10 +158,12 @@ public class QuestionService {
      * @return 题目详情 VO
      */
     public QuestionVO getVoById(Long id) {
-        Question question = getById(id);
+        Question question = loadQuestionOrThrow(id);
         if (!"PUBLISHED".equals(question.getStatus())) {
             throw new BusinessException(404, "题目不存在");
         }
+        viewCountService.increment(id);
+        log.info("查看题目详情，id={}, title={}", id, question.getTitle());
         return toVos(List.of(question)).getFirst();
     }
 
@@ -125,8 +172,9 @@ public class QuestionService {
      */
     @Cacheable(value = "hotQuestions")
     public List<Question> getHot(int size) {
-        log.info("缓存未命中，从数据库加载热门题目 Top {}", size);
-        return questionMapper.selectHot(size);
+        int safeSize = normalizeSize(size);
+        log.info("缓存未命中，从数据库加载热门题目 Top {}", safeSize);
+        return questionMapper.selectHot(safeSize);
     }
 
     /**
@@ -138,6 +186,36 @@ public class QuestionService {
     @Cacheable(value = "hotQuestionVos")
     public List<QuestionVO> getHotVo(int size) {
         return toVos(getHot(size));
+    }
+
+    private int normalizePage(int page) {
+        return Math.max(0, page);
+    }
+
+    private int normalizeSize(int size) {
+        return Math.min(MAX_PAGE_SIZE, Math.max(MIN_PAGE_SIZE, size));
+    }
+
+    private String normalizeSort(String sort, boolean hasKeyword) {
+        if (SORT_HOT.equalsIgnoreCase(sort)) {
+            return SORT_HOT;
+        }
+        if (SORT_LATEST.equalsIgnoreCase(sort)) {
+            return SORT_LATEST;
+        }
+        if (SORT_RELEVANCE.equalsIgnoreCase(sort)) {
+            return SORT_RELEVANCE;
+        }
+        return hasKeyword ? SORT_RELEVANCE : SORT_LATEST;
+    }
+
+    private Question loadQuestionOrThrow(Long id) {
+        Question question = questionMapper.selectById(id);
+        if (question == null) {
+            log.warn("题目不存在，id={}", id);
+            throw new BusinessException(404, "题目不存在");
+        }
+        return question;
     }
 
     private List<QuestionVO> toVos(List<Question> questions) {

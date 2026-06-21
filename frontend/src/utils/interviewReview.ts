@@ -9,6 +9,7 @@ import type {
   QuestionSnapshot,
   StudyProgress,
 } from '../types'
+import { buildDailyPracticePath } from './practiceRoute'
 
 const TREND_THRESHOLD = 5
 const RECENT_ATTEMPT_LIMIT = 3
@@ -73,6 +74,39 @@ export function buildInterviewReviewMarkdown(
     renderRecentAttempts(summary.recentAttempts),
     renderReviewNextStep(summary),
   ].join('\n').trimEnd()
+}
+
+export interface InterviewReviewNextStep {
+  action: string
+  label: string
+  questionTitle?: string
+  to: string
+}
+
+export function buildInterviewReviewNextStep(summary: InterviewReviewSummary): InterviewReviewNextStep {
+  if (summary.totalAttempts === 0) {
+    return {
+      action: '开始模拟面试',
+      label: '开始模拟面试',
+      to: '/practice',
+    }
+  }
+
+  const recoveryAttempt = selectInterviewRecoveryAttempt(summary.recentAttempts)
+  if (!recoveryAttempt) {
+    return {
+      action: '继续模拟面试',
+      label: '继续模拟面试',
+      to: '/practice',
+    }
+  }
+
+  return {
+    action: '重答低分面试题',
+    label: '重答低分题',
+    questionTitle: recoveryAttempt.question?.title ?? `题目 #${recoveryAttempt.questionId}`,
+    to: buildDailyPracticePath([recoveryAttempt.questionId], 12, 'interview-retrospective'),
+  }
 }
 
 function renderReviewOverview(summary: InterviewReviewSummary): string {
@@ -149,12 +183,23 @@ function renderRecentAttempts(attempts: InterviewReviewAttempt[]): string {
 }
 
 function renderReviewNextStep(summary: InterviewReviewSummary): string {
-  const action = summary.totalAttempts === 0 ? '开始模拟面试' : '继续模拟面试'
-  return [
+  const nextStep = buildInterviewReviewNextStep(summary)
+  const lines = [
     '## 下一步',
-    `- 动作：${action}`,
-    '- 入口：/practice',
-  ].join('\n')
+    `- 动作：${nextStep.action}`,
+  ]
+
+  if (nextStep.questionTitle) {
+    lines.push(`- 题目：${nextStep.questionTitle}`)
+  }
+
+  lines.push(`- 入口：${nextStep.to}`)
+  return lines.join('\n')
+}
+
+function selectInterviewRecoveryAttempt(attempts: InterviewReviewAttempt[]): InterviewReviewAttempt | undefined {
+  return [...attempts]
+    .sort((left, right) => left.feedback.score - right.feedback.score || right.createdAt.localeCompare(left.createdAt))[0]
 }
 
 function labelForTrend(trend: InterviewTrend): string {

@@ -14,6 +14,7 @@ import type { Question } from '../types'
 import { useStudyProgress } from '../hooks/useStudyProgress'
 import { buildDailyPlan, resolvePlanQuestions, summarizeProgress, weakAreasFromQuestions } from '../utils/studyProgress'
 import { buildStudyDashboardMarkdown } from '../utils/studyDashboardReport'
+import { buildDailyPracticePath } from '../utils/practiceRoute'
 
 interface Props {
   hotQuestions: Question[]
@@ -21,7 +22,7 @@ interface Props {
 
 export default function StudyDashboard({ hotQuestions }: Props) {
   const navigate = useNavigate()
-  const { getState, progress, setDailyPlan } = useStudyProgress()
+  const { getState, progress, rememberQuestions, setDailyPlan } = useStudyProgress()
   const summary = summarizeProgress(progress)
   const generatedPlanIds = useMemo(
     () => buildDailyPlan(progress, hotQuestions, Math.max(progress.dailyPlan.length, 5)),
@@ -33,12 +34,31 @@ export default function StudyDashboard({ hotQuestions }: Props) {
   const nextQuestion = planQuestions[0] ?? hotQuestions[0]
   const canGeneratePlan = generatedPlanIds.length > 0
   const planActionText = planCount > 0 ? '补齐今日计划' : '生成今日计划'
+  const trainingQuestionIds = planCount > 0 ? progress.dailyPlan : generatedPlanIds
+  const trainingPath = buildDailyPracticePath(trainingQuestionIds, 12, 'daily-plan')
 
   const handleGeneratePlan = () => {
     if (!canGeneratePlan) {
       return
     }
+    rememberRecommendedQuestions(generatedPlanIds)
     setDailyPlan(generatedPlanIds)
+  }
+
+  const handleStartTraining = () => {
+    rememberRecommendedQuestions(trainingQuestionIds)
+    if (planCount === 0 && generatedPlanIds.length > 0) {
+      setDailyPlan(generatedPlanIds)
+    }
+    navigate(trainingPath)
+  }
+
+  const rememberRecommendedQuestions = (questionIds: number[]) => {
+    if (questionIds.length === 0) {
+      return
+    }
+    const questionIdSet = new Set(questionIds)
+    rememberQuestions(hotQuestions.filter(question => questionIdSet.has(question.id)))
   }
 
   const handleCopyDashboard = async () => {
@@ -62,7 +82,7 @@ export default function StudyDashboard({ hotQuestions }: Props) {
           <h1>{progress.targetRole} · {progress.sprintDays} 天冲刺</h1>
           <p>今天只做最值得做的题：先补薄弱点，再巩固高频题。</p>
           <div className="study-hero-actions">
-            <Button type="primary" icon={<PlayCircleOutlined />} onClick={() => navigate('/practice')}>
+            <Button type="primary" icon={<PlayCircleOutlined />} onClick={handleStartTraining}>
               开始训练
             </Button>
             <Button icon={<CalendarOutlined />} onClick={() => navigate('/study')}>
@@ -109,7 +129,7 @@ export default function StudyDashboard({ hotQuestions }: Props) {
               <small>{planCount > 0 ? `${planCount} 道已加入` : `${planQuestions.length} 道推荐`}</small>
             </div>
             {nextQuestion && (
-              <Button size="small" type="primary" ghost icon={<PlayCircleOutlined />} onClick={() => navigate('/practice')}>
+              <Button size="small" type="primary" ghost icon={<PlayCircleOutlined />} onClick={handleStartTraining}>
                 进入训练
               </Button>
             )}

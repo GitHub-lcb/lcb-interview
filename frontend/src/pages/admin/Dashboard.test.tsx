@@ -33,6 +33,11 @@ const summary: AdminQualitySummary = {
       missingRisk: 6,
       missingProjectExp: 7,
       missingCodeExamples: 8,
+      missingSummary: 1,
+      missingComparison: 2,
+      missingScenario: 3,
+      missingContentSections: 4,
+      invalidDifficulty: 1,
       completionRate: 60,
       riskScore: 71,
     },
@@ -107,6 +112,9 @@ describe('AdminDashboard', () => {
     expect(row).not.toBeNull()
     expect(within(row as HTMLElement).getByText('71')).toBeInTheDocument()
     expect(within(row as HTMLElement).getByText('60%')).toBeInTheDocument()
+    expect(within(row as HTMLElement).getByText('首要缺口')).toBeInTheDocument()
+    expect(within(row as HTMLElement).getByText('缺代码 8')).toBeInTheDocument()
+    expect(within(row as HTMLElement).getByText('缺结构段 4')).toBeInTheDocument()
   })
 
   it('uses silent loading and recovers from inline quality summary failure', async () => {

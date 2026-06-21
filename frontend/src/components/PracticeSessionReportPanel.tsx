@@ -11,11 +11,12 @@ import {
 } from '@ant-design/icons'
 import { Button } from 'antd'
 import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import type {
   PracticeQueueItem,
   PracticeSessionReport,
   PracticeSessionReportAction,
+  PracticeSessionReportContext,
   PracticeSessionRepairAction,
   StudyProgress,
 } from '../types'
@@ -70,10 +71,12 @@ import {
   buildPracticeSessionTrainingSchedule,
 } from '../utils/practiceSessionReport'
 import { buildInterviewRecoveryPlan } from '../utils/interviewRecoveryPlan'
+import { appendPracticeHandoffSource, extractPracticeHandoffSource } from '../utils/practiceRoute'
 
 interface PracticeSessionReportPanelProps {
   queue: PracticeQueueItem[]
   progress: StudyProgress
+  queueContext?: PracticeSessionReportContext
   onNavigate: (to: string) => void
   onUseRepairAction?: (action: PracticeSessionRepairAction) => void
 }
@@ -95,12 +98,16 @@ const actionIcons: Record<PracticeSessionReportAction['kind'], JSX.Element> = {
 export default function PracticeSessionReportPanel({
   queue,
   progress,
-  onNavigate,
+  queueContext,
+  onNavigate: onNavigateRaw,
   onUseRepairAction,
 }: PracticeSessionReportPanelProps) {
+  const onNavigate = useCallback((to: string) => {
+    onNavigateRaw(preserveNavigationHandoffSource(to, queueContext))
+  }, [onNavigateRaw, queueContext])
   const report = useMemo(
-    () => buildPracticeSessionReport(queue, progress),
-    [progress, queue],
+    () => buildPracticeSessionReport(queue, progress, queueContext),
+    [progress, queue, queueContext],
   )
   const nextTrainingQueue = useMemo(
     () => buildPracticeSessionNextTrainingQueue(queue, progress, progress.updatedAt, 3),
@@ -289,7 +296,7 @@ export default function PracticeSessionReportPanel({
   const dailyClosureRiskCount = dailyClosure.reviewDebtCount + dailyClosure.weakCount
 
   const handleCopyReport = async () => {
-    const markdown = buildPracticeSessionReportMarkdown(queue, progress)
+    const markdown = buildPracticeSessionReportMarkdown(queue, progress, undefined, queueContext)
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
@@ -2098,6 +2105,14 @@ export default function PracticeSessionReportPanel({
       </Button>
     </section>
   )
+}
+
+function preserveNavigationHandoffSource(to: string, context?: PracticeSessionReportContext): string {
+  const source = extractPracticeHandoffSource(context?.queuePath)
+  if (!source || (!to.startsWith('/practice?queue=') && !to.startsWith('/practice?question='))) {
+    return to
+  }
+  return appendPracticeHandoffSource(to, source, { replace: false })
 }
 
 async function copyMarkdown(markdown: string): Promise<boolean> {

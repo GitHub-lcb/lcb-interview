@@ -6,6 +6,7 @@ import {
   getQuestionState,
   rememberQuestions as rememberQuestionsInProgress,
   readStudyProgress,
+  recordQuestionEncounter as recordQuestionEncounterInProgress,
   recordInterviewAttempt as recordInterviewAttemptInProgress,
   replaceDailyPlan,
   toggleQuestionInPlan,
@@ -63,6 +64,10 @@ export function useStudyProgress() {
     save(rememberQuestionsInProgress(readStudyProgress(), [question]))
   }, [save])
 
+  const recordQuestionEncounter = useCallback((question: Question) => {
+    save(recordQuestionEncounterInProgress(readStudyProgress(), question))
+  }, [save])
+
   const recordInterviewAttempt = useCallback((attempt: InterviewAttempt) => {
     save(recordInterviewAttemptInProgress(readStudyProgress(), attempt))
   }, [save])
@@ -77,6 +82,7 @@ export function useStudyProgress() {
     updateSettings,
     rememberQuestion,
     rememberQuestions,
+    recordQuestionEncounter,
     recordInterviewAttempt,
-  }), [addDailyPlanQuestions, progress, rememberQuestion, rememberQuestions, recordInterviewAttempt, setDailyPlan, setInPlan, setStatus, updateSettings])
+  }), [addDailyPlanQuestions, progress, recordQuestionEncounter, rememberQuestion, rememberQuestions, recordInterviewAttempt, setDailyPlan, setInPlan, setStatus, updateSettings])
 }

@@ -14,6 +14,9 @@ import { buildDailyPracticePath } from './practiceRoute'
 import { buildScheduledReviewQueue } from './reviewSchedule'
 
 const MAX_ITEMS = 5
+const INTERVIEW_RETROSPECTIVE_SOURCE = 'interview-retrospective'
+const NEXT_TRAINING_SOURCE = 'next-training'
+const REVIEW_DUE_SOURCE = 'review-due'
 
 const ITEM_KIND_LABELS: Record<InterviewLastMinuteBriefItem['kind'], string> = {
   'must-review': '必看复习',
@@ -77,7 +80,7 @@ export function buildInterviewLastMinuteBrief(
       title: `${reviewDebtIds.length} 道复习债面试前必须回看`,
       detail: '先用最短路径把逾期和今日到期题过一遍，避免临场被熟题打穿。',
       evidence: reviewDebtItems[0]?.scheduleReason ?? '复习窗口已经打开。',
-      to: buildDailyPracticePath(reviewDebtIds),
+      to: buildDailyPracticePath(reviewDebtIds, 12, REVIEW_DUE_SOURCE),
       questionIds: reviewDebtIds,
       priority: 120,
       actionLabel: '先复盘高风险题',
@@ -207,7 +210,7 @@ function buildAvoidItem(
     title: `不要再让${criterionLabel}失分`,
     detail: avoidGuidance(criterionKey),
     evidence: `${questionIds.length} 道模拟回答暴露了这个薄弱维度。`,
-    to: buildDailyPracticePath(questionIds),
+    to: buildDailyPracticePath(questionIds, 12, INTERVIEW_RETROSPECTIVE_SOURCE),
     questionIds,
     priority: 100,
     actionLabel: '回看失分禁忌',
@@ -226,7 +229,7 @@ function buildTalkTrackItem(progress: StudyProgress): InterviewLastMinuteBriefIt
     evidence: strongestCategory === '核心题域'
       ? '当前轨迹还不够集中，先使用通用结构稳定表达。'
       : `本地轨迹里「${strongestCategory}」的掌握信号最稳定。`,
-    to: buildDailyPracticePath(questionIds),
+    to: buildDailyPracticePath(questionIds, 12, NEXT_TRAINING_SOURCE),
     questionIds,
     priority: 70,
     actionLabel: '演练进场主线',
@@ -242,7 +245,7 @@ function buildClosingItem(progress: StudyProgress): InterviewLastMinuteBriefItem
     title: '最后 30 秒用复盘式收尾',
     detail: '每道题结束前补一句「如果放到项目里，我会重点关注容量、回滚和监控」，把答案从背诵拉到工程落地。',
     evidence: '临场收尾比继续堆知识点更能显出工程判断。',
-    to: buildDailyPracticePath(questionIds),
+    to: buildDailyPracticePath(questionIds, 12, NEXT_TRAINING_SOURCE),
     questionIds,
     priority: 50,
     actionLabel: '练一轮收尾',

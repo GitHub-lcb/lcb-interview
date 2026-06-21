@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Select, Pagination, Skeleton, Empty, Alert, Button } from 'antd'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeftOutlined, FilterOutlined, PlayCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { getQuestions } from '../../api/question'
 import { getCategoryById } from '../../api/category'
@@ -8,9 +8,28 @@ import StudyActionButtons from '../../components/StudyActionButtons'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { summarizeQuestionSetProgress } from '../../utils/studyProgress'
-import type { Question, Category } from '../../types'
+import { buildScheduledReviewQueue } from '../../utils/reviewSchedule'
+import { buildContinuePracticePath } from '../../utils/practiceRoute'
+import type { Question, Category, StudyQuestionStatus } from '../../types'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
+type StudyStatusFilter = 'all' | 'plan' | 'reviewDue' | StudyQuestionStatus
+type QuestionSortMode = 'latest' | 'hot'
+
+const studyStatusFilterLabels: Record<StudyStatusFilter, string> = {
+  all: '全部状态',
+  plan: '今日计划',
+  reviewDue: '到期复习',
+  new: '未开始',
+  learning: '学习中',
+  weak: '薄弱题',
+  mastered: '已掌握',
+}
+
+const sortLabels: Record<QuestionSortMode, string> = {
+  latest: '按最新',
+  hot: '按热度',
+}
 
 function parseCategoryRouteId(id?: string): number | null {
   const categoryId = Number(id)
@@ -20,19 +39,49 @@ function parseCategoryRouteId(id?: string): number | null {
   return categoryId
 }
 
+function parseDifficulty(value: string | null): string | undefined {
+  if (!value || !(value in difficultyLabels)) {
+    return undefined
+  }
+  return value
+}
+
+function parseSort(value: string | null): QuestionSortMode {
+  if (value === 'hot' || value === 'latest') {
+    return value
+  }
+  return 'latest'
+}
+
+function parsePage(value: string | null): number {
+  const parsed = Number(value)
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    return 1
+  }
+  return parsed
+}
+
 export default function QuestionList() {
   const { id } = useParams()
   const categoryId = parseCategoryRouteId(id)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const difficulty = parseDifficulty(searchParams.get('difficulty'))
+  const sort = parseSort(searchParams.get('sort'))
+  const page = parsePage(searchParams.get('page'))
   const [category, setCategory] = useState<Category | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
-  const [difficulty, setDifficulty] = useState<string>()
+  const [studyStatusFilter, setStudyStatusFilter] = useState<StudyStatusFilter>('all')
   const requestSeq = useRef(0)
   const navigate = useNavigate()
   const { getState, progress, rememberQuestions, addDailyPlanQuestions, setInPlan, setStatus } = useStudyProgress()
+  const reviewDebtQuestionIds = useMemo(() => new Set(
+    buildScheduledReviewQueue(progress, new Date().toISOString(), Number.MAX_SAFE_INTEGER)
+      .filter(item => item.dueStatus !== 'upcoming')
+      .map(item => item.id),
+  ), [progress])
 
   const fetch = () => {
     const requestId = requestSeq.current + 1
@@ -49,7 +98,7 @@ export default function QuestionList() {
     setError(false)
     Promise.all([
       getCategoryById(categoryId, { silentGlobalError: true }).catch(() => undefined),
-      getQuestions({ category: categoryId, difficulty, page: page - 1, size: 20 }, { silentGlobalError: true }),
+      getQuestions({ category: categoryId, difficulty, page: page - 1, size: 20, sort }, { silentGlobalError: true }),
     ]).then(([nextCategory, res]) => {
       if (requestId !== requestSeq.current) {
         return
@@ -74,7 +123,38 @@ export default function QuestionList() {
 
   useEffect(() => {
     fetch()
-  }, [categoryId, difficulty, page])
+  }, [categoryId, difficulty, page, sort])
+
+  const updateListState = (next: {
+    difficulty?: string
+    sort?: QuestionSortMode
+    page?: number
+  }) => {
+    const params = new URLSearchParams(searchParams)
+    if ('difficulty' in next) {
+      if (next.difficulty) {
+        params.set('difficulty', next.difficulty)
+      } else {
+        params.delete('difficulty')
+      }
+    }
+    if ('sort' in next) {
+      if (next.sort === 'latest' || !next.sort) {
+        params.delete('sort')
+      } else {
+        params.set('sort', next.sort)
+      }
+    }
+    if ('page' in next) {
+      const nextPage = next.page ?? 1
+      if (nextPage <= 1) {
+        params.delete('page')
+      } else {
+        params.set('page', String(nextPage))
+      }
+    }
+    setSearchParams(params)
+  }
 
   if (categoryId === null) {
     return (
@@ -98,26 +178,47 @@ export default function QuestionList() {
     )
   }
 
+  const visibleQuestions = questions.filter(question => {
+    const state = getState(question.id)
+    if (studyStatusFilter === 'all') {
+      return true
+    }
+    if (studyStatusFilter === 'plan') {
+      return state.addedToPlan
+    }
+    if (studyStatusFilter === 'reviewDue') {
+      return reviewDebtQuestionIds.has(question.id)
+    }
+    return state.status === studyStatusFilter
+  })
+  const visibleQuestionIds = visibleQuestions.map(question => question.id)
   const pageQuestionIds = questions.map(question => question.id)
   const pageProgress = summarizeQuestionSetProgress(progress, pageQuestionIds)
   const trackedOnPage = pageProgress.tracked
-  const hasPageQuestions = pageProgress.hasQuestions
-  const canAddPageToPlan = hasPageQuestions && !pageProgress.allPlanned
-  const addPageButtonText = pageProgress.allPlanned ? '本页已加入' : '本页入计划'
+  const visibleProgress = summarizeQuestionSetProgress(progress, visibleQuestionIds)
+  const hasVisibleQuestions = visibleProgress.hasQuestions
+  const canAddPageToPlan = hasVisibleQuestions && !visibleProgress.allPlanned
+  const addPageButtonText = visibleProgress.allPlanned ? '本页已加入' : '本页入计划'
+  const filterSummary = [
+    difficulty ? `难度：${difficultyLabels[difficulty] || difficulty}` : '全部难度',
+    studyStatusFilter === 'all' ? '全部状态' : `状态：${studyStatusFilterLabels[studyStatusFilter]}`,
+    `排序：${sortLabels[sort]}`,
+  ].join(' · ')
 
   const addCurrentPageToPlan = () => {
     if (!canAddPageToPlan) {
       return
     }
-    addDailyPlanQuestions(pageQuestionIds)
+    addDailyPlanQuestions(visibleQuestionIds)
   }
 
   const startPagePractice = () => {
-    if (pageQuestionIds.length === 0) {
-      navigate('/practice')
+    if (visibleQuestionIds.length === 0) {
+      navigate(buildContinuePracticePath(progress))
       return
     }
-    navigate(`/practice?queue=${pageQuestionIds.join(',')}`)
+    const sourceParam = studyStatusFilter === 'reviewDue' ? '&from=review-due' : '&from=filtered-list'
+    navigate(`/practice?queue=${visibleQuestionIds.join(',')}${sourceParam}`)
   }
 
   return (
@@ -152,17 +253,17 @@ export default function QuestionList() {
       <div className="question-list-toolbar">
         <div>
           <FilterOutlined />
-          <span>{difficulty ? `已筛选：${difficultyLabels[difficulty] || difficulty}` : '全部难度'}</span>
+          <span>{filterSummary}</span>
         </div>
         <div className="question-list-toolbar-actions">
           <Select
+            aria-label="按难度筛选"
             placeholder="难度"
             allowClear
             value={difficulty}
             style={{ width: 120 }}
             onChange={(value) => {
-              setDifficulty(value)
-              setPage(1)
+              updateListState({ difficulty: value, page: 1 })
             }}
             options={[
               { value: 'EASY', label: '简单' },
@@ -170,13 +271,51 @@ export default function QuestionList() {
               { value: 'HARD', label: '困难' },
             ]}
           />
-          {hasPageQuestions && (
-            <Button icon={<PlusOutlined />} disabled={!canAddPageToPlan} onClick={addCurrentPageToPlan}>
+          <Select
+            aria-label="按学习状态筛选"
+            value={studyStatusFilter}
+            style={{ width: 128 }}
+            onChange={(value: StudyStatusFilter) => setStudyStatusFilter(value)}
+            options={[
+              { value: 'all', label: studyStatusFilterLabels.all },
+              { value: 'plan', label: studyStatusFilterLabels.plan },
+              { value: 'reviewDue', label: studyStatusFilterLabels.reviewDue },
+              { value: 'weak', label: studyStatusFilterLabels.weak },
+              { value: 'learning', label: studyStatusFilterLabels.learning },
+              { value: 'mastered', label: studyStatusFilterLabels.mastered },
+              { value: 'new', label: studyStatusFilterLabels.new },
+            ]}
+          />
+          <Select
+            aria-label="按排序方式选择"
+            value={sort}
+            style={{ width: 120 }}
+            onChange={(value: QuestionSortMode) => {
+              updateListState({ sort: value, page: 1 })
+            }}
+            options={[
+              { value: 'latest', label: sortLabels.latest },
+              { value: 'hot', label: sortLabels.hot },
+            ]}
+          />
+          {hasVisibleQuestions && (
+            <Button
+              icon={<PlusOutlined />}
+              aria-label={addPageButtonText}
+              disabled={!canAddPageToPlan}
+              onClick={addCurrentPageToPlan}
+            >
               {addPageButtonText}
             </Button>
           )}
-          <Button icon={<PlayCircleOutlined />} type="primary" ghost onClick={startPagePractice}>
-            {hasPageQuestions ? '练本页' : '开始训练'}
+          <Button
+            icon={<PlayCircleOutlined />}
+            type="primary"
+            ghost
+            aria-label={hasVisibleQuestions ? '练本页' : '开始训练'}
+            onClick={startPagePractice}
+          >
+            {hasVisibleQuestions ? '练本页' : '开始训练'}
           </Button>
         </div>
       </div>
@@ -196,8 +335,7 @@ export default function QuestionList() {
               <Button
                 type="primary"
                 onClick={() => {
-                  setDifficulty(undefined)
-                  setPage(1)
+                  updateListState({ difficulty: '', page: 1 })
                 }}
               >
                 清除难度筛选
@@ -211,10 +349,21 @@ export default function QuestionList() {
             </Empty>
           )}
         </div>
+      ) : visibleQuestions.length === 0 ? (
+        <div className="question-list-empty" role="status" aria-live="polite">
+          <Empty description="当前学习状态暂无题目">
+            <Button
+              type="primary"
+              onClick={() => setStudyStatusFilter('all')}
+            >
+              清除状态筛选
+            </Button>
+          </Empty>
+        </div>
       ) : (
         <>
           <div className="question-list-stack">
-            {questions.map((q) => {
+            {visibleQuestions.map((q) => {
               const studyState = getState(q.id)
               return (
                 <article
@@ -272,7 +421,7 @@ export default function QuestionList() {
               current={page}
               total={total}
               pageSize={20}
-              onChange={paginationPage => setPage(paginationPage)}
+              onChange={paginationPage => updateListState({ page: paginationPage })}
               showSizeChanger={false}
               hideOnSinglePage
               showTotal={count => `共 ${count} 条`}

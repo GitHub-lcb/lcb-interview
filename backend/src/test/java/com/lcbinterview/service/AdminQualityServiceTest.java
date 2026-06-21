@@ -26,6 +26,13 @@ class AdminQualityServiceTest {
 
     @Test
     void buildSummaryAggregatesQuestionQualityAndPrioritizesRiskyCategories() {
+        Question invalidDifficulty = question(5L, 2L, "DRAFT", "缺少结构段的完整答案" + "a".repeat(520),
+                repeat("原理", 70), repeat("风险", 45), repeat("项目", 45), validCodeExample());
+        invalidDifficulty.setSummary("短");
+        invalidDifficulty.setComparison("短");
+        invalidDifficulty.setScenario("短");
+        invalidDifficulty.setDifficulty("UNKNOWN");
+
         when(categoryMapper.selectList(any())).thenReturn(List.of(
                 category(1L, "Java 基础", 10),
                 category(2L, "Redis", 20)
@@ -36,23 +43,30 @@ class AdminQualityServiceTest {
                 question(2L, 1L, "DRAFT", "太短", "", "", "", ""),
                 question(3L, 2L, "DRAFT", "   ", "", "", "", ""),
                 question(4L, 2L, "REJECTED", publishableContent(520), repeat("原理", 70),
-                        repeat("风险", 45), repeat("项目", 45), "")
+                        repeat("风险", 45), repeat("项目", 45), ""),
+                invalidDifficulty
         ));
 
         AdminQualitySummaryVO summary = service.buildSummary();
 
-        assertThat(summary.totalQuestions()).isEqualTo(4);
+        assertThat(summary.totalQuestions()).isEqualTo(5);
         assertThat(summary.publishedQuestions()).isEqualTo(1);
-        assertThat(summary.draftQuestions()).isEqualTo(2);
+        assertThat(summary.draftQuestions()).isEqualTo(3);
         assertThat(summary.rejectedQuestions()).isEqualTo(1);
         assertThat(summary.emptyAnswerQuestions()).isEqualTo(1);
-        assertThat(summary.qualityRiskQuestions()).isEqualTo(3);
+        assertThat(summary.qualityRiskQuestions()).isEqualTo(4);
 
         assertThat(summary.categories())
                 .extracting(AdminCategoryQualityVO::categoryName)
                 .containsExactly("Redis", "Java 基础");
-        assertThat(summary.categories().getFirst().emptyAnswer()).isEqualTo(1);
-        assertThat(summary.categories().getFirst().riskScore()).isGreaterThan(summary.categories().getLast().riskScore());
+        AdminCategoryQualityVO redis = summary.categories().getFirst();
+        assertThat(redis.emptyAnswer()).isEqualTo(1);
+        assertThat(redis.missingSummary()).isEqualTo(1);
+        assertThat(redis.missingComparison()).isEqualTo(1);
+        assertThat(redis.missingScenario()).isEqualTo(1);
+        assertThat(redis.missingContentSections()).isEqualTo(1);
+        assertThat(redis.invalidDifficulty()).isEqualTo(1);
+        assertThat(redis.riskScore()).isGreaterThan(summary.categories().getLast().riskScore());
 
         assertThat(summary.todos())
                 .extracting(todo -> todo.type())

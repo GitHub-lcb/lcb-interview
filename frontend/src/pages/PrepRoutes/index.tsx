@@ -125,7 +125,7 @@ export default function PrepRoutes() {
                   </Button>
                   <Button
                     icon={<ArrowRightOutlined />}
-                    onClick={() => navigate(`/practice?queue=${routeProgress.nextQuestionIds.slice(0, 12).join(',')}`)}
+                    onClick={() => navigate(`/practice?queue=${routeProgress.nextQuestionIds.slice(0, 12).join(',')}&from=ability-gap`)}
                   >
                     路线训练
                   </Button>

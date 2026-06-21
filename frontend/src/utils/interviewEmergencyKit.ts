@@ -9,11 +9,14 @@ import type {
 import { buildDailyPlanCompletion } from './dailyPlanCompletion'
 import { buildInterviewMistakeLedger } from './interviewMistakeLedger'
 import { buildInterviewRecoveryPlan } from './interviewRecoveryPlan'
-import { buildDailyPracticePath } from './practiceRoute'
+import { appendPracticeHandoffSource, buildDailyPracticePath } from './practiceRoute'
 import { buildScheduledReviewQueue } from './reviewSchedule'
 
 const MAX_TOTAL_MINUTES = 30
 const MAX_ACTIONS = 5
+const INTERVIEW_RETROSPECTIVE_SOURCE = 'interview-retrospective'
+const NEXT_TRAINING_SOURCE = 'next-training'
+const REVIEW_DUE_SOURCE = 'review-due'
 
 const ITEM_KIND_LABELS: Record<InterviewEmergencyKitItem['kind'], string> = {
   review: '复习债',
@@ -49,7 +52,7 @@ export function buildInterviewEmergencyKit(
       title: `${reviewDebtIds.length} 道复习债先清掉`,
       description: '临场前先复盘到期和逾期题，减少最后一轮遗忘损耗。',
       reason: reviewDebtItems[0]?.scheduleReason ?? '复习窗口已经打开。',
-      to: buildDailyPracticePath(reviewDebtIds),
+      to: buildDailyPracticePath(reviewDebtIds, 12, REVIEW_DUE_SOURCE),
       durationMinutes: 12,
       priority: 120,
       questionIds: reviewDebtIds,
@@ -65,7 +68,7 @@ export function buildInterviewEmergencyKit(
       title: step.title,
       description: step.description,
       reason: step.reason,
-      to: step.to || '/practice',
+      to: appendPracticeHandoffSource(step.to || '/practice', sourceForRecoveryStep(step.id)),
       durationMinutes: Math.min(step.durationMinutes, 12),
       priority: 100,
       questionIds: step.questionIds,
@@ -88,7 +91,7 @@ export function buildInterviewEmergencyKit(
       title: `${weakUnspokenIds.length} 道薄弱题开口过一遍`,
       description: '把“看过”变成“能说清”，优先暴露临场表达断点。',
       reason: '薄弱题如果没有开口样本，面试前风险不可见。',
-      to: buildDailyPracticePath(weakUnspokenIds),
+      to: buildDailyPracticePath(weakUnspokenIds, 12, NEXT_TRAINING_SOURCE),
       durationMinutes: 10,
       priority: 80,
       questionIds: weakUnspokenIds,
@@ -254,12 +257,18 @@ function buildReadyWarmup(progress: StudyProgress): InterviewEmergencyKitItem {
     title: '轻量热身保持手感',
     description: '当前没有明显紧急风险，面试前用熟题做一轮口述热身即可。',
     reason: '最后阶段不再扩展新负担，优先保持表达稳定。',
-    to: buildDailyPracticePath(questionIds),
+    to: buildDailyPracticePath(questionIds, 12, NEXT_TRAINING_SOURCE),
     durationMinutes: 8,
     priority: 10,
     questionIds,
     actionLabel: '轻量热身',
   }
+}
+
+function sourceForRecoveryStep(stepId: string): string {
+  return stepId.startsWith('weak-unspoken')
+    ? NEXT_TRAINING_SOURCE
+    : INTERVIEW_RETROSPECTIVE_SOURCE
 }
 
 function resolveLevel(input: {

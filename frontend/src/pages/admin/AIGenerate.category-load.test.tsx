@@ -12,6 +12,7 @@ vi.mock('../../api/category', () => ({
 
 vi.mock('../../api/admin', () => ({
   batchGenerate: vi.fn(),
+  getAiConfigStatus: vi.fn(),
   getBatchStatus: vi.fn(),
   streamGenerate: vi.fn(),
   streamFillAnswer: vi.fn(),
@@ -42,6 +43,13 @@ describe('AIGenerate category loading', () => {
     })
 
     vi.mocked(adminApi.getBatchStatus).mockResolvedValue({ status: 'IDLE' } as never)
+    vi.mocked((adminApi as any).getAiConfigStatus).mockResolvedValue({
+      available: true,
+      apiKeyConfigured: true,
+      model: 'glm-5.2',
+      endpointHost: 'opencode.ai',
+      message: 'AI 生成服务已配置',
+    })
     vi.mocked(adminApi.listDrafts).mockResolvedValue({ total: 0 } as never)
     vi.mocked(adminApi.streamRewritePublishedAnswers).mockReturnValue(new AbortController())
   })
@@ -105,5 +113,30 @@ describe('AIGenerate category loading', () => {
         5,
       )
     })
+  })
+
+  it('shows ai configuration warning and disables generation when remote ai is unavailable', async () => {
+    vi.mocked(getCategories).mockResolvedValue([
+      {
+        id: 1,
+        name: 'Java 基础',
+        icon: 'java',
+        description: 'Java 基础题库',
+        sortOrder: 1,
+      },
+    ])
+    vi.mocked((adminApi as any).getAiConfigStatus).mockResolvedValue({
+      available: false,
+      apiKeyConfigured: false,
+      model: 'glm-5.2',
+      endpointHost: 'opencode.ai',
+      message: 'AI 生成服务未配置密钥，请设置 AI_OPENCODE_API_KEY',
+    })
+
+    const { container } = render(<AIGenerate />)
+
+    expect(await screen.findByText('AI 服务未配置')).toBeInTheDocument()
+    expect(screen.getByText(/AI_OPENCODE_API_KEY/)).toBeInTheDocument()
+    expect(container.querySelector('button[type="submit"]')).toBeDisabled()
   })
 })

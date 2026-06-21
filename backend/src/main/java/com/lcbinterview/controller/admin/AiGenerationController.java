@@ -1,6 +1,7 @@
 package com.lcbinterview.controller.admin;
 
 import com.lcbinterview.common.ApiResponse;
+import com.lcbinterview.dto.AdminAiConfigStatusVO;
 import com.lcbinterview.dto.BatchGenerationRequest;
 import com.lcbinterview.dto.BatchProgressVO;
 import com.lcbinterview.dto.FillAnswersRequest;
@@ -31,6 +32,16 @@ public class AiGenerationController {
     private final AiGenerationRequestPolicy requestPolicy;
 
     /**
+     * 查询 AI 生成服务配置状态，供管理端展示可用性和非敏感诊断信息。
+     *
+     * @return AI 配置状态
+     */
+    @GetMapping("/config-status")
+    public ResponseEntity<ApiResponse<AdminAiConfigStatusVO>> configStatus() {
+        return ResponseEntity.ok(ApiResponse.success(aiQuestionService.configStatus()));
+    }
+
+    /**
      * SSE 流式生成单道题。实时推送 AI 思考过程（reasoning_content）和内容。
      * 前端使用 EventSource 连接：
      *   es.addEventListener('thinking', e => console.log(e.data))
@@ -45,6 +56,10 @@ public class AiGenerationController {
             @RequestParam(required = false) String difficulty,
             @RequestParam(defaultValue = "1") int count,
             @RequestParam(required = false) String topic) {
+        AdminAiConfigStatusVO configStatus = aiQuestionService.configStatus();
+        if (!configStatus.available()) {
+            return unavailableStream(configStatus);
+        }
         SseEmitter emitter = new SseEmitter(SSE_TIMEOUT_NEVER);
         GenerationRequest req = new GenerationRequest(category, difficulty, requestPolicy.clampCount(count), topic);
         aiQuestionService.streamGenerate(req, emitter);
@@ -58,6 +73,10 @@ public class AiGenerationController {
     public SseEmitter fillAnswerStream(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(defaultValue = "5") int count) {
+        AdminAiConfigStatusVO configStatus = aiQuestionService.configStatus();
+        if (!configStatus.available()) {
+            return unavailableStream(configStatus);
+        }
         SseEmitter emitter = new SseEmitter(SSE_TIMEOUT_NEVER);
         aiQuestionService.streamFillAnswer(categoryId, requestPolicy.clampCount(count), emitter);
         return emitter;
@@ -71,6 +90,10 @@ public class AiGenerationController {
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "5") int count) {
+        AdminAiConfigStatusVO configStatus = aiQuestionService.configStatus();
+        if (!configStatus.available()) {
+            return unavailableStream(configStatus);
+        }
         SseEmitter emitter = new SseEmitter(SSE_TIMEOUT_NEVER);
         aiQuestionService.streamRewritePublishedAnswers(categoryId, keyword, requestPolicy.clampCount(count), emitter);
         return emitter;
@@ -81,6 +104,10 @@ public class AiGenerationController {
      */
     @PostMapping("/batch")
     public ResponseEntity<ApiResponse<String>> batchGenerate(@Valid @RequestBody BatchGenerationRequest req) {
+        AdminAiConfigStatusVO configStatus = aiQuestionService.configStatus();
+        if (!configStatus.available()) {
+            return ResponseEntity.ok(ApiResponse.error(503, configStatus.message()));
+        }
         boolean started = batchRunner.start(
                 req.countPerCategory(), req.categoryName(), req.delaySeconds());
         if (!started) {
@@ -95,5 +122,16 @@ public class AiGenerationController {
     @GetMapping("/batch/status")
     public ResponseEntity<ApiResponse<BatchProgressVO>> batchStatus() {
         return ResponseEntity.ok(ApiResponse.success(batchRunner.getProgress()));
+    }
+
+    private SseEmitter unavailableStream(AdminAiConfigStatusVO configStatus) {
+        SseEmitter emitter = new SseEmitter(SSE_TIMEOUT_NEVER);
+        try {
+            emitter.send(SseEmitter.event().name("error").data(configStatus.message()));
+            emitter.complete();
+        } catch (Exception e) {
+            emitter.completeWithError(e);
+        }
+        return emitter;
     }
 }

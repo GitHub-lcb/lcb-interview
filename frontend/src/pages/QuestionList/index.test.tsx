@@ -1,11 +1,12 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import { getCategoryById } from '../../api/category'
 import { getQuestions } from '../../api/question'
 import QuestionList from './index'
+import { STUDY_PROGRESS_STORAGE_KEY, createDefaultProgress } from '../../utils/studyProgress'
 
 const fixtures = vi.hoisted(() => ({
   category: {
@@ -27,6 +28,17 @@ const fixtures = vi.hoisted(() => ({
       viewCount: 120,
       createTime: '2026-06-20T00:00:00.000Z',
     },
+    {
+      id: 12,
+      title: 'HashMap 为什么线程不安全？',
+      content: '标准答案',
+      difficulty: 'HARD',
+      categoryName: 'Java 基础',
+      categoryId: 1,
+      tags: ['Java', '集合'],
+      viewCount: 240,
+      createTime: '2026-06-20T00:00:00.000Z',
+    },
   ],
 }))
 
@@ -43,6 +55,34 @@ vi.mock('../../api/question', () => ({
     totalPages: 1,
   }),
 }))
+
+function PracticeLocationProbe() {
+  const location = useLocation()
+  return (
+    <div>
+      <span>练习入口</span>
+      <span>{location.search}</span>
+    </div>
+  )
+}
+
+function QuestionListLocationProbe() {
+  const location = useLocation()
+  return (
+    <>
+      <QuestionList />
+      <span data-testid="bank-location">{location.search}</span>
+    </>
+  )
+}
+
+function toolbarPracticeButton(): HTMLButtonElement {
+  const button = document.querySelector('.question-list-toolbar-actions .ant-btn-primary')
+  if (!(button instanceof HTMLButtonElement)) {
+    throw new Error('Question list practice action was not rendered')
+  }
+  return button
+}
 
 describe('QuestionList', () => {
   beforeEach(() => {
@@ -80,9 +120,87 @@ describe('QuestionList', () => {
     await waitFor(() => {
       expect(vi.mocked(getCategoryById)).toHaveBeenCalledWith(1, { silentGlobalError: true })
       expect(vi.mocked(getQuestions)).toHaveBeenCalledWith(
-        { category: 1, difficulty: undefined, page: 0, size: 20 },
+        { category: 1, difficulty: undefined, page: 0, size: 20, sort: 'latest' },
         { silentGlobalError: true },
       )
+    })
+  })
+
+  it('passes selected sort mode to the backend query', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter initialEntries={['/bank/1']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/bank/:id" element={<QuestionList />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    await waitFor(() => {
+      expect(vi.mocked(getQuestions)).toHaveBeenCalledWith(
+        { category: 1, difficulty: undefined, page: 0, size: 20, sort: 'latest' },
+        { silentGlobalError: true },
+      )
+    })
+
+    await user.click(screen.getByRole('combobox', { name: '按排序方式选择' }))
+    await user.click(await screen.findByText('按热度'))
+
+    await waitFor(() => {
+      expect(vi.mocked(getQuestions)).toHaveBeenLastCalledWith(
+        { category: 1, difficulty: undefined, page: 0, size: 20, sort: 'hot' },
+        { silentGlobalError: true },
+      )
+    })
+  })
+
+  it('loads difficulty sort and page from the URL state', async () => {
+    render(
+      <MemoryRouter initialEntries={['/bank/1?difficulty=HARD&sort=hot&page=2']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/bank/:id" element={<QuestionList />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    await waitFor(() => {
+      expect(vi.mocked(getQuestions)).toHaveBeenCalledWith(
+        { category: 1, difficulty: 'HARD', page: 1, size: 20, sort: 'hot' },
+        { silentGlobalError: true },
+      )
+    })
+  })
+
+  it('writes selected difficulty and sort to the URL for shareable category lists', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter initialEntries={['/bank/1']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/bank/:id" element={<QuestionListLocationProbe />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    await waitFor(() => {
+      expect(vi.mocked(getQuestions)).toHaveBeenCalledWith(
+        { category: 1, difficulty: undefined, page: 0, size: 20, sort: 'latest' },
+        { silentGlobalError: true },
+      )
+    })
+
+    await user.click(screen.getByRole('combobox', { name: '按难度筛选' }))
+    const hardOptions = await screen.findAllByText('困难')
+    await user.click(hardOptions[hardOptions.length - 1])
+    await user.click(screen.getByRole('combobox', { name: '按排序方式选择' }))
+    await user.click(await screen.findByText('按热度'))
+
+    await waitFor(() => {
+      const params = new URLSearchParams(screen.getByTestId('bank-location').textContent || '')
+      expect(params.get('difficulty')).toBe('HARD')
+      expect(params.get('sort')).toBe('hot')
+      expect(params.get('page')).toBeNull()
     })
   })
 
@@ -140,8 +258,9 @@ describe('QuestionList', () => {
 
     expect(await screen.findByText('Java 中的序列化是什么？')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('combobox'))
-    await user.click(await screen.findByText('困难'))
+    await user.click(screen.getByRole('combobox', { name: '按难度筛选' }))
+    const hardOptions = await screen.findAllByText('困难')
+    await user.click(hardOptions[hardOptions.length - 1])
 
     expect(await screen.findByText('当前筛选暂无题目')).toBeInTheDocument()
 
@@ -149,9 +268,115 @@ describe('QuestionList', () => {
 
     expect(await screen.findByText('Java 中的序列化是什么？')).toBeInTheDocument()
     expect(vi.mocked(getQuestions)).toHaveBeenLastCalledWith(
-      { category: 1, difficulty: undefined, page: 0, size: 20 },
+      { category: 1, difficulty: undefined, page: 0, size: 20, sort: 'latest' },
       { silentGlobalError: true },
     )
+  })
+
+  it('filters the current page by local study status and practices the filtered questions only', async () => {
+    const user = userEvent.setup()
+    const progress = createDefaultProgress('2026-06-21T00:00:00.000Z')
+    progress.questionStates = {
+      11: { status: 'weak', addedToPlan: true, reviewCount: 2 },
+      12: { status: 'mastered', addedToPlan: false, reviewCount: 3 },
+    }
+    progress.dailyPlan = [11]
+    window.localStorage.setItem(STUDY_PROGRESS_STORAGE_KEY, JSON.stringify(progress))
+
+    render(
+      <MemoryRouter initialEntries={['/bank/1']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/bank/:id" element={<QuestionList />} />
+          <Route path="/practice" element={<PracticeLocationProbe />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText('Java 中的序列化是什么？')).toBeInTheDocument()
+    expect(screen.getByText('HashMap 为什么线程不安全？')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('combobox', { name: '按学习状态筛选' }))
+    await user.click(await screen.findByText('薄弱题'))
+
+    expect(screen.getByText('Java 中的序列化是什么？')).toBeInTheDocument()
+    expect(screen.queryByText('HashMap 为什么线程不安全？')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /练本页/ }))
+
+    expect(await screen.findByText('练习入口')).toBeInTheDocument()
+    expect(screen.getByText('?queue=11&from=filtered-list')).toBeInTheDocument()
+  })
+
+  it('filters the current page by due reviews and practices only overdue questions', async () => {
+    const user = userEvent.setup()
+    const progress = createDefaultProgress('2026-06-21T00:00:00.000Z')
+    progress.questionStates = {
+      11: {
+        status: 'learning',
+        addedToPlan: false,
+        reviewCount: 1,
+        lastReviewedAt: '2020-01-01T00:00:00.000Z',
+      },
+      12: {
+        status: 'mastered',
+        addedToPlan: false,
+        reviewCount: 3,
+        lastReviewedAt: '2999-01-01T00:00:00.000Z',
+      },
+    }
+    window.localStorage.setItem(STUDY_PROGRESS_STORAGE_KEY, JSON.stringify(progress))
+
+    render(
+      <MemoryRouter initialEntries={['/bank/1']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/bank/:id" element={<QuestionList />} />
+          <Route path="/practice" element={<PracticeLocationProbe />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText(fixtures.questions[0].title)).toBeInTheDocument()
+    expect(screen.getByText(fixtures.questions[1].title)).toBeInTheDocument()
+
+    await user.click(screen.getByRole('combobox', { name: '按学习状态筛选' }))
+    await user.click(await screen.findByText('到期复习'))
+
+    expect(screen.getByText(fixtures.questions[0].title)).toBeInTheDocument()
+    expect(screen.queryByText(fixtures.questions[1].title)).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /练本页/ }))
+
+    expect(await screen.findByText('练习入口')).toBeInTheDocument()
+    expect(screen.getByText('?queue=11&from=review-due')).toBeInTheDocument()
+  })
+
+  it('falls back to the unfinished daily plan queue when the current filter has no practice items', async () => {
+    const user = userEvent.setup()
+    const progress = createDefaultProgress('2026-06-21T00:00:00.000Z')
+    progress.questionStates = {
+      11: { status: 'mastered', addedToPlan: false, reviewCount: 2 },
+      12: { status: 'learning', addedToPlan: true, reviewCount: 1 },
+    }
+    progress.dailyPlan = [12]
+    window.localStorage.setItem(STUDY_PROGRESS_STORAGE_KEY, JSON.stringify(progress))
+
+    render(
+      <MemoryRouter initialEntries={['/bank/1']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/bank/:id" element={<QuestionList />} />
+          <Route path="/practice" element={<PracticeLocationProbe />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText(fixtures.questions[0].title)).toBeInTheDocument()
+
+    await user.click(screen.getByRole('combobox', { name: '按学习状态筛选' }))
+    await user.click(await screen.findByText('薄弱题'))
+    await user.click(toolbarPracticeButton())
+
+    expect(await screen.findByText('练习入口')).toBeInTheDocument()
+    expect(screen.getByText('?queue=12&from=daily-plan')).toBeInTheDocument()
   })
 
   it.each(['/bank/abc', '/bank/2.5', '/bank/0'])(

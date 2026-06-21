@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Card, Form, Select, InputNumber, Input, Button, Progress, Alert, Segmented, Tag, Divider, Statistic, Row, Col, Collapse, List, Badge, Space } from 'antd'
 import { emitFeedbackError, emitFeedbackSuccess } from '../../utils/feedbackMessage'
-import { batchGenerate, getBatchStatus, streamGenerate, streamFillAnswer, streamRewritePublishedAnswers } from '../../api/admin'
+import { batchGenerate, getAiConfigStatus, getBatchStatus, streamGenerate, streamFillAnswer, streamRewritePublishedAnswers } from '../../api/admin'
 import { getCategories } from '../../api/category'
 import { listDrafts } from '../../api/admin'
-import type { Category, BatchProgress, StreamEvent } from '../../types'
+import type { AdminAiConfigStatus, Category, BatchProgress, StreamEvent } from '../../types'
 import { getStreamResultMeta } from './aiGenerateResult'
 
 export default function AIGenerate() {
@@ -13,6 +13,8 @@ export default function AIGenerate() {
   const [categoryLoadError, setCategoryLoadError] = useState(false)
   const [categoryLoading, setCategoryLoading] = useState(false)
   const [batchProgress, setBatchProgress] = useState<BatchProgress | null>(null)
+  const [aiConfigStatus, setAiConfigStatus] = useState<AdminAiConfigStatus | null>(null)
+  const [aiConfigLoadError, setAiConfigLoadError] = useState(false)
   const [draftCount, setDraftCount] = useState(0)
 
   const [streamStatus, setStreamStatus] = useState<'idle' | 'connecting' | 'streaming' | 'done' | 'error'>('idle')
@@ -45,11 +47,24 @@ export default function AIGenerate() {
 
   useEffect(() => {
     loadCategories()
+    getAiConfigStatus()
+      .then(status => {
+        setAiConfigStatus(status)
+        setAiConfigLoadError(false)
+      })
+      .catch(() => {
+        setAiConfigStatus(null)
+        setAiConfigLoadError(true)
+      })
     getBatchStatus().then(p => setBatchProgress(p as any)).catch(() => {})
     listDrafts(0, 1).then((res: any) => setDraftCount(res.total || 0)).catch(() => {})
   }, [loadCategories])
 
   const categoryOptions = categories.map(c => ({ value: c.name, label: c.name }))
+  const aiOperationDisabled = aiConfigLoadError || aiConfigStatus?.available !== true
+  const aiConfigDescription = aiConfigStatus?.available
+    ? `模型：${aiConfigStatus.model || '-'}；端点：${aiConfigStatus.endpointHost || '-'}`
+    : aiConfigStatus?.message || '请设置 AI_OPENCODE_API_KEY 后再使用生成、补答案和重写。'
 
   const onBatchFinish = async (values: any) => {
     setBatchLoading(true)
@@ -260,6 +275,26 @@ export default function AIGenerate() {
         style={{ marginBottom: 24 }}
       />
 
+      {aiConfigLoadError && (
+        <Alert
+          type="warning"
+          showIcon
+          message="AI 配置状态读取失败"
+          description="暂时无法确认远程 AI 生成服务是否可用，请稍后刷新页面或检查管理端接口。"
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
+      {aiConfigStatus && (
+        <Alert
+          type={aiConfigStatus.available ? 'success' : 'warning'}
+          showIcon
+          message={aiConfigStatus.available ? 'AI 服务已就绪' : 'AI 服务未配置'}
+          description={aiConfigDescription}
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
       {categoryLoadError && (
         <Alert
           type="warning"
@@ -292,7 +327,7 @@ export default function AIGenerate() {
             </Form.Item>
             <Space>
               <Button type="primary" htmlType="submit" loading={streamStatus === 'connecting' || streamStatus === 'streaming'}
-                disabled={streamStatus === 'connecting' || streamStatus === 'streaming'}>
+                disabled={aiOperationDisabled || streamStatus === 'connecting' || streamStatus === 'streaming'}>
                 逐题流式生成
               </Button>
               {(streamStatus === 'connecting' || streamStatus === 'streaming') && (
@@ -325,7 +360,7 @@ export default function AIGenerate() {
             </Form.Item>
             <Space>
               <Button type="primary" htmlType="submit" loading={streamStatus === 'connecting' || streamStatus === 'streaming'}
-                disabled={streamStatus === 'connecting' || streamStatus === 'streaming'}>
+                disabled={aiOperationDisabled || streamStatus === 'connecting' || streamStatus === 'streaming'}>
                 逐题流式补答案
               </Button>
               {(streamStatus === 'connecting' || streamStatus === 'streaming') && (
@@ -362,7 +397,7 @@ export default function AIGenerate() {
             </Form.Item>
             <Space>
               <Button type="primary" htmlType="submit" loading={streamStatus === 'connecting' || streamStatus === 'streaming'}
-                disabled={streamStatus === 'connecting' || streamStatus === 'streaming'}>
+                disabled={aiOperationDisabled || streamStatus === 'connecting' || streamStatus === 'streaming'}>
                 逐题流式重写答案
               </Button>
               {(streamStatus === 'connecting' || streamStatus === 'streaming') && (
@@ -409,7 +444,7 @@ export default function AIGenerate() {
             <Form.Item name="delaySeconds" label="API 调用间隔（秒）" initialValue={3}>
               <InputNumber min={1} max={30} />
             </Form.Item>
-            <Button type="primary" htmlType="submit" loading={batchLoading} danger>启动批量生成</Button>
+            <Button type="primary" htmlType="submit" loading={batchLoading} disabled={aiOperationDisabled} danger>启动批量生成</Button>
           </Form>
           <Divider />
           <Alert type="info" showIcon message="批量生成说明"

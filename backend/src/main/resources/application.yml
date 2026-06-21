@@ -44,8 +44,8 @@ ai:
     enabled: ${AI_INTERVIEW_ENABLED:true}
     timeout-ms: ${AI_INTERVIEW_TIMEOUT_MS:8000}
   deepseek:
-    api-key: ${AI_OPENCODE_API_KEY:sk-Lz3bHKegKd6FR6F7kooQvVsWI9X7E93HTdwZirsy2Mb1IvrDj7wejHUovTbSU9fk}
-    model: ${AI_DEEPSEEK_MODEL:deepseek-v4-flash}
+    api-key: ${AI_OPENCODE_API_KEY:}
+    model: ${AI_DEEPSEEK_MODEL:deepseek-v4-pro}
     url: ${AI_DEEPSEEK_URL:https://opencode.ai/zen/go/v1/chat/completions}
     # 1M 上下文 + max 模式
     max-tokens: 65536

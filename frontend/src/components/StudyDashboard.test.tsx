@@ -7,6 +7,18 @@ import type { InterviewAttempt, Question, StudyProgress } from '../types'
 import { createDefaultProgress, STUDY_PROGRESS_STORAGE_KEY } from '../utils/studyProgress'
 import StudyDashboard from './StudyDashboard'
 
+const { navigate } = vi.hoisted(() => ({
+  navigate: vi.fn(),
+}))
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  return {
+    ...actual,
+    useNavigate: () => navigate,
+  }
+})
+
 const hotQuestions: Question[] = [
   {
     id: 1,
@@ -105,8 +117,51 @@ describe('StudyDashboard', () => {
   })
 
   afterEach(() => {
+    navigate.mockReset()
     cleanup()
     window.localStorage.clear()
+  })
+
+  it('starts training from the concrete daily plan queue', async () => {
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <StudyDashboard hotQuestions={hotQuestions} />
+      </MemoryRouter>,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /开始训练/ }))
+
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=1,2&from=daily-plan')
+  })
+
+  it('enters the dashboard queue from the plan card', async () => {
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <StudyDashboard hotQuestions={hotQuestions} />
+      </MemoryRouter>,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /进入训练/ }))
+
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=1,2&from=daily-plan')
+  })
+
+  it('turns recommended questions into a daily-plan queue before first training', async () => {
+    window.localStorage.setItem(STUDY_PROGRESS_STORAGE_KEY, JSON.stringify(createDefaultProgress('2026-06-18T00:00:00.000Z')))
+
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <StudyDashboard hotQuestions={hotQuestions} />
+      </MemoryRouter>,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /开始训练/ }))
+
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=1,2&from=daily-plan')
+    const stored = JSON.parse(window.localStorage.getItem(STUDY_PROGRESS_STORAGE_KEY) ?? '{}') as StudyProgress
+    expect(stored.dailyPlan).toEqual([1, 2])
+    expect(stored.questionSnapshots[1].title).toBe('HashMap 为什么线程不安全？')
+    expect(stored.questionSnapshots[2].title).toBe('Redis 缓存雪崩怎么处理？')
   })
 
   it('copies dashboard daily report markdown', async () => {

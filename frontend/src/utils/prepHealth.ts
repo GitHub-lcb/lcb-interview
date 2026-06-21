@@ -212,7 +212,7 @@ function buildAbilityDimension(abilityItems: AbilityMapItem[]): HealthCandidate 
   // 岗位准备度不能只看平均分，薄弱题会在面试中放大，因此额外扣除薄弱和学习中权重。
   const score = clampScore(focus.readinessScore - focus.weak * 8 - focus.learning * 2)
   const to = focus.nextQuestionIds.length > 0
-    ? `/practice?queue=${focus.nextQuestionIds.join(',')}`
+    ? `/practice?queue=${focus.nextQuestionIds.join(',')}&from=ability-gap`
     : '/routes'
 
   return withAction({

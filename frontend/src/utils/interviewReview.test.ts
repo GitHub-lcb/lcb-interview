@@ -179,6 +179,42 @@ describe('interviewReview', () => {
     expect(markdown).not.toContain('undefined')
   })
 
+  it('exports a concrete retrospective practice entry for the weakest recent answer', () => {
+    const progress: StudyProgress = {
+      ...createDefaultProgress('2026-06-17T00:00:00.000Z'),
+      targetRole: 'Java 后端',
+      questionSnapshots: {
+        1: {
+          id: 1,
+          title: 'HashMap 为什么线程不安全？',
+          difficulty: 'MEDIUM',
+          categoryName: 'Java 集合',
+          tags: ['Java'],
+          viewCount: 10,
+        },
+        2: {
+          id: 2,
+          title: 'Redis 缓存击穿怎么处理？',
+          difficulty: 'HARD',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 12,
+        },
+      },
+      interviewAttempts: {
+        1: [attempt(1, 84, '2026-06-17T12:00:00')],
+        2: [attempt(2, 58, '2026-06-17T11:00:00')],
+      },
+    }
+
+    const markdown = buildInterviewReviewMarkdown(progress, '2026-06-18T00:00:00.000Z')
+
+    expect(markdown).toContain('## 下一步')
+    expect(markdown).toContain('动作：重答低分面试题')
+    expect(markdown).toContain('题目：Redis 缓存击穿怎么处理？')
+    expect(markdown).toContain('入口：/practice?queue=2&from=interview-retrospective')
+  })
+
   it('keeps empty interview review export actionable', () => {
     const markdown = buildInterviewReviewMarkdown(createDefaultProgress(), '2026-06-18T00:00:00.000Z')
 

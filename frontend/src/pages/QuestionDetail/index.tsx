@@ -58,7 +58,7 @@ export default function QuestionDetail() {
   const [error, setError] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
-  const { progress, getState, rememberQuestion, setInPlan, setStatus } = useStudyProgress()
+  const { progress, getState, recordQuestionEncounter, setInPlan, setStatus } = useStudyProgress()
   const isPracticeCalibrationReturn = new URLSearchParams(location.search).get('from') === 'practice-calibration'
 
   const fetchQuestion = () => {
@@ -73,7 +73,7 @@ export default function QuestionDetail() {
     getQuestionById(questionId, { silentGlobalError: true })
       .then(data => {
         setQ(data)
-        rememberQuestion(data)
+        recordQuestionEncounter(data)
         setLoading(false)
       })
       .catch(() => {
@@ -139,9 +139,11 @@ export default function QuestionDetail() {
   }
 
   const studyState = getState(q.id)
+  const encounterCount = studyState.encounterCount ?? 0
   const latestPracticeAttempt = progress.interviewAttempts[q.id]?.[0]
+  const latestPracticeSummary = resolvePracticeCalibrationSummary(latestPracticeAttempt)
   const practiceCalibrationSummary = isPracticeCalibrationReturn
-    ? resolvePracticeCalibrationSummary(latestPracticeAttempt)
+    ? latestPracticeSummary
     : undefined
 
   return (
@@ -177,12 +179,30 @@ export default function QuestionDetail() {
               />
               <Button
                 type="primary"
+                aria-label="开始本题模拟面试"
                 icon={<PlayCircleOutlined />}
-                onClick={() => navigate(`/practice?question=${q.id}`)}
+                onClick={() => navigate(`/practice?question=${q.id}&from=question-detail`)}
               >
                 模拟面试
               </Button>
             </div>
+            {encounterCount > 0 ? (
+              <div className="detail-encounter-cue" aria-label="本题遇见次数">
+                <span>第 {encounterCount} 次遇见</span>
+                <small>结合上次标记和模拟分数继续巩固。</small>
+              </div>
+            ) : null}
+            {latestPracticeSummary ? (
+              <div className="detail-practice-memory" aria-label="本题练习记录">
+                <div>
+                  <span>最近模拟 {latestPracticeSummary.score} 分</span>
+                  {latestPracticeSummary.weakestLabel ? (
+                    <strong>最低项：{latestPracticeSummary.weakestLabel}</strong>
+                  ) : null}
+                </div>
+                <p>先校准 60 秒口径，再复练这题。</p>
+              </div>
+            ) : null}
             <div className="detail-free-cue">本题答案、追问、质量评分和模拟面试均免费开放。</div>
           </header>
 

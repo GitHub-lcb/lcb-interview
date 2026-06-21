@@ -38,7 +38,7 @@ export interface FirstRunLaunchpadOptions {
   answerDrafts?: PracticeAnswerDraft[]
 }
 
-type PracticeQueueSource = 'first-run' | 'first-run-rehearsal'
+type PracticeQueueSource = 'first-run' | 'first-run-repair' | 'first-run-rehearsal' | 'daily-plan' | 'resume-draft'
 
 const FIRST_RUN_LIMIT = 5
 const CONTINUE_LIMIT = 12
@@ -58,7 +58,7 @@ export function buildFirstRunLaunchpad(
       primaryAction: {
         label: `恢复 ${draftIds.length} 份回答草稿`,
         description: '回到未提交回答继续评分',
-        to: buildPracticeQueuePath(draftIds),
+        to: buildPracticeQueuePath(draftIds, 'resume-draft'),
         kind: 'append-plan',
       },
       secondaryActions: baseSecondaryActions(),
@@ -89,7 +89,7 @@ export function buildFirstRunLaunchpad(
       primaryAction: {
         label: `修复 ${repairIds.length} 道风险题`,
         description: '直接进入薄弱题训练队列',
-        to: buildPracticeQueuePath(repairIds),
+        to: buildPracticeQueuePath(repairIds, 'first-run-repair'),
         kind: 'append-plan',
       },
       secondaryActions: baseSecondaryActions(),
@@ -136,7 +136,7 @@ export function buildFirstRunLaunchpad(
       primaryAction: {
         label: `继续 ${unfinishedDailyPlanIds.length} 题队列`,
         description: '从今日计划进入训练',
-        to: buildPracticeQueuePath(unfinishedDailyPlanIds),
+        to: buildPracticeQueuePath(unfinishedDailyPlanIds, 'daily-plan'),
         kind: 'practice',
       },
       secondaryActions: baseSecondaryActions(),
@@ -164,7 +164,7 @@ export function buildFirstRunLaunchpad(
       primaryAction: {
         label: `继续 ${learningReviewIds.length} 题队列`,
         description: '从学习中题目继续训练',
-        to: buildPracticeQueuePath(learningReviewIds),
+        to: buildPracticeQueuePath(learningReviewIds, 'daily-plan'),
         kind: 'plan',
       },
       secondaryActions: baseSecondaryActions(),
@@ -213,7 +213,7 @@ export function buildFirstRunLaunchpad(
         to: '/routes',
         kind: 'route',
       },
-      secondaryActions: baseSecondaryActions(),
+      secondaryActions: emptyFallbackSecondaryActions(),
       metrics: [
         { label: '首练题', value: '0' },
         { label: '目标', value: progress.targetRole },
@@ -293,6 +293,17 @@ function completedSecondaryActions(): LaunchpadAction[] {
       description: '查看 Java、前端、AI、架构路线',
       to: '/routes',
       kind: 'route',
+    },
+  ]
+}
+
+function emptyFallbackSecondaryActions(): LaunchpadAction[] {
+  return [
+    {
+      label: '打开学习计划',
+      description: '先建立今日计划和冲刺节奏',
+      to: '/study',
+      kind: 'study',
     },
   ]
 }

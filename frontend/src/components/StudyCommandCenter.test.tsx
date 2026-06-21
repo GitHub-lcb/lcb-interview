@@ -106,7 +106,7 @@ describe('StudyCommandCenter', () => {
 
     await userEvent.click(within(recovery).getByRole('button', { name: /恢复 1 份草稿/ }))
 
-    expect(navigate).toHaveBeenCalledWith('/practice?queue=2')
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=2&from=resume-draft')
   })
 
   it('copies study command center markdown', async () => {

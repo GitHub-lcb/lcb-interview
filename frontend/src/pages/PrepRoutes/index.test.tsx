@@ -2,10 +2,16 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import type { StudyProgress } from '../../types'
 import { createDefaultProgress, STUDY_PROGRESS_STORAGE_KEY } from '../../utils/studyProgress'
 import PrepRoutes from './index'
+
+function LocationProbe() {
+  const location = useLocation()
+
+  return <div>当前位置 {location.pathname}{location.search}</div>
+}
 
 function progressWithJavaRoute(): StudyProgress {
   return {
@@ -81,6 +87,21 @@ describe('PrepRoutes', () => {
     expect(markdown).toContain('# Java 后端 备考路线战术包')
     expect(markdown).toContain('## 路线战术')
     expect(markdown).toContain('Java 后端冲刺路线')
-    expect(markdown).toContain('/practice?queue=2')
+    expect(markdown).toContain('/practice?queue=2&from=ability-gap')
+  })
+
+  it('starts route training with ability-gap practice context', async () => {
+    render(
+      <MemoryRouter initialEntries={['/routes']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/routes" element={<PrepRoutes />} />
+          <Route path="*" element={<LocationProbe />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    await userEvent.click(await screen.findByRole('button', { name: /路线训练/ }))
+
+    expect(await screen.findByText('当前位置 /practice?queue=2&from=ability-gap')).toBeInTheDocument()
   })
 })

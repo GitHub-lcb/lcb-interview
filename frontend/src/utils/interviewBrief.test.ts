@@ -122,6 +122,63 @@ describe('buildInterviewBrief', () => {
     expect(brief.primaryAction.to).toContain('/study')
   })
 
+  it('starts warmup practice with interview brief context', () => {
+    const progress = emptyProgress()
+    addQuestion(progress, 1, 'mastered', 'Java Core')
+    addQuestion(progress, 2, 'mastered', 'MySQL')
+    progress.dailyPlan = [1, 2]
+    progress.interviewAttempts[1] = [interviewAttempt(1, 88, '2026-06-16T00:00:00.000Z')]
+
+    const brief = buildInterviewBrief(routes, progress, NOW)
+    const markdown = buildInterviewBriefMarkdown(routes, progress, NOW)
+
+    expect(brief.level).toBe('warmup')
+    expect(brief.primaryAction.to).toBe('/practice?queue=1,2&from=interview-brief')
+    expect(markdown).toContain('/practice?queue=1,2&from=interview-brief')
+  })
+
+  it('surfaces repeated new questions as active recall risk and warmup', () => {
+    const progress = emptyProgress()
+    addQuestion(progress, 1, 'mastered', 'Java 并发')
+    progress.dailyPlan = [1]
+    progress.interviewAttempts[1] = [interviewAttempt(1, 84, '2026-06-16T00:00:00.000Z')]
+    progress.questionStates[5] = {
+      status: 'new',
+      addedToPlan: false,
+      reviewCount: 0,
+      encounterCount: 2,
+      lastEncounteredAt: '2026-06-16T20:00:00.000Z',
+    }
+    progress.questionSnapshots[5] = {
+      id: 5,
+      title: 'ThreadLocal 内存泄漏怎么排查？',
+      difficulty: 'HARD',
+      categoryName: 'Java 并发',
+      tags: ['ThreadLocal'],
+      viewCount: 150,
+    }
+
+    const brief = buildInterviewBrief(routes, progress, NOW)
+    const markdown = buildInterviewBriefMarkdown(routes, progress, NOW)
+
+    expect(brief.level).toBe('risk')
+    expect(brief.risks[0]).toMatchObject({
+      id: 'active-recall',
+      title: '多次遇见题还没完成主动回忆',
+      metric: '1 主动回忆',
+      to: '/study',
+    })
+    expect(brief.risks[0].description).toContain('多次遇见')
+    expect(brief.primaryAction.to).toBe('/study')
+    expect(brief.warmups[0]).toMatchObject({
+      questionId: 5,
+      metric: '主动回忆',
+    })
+    expect(markdown).toContain('多次遇见题还没完成主动回忆')
+    expect(markdown).toContain('指标：1 主动回忆')
+    expect(markdown).toContain('指标：主动回忆')
+  })
+
   it('adds a risk when mock interview scores are declining', () => {
     const progress = emptyProgress()
     addQuestion(progress, 1, 'mastered', 'Java 并发')

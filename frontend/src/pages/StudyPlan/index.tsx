@@ -64,6 +64,8 @@ const dueStatusLabels: Record<ReviewDueStatus, string> = {
   'due-today': '今日到期',
   upcoming: '即将到期',
 }
+const ACTIVE_RECALL_ENCOUNTER_THRESHOLD = 2
+const FIRST_RUN_REHEARSAL_SOURCE = 'first-run-rehearsal'
 
 function formatScheduleDate(value?: string) {
   if (!value) {
@@ -97,6 +99,25 @@ export default function StudyPlan() {
   const planQuestions = useMemo(() => resolvePlanQuestions(progress, hotQuestions, 8), [hotQuestions, progress])
   const reviewQueue = useMemo(() => buildScheduledReviewQueue(progress, new Date().toISOString(), 12), [progress])
   const reviewSummary = useMemo(() => summarizeReviewSchedule(reviewQueue), [reviewQueue])
+  const dueReviewItems = useMemo(
+    () => reviewQueue.filter(item => item.dueStatus !== 'upcoming'),
+    [reviewQueue],
+  )
+  const dueReviewQuestionIds = useMemo(
+    () => dueReviewItems.map(item => item.id),
+    [dueReviewItems],
+  )
+  const activeRecallReviewCount = useMemo(
+    () => dueReviewItems.filter(item => isActiveRecallReviewState(progress, item.id)).length,
+    [dueReviewItems, progress],
+  )
+  const isActiveRecallOnlyReviewQueue = dueReviewItems.length > 0
+    && activeRecallReviewCount === dueReviewItems.length
+  const reviewQueueTitle = isActiveRecallOnlyReviewQueue ? '主动回忆优先' : '智能复习队列'
+  const reviewQueueMetric = isActiveRecallOnlyReviewQueue
+    ? `${activeRecallReviewCount} 道多次遇见题`
+    : activeRecallReviewCount > 0 ? `含 ${activeRecallReviewCount} 道主动回忆` : `${reviewQueue.length} 道`
+  const dueReviewPracticeLabel = isActiveRecallOnlyReviewQueue ? '练主动回忆' : '练到期复习'
   const firstRunCompletionReport = useMemo(() => buildFirstRunCompletionReport(progress), [progress])
   const trackedCount = Object.keys(progress.questionStates).length
   const canGeneratePlan = generatedPlanIds.length > 0
@@ -167,6 +188,10 @@ export default function StudyPlan() {
     emitFeedbackWarning('剪贴板不可用，已下载 Markdown 队列')
   }
 
+  const handleStartDueReviewPractice = () => {
+    navigate(buildDailyPracticePath(dueReviewQuestionIds, 12, 'review-due'))
+  }
+
   const handleCopyFirstRunCompletion = async () => {
     if (!firstRunCompletionReport) {
       return
@@ -203,7 +228,7 @@ export default function StudyPlan() {
           <Button
             type="primary"
             icon={<PlayCircleOutlined />}
-            onClick={() => navigate(buildDailyPracticePath(progress.dailyPlan))}
+            onClick={() => navigate(buildDailyPracticePath(progress.dailyPlan, 12, 'daily-plan'))}
           >
             开始训练
           </Button>
@@ -271,7 +296,11 @@ export default function StudyPlan() {
               <Button
                 type="primary"
                 icon={<PlayCircleOutlined />}
-                onClick={() => navigate(buildDailyPracticePath(firstRunCompletionReport.rehearsalQueueIds))}
+                onClick={() => navigate(buildDailyPracticePath(
+                  firstRunCompletionReport.rehearsalQueueIds,
+                  12,
+                  FIRST_RUN_REHEARSAL_SOURCE,
+                ))}
               >
                 抽查复述
               </Button>
@@ -308,7 +337,11 @@ export default function StudyPlan() {
               <Button
                 type="primary"
                 icon={<PlayCircleOutlined />}
-                onClick={() => navigate(buildDailyPracticePath(firstRunCompletionReport.rehearsalQueueIds))}
+                onClick={() => navigate(buildDailyPracticePath(
+                  firstRunCompletionReport.rehearsalQueueIds,
+                  12,
+                  FIRST_RUN_REHEARSAL_SOURCE,
+                ))}
               >
                 优先复述
               </Button>
@@ -372,6 +405,11 @@ export default function StudyPlan() {
           <span>今日到期</span>
           <strong>{reviewSummary.dueToday}</strong>
           <small>今天必须复盘</small>
+        </div>
+        <div className="active-recall">
+          <span>主动回忆</span>
+          <strong>{reviewSummary.activeRecall}</strong>
+          <small>多次遇见题</small>
         </div>
         <div className="upcoming">
           <span>即将到期</span>
@@ -445,15 +483,28 @@ export default function StudyPlan() {
           )}
         </section>
 
-        <section className="study-plan-section">
+        <section className="study-plan-section" aria-label="智能复习队列">
           <div className="study-plan-section-title with-actions">
             <div>
-              <span>智能复习队列</span>
-              <small>{reviewQueue.length} 道</small>
+              <span>{reviewQueueTitle}</span>
+              <small>{reviewQueueMetric}</small>
             </div>
-            <Button size="small" icon={<CopyOutlined />} onClick={handleCopyReviewSchedule}>
-              复制队列
-            </Button>
+            <div className="study-plan-section-actions">
+              {dueReviewQuestionIds.length > 0 && (
+                <Button
+                  size="small"
+                  type="primary"
+                  ghost
+                  icon={<PlayCircleOutlined />}
+                  onClick={handleStartDueReviewPractice}
+                >
+                  {dueReviewPracticeLabel}
+                </Button>
+              )}
+              <Button size="small" icon={<CopyOutlined />} onClick={handleCopyReviewSchedule}>
+                复制队列
+              </Button>
+            </div>
           </div>
           {reviewQueue.length === 0 ? (
             <div className="study-empty-panel">
@@ -464,12 +515,19 @@ export default function StudyPlan() {
             <div className="review-queue-list">
               {reviewQueue.map(item => {
                 const state = getState(item.id)
+                const isActiveRecallItem = isActiveRecallReviewState(progress, item.id)
                 return (
                   <button type="button" key={item.id} onClick={() => navigate(`/question/${item.id}`)}>
                     <div>
                       <div className="review-queue-item-top">
-                        <span className={`review-due-badge ${item.dueStatus}`}>{dueStatusLabels[item.dueStatus]}</span>
-                        <small>{item.categoryName} · 复习 {item.reviewCount} 次</small>
+                        <span className={`review-due-badge ${isActiveRecallItem ? 'active-recall' : item.dueStatus}`}>
+                          {isActiveRecallItem ? '主动回忆' : dueStatusLabels[item.dueStatus]}
+                        </span>
+                        <small>
+                          {item.categoryName} · {isActiveRecallItem
+                            ? `遇见 ${state.encounterCount ?? ACTIVE_RECALL_ENCOUNTER_THRESHOLD} 次`
+                            : `复习 ${item.reviewCount} 次`}
+                        </small>
                       </div>
                       <strong>{item.title}</strong>
                       <small>{item.scheduleReason}</small>
@@ -484,6 +542,13 @@ export default function StudyPlan() {
       </div>
     </div>
   )
+}
+
+function isActiveRecallReviewState(progress: StudyProgress, questionId: number): boolean {
+  const state = progress.questionStates[questionId]
+  return state?.status === 'new'
+    && state.reviewCount === 0
+    && (state.encounterCount ?? 0) >= ACTIVE_RECALL_ENCOUNTER_THRESHOLD
 }
 
 async function copyMarkdown(markdown: string): Promise<boolean> {
@@ -522,6 +587,12 @@ function buildFirstRunCompletionFileName(targetRole: string): string {
 }
 
 function buildFirstRunCompletionMarkdown(report: FirstRunCompletionReport, targetRole: string): string {
+  const rehearsalPracticePath = buildDailyPracticePath(
+    report.rehearsalQueueIds,
+    12,
+    FIRST_RUN_REHEARSAL_SOURCE,
+  )
+
   return [
     `# ${targetRole} 首练成果战报`,
     '',
@@ -549,6 +620,7 @@ function buildFirstRunCompletionMarkdown(report: FirstRunCompletionReport, targe
     ]),
     '## 下一步',
     '- 抽查复述：从复述优先题开始，按低分到高分完成脱稿验证。',
+    `- 复述入口：${rehearsalPracticePath}`,
     '- 素材复用：把高分回答片段整理进简历项目或面试自我介绍。',
   ].join('\n')
 }

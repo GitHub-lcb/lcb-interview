@@ -64,7 +64,7 @@ describe('buildFirstRunLaunchpad', () => {
     expect(model.mode).toBe('resume-draft')
     expect(model.title).toBe('继续未提交回答')
     expect(model.primaryAction.label).toBe('恢复 2 份回答草稿')
-    expect(model.primaryAction.to).toBe('/practice?queue=2,5')
+    expect(model.primaryAction.to).toBe('/practice?queue=2,5&from=resume-draft')
     expect(model.recommendedQuestionIds).toEqual([2, 5])
     expect(model.metrics).toContainEqual({ label: '未提交', value: '2' })
     expect(model.previewItems).toEqual([
@@ -90,7 +90,7 @@ describe('buildFirstRunLaunchpad', () => {
     const model = buildFirstRunLaunchpad(progress, questions, { answerDrafts })
 
     expect(model.mode).toBe('resume-draft')
-    expect(model.primaryAction.to).toBe('/practice?queue=2')
+    expect(model.primaryAction.to).toBe('/practice?queue=2&from=resume-draft')
     expect(model.recommendedQuestionIds).toEqual([2])
     expect(model.metrics[0].value).toBe('1')
     expect(model.previewItems).toEqual([
@@ -194,7 +194,7 @@ describe('buildFirstRunLaunchpad', () => {
     expect(model.mode).toBe('continue-plan')
     expect(model.title).toBe('继续今日训练')
     expect(model.primaryAction.label).toBe('继续 2 题队列')
-    expect(model.primaryAction.to).toBe('/practice?queue=3,4')
+    expect(model.primaryAction.to).toBe('/practice?queue=3,4&from=daily-plan')
     expect(model.recommendedQuestionIds).toEqual([3, 4])
     expect(model.previewItems).toEqual([
       { id: 3, title: 'Question 3', meta: 'MySQL · HARD' },
@@ -224,7 +224,7 @@ describe('buildFirstRunLaunchpad', () => {
     const model = buildFirstRunLaunchpad(progress, [])
 
     expect(model.mode).toBe('continue-plan')
-    expect(model.primaryAction.to).toBe('/practice?queue=10')
+    expect(model.primaryAction.to).toBe('/practice?queue=10&from=daily-plan')
     expect(model.recommendedQuestionIds).toEqual([10])
     expect(model.previewItems).toEqual([
       { id: 10, title: 'Question 10', meta: 'Java · MEDIUM' },
@@ -241,7 +241,7 @@ describe('buildFirstRunLaunchpad', () => {
     expect(model.mode).toBe('continue-plan')
     expect(model.title).toBe('继续今日训练')
     expect(model.primaryAction.label).toBe('继续 1 题队列')
-    expect(model.primaryAction.to).toBe('/practice?queue=2')
+    expect(model.primaryAction.to).toBe('/practice?queue=2&from=daily-plan')
     expect(model.recommendedQuestionIds).toEqual([2])
     expect(model.previewItems).toEqual([
       { id: 2, title: 'Question 2', meta: 'Redis · MEDIUM' },
@@ -304,7 +304,7 @@ describe('buildFirstRunLaunchpad', () => {
     const model = buildFirstRunLaunchpad(progress, questions)
 
     expect(model.mode).toBe('continue-plan')
-    expect(model.primaryAction.to).toBe('/practice?queue=5')
+    expect(model.primaryAction.to).toBe('/practice?queue=5&from=daily-plan')
     expect(model.recommendedQuestionIds).toEqual([5])
   })
 
@@ -319,7 +319,18 @@ describe('buildFirstRunLaunchpad', () => {
     expect(model.mode).toBe('repair')
     expect(model.title).toBe('先修复最影响面试的薄弱题')
     expect(model.primaryAction.label).toBe('修复 2 道风险题')
-    expect(model.primaryAction.to).toBe('/practice?queue=2,5')
+    expect(model.primaryAction.to).toBe('/practice?queue=2,5&from=first-run-repair')
     expect(model.recommendedQuestionIds).toEqual([2, 5])
+  })
+
+  it('keeps homepage weak repair scoped as a first-run repair session', () => {
+    let progress: StudyProgress = createDefaultProgress('2026-06-20T00:00:00.000Z')
+    progress = rememberQuestions(progress, questions, '2026-06-20T00:01:00.000Z')
+    progress = updateQuestionStatus(progress, 2, 'weak', '2026-06-20T00:02:00.000Z')
+
+    const model = buildFirstRunLaunchpad(progress, questions)
+
+    expect(model.mode).toBe('repair')
+    expect(model.primaryAction.to).toBe('/practice?queue=2&from=first-run-repair')
   })
 })

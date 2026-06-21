@@ -209,6 +209,85 @@ describe('QuestionDetail', () => {
     expect(within(scriptPanel).getByRole('button', { name: /开启盲练/ })).toBeInTheDocument()
   })
 
+  it('summarizes the latest mock interview result as the next detail-page training step', async () => {
+    window.localStorage.setItem(STUDY_PROGRESS_STORAGE_KEY, JSON.stringify({
+      ...createDefaultProgress('2026-06-20T00:00:00.000Z'),
+      interviewAttempts: {
+        101: [
+          {
+            questionId: 101,
+            answer: '结论：序列化用于对象传输。',
+            createdAt: '2026-06-20T08:00:00.000Z',
+            feedback: {
+              score: 52,
+              level: 'needs-work',
+              source: 'LOCAL_RULE_BASED',
+              criteria: [
+                { key: 'coverage', label: '知识覆盖', score: 62, summary: '覆盖一般' },
+                { key: 'structure', label: '表达结构', score: 38, summary: '结构不足' },
+                { key: 'specificity', label: '场景细节', score: 55, summary: '场景不足' },
+                { key: 'risk', label: '边界风险', score: 58, summary: '风险不足' },
+              ],
+              advice: [],
+              followUps: [],
+            },
+          },
+        ],
+      },
+    }))
+
+    render(
+      <MemoryRouter initialEntries={['/question/101']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/question/:id" element={<QuestionDetail />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    const practiceMemory = await screen.findByLabelText('本题练习记录')
+
+    expect(within(practiceMemory).getByText('最近模拟 52 分')).toBeInTheDocument()
+    expect(within(practiceMemory).getByText('最低项：表达结构')).toBeInTheDocument()
+    expect(within(practiceMemory).getByText('先校准 60 秒口径，再复练这题。')).toBeInTheDocument()
+  })
+
+  it('records and displays the personal encounter count when opening a question detail', async () => {
+    window.localStorage.setItem(STUDY_PROGRESS_STORAGE_KEY, JSON.stringify({
+      ...createDefaultProgress('2026-06-20T00:00:00.000Z'),
+      questionStates: {
+        101: {
+          status: 'learning',
+          addedToPlan: true,
+          reviewCount: 1,
+          encounterCount: 2,
+          lastEncounteredAt: '2026-06-20T08:00:00.000Z',
+        },
+      },
+      dailyPlan: [101],
+    }))
+
+    render(
+      <MemoryRouter initialEntries={['/question/101']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/question/:id" element={<QuestionDetail />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    const encounter = await screen.findByLabelText('本题遇见次数')
+
+    expect(encounter).toHaveTextContent('第 3 次遇见')
+    expect(encounter).toHaveTextContent('结合上次标记和模拟分数继续巩固。')
+
+    const stored = JSON.parse(window.localStorage.getItem(STUDY_PROGRESS_STORAGE_KEY) || '{}')
+    expect(stored.questionStates[101]).toMatchObject({
+      status: 'learning',
+      addedToPlan: true,
+      reviewCount: 1,
+      encounterCount: 3,
+    })
+  })
+
   it('reads the 60 second interview answer script aloud when speech is available', async () => {
     const user = userEvent.setup()
     const cancel = vi.fn()
@@ -395,5 +474,23 @@ describe('QuestionDetail', () => {
     await user.click(within(acceptance).getByRole('button', { name: /进入模拟面试/ }))
 
     expect(screen.getByLabelText('模拟面试页面')).toHaveTextContent('模拟面试页面 ?question=101&from=script')
+  })
+
+  it('starts detail-page calibration practice with an explicit handoff source', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter initialEntries={['/question/101']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/question/:id" element={<QuestionDetail />} />
+          <Route path="/practice" element={<PracticeLocationProbe />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    await screen.findByRole('heading', { name: 'Java 中的序列化是什么？' })
+    await user.click(screen.getByRole('button', { name: /模拟面试/ }))
+
+    expect(screen.getByLabelText('模拟面试页面')).toHaveTextContent('模拟面试页面 ?question=101&from=question-detail')
   })
 })

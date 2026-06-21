@@ -3,8 +3,14 @@ import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
+import type { StudyProgress } from '../../types'
+import { createDefaultProgress, STUDY_PROGRESS_STORAGE_KEY } from '../../utils/studyProgress'
 import { getCategories } from '../../api/category'
 import QuestionBank from './index'
+
+const { navigate } = vi.hoisted(() => ({
+  navigate: vi.fn(),
+}))
 
 const fixtures = vi.hoisted(() => ({
   categories: [
@@ -18,12 +24,33 @@ const fixtures = vi.hoisted(() => ({
   ],
 }))
 
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  return {
+    ...actual,
+    useNavigate: () => navigate,
+  }
+})
+
 vi.mock('../../api/category', () => ({
   getCategories: vi.fn().mockResolvedValue(fixtures.categories),
 }))
 
+function setProgress(progress: StudyProgress) {
+  window.localStorage.setItem(STUDY_PROGRESS_STORAGE_KEY, JSON.stringify(progress))
+}
+
+function heroPrimaryButton(): HTMLButtonElement {
+  const button = document.querySelector('.bank-hero-actions .ant-btn-primary')
+  if (!(button instanceof HTMLButtonElement)) {
+    throw new Error('Question bank primary action was not rendered')
+  }
+  return button
+}
+
 describe('QuestionBank', () => {
   beforeEach(() => {
+    navigate.mockReset()
     window.localStorage.clear()
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
@@ -97,6 +124,44 @@ describe('QuestionBank', () => {
 
     expect(await screen.findByRole('button', { name: '继续训练' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '学习计划' })).toBeInTheDocument()
+  })
+
+  it('continues from the unfinished daily plan queue', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-21T00:00:00.000Z'),
+      dailyPlan: [1, 2, 3],
+      questionStates: {
+        1: { status: 'mastered', addedToPlan: true, reviewCount: 2 },
+        2: { status: 'learning', addedToPlan: true, reviewCount: 1 },
+        3: { status: 'new', addedToPlan: true, reviewCount: 0 },
+      },
+    })
+
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <QuestionBank />
+      </MemoryRouter>,
+    )
+
+    await waitFor(() => expect(getCategories).toHaveBeenCalledTimes(1))
+    await userEvent.click(heroPrimaryButton())
+
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=2,3&from=daily-plan')
+  })
+
+  it('falls back to the general practice queue without unfinished plan items', async () => {
+    setProgress(createDefaultProgress('2026-06-21T00:00:00.000Z'))
+
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <QuestionBank />
+      </MemoryRouter>,
+    )
+
+    await waitFor(() => expect(getCategories).toHaveBeenCalledTimes(1))
+    await userEvent.click(heroPrimaryButton())
+
+    expect(navigate).toHaveBeenCalledWith('/practice')
   })
 
   it('keeps decorative card arrows out of category link names', async () => {

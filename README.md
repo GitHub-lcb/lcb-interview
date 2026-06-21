@@ -86,11 +86,11 @@ lcb-interview/
 | `ADMIN_TOKEN` | `dev-admin-token-change-me` | 管理后台访问 Token |
 | `AI_INTERVIEW_ENABLED` | `true` | 是否启用远程 AI 面试评分 |
 | `AI_INTERVIEW_TIMEOUT_MS` | `8000` | AI 面试评分超时时间 |
-| `AI_OPENCODE_API_KEY` | 见本地配置 | AI 服务 API Key |
+| `AI_OPENCODE_API_KEY` | 空 | AI 服务 API Key；不配置时远程 AI 能力不可用 |
 | `AI_DEEPSEEK_MODEL` | `glm-5.2` | AI 模型名 |
 | `AI_DEEPSEEK_URL` | OpenAI 兼容接口地址 | AI 服务地址 |
 
-生产环境必须通过环境变量覆盖 `ADMIN_TOKEN` 和 `AI_OPENCODE_API_KEY`，不要依赖开发默认值。
+生产环境必须通过环境变量覆盖 `ADMIN_TOKEN` 和 `AI_OPENCODE_API_KEY`；AI Key 不提供源码默认值。
 
 ## 快速启动
 

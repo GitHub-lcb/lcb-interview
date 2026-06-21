@@ -81,6 +81,50 @@ describe('buildStudyPaceCoach', () => {
     expect(coach.reviewDueCount).toBeGreaterThan(0)
   })
 
+  it('prioritizes active recall when repeated new questions are due', () => {
+    const progress = emptyProgress()
+    for (let id = 1; id <= 6; id += 1) {
+      addQuestion(progress, id, 'mastered')
+    }
+    progress.questionStates[20] = {
+      status: 'new',
+      addedToPlan: false,
+      reviewCount: 0,
+      encounterCount: 2,
+      lastEncounteredAt: '2026-06-16T20:00:00.000Z',
+    }
+    progress.questionSnapshots[20] = {
+      id: 20,
+      title: 'ThreadLocal 内存泄漏怎么排查？',
+      difficulty: 'HARD',
+      categoryName: 'Java 并发',
+      tags: ['ThreadLocal'],
+      viewCount: 220,
+    }
+    progress.dailyPlan = [1, 2, 3, 4, 5, 6]
+    progress.interviewAttempts[1] = [interviewAttempt(1)]
+
+    const coach = buildStudyPaceCoach(progress, NOW)
+    const markdown = buildStudyPaceMarkdown(progress, NOW)
+
+    expect(coach.level).toBe('behind')
+    expect(coach.activeRecallCount).toBe(1)
+    expect(coach.primaryAction).toMatchObject({
+      key: 'activeRecall',
+      label: '先做主动回忆',
+      to: '/study',
+    })
+    expect(coach.metrics).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        key: 'activeRecall',
+        label: '主动回忆',
+        value: '1 道',
+      }),
+    ]))
+    expect(markdown).toContain('- 主动回忆：1 道')
+    expect(markdown).toContain('先做主动回忆')
+  })
+
   it('asks users to fill the daily plan when planned count is below target', () => {
     const progress = emptyProgress()
     addQuestion(progress, 1)
@@ -120,7 +164,7 @@ describe('buildStudyPaceCoach', () => {
 
     expect(coach.level).toBe('balanced')
     expect(coach.primaryAction.key).toBe('practice')
-    expect(coach.primaryAction.to).toBe('/practice?queue=4,5,6')
+    expect(coach.primaryAction.to).toBe('/practice?queue=4,5,6&from=pace-coach')
   })
 
   it('routes completed daily plans to study closeout instead of another practice queue', () => {

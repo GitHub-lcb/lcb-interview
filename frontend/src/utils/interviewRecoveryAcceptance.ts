@@ -7,8 +7,11 @@ import type {
   InterviewRecoveryAcceptance,
   StudyProgress,
 } from '../types'
+import { appendPracticeHandoffSource } from './practiceRoute'
 
 const PASSING_SCORE = 70
+const INTERVIEW_RETROSPECTIVE_SOURCE = 'interview-retrospective'
+const PRACTICE_RECOVERY_TARGET_PATTERN = /[?&](queue|question)=/
 
 export function buildInterviewRecoveryAcceptance(
   progress: StudyProgress,
@@ -23,7 +26,7 @@ export function buildInterviewRecoveryAcceptance(
       [],
       [],
       [],
-      ledger.primaryAction,
+      actionWithInterviewRetrospectiveSource(ledger.primaryAction),
     )
   }
 
@@ -37,7 +40,7 @@ export function buildInterviewRecoveryAcceptance(
       primaryItem.affectedQuestionIds,
       [],
       [],
-      ledger.primaryAction,
+      actionWithInterviewRetrospectiveSource(ledger.primaryAction),
     )
   }
 
@@ -80,7 +83,7 @@ export function buildInterviewRecoveryAcceptance(
     primaryAction: {
       label: status === 'passed' ? '继续加压' : '继续复测',
       description: primaryItem.summary,
-      to: primaryItem.to || '/practice',
+      to: withInterviewRetrospectiveSource(primaryItem.to),
     },
   }
 }
@@ -170,4 +173,22 @@ function buildStaticReport(
     pendingQuestionIds,
     primaryAction,
   }
+}
+
+function actionWithInterviewRetrospectiveSource(
+  primaryAction: InterviewMistakeLedgerAction,
+): InterviewMistakeLedgerAction {
+  return {
+    ...primaryAction,
+    to: withInterviewRetrospectiveSource(primaryAction.to),
+  }
+}
+
+function withInterviewRetrospectiveSource(to?: string): string {
+  const target = to || '/practice'
+  if (!target.startsWith('/practice') || !PRACTICE_RECOVERY_TARGET_PATTERN.test(target)) {
+    return target
+  }
+
+  return appendPracticeHandoffSource(target, INTERVIEW_RETROSPECTIVE_SOURCE, { replace: false })
 }

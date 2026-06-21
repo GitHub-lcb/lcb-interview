@@ -32,6 +32,7 @@ import {
   readPracticeAnswerDraft,
   writePracticeAnswerDraft,
 } from '../../utils/practiceAnswerDraftStore'
+import { buildExperiencePressureQueue } from '../../utils/experiencePlaybook'
 import { buildPracticeSessionRepairDraft } from '../../utils/practiceSessionReport'
 import { buildScopedPracticeQueue, describeInterviewStatusSync, summarizeProgress } from '../../utils/studyProgress'
 
@@ -40,6 +41,7 @@ const sourceLabels: Record<PracticeQueueItem['source'], string> = {
   review: '复习优先',
   plan: '今日计划',
   page: '当前筛选',
+  'active-recall': '主动回忆',
   new: '新题训练',
 }
 
@@ -56,7 +58,7 @@ const feedbackSourceLabels: Record<NonNullable<InterviewFeedback['source']>, str
 }
 
 const scopedQuestionDetailCache = new Map<number, Promise<Question>>()
-const FIRST_RUN_SCOPED_BASELINE_STORAGE_PREFIX = 'lcb-first-run-scoped-baseline:'
+const SCOPED_SESSION_BASELINE_STORAGE_PREFIX = 'lcb-first-run-scoped-baseline:'
 
 function getScopedQuestionById(questionId: number): Promise<Question> {
   const cached = scopedQuestionDetailCache.get(questionId)
@@ -117,9 +119,9 @@ function resolveNextPracticeIndex(
   return (currentIndex + 1) % queue.length
 }
 
-function readFirstRunScopedAttemptBaseline(sessionKey: string, questionIds: number[]): Map<number, number> | null {
+function readScopedSessionAttemptBaseline(sessionKey: string, questionIds: number[]): Map<number, number> | null {
   try {
-    const raw = window.sessionStorage.getItem(`${FIRST_RUN_SCOPED_BASELINE_STORAGE_PREFIX}${sessionKey}`)
+    const raw = window.sessionStorage.getItem(`${SCOPED_SESSION_BASELINE_STORAGE_PREFIX}${sessionKey}`)
     if (!raw) {
       return null
     }
@@ -136,10 +138,10 @@ function readFirstRunScopedAttemptBaseline(sessionKey: string, questionIds: numb
   }
 }
 
-function writeFirstRunScopedAttemptBaseline(sessionKey: string, counts: Map<number, number>): void {
+function writeScopedSessionAttemptBaseline(sessionKey: string, counts: Map<number, number>): void {
   try {
     window.sessionStorage.setItem(
-      `${FIRST_RUN_SCOPED_BASELINE_STORAGE_PREFIX}${sessionKey}`,
+      `${SCOPED_SESSION_BASELINE_STORAGE_PREFIX}${sessionKey}`,
       JSON.stringify({ counts: Object.fromEntries(counts) }),
     )
   } catch {
@@ -174,7 +176,8 @@ export default function Practice() {
   const latestQueueParamRef = useRef<string | null>(null)
   const pendingSessionRepairDraftRef = useRef<{ questionId: number; draft: string } | null>(null)
   const answerPanelRef = useRef<HTMLElement | null>(null)
-  const firstRunSessionAttemptBaselineRef = useRef<{ key: string; counts: Map<number, number> }>({
+  const activeRecallSessionRef = useRef<{ key: string; value: boolean }>({ key: '', value: false })
+  const scopedSessionAttemptBaselineRef = useRef<{ key: string; counts: Map<number, number> }>({
     key: '',
     counts: new Map(),
   })
@@ -201,16 +204,57 @@ export default function Practice() {
   const isFirstRunRepairHandoffSource = practiceHandoffSource === 'first-run-repair' && scopedQuestionIds.length > 0
   const isFirstRunRehearsalHandoffSource = practiceHandoffSource === 'first-run-rehearsal'
     && scopedQuestionIds.length > 0
+  const isReviewDueHandoffSource = practiceHandoffSource === 'review-due' && scopedQuestionIds.length > 0
+  const isDailyPlanHandoffSource = practiceHandoffSource === 'daily-plan' && scopedQuestionIds.length > 0
+  const isResumeDraftHandoffSource = practiceHandoffSource === 'resume-draft' && scopedQuestionIds.length > 0
+  const isAbilityGapHandoffSource = practiceHandoffSource === 'ability-gap' && scopedQuestionIds.length > 0
+  const isExperiencePlaybookHandoffSource = practiceHandoffSource === 'experience-playbook' && scopedQuestionIds.length > 0
+  const isNextTrainingHandoffSource = practiceHandoffSource === 'next-training' && scopedQuestionIds.length > 0
+  const isInterviewRetrospectiveHandoffSource = practiceHandoffSource === 'interview-retrospective'
+    && scopedQuestionIds.length > 0
+  const isInterviewBriefHandoffSource = practiceHandoffSource === 'interview-brief' && scopedQuestionIds.length > 0
+  const isPaceCoachHandoffSource = practiceHandoffSource === 'pace-coach' && scopedQuestionIds.length > 0
+  const isFilteredListHandoffSource = practiceHandoffSource === 'filtered-list' && scopedQuestionIds.length > 0
+  const activeRecallScopedCount = useMemo(() => {
+    if (!isReviewDueHandoffSource) {
+      return 0
+    }
+    return scopedQuestionIds.filter(questionId => {
+      const state = progress.questionStates[questionId]
+      return state?.status === 'new' && state.reviewCount === 0 && (state.encounterCount ?? 0) >= 2
+    }).length
+  }, [isReviewDueHandoffSource, progress.questionStates, scopedQuestionIds])
+  const isActiveRecallHandoffCandidate = isReviewDueHandoffSource
+    && activeRecallScopedCount > 0
+    && activeRecallScopedCount === scopedQuestionIds.length
   const isFirstRunScopedHandoffSource = isFirstRunHandoffSource
     || isFirstRunRepairHandoffSource
     || isFirstRunRehearsalHandoffSource
-  const isFirstRunBaselineHandoffSource = isFirstRunRepairHandoffSource || isFirstRunRehearsalHandoffSource
-  const firstRunSessionKey = isFirstRunBaselineHandoffSource
+  const isScopedSessionBaselineHandoffSource = isFirstRunRepairHandoffSource
+    || isFirstRunRehearsalHandoffSource
+    || isReviewDueHandoffSource
+    || isDailyPlanHandoffSource
+    || isResumeDraftHandoffSource
+    || isAbilityGapHandoffSource
+    || isExperiencePlaybookHandoffSource
+    || isNextTrainingHandoffSource
+    || isInterviewRetrospectiveHandoffSource
+    || isInterviewBriefHandoffSource
+    || isPaceCoachHandoffSource
+    || isFilteredListHandoffSource
+  const scopedSessionKey = isScopedSessionBaselineHandoffSource
     ? `${practiceHandoffSource}:${scopedQuestionIds.join(',')}`
     : ''
-  if (firstRunSessionAttemptBaselineRef.current.key !== firstRunSessionKey) {
-    const storedBaseline = firstRunSessionKey
-      ? readFirstRunScopedAttemptBaseline(firstRunSessionKey, scopedQuestionIds)
+  if (activeRecallSessionRef.current.key !== scopedSessionKey) {
+    activeRecallSessionRef.current = {
+      key: scopedSessionKey,
+      value: isActiveRecallHandoffCandidate,
+    }
+  }
+  const isActiveRecallHandoffSource = isReviewDueHandoffSource && activeRecallSessionRef.current.value
+  if (scopedSessionAttemptBaselineRef.current.key !== scopedSessionKey) {
+    const storedBaseline = scopedSessionKey
+      ? readScopedSessionAttemptBaseline(scopedSessionKey, scopedQuestionIds)
       : null
     const counts = storedBaseline ?? new Map(
       scopedQuestionIds.map(questionId => [
@@ -218,15 +262,29 @@ export default function Practice() {
         progress.interviewAttempts[questionId]?.length ?? 0,
       ]),
     )
-    firstRunSessionAttemptBaselineRef.current = {
-      key: firstRunSessionKey,
+    scopedSessionAttemptBaselineRef.current = {
+      key: scopedSessionKey,
       counts,
     }
-    if (firstRunSessionKey && !storedBaseline) {
-      writeFirstRunScopedAttemptBaseline(firstRunSessionKey, counts)
+    if (scopedSessionKey && !storedBaseline) {
+      writeScopedSessionAttemptBaseline(scopedSessionKey, counts)
     }
   }
-  const practiceQueueLimit = isFirstRunScopedHandoffSource ? scopedQuestionIds.length : 12
+  const practiceQueueLimit = (
+    isFirstRunScopedHandoffSource
+    || isReviewDueHandoffSource
+    || isDailyPlanHandoffSource
+    || isResumeDraftHandoffSource
+    || isAbilityGapHandoffSource
+    || isExperiencePlaybookHandoffSource
+    || isNextTrainingHandoffSource
+    || isInterviewRetrospectiveHandoffSource
+    || isInterviewBriefHandoffSource
+    || isPaceCoachHandoffSource
+    || isFilteredListHandoffSource
+  )
+    ? scopedQuestionIds.length
+    : 12
   const candidateQuestions = useMemo(() => {
     const candidates = [
       ...(focusedQuestion ? [focusedQuestion] : []),
@@ -406,10 +464,10 @@ export default function Practice() {
   const currentQuestionId = current?.id
   const hasCurrentFeedback = feedback !== null && currentQuestionId !== undefined
   const answeredQuestionIds = useMemo(() => {
-    if (isFirstRunBaselineHandoffSource) {
+    if (isScopedSessionBaselineHandoffSource) {
       const questionIds = new Set(
         scopedQuestionIds.filter(questionId => {
-          const baselineCount = firstRunSessionAttemptBaselineRef.current.counts.get(questionId) ?? 0
+          const baselineCount = scopedSessionAttemptBaselineRef.current.counts.get(questionId) ?? 0
           return (progress.interviewAttempts[questionId]?.length ?? 0) > baselineCount
         }),
       )
@@ -431,7 +489,7 @@ export default function Practice() {
   }, [
     currentQuestionId,
     hasCurrentFeedback,
-    isFirstRunBaselineHandoffSource,
+    isScopedSessionBaselineHandoffSource,
     progress.interviewAttempts,
     scopedQuestionIds,
   ])
@@ -442,16 +500,75 @@ export default function Practice() {
   const feedbackStatusSync = feedback ? describeInterviewStatusSync(feedback.score) : null
   const isFocusedQuestionPractice = focusQuestionId === currentQuestionId
   const isScriptHandoffPractice = isFocusedQuestionPractice && practiceHandoffSource === 'script'
+  const isQuestionDetailHandoffPractice = isFocusedQuestionPractice && practiceHandoffSource === 'question-detail'
   const isFirstRunLaunchpadPractice = !focusQuestionId && isFirstRunHandoffSource
   const isFirstRunRepairPractice = !focusQuestionId && isFirstRunRepairHandoffSource
   const isFirstRunRehearsalPractice = !focusQuestionId && isFirstRunRehearsalHandoffSource
+  const isDailyPlanPractice = !focusQuestionId && isDailyPlanHandoffSource
+  const isResumeDraftPractice = !focusQuestionId && isResumeDraftHandoffSource
+  const isAbilityGapPractice = !focusQuestionId && isAbilityGapHandoffSource
+  const isExperiencePlaybookPractice = !focusQuestionId && isExperiencePlaybookHandoffSource
+  const isNextTrainingPractice = !focusQuestionId && isNextTrainingHandoffSource
+  const isInterviewRetrospectivePractice = !focusQuestionId && isInterviewRetrospectiveHandoffSource
+  const isInterviewBriefPractice = !focusQuestionId && isInterviewBriefHandoffSource
+  const isPaceCoachPractice = !focusQuestionId && isPaceCoachHandoffSource
+  const isFilteredListPractice = !focusQuestionId && isFilteredListHandoffSource
+  const experiencePressureQueue = useMemo(
+    () => isExperiencePlaybookPractice ? buildExperiencePressureQueue(progress) : null,
+    [isExperiencePlaybookPractice, progress],
+  )
+  const currentExperiencePressureItem = current && experiencePressureQueue
+    ? experiencePressureQueue.items.find(item => item.questionId === current.id)
+    : undefined
   const currentQuestionDetailPath = current
     ? `/question/${current.id}${isScriptHandoffPractice ? '?from=practice-calibration#answer-script' : ''}`
     : ''
   const scopedQueueSourceLabel = isFirstRunRepairPractice
     ? '首练补弱'
-    : isFirstRunRehearsalPractice ? '首练复述' : isFirstRunLaunchpadPractice ? '首练队列' : undefined
-  const currentSourceLabel = current ? scopedQueueSourceLabel ?? sourceLabels[current.source] : ''
+    : isFirstRunRehearsalPractice
+      ? '首练复述'
+      : isFirstRunLaunchpadPractice
+        ? '首练队列'
+          : isReviewDueHandoffSource
+            ? isActiveRecallHandoffSource ? '主动回忆' : '到期复习'
+          : isDailyPlanPractice
+            ? '今日计划'
+          : isResumeDraftPractice
+            ? '草稿恢复'
+          : isAbilityGapPractice
+            ? '能力短板'
+            : isExperiencePlaybookPractice
+              ? '真实面试'
+              : isNextTrainingPractice
+                ? '下一轮训练'
+                : isInterviewRetrospectivePractice
+                  ? '面试复盘'
+                  : isInterviewBriefPractice
+                    ? '面试简报'
+                    : isPaceCoachPractice
+                      ? '配速训练'
+                    : isFilteredListPractice ? '当前筛选' : undefined
+  const focusedQuestionSourceLabel = isScriptHandoffPractice
+    ? '口径盲练'
+    : isQuestionDetailHandoffPractice
+      ? '题目详情校准'
+      : undefined
+  const currentSourceLabel = current ? scopedQueueSourceLabel ?? focusedQuestionSourceLabel ?? sourceLabels[current.source] : ''
+  const sessionReportContext = scopedQueueSourceLabel
+    ? {
+      sourceLabel: isExperiencePlaybookPractice ? '真实面试押题' : scopedQueueSourceLabel,
+      queuePath: `/practice?queue=${scopedQuestionIds.join(',')}&from=${practiceHandoffSource}`,
+      pressureItems: isExperiencePlaybookPractice
+        ? experiencePressureQueue?.items.map(item => ({
+          questionId: item.questionId,
+          signal: item.signal,
+          detail: item.detail,
+          interviewerProbe: item.interviewerProbe,
+          passCriteria: item.passCriteria,
+        }))
+        : undefined,
+    }
+    : undefined
   const hasSavedDraft = !feedback && answerDraft.trim().length > 0
 
   const updateAnswerDraft = useCallback((nextDraft: string) => {
@@ -492,17 +609,35 @@ export default function Practice() {
   useEffect(() => {
     if (
       isScriptHandoffPractice
+      || isQuestionDetailHandoffPractice
       || isFirstRunLaunchpadPractice
       || isFirstRunRepairPractice
       || isFirstRunRehearsalPractice
+      || isDailyPlanPractice
+      || isResumeDraftPractice
+      || isAbilityGapPractice
+      || isExperiencePlaybookPractice
+      || isNextTrainingPractice
+      || isInterviewRetrospectivePractice
+      || isInterviewBriefPractice
+      || isFilteredListPractice
     ) {
       focusAnswerEditor()
     }
   }, [
     focusAnswerEditor,
+    isAbilityGapPractice,
+    isDailyPlanPractice,
+    isExperiencePlaybookPractice,
+    isFilteredListPractice,
     isFirstRunLaunchpadPractice,
     isFirstRunRehearsalPractice,
     isFirstRunRepairPractice,
+    isInterviewBriefPractice,
+    isInterviewRetrospectivePractice,
+    isNextTrainingPractice,
+    isQuestionDetailHandoffPractice,
+    isResumeDraftPractice,
     isScriptHandoffPractice,
   ])
 
@@ -512,9 +647,23 @@ export default function Practice() {
     })
   }
 
-  const firstRunProgress = (() => {
+  const scopedQueueProgress = (() => {
     if (
-      (!isFirstRunLaunchpadPractice && !isFirstRunRepairPractice && !isFirstRunRehearsalPractice)
+      (
+        !isFirstRunLaunchpadPractice
+        && !isFirstRunRepairPractice
+        && !isFirstRunRehearsalPractice
+        && !isReviewDueHandoffSource
+        && !isDailyPlanPractice
+        && !isResumeDraftPractice
+        && !isAbilityGapPractice
+        && !isExperiencePlaybookPractice
+                && !isNextTrainingPractice
+                && !isInterviewRetrospectivePractice
+                && !isInterviewBriefPractice
+                && !isPaceCoachPractice
+                && !isFilteredListPractice
+      )
       || queue.length === 0
     ) {
       return undefined
@@ -524,7 +673,27 @@ export default function Practice() {
     const nextQuestion = queue[nextIndex]
     const variant = isFirstRunRepairPractice
       ? 'repair' as const
-      : isFirstRunRehearsalPractice ? 'rehearsal' as const : 'launchpad' as const
+      : isFirstRunRehearsalPractice
+        ? 'rehearsal' as const
+        : isReviewDueHandoffSource
+          ? isActiveRecallHandoffSource ? 'active-recall' as const : 'review-due' as const
+          : isDailyPlanPractice
+            ? 'daily-plan' as const
+          : isResumeDraftPractice
+            ? 'resume-draft' as const
+          : isAbilityGapPractice
+            ? 'ability-gap' as const
+            : isExperiencePlaybookPractice
+              ? 'experience-playbook' as const
+              : isNextTrainingPractice
+                ? 'next-training' as const
+                : isInterviewRetrospectivePractice
+                  ? 'interview-retrospective' as const
+                  : isInterviewBriefPractice
+                    ? 'interview-brief' as const
+                    : isPaceCoachPractice
+                      ? 'pace-coach' as const
+                    : isFilteredListPractice ? 'filtered-list' as const : 'launchpad' as const
     return {
       answeredCount: answeredInQueue,
       totalCount: queue.length,
@@ -715,6 +884,191 @@ export default function Practice() {
               </Button>
             </div>
           ) : null}
+          {isReviewDueHandoffSource ? (
+            <div
+              className="practice-question-focus-context"
+              aria-label={isActiveRecallHandoffSource ? '主动回忆队列上下文' : '到期复习队列上下文'}
+            >
+              <div>
+                <span>{isActiveRecallHandoffSource ? '主动回忆队列' : '到期复习队列'}</span>
+                <strong>
+                  {isActiveRecallHandoffSource
+                    ? `先脱稿回忆这 ${queue.length} 道多次遇见题`
+                    : `先补回这 ${queue.length} 道到期题`}
+                </strong>
+                <small>
+                  {isActiveRecallHandoffSource
+                    ? '这轮训练来自多次遇见题，还没完成复习前先做一次无提示主动回忆。'
+                    : '这轮训练来自智能复习排期，优先处理已经逾期或今天到期的记忆窗口。'}
+                </small>
+              </div>
+              <Button
+                size="small"
+                icon={<BookOutlined />}
+                onClick={() => navigate('/study')}
+              >
+                回到复习计划
+              </Button>
+            </div>
+          ) : null}
+          {isDailyPlanPractice ? (
+            <div className="practice-question-focus-context" aria-label="今日计划队列上下文">
+              <div>
+                <span>今日计划队列</span>
+                <strong>先完成这 {queue.length} 道今日计划题</strong>
+                <small>来自学习计划页，按今天已经排好的题单训练，评分后再决定补弱或收口。</small>
+              </div>
+              <Button
+                size="small"
+                icon={<BookOutlined />}
+                onClick={() => navigate('/study')}
+              >
+                回到学习计划
+              </Button>
+            </div>
+          ) : null}
+          {isFilteredListPractice ? (
+            <div className="practice-question-focus-context" aria-label="当前筛选题单上下文">
+              <div>
+                <span>当前筛选题单</span>
+                <strong>先完成这 {queue.length} 道筛选题</strong>
+                <small>来自题库或搜索结果页，按你刚筛出的题单完成一轮评分，避免只浏览不训练。</small>
+              </div>
+              <Button
+                size="small"
+                icon={<BookOutlined />}
+                onClick={() => navigate('/banks')}
+              >
+                回到题库
+              </Button>
+            </div>
+          ) : null}
+          {isInterviewBriefPractice ? (
+            <div className="practice-question-focus-context" aria-label="面试简报热身队列上下文">
+              <div>
+                <span>面试简报热身</span>
+                <strong>先完成这 {queue.length} 道面试前热身题</strong>
+                <small>来自面试前冲刺简报，先把可主动表达的高价值题讲一轮，再回到学习中心收口风险。</small>
+              </div>
+              <Button
+                size="small"
+                icon={<BookOutlined />}
+                onClick={() => navigate('/study')}
+              >
+                回到学习中心
+              </Button>
+            </div>
+          ) : null}
+          {isPaceCoachPractice ? (
+            <div className="practice-question-focus-context" aria-label="配速训练队列上下文">
+              <div>
+                <span>配速训练队列</span>
+                <strong>先收口这 {queue.length} 道今日配速题</strong>
+                <small>来自备考配速教练，按今日计划未完成题收口，避免节奏诊断停在建议层。</small>
+              </div>
+              <Button
+                size="small"
+                icon={<BookOutlined />}
+                onClick={() => navigate('/study')}
+              >
+                回到学习中心
+              </Button>
+            </div>
+          ) : null}
+          {isNextTrainingPractice ? (
+            <div className="practice-question-focus-context" aria-label="下一轮训练队列上下文">
+              <div>
+                <span>下一轮训练队列</span>
+                <strong>按系统排好的 {queue.length} 道风险题继续训练</strong>
+                <small>来自评分影响、薄弱题、学习中题和面试错因，先按队列补强，不再重新选题。</small>
+              </div>
+              <Button
+                size="small"
+                icon={<BookOutlined />}
+                onClick={() => navigate('/study')}
+              >
+                回到学习中心
+              </Button>
+            </div>
+          ) : null}
+          {isInterviewRetrospectivePractice ? (
+            <div className="practice-question-focus-context" aria-label="面试复盘队列上下文">
+              <div>
+                <span>面试复盘队列</span>
+                <strong>先重答这 {queue.length} 道低分面试题</strong>
+                <small>来自今日冲刺任务，按最近模拟评分里的薄弱题重练，先把表达补到可过线。</small>
+              </div>
+              <Button
+                size="small"
+                icon={<BookOutlined />}
+                onClick={() => navigate('/study')}
+              >
+                回到学习中心
+              </Button>
+            </div>
+          ) : null}
+          {isResumeDraftPractice ? (
+            <div className="practice-question-focus-context" aria-label="未提交回答恢复上下文">
+              <div>
+                <span>未提交回答恢复</span>
+                <strong>先补完这 {queue.length} 份未提交回答</strong>
+                <small>来自本地草稿恢复，优先把已经开始的回答提交评分，避免训练样本断档。</small>
+              </div>
+              <Button
+                size="small"
+                icon={<BookOutlined />}
+                onClick={() => navigate('/study')}
+              >
+                回到学习计划
+              </Button>
+            </div>
+          ) : null}
+          {isAbilityGapPractice ? (
+            <div className="practice-question-focus-context" aria-label="能力短板队列上下文">
+              <div>
+                <span>能力短板训练</span>
+                <strong>先突破这 {queue.length} 道短板题</strong>
+                <small>来自岗位能力地图和备考路线，把薄弱、学习中和未过线题集中成一轮闭环训练。</small>
+              </div>
+              <Button
+                size="small"
+                icon={<BookOutlined />}
+                onClick={() => navigate('/routes')}
+              >
+                回到路线图
+              </Button>
+            </div>
+          ) : null}
+          {isExperiencePlaybookPractice ? (
+            <div className="practice-question-focus-context" aria-label="真实面试押题队列上下文">
+              <div>
+                <span>真实面试押题</span>
+                <strong>先压测这 {queue.length} 道高压题</strong>
+                <small>来自面经场景和个人低分/薄弱轨迹，把容易被追问的题先放到一轮里拆解。</small>
+                {currentExperiencePressureItem ? (
+                  <div className="practice-pressure-reason" aria-label="本题押题理由">
+                    <span>{currentExperiencePressureItem.signal}</span>
+                    <small>{currentExperiencePressureItem.detail}</small>
+                  </div>
+                ) : null}
+                {currentExperiencePressureItem ? (
+                  <div className="practice-pressure-probe" aria-label="本题押题追问">
+                    <span>面试官追问</span>
+                    <small>{currentExperiencePressureItem.interviewerProbe}</small>
+                    <span>通过口径</span>
+                    <small>{currentExperiencePressureItem.passCriteria}</small>
+                  </div>
+                ) : null}
+              </div>
+              <Button
+                size="small"
+                icon={<BookOutlined />}
+                onClick={() => navigate('/experiences')}
+              >
+                回到面经场景
+              </Button>
+            </div>
+          ) : null}
           {isFirstRunRepairPractice ? (
             <div className="practice-question-focus-context" aria-label="首练补弱队列上下文">
               <div>
@@ -748,14 +1102,31 @@ export default function Practice() {
             </div>
           ) : null}
           {isFocusedQuestionPractice ? (
-            <div className="practice-question-focus-context" aria-label="同题模拟面试上下文">
+            <div
+              className="practice-question-focus-context"
+              aria-label={isQuestionDetailHandoffPractice ? '题目详情校准上下文' : '同题模拟面试上下文'}
+            >
               <div>
-                <span>{isScriptHandoffPractice ? '口径盲练完成' : '同题模拟'}</span>
-                <strong>{isScriptHandoffPractice ? '现在进入无提示模拟' : '先脱稿回答这道题'}</strong>
+                <span>
+                  {isScriptHandoffPractice
+                    ? '口径盲练完成'
+                    : isQuestionDetailHandoffPractice
+                      ? '题目详情校准'
+                      : '同题模拟'}
+                </span>
+                <strong>
+                  {isScriptHandoffPractice
+                    ? '现在进入无提示模拟'
+                    : isQuestionDetailHandoffPractice
+                      ? '把阅读理解转成可评分回答'
+                      : '先脱稿回答这道题'}
+                </strong>
                 <small>
                   {isScriptHandoffPractice
                     ? '刚完成 60 秒口径盲练，现在按面试节奏无提示作答。'
-                    : '刚从题目详情进入，先按当前题完成一轮无提示回答。'}
+                    : isQuestionDetailHandoffPractice
+                      ? '刚从题目详情进入，先把阅读理解转成一轮无提示回答。'
+                      : '刚从题目详情进入，先按当前题完成一轮无提示回答。'}
                 </small>
               </div>
               <Button
@@ -883,7 +1254,7 @@ export default function Practice() {
             <PracticePostScoreNextStepPanel
               queue={queue}
               progress={progress}
-              firstRunProgress={firstRunProgress}
+              scopedQueueProgress={scopedQueueProgress}
               onNavigate={navigate}
             />
             <PracticeFeedbackClosurePanel
@@ -985,6 +1356,7 @@ export default function Practice() {
         <PracticeSessionReportPanel
           queue={queue}
           progress={progress}
+          queueContext={sessionReportContext}
           onNavigate={navigate}
           onUseRepairAction={startSessionRepairAnswer}
         />

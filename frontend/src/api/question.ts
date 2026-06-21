@@ -37,6 +37,7 @@ export interface QuestionQuery {
   difficulty?: string
   keyword?: string
   tag?: number
+  sort?: 'latest' | 'hot' | 'relevance'
   page?: number
   size?: number
 }

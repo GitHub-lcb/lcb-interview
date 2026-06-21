@@ -12,13 +12,14 @@ import type {
 } from '../types'
 import { buildDailyPlanCompletion } from './dailyPlanCompletion'
 import { buildInterviewMistakeLedger } from './interviewMistakeLedger'
-import { buildDailyPracticePath } from './practiceRoute'
+import { appendPracticeHandoffSource, buildDailyPracticePath } from './practiceRoute'
 import { buildScheduledReviewQueue } from './reviewSchedule'
 import { getQuestionState } from './studyProgress'
 
 const DEFAULT_LIMIT = 8
 const REVIEW_SCAN_LIMIT = 30
 const MISTAKE_SCAN_LIMIT = 4
+const NEXT_TRAINING_SOURCE = 'next-training'
 
 interface RankedQueueItem extends NextTrainingQueueItem {
   order: number
@@ -128,7 +129,7 @@ function addScoreImpactItems(
       sourceLabel: '评分影响',
       reason: `${impact.score} 分，${impact.message}`,
       actionLabel: impact.actionLabel,
-      to: impact.to,
+      to: withNextTrainingSource(impact.to),
       priority: scoreImpactPriority(impact.status),
       score: impact.score,
     })
@@ -144,6 +145,7 @@ function addReviewDebtItems(
     .filter(item => item.dueStatus !== 'upcoming')
 
   for (const item of reviewDebts) {
+    const isActiveRecall = isActiveRecallReview(item)
     pushQueueItem(builder, {
       id: `review-debt-${item.id}`,
       questionId: item.id,
@@ -151,14 +153,18 @@ function addReviewDebtItems(
       categoryName: item.categoryName,
       status: item.status,
       source: 'review-debt',
-      sourceLabel: '复习债',
+      sourceLabel: isActiveRecall ? '主动回忆' : '复习债',
       reason: item.scheduleReason,
-      actionLabel: '复盘到期题',
-      to: buildDailyPracticePath([item.id]),
+      actionLabel: isActiveRecall ? '做一次主动回忆' : '复盘到期题',
+      to: buildDailyPracticePath([item.id], 12, 'review-due'),
       priority: reviewDebtPriority(item),
       dueStatus: item.dueStatus,
     })
   }
+}
+
+function isActiveRecallReview(item: ScheduledReviewItem): boolean {
+  return item.status === 'new' && item.reviewCount === 0 && item.scheduleReason.includes('多次遇见')
 }
 
 function addMistakeItems(
@@ -184,7 +190,7 @@ function addMistakeItems(
         sourceLabel: '面试错因',
         reason: mistake.summary,
         actionLabel: mistake.actionLabel,
-        to: buildMistakeItemPath(mistake, questionId),
+        to: withNextTrainingSource(buildMistakeItemPath(mistake, questionId)),
         priority: mistakePriority(mistake),
       })
     }
@@ -217,7 +223,7 @@ function addStatusItems(
         ? '仍是薄弱状态，先用原理、边界和项目场景讲清。'
         : '学习中题继续巩固，避免只看过但讲不出来。',
       actionLabel: isWeak ? '修复薄弱' : '继续巩固',
-      to: buildDailyPracticePath([questionId]),
+      to: buildDailyPracticePath([questionId], 12, NEXT_TRAINING_SOURCE),
       priority: isWeak ? 80 : 60,
     })
   }
@@ -245,7 +251,7 @@ function addPlanItems(
       sourceLabel: '今日计划',
       reason: '来自今日计划，保持执行节奏。',
       actionLabel: '推进计划',
-      to: buildDailyPracticePath([questionId]),
+      to: buildDailyPracticePath([questionId], 12, 'daily-plan'),
       priority: 50,
     })
   }
@@ -291,9 +297,8 @@ function buildPrimaryAction(items: NextTrainingQueueItem[]): NextTrainingQueueAc
     }
   }
 
-  const activeQuestionIds = items
-    .filter(item => item.status !== 'mastered')
-    .map(item => item.questionId)
+  const activeItems = items.filter(item => item.status !== 'mastered')
+  const activeQuestionIds = activeItems.map(item => item.questionId)
   if (activeQuestionIds.length === 0) {
     return {
       label: '沉淀高分题目',
@@ -305,8 +310,39 @@ function buildPrimaryAction(items: NextTrainingQueueItem[]): NextTrainingQueueAc
   return {
     label: '开始下一轮训练',
     description: '按评分、复习债和错因优先级进入下一轮练习。',
-    to: buildDailyPracticePath(activeQuestionIds),
+    to: buildDailyPracticePath(activeQuestionIds, 12, practiceSourceForPrimaryAction(activeItems)),
   }
+}
+
+function practiceSourceForPrimaryAction(items: NextTrainingQueueItem[]): string | undefined {
+  const sources = new Set(items.map(item => item.source))
+  if ([...sources].every(isGenericNextTrainingSource)) {
+    return NEXT_TRAINING_SOURCE
+  }
+
+  if (sources.size !== 1) {
+    return NEXT_TRAINING_SOURCE
+  }
+
+  const source = items[0]?.source
+  if (source === 'review-debt') {
+    return 'review-due'
+  }
+  if (source === 'plan') {
+    return 'daily-plan'
+  }
+  return undefined
+}
+
+function isGenericNextTrainingSource(source: NextTrainingQueueItem['source']): boolean {
+  return source === 'score-impact'
+    || source === 'mistake'
+    || source === 'weak'
+    || source === 'learning'
+}
+
+function withNextTrainingSource(to: string): string {
+  return appendPracticeHandoffSource(to, NEXT_TRAINING_SOURCE)
 }
 
 function buildMetrics(

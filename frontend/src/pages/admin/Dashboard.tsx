@@ -26,6 +26,7 @@ import {
 import type { ColumnsType } from 'antd/es/table'
 import { getAdminQualitySummary } from '../../api/admin'
 import type { AdminCategoryQuality, AdminQualitySummary, AdminQualityTodo } from '../../types'
+import { buildCategoryRiskBreakdown, draftRiskPath } from './qualityRisk'
 
 const { Text, Title } = Typography
 
@@ -115,18 +116,36 @@ export default function AdminDashboard() {
       render: (value: number) => value > 0 ? <Tag color="warning">{value}</Tag> : <Text type="secondary">0</Text>,
     },
     {
-      title: '结构缺口',
-      width: 220,
+      title: '首要处理',
+      width: 150,
+      render: (_, row) => {
+        const primaryRisk = buildCategoryRiskBreakdown(row)[0]
+        if (!primaryRisk) {
+          return <Tag color="success">质量稳定</Tag>
+        }
+        return (
+          <Space direction="vertical" size={2}>
+            <Text style={compactMetaStyle}>首要缺口</Text>
+            <Button
+              size="small"
+              onClick={() => navigate(draftRiskPath(row, primaryRisk.riskType))}
+            >
+              处理{primaryRisk.label}
+            </Button>
+          </Space>
+        )
+      },
+    },
+    {
+      title: '风险拆解',
+      width: 300,
       render: (_, row) => (
         <Space wrap size={[4, 4]}>
-          {moduleTag('原理', row.missingPrinciple)}
-          {moduleTag('风险', row.missingRisk)}
-          {moduleTag('项目', row.missingProjectExp)}
-          {moduleTag('代码', row.missingCodeExamples)}
+          {renderRiskTags(row)}
         </Space>
       ),
     },
-  ], [])
+  ], [navigate])
 
   const topCategories = summary?.categories.slice(0, 8) || []
 
@@ -256,11 +275,14 @@ export default function AdminDashboard() {
   )
 }
 
-function moduleTag(label: string, value: number) {
-  if (value <= 0) {
-    return <Tag>{label} 0</Tag>
+function renderRiskTags(row: AdminCategoryQuality) {
+  const risks = buildCategoryRiskBreakdown(row)
+  if (risks.length === 0) {
+    return <Tag color="success">无结构风险</Tag>
   }
-  return <Tag color="warning">{label} {value}</Tag>
+  return risks.slice(0, 8).map(risk => (
+    <Tag key={risk.riskType} color={risk.tone}>{risk.label} {risk.value}</Tag>
+  ))
 }
 
 function todoTagColor(todo: AdminQualityTodo) {

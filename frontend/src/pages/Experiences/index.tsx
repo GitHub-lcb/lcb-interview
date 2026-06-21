@@ -1,17 +1,19 @@
 import { Button } from 'antd'
 import { emitFeedbackSuccess, emitFeedbackWarning } from '../../utils/feedbackMessage'
 import { ArrowRightOutlined, BulbOutlined, CopyOutlined } from '@ant-design/icons'
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { experienceSets } from '../../data/freeSuperiority'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
-import { buildExperiencePlaybookMarkdown } from '../../utils/experiencePlaybook'
+import { buildExperiencePlaybookMarkdown, buildExperiencePressureQueue } from '../../utils/experiencePlaybook'
 
 export default function Experiences() {
   const navigate = useNavigate()
   const { progress } = useStudyProgress()
+  const pressureQueue = useMemo(() => buildExperiencePressureQueue(progress), [progress])
 
   const handleCopyExperiencePlaybook = async () => {
-    const markdown = buildExperiencePlaybookMarkdown(experienceSets, progress.targetRole)
+    const markdown = buildExperiencePlaybookMarkdown(experienceSets, progress.targetRole, new Date().toISOString(), progress)
     const copied = await copyMarkdown(markdown)
 
     if (copied) {
@@ -41,6 +43,49 @@ export default function Experiences() {
         <div className="prep-hero-stat">
           <strong>{experienceSets.length}</strong>
           <span>组场景题单</span>
+        </div>
+      </section>
+
+      <section className="experience-pressure-panel" aria-label="个人押题队列">
+        <div className="experience-pressure-head">
+          <div>
+            <div className="dashboard-kicker">个人押题队列</div>
+            <h2>{pressureQueue.title}</h2>
+            <p>{pressureQueue.summary}</p>
+          </div>
+          <div className="experience-pressure-stat">
+            <strong>{pressureQueue.totalCount}</strong>
+            <span>道高压题</span>
+          </div>
+        </div>
+
+        {pressureQueue.items.length > 0 ? (
+          <div className="experience-pressure-list">
+            {pressureQueue.items.map(item => (
+              <button key={item.questionId} type="button" onClick={() => navigate(item.practicePath)}>
+                <span>{item.signal}</span>
+                <strong>{item.title}</strong>
+                <em>{item.categoryName} · {item.difficulty}</em>
+                <p>{item.detail}</p>
+                <div className="experience-pressure-proof">
+                  <small>面试官追问</small>
+                  <p>{item.interviewerProbe}</p>
+                  <small>通过口径</small>
+                  <p>{item.passCriteria}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="experience-pressure-empty">
+            完成一轮模拟面试或把题目标记为薄弱后，这里会自动出现面试官最可能追问的个人题单。
+          </p>
+        )}
+
+        <div className="prep-action-row">
+          <Button type="primary" icon={<ArrowRightOutlined />} onClick={() => navigate(pressureQueue.queuePath)}>
+            开始押题练习
+          </Button>
         </div>
       </section>
 

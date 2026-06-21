@@ -10,9 +10,11 @@ import type {
   StudyProgress,
 } from '../types'
 import { buildFollowUpDrillPack } from './followUpDrill'
+import { buildDailyPracticePath } from './practiceRoute'
 
 const MAX_DEFENSE_ITEMS = 5
 const RISK_SCORE_THRESHOLD = 70
+const INTERVIEW_RETROSPECTIVE_SOURCE = 'interview-retrospective'
 
 interface LatestAttemptContext {
   questionId: number
@@ -149,7 +151,7 @@ function toDefenseItem(
     prompt: item.prompt,
     pressurePoint: item.pressurePoint,
     answerGuide: item.answerGuide,
-    to: `/practice?queue=${context.questionId}`,
+    to: buildFollowUpDefensePracticePath([context.questionId]),
     priority: item.priority + lowScoreBoost(context.attempt.feedback.score) + weakCriterionBoost(weakestScore) + timestampWeight(context.attempt.createdAt),
     createdAt: context.attempt.createdAt,
   }
@@ -273,8 +275,8 @@ function actionForLevel(
     }
   }
 
-  const queue = [...new Set(items.map(item => item.questionId))].join(',')
-  const to = queue ? `/practice?queue=${queue}` : '/practice'
+  const questionIds = [...new Set(items.map(item => item.questionId))]
+  const to = buildFollowUpDefensePracticePath(questionIds)
   if (level === 'risk') {
     return {
       label: '先修追问短板',
@@ -294,6 +296,10 @@ function actionForLevel(
     description: '连续回答防线清单，训练被追问后的临场拆解。',
     to,
   }
+}
+
+function buildFollowUpDefensePracticePath(questionIds: number[]): string {
+  return buildDailyPracticePath(questionIds, 12, INTERVIEW_RETROSPECTIVE_SOURCE)
 }
 
 function fallbackSnapshot(questionId: number): QuestionSnapshot {

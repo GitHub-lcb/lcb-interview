@@ -51,7 +51,7 @@ export default function AbilityMapPanel() {
       navigate('/routes')
       return
     }
-    navigate(`/practice?queue=${item.nextQuestionIds.join(',')}`)
+    navigate(`/practice?queue=${item.nextQuestionIds.join(',')}&from=ability-gap`)
   }
 
   return (

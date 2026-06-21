@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<Void>> handleBusiness(BusinessException e) {
         log.warn("业务异常: code={}, message={}", e.getCode(), e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(resolveBusinessStatus(e.getCode()))
                 .body(ApiResponse.error(e.getCode(), e.getMessage()));
     }
 
@@ -38,5 +38,13 @@ public class GlobalExceptionHandler {
         log.error("未知异常", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error(500, "服务器内部错误"));
+    }
+
+    private HttpStatus resolveBusinessStatus(int code) {
+        HttpStatus status = HttpStatus.resolve(code);
+        if (status == null || !status.isError()) {
+            return HttpStatus.BAD_REQUEST;
+        }
+        return status;
     }
 }

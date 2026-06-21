@@ -1,5 +1,6 @@
 import type {
   QuestionSnapshot,
+  QuestionStudyState,
   ReviewDueStatus,
   ReviewScheduleSummary,
   ScheduledReviewItem,
@@ -8,6 +9,7 @@ import type {
 } from '../types'
 
 const DAY_MS = 24 * 60 * 60 * 1000
+const ENCOUNTER_REVIEW_THRESHOLD = 2
 
 export function buildScheduledReviewQueue(
   progress: StudyProgress,
@@ -18,7 +20,8 @@ export function buildScheduledReviewQueue(
   const items: ScheduledReviewItem[] = []
 
   for (const [id, state] of Object.entries(progress.questionStates)) {
-    if (state.status === 'new') {
+    const isEncounterReview = shouldScheduleEncounterReview(state)
+    if (state.status === 'new' && !isEncounterReview) {
       continue
     }
 
@@ -26,9 +29,11 @@ export function buildScheduledReviewQueue(
     const intervalDays = reviewIntervalDays(state.status, state.reviewCount)
     const lastReviewedAt = parseReviewDate(state.lastReviewedAt)
     // 老数据可能没有 lastReviewedAt。宁可把已跟踪题放到今天，也不要让用户错过复习窗口。
-    const nextReviewDate = lastReviewedAt
-      ? addDays(lastReviewedAt, intervalDays)
-      : currentDate
+    const nextReviewDate = isEncounterReview
+      ? currentDate
+      : lastReviewedAt
+        ? addDays(lastReviewedAt, intervalDays)
+        : currentDate
     const dueStatus = resolveDueStatus(nextReviewDate, currentDate)
     const snapshot = progress.questionSnapshots[questionId] ?? fallbackSnapshot(questionId)
 
@@ -37,11 +42,13 @@ export function buildScheduledReviewQueue(
       status: state.status,
       lastReviewedAt: state.lastReviewedAt,
       reviewCount: state.reviewCount,
+      lastEncounteredAt: state.lastEncounteredAt,
+      encounterCount: state.encounterCount,
       reason: dueStatusLabel(dueStatus),
       dueStatus,
       nextReviewAt: nextReviewDate.toISOString(),
       daysUntilDue: daysBetween(startOfUtcDay(currentDate), startOfUtcDay(nextReviewDate)),
-      scheduleReason: scheduleReason(state.status, state.reviewCount),
+      scheduleReason: scheduleReason(state.status, state.reviewCount, isEncounterReview),
     })
   }
 
@@ -54,6 +61,7 @@ export function summarizeReviewSchedule(items: ScheduledReviewItem[]): ReviewSch
     overdue: items.filter(item => item.dueStatus === 'overdue').length,
     dueToday: items.filter(item => item.dueStatus === 'due-today').length,
     upcoming: upcomingItems.length,
+    activeRecall: items.filter(isActiveRecallReviewItem).length,
     nextReviewAt: upcomingItems[0]?.nextReviewAt,
   }
 }
@@ -84,6 +92,10 @@ export function buildReviewScheduleMarkdown(
     '## 复习队列',
     renderReviewQueue(queue),
   ].join('\n')
+}
+
+function shouldScheduleEncounterReview(state: QuestionStudyState): boolean {
+  return state.status === 'new' && (state.encounterCount ?? 0) >= ENCOUNTER_REVIEW_THRESHOLD
 }
 
 function reviewIntervalDays(status: StudyQuestionStatus, reviewCount: number): number {
@@ -166,7 +178,10 @@ function dueStatusLabel(status: ReviewDueStatus): string {
   return '即将到期'
 }
 
-function scheduleReason(status: StudyQuestionStatus, reviewCount: number): string {
+function scheduleReason(status: StudyQuestionStatus, reviewCount: number, isEncounterReview = false): string {
+  if (isEncounterReview) {
+    return '多次遇见但还没完成复习，先安排一次主动回忆。'
+  }
   if (status === 'weak') {
     return '薄弱题每天复习一次，直到能稳定讲清。'
   }
@@ -185,6 +200,12 @@ function scheduleReason(status: StudyQuestionStatus, reviewCount: number): strin
       : '已掌握题 7 天后巩固，避免长期遗忘。'
   }
   return '新题暂不进入复习排期。'
+}
+
+function isActiveRecallReviewItem(item: ScheduledReviewItem): boolean {
+  return item.status === 'new'
+    && item.reviewCount === 0
+    && (item.encounterCount ?? 0) >= ENCOUNTER_REVIEW_THRESHOLD
 }
 
 function parseReviewDate(value?: string): Date | null {
@@ -212,6 +233,7 @@ function renderScheduleOverview(summary: ReviewScheduleSummary): string {
   return [
     `- 已逾期：${summary.overdue} 道`,
     `- 今日到期：${summary.dueToday} 道`,
+    `- 主动回忆：${summary.activeRecall} 道`,
     `- 即将到期：${summary.upcoming} 道`,
     `- 下次复习：${formatMarkdownDate(summary.nextReviewAt)}`,
   ].join('\n')
@@ -227,15 +249,33 @@ function renderReviewQueue(items: ScheduledReviewItem[]): string {
   }
 
   return items
-    .map((item, index) => [
-      `${index + 1}. ${sanitizeMarkdownValue(item.title, `题目 #${item.id}`)}`,
-      `   - 状态：${dueStatusLabel(item.dueStatus)}`,
-      `   - 分类：${sanitizeMarkdownValue(item.categoryName, '未分组')}`,
-      `   - 复习次数：${item.reviewCount} 次`,
-      `   - 下次复习：${formatMarkdownDate(item.nextReviewAt)}`,
-      `   - 原因：${sanitizeMarkdownValue(item.scheduleReason, '按当前掌握状态进入复习队列。')}`,
-      `   - 入口：/question/${item.id}`,
-    ].join('\n'))
+    .map((item, index) => {
+      const title = `${index + 1}. ${sanitizeMarkdownValue(item.title, `题目 #${item.id}`)}`
+
+      if (isActiveRecallReviewItem(item)) {
+        return [
+          title,
+          '   - 状态：主动回忆',
+          `   - 排期：${dueStatusLabel(item.dueStatus)}`,
+          `   - 分类：${sanitizeMarkdownValue(item.categoryName, '未分组')}`,
+          `   - 遇见次数：${item.encounterCount ?? ENCOUNTER_REVIEW_THRESHOLD} 次`,
+          `   - 下次复习：${formatMarkdownDate(item.nextReviewAt)}`,
+          `   - 原因：${sanitizeMarkdownValue(item.scheduleReason, '多次遇见但还没完成复习，先安排一次主动回忆。')}`,
+          `   - 训练入口：/practice?queue=${item.id}&from=review-due`,
+          `   - 题目入口：/question/${item.id}`,
+        ].join('\n')
+      }
+
+      return [
+        title,
+        `   - 状态：${dueStatusLabel(item.dueStatus)}`,
+        `   - 分类：${sanitizeMarkdownValue(item.categoryName, '未分组')}`,
+        `   - 复习次数：${item.reviewCount} 次`,
+        `   - 下次复习：${formatMarkdownDate(item.nextReviewAt)}`,
+        `   - 原因：${sanitizeMarkdownValue(item.scheduleReason, '按当前掌握状态进入复习队列。')}`,
+        `   - 入口：/question/${item.id}`,
+      ].join('\n')
+    })
     .join('\n\n')
 }
 

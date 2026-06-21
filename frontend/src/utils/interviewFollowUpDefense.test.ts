@@ -80,8 +80,8 @@ describe('buildInterviewFollowUpDefense', () => {
     expect(report.riskCount).toBe(1)
     expect(report.items[0]).toMatchObject({ questionId: 2, score: 62 })
     expect(report.items[0].prompt).toContain('线上')
-    expect(report.items[0].to).toBe('/practice?queue=2')
-    expect(report.primaryAction.to).toBe('/practice?queue=2')
+    expect(report.items[0].to).toBe('/practice?queue=2&from=interview-retrospective')
+    expect(report.primaryAction.to).toBe('/practice?queue=2&from=interview-retrospective')
   })
 
   it('uses only the latest attempt of each question', () => {
@@ -139,7 +139,7 @@ describe('buildInterviewFollowUpDefense', () => {
     expect(markdown).toContain('Java 并发 追问题 2')
     expect(markdown).toContain('如果面试官追问线上场景')
     expect(markdown).toContain('面试官在追项目场景')
-    expect(markdown).toContain('入口：/practice?queue=2')
+    expect(markdown).toContain('入口：/practice?queue=2&from=interview-retrospective')
     expect(markdown).not.toContain('undefined')
   })
 

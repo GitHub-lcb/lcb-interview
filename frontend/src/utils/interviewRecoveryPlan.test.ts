@@ -60,7 +60,11 @@ describe('buildInterviewRecoveryPlan', () => {
 
     expect(plan.mode).toBe('repair')
     expect(plan.steps).toHaveLength(3)
-    expect(plan.steps[0].to).toBe('/practice?queue=1,2')
+    expect(plan.steps.map(step => step.to)).toEqual([
+      '/practice?queue=1,2&from=interview-retrospective',
+      '/practice?queue=1,2&from=interview-retrospective',
+      '/practice?queue=1,2&from=interview-retrospective',
+    ])
     expect(plan.steps[0].questionIds).toEqual([1, 2])
     expect(plan.totalMinutes).toBe(37)
   })
@@ -85,7 +89,7 @@ describe('buildInterviewRecoveryPlan', () => {
     }))
 
     expect(plan.steps[0].title).toContain('开口')
-    expect(plan.primaryAction.to).toBe('/practice?queue=3')
+    expect(plan.primaryAction.to).toBe('/practice?queue=3&from=interview-retrospective')
   })
 
   it('creates an advanced pressure plan when the ledger is stable', () => {
@@ -114,6 +118,11 @@ describe('buildInterviewRecoveryPlan', () => {
     expect(plan.mode).toBe('advanced')
     expect(plan.title).toContain('加压')
     expect(plan.steps[0].title).toBe('连续追问加压')
+    expect(plan.steps.map(step => step.to)).toEqual([
+      '/practice?queue=1&from=interview-retrospective',
+      '/practice?queue=1&from=interview-retrospective',
+      '/practice?queue=1&from=interview-retrospective',
+    ])
     expect(plan.totalMinutes).toBe(42)
   })
 

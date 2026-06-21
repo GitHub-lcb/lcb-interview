@@ -106,7 +106,7 @@ describe('buildPrepHealthReport', () => {
 
     expect(ability?.score).toBeLessThan(60)
     expect(ability?.detail).toContain('Java 后端冲刺路线')
-    expect(report.primaryAction.to).toBe('/practice?queue=1,2')
+    expect(report.primaryAction.to).toBe('/practice?queue=1,2&from=ability-gap')
   })
 
   it('raises interview risk when recent scores are declining', () => {

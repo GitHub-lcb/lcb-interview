@@ -125,7 +125,7 @@ describe('NextTrainingQueuePanel', () => {
 
     await userEvent.click(within(recovery).getByRole('button', { name: /恢复 1 份草稿/ }))
 
-    expect(navigate).toHaveBeenCalledWith('/practice?queue=1')
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=1&from=resume-draft')
   })
 
   it('copies next training queue markdown', async () => {

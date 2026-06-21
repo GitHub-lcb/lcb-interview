@@ -7,9 +7,11 @@ import type {
   QuestionSnapshot,
   StudyProgress,
 } from '../types'
+import { buildDailyPracticePath } from './practiceRoute'
 
 const LOW_SCORE_THRESHOLD = 70
 const QUEUE_LIMIT = 8
+const INTERVIEW_RETROSPECTIVE_SOURCE = 'interview-retrospective'
 
 interface AttemptWithQuestion extends InterviewAttempt {
   question: QuestionSnapshot
@@ -206,10 +208,7 @@ function buildPrimaryAction(item: InterviewMistakeLedgerItem) {
 }
 
 function buildPracticeQueuePath(questionIds: number[]): string {
-  if (questionIds.length === 0) {
-    return '/practice'
-  }
-  return `/practice?queue=${questionIds.join(',')}`
+  return buildDailyPracticePath(questionIds, QUEUE_LIMIT, INTERVIEW_RETROSPECTIVE_SOURCE)
 }
 
 function fallbackSnapshot(questionId: number): QuestionSnapshot {

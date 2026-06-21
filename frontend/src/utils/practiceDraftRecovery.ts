@@ -30,7 +30,7 @@ export function buildPracticeDraftRecovery(
   const drafts = options.drafts ?? readPracticeAnswerDrafts()
   const items = drafts
     .filter(draft => {
-      if (!Number.isFinite(draft.questionId) || draft.questionId <= 0 || seen.has(draft.questionId)) {
+      if (!Number.isInteger(draft.questionId) || draft.questionId <= 0 || seen.has(draft.questionId)) {
         return false
       }
       seen.add(draft.questionId)
@@ -44,14 +44,14 @@ export function buildPracticeDraftRecovery(
         id: draft.questionId,
         title: snapshot?.title || `题目 ${draft.questionId}`,
         meta: `${category} · ${formatDraftUpdatedAt(draft.updatedAt)}`,
-        to: buildDailyPracticePath([draft.questionId]),
+        to: buildDailyPracticePath([draft.questionId], limit, 'resume-draft'),
       }
     })
     .slice(0, limit)
 
   return {
     items,
-    primaryPath: buildDailyPracticePath(items.map(item => item.id)),
+    primaryPath: buildDailyPracticePath(items.map(item => item.id), limit, 'resume-draft'),
   }
 }
 

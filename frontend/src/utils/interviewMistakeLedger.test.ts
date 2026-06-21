@@ -81,7 +81,7 @@ describe('buildInterviewMistakeLedger', () => {
     expect(ledger.level).toBe('risk')
     expect(ledger.items[0].criterionKey).toBe('specificity')
     expect(ledger.items[0].affectedQuestionIds).toEqual([1, 2])
-    expect(ledger.items[0].to).toBe('/practice?queue=1,2')
+    expect(ledger.items[0].to).toBe('/practice?queue=1,2&from=interview-retrospective')
   })
 
   it('adds weak questions that have not been practiced aloud', () => {
@@ -92,7 +92,7 @@ describe('buildInterviewMistakeLedger', () => {
 
     expect(ledger.items[0].type).toBe('weak-unspoken')
     expect(ledger.items[0].affectedQuestionIds).toEqual([3])
-    expect(ledger.primaryAction.to).toBe('/practice?queue=3')
+    expect(ledger.primaryAction.to).toBe('/practice?queue=3&from=interview-retrospective')
   })
 
   it('creates advanced pressure entry when attempts have no obvious mistakes', () => {
@@ -104,7 +104,7 @@ describe('buildInterviewMistakeLedger', () => {
 
     expect(ledger.level).toBe('stable')
     expect(ledger.items[0].type).toBe('advanced')
-    expect(ledger.items[0].to).toBe('/practice?queue=1')
+    expect(ledger.items[0].to).toBe('/practice?queue=1&from=interview-retrospective')
   })
 
   it('deduplicates repeated question ids in practice queues', () => {
@@ -118,6 +118,6 @@ describe('buildInterviewMistakeLedger', () => {
     const ledger = buildInterviewMistakeLedger(progress)
 
     expect(ledger.items[0].affectedQuestionIds).toEqual([1])
-    expect(ledger.items[0].to).toBe('/practice?queue=1')
+    expect(ledger.items[0].to).toBe('/practice?queue=1&from=interview-retrospective')
   })
 })

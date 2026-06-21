@@ -9,6 +9,7 @@ import type {
   StudyQuestionStatus,
 } from '../types'
 import { buildInterviewReviewSummary } from './interviewReview'
+import { buildDailyPracticePath } from './practiceRoute'
 import { buildRouteProgressList } from './routeProgress'
 import { buildScheduledReviewQueue, summarizeReviewSchedule } from './reviewSchedule'
 import { getQuestionState } from './studyProgress'
@@ -24,6 +25,7 @@ interface CategoryBucket {
 
 const BRIEF_LIMIT = 3
 const WARMUP_LIMIT = 6
+const INTERVIEW_BRIEF_SOURCE = 'interview-brief'
 
 export function buildInterviewBrief(
   routes: PrepRoute[],
@@ -206,6 +208,16 @@ function buildRisks(
     })
   }
 
+  if (reviewSummary.activeRecall > 0) {
+    risks.push({
+      id: 'active-recall',
+      title: '多次遇见题还没完成主动回忆',
+      metric: `${reviewSummary.activeRecall} 主动回忆`,
+      description: `已有 ${reviewSummary.activeRecall} 道题多次遇见但还没脱稿回忆，先回到复习队列完成一次开口验证。`,
+      to: '/study',
+    })
+  }
+
   const weakBucket = [...buckets]
     .filter(bucket => bucket.weak > 0)
     .sort((a, b) => b.weak - a.weak)[0]
@@ -270,7 +282,12 @@ function buildWarmups(
   const dueItems = reviewQueue.filter(item => item.dueStatus !== 'upcoming')
 
   for (const item of dueItems) {
-    pushWarmup(items, seen, item, item.dueStatus === 'overdue' ? '逾期复习' : '今日到期')
+    pushWarmup(
+      items,
+      seen,
+      item,
+      isActiveRecallWarmup(item) ? '主动回忆' : item.dueStatus === 'overdue' ? '逾期复习' : '今日到期',
+    )
   }
 
   // 热身队列先消化复习债，再补岗位路线下一步，避免同一道题在多个来源重复出现。
@@ -314,6 +331,12 @@ function pushWarmup(
   })
 }
 
+function isActiveRecallWarmup(item: ReturnType<typeof buildScheduledReviewQueue>[number]): boolean {
+  return item.status === 'new'
+    && item.reviewCount === 0
+    && (item.encounterCount ?? 0) >= 2
+}
+
 function resolveLevel(
   tracked: number,
   risks: InterviewBriefItem[],
@@ -322,7 +345,7 @@ function resolveLevel(
   if (tracked === 0) {
     return 'empty'
   }
-  if (risks.some(risk => ['review-overdue', 'interview-declining'].includes(risk.id) || risk.id.startsWith('weak-'))) {
+  if (risks.some(risk => ['review-overdue', 'active-recall', 'interview-declining'].includes(risk.id) || risk.id.startsWith('weak-'))) {
     return 'risk'
   }
   if (warmups.length > 0) {
@@ -345,7 +368,12 @@ function resolvePrimaryAction(
   }
 
   const firstRisk = risks[0]
-  if (firstRisk?.id === 'review-overdue' || firstRisk?.id === 'empty-plan' || firstRisk?.id.startsWith('weak-')) {
+  if (
+    firstRisk?.id === 'review-overdue'
+    || firstRisk?.id === 'active-recall'
+    || firstRisk?.id === 'empty-plan'
+    || firstRisk?.id.startsWith('weak-')
+  ) {
     return {
       label: '先处理风险',
       description: firstRisk.description,
@@ -363,7 +391,7 @@ function resolvePrimaryAction(
     return {
       label: '开始热身题',
       description: '按简报队列先讲一轮高价值题。',
-      to: `/practice?queue=${warmups.map(item => item.questionId).filter(Boolean).join(',')}`,
+      to: buildInterviewBriefWarmupPath(warmups),
     }
   }
   return {
@@ -371,6 +399,18 @@ function resolvePrimaryAction(
     description: '保持当前节奏，继续做一轮模拟面试。',
     to: '/practice',
   }
+}
+
+function buildInterviewBriefWarmupPath(warmups: InterviewBriefItem[]): string {
+  const questionIds = warmups
+    .map(item => item.questionId)
+    .filter((questionId): questionId is number => (
+      typeof questionId === 'number'
+      && Number.isInteger(questionId)
+      && questionId > 0
+    ))
+
+  return buildDailyPracticePath(questionIds, WARMUP_LIMIT, INTERVIEW_BRIEF_SOURCE)
 }
 
 function titleForLevel(level: InterviewBriefLevel, targetRole: string): string {

@@ -11,6 +11,7 @@ import {
   describeInterviewStatusSync,
   getQuestionState,
   parseStudyProgress,
+  recordQuestionEncounter,
   rememberQuestions,
   recordInterviewAttempt,
   replaceDailyPlan,
@@ -227,6 +228,24 @@ describe('studyProgress', () => {
     expect(next.updatedAt).toBe('2026-06-15T11:00:00')
   })
 
+  it('records personal question encounters while preserving existing study state', () => {
+    let progress = createDefaultProgress('2026-06-15T00:00:00')
+    progress = toggleQuestionInPlan(progress, 7, true, '2026-06-15T10:00:00')
+
+    const first = recordQuestionEncounter(progress, baseQuestion(7, 'Redis'), '2026-06-15T11:00:00')
+    const second = recordQuestionEncounter(first, baseQuestion(7, 'Redis'), '2026-06-15T12:00:00')
+
+    expect(second.questionStates[7]).toMatchObject({
+      status: 'learning',
+      addedToPlan: true,
+      reviewCount: 0,
+      encounterCount: 2,
+      lastEncounteredAt: '2026-06-15T12:00:00',
+    })
+    expect(second.questionSnapshots[7].title).toBe('Question 7')
+    expect(second.updatedAt).toBe('2026-06-15T12:00:00')
+  })
+
   it('resolves today plan titles from remembered snapshots when candidates are absent', () => {
     let progress = createDefaultProgress()
     progress = rememberQuestions(progress, [baseQuestion(7, 'Redis')], '2026-06-15T11:00:00')
@@ -321,6 +340,27 @@ describe('studyProgress', () => {
 
     expect(queue.map(item => item.id)).toEqual([10, 11])
     expect(queue.map(item => item.source)).toEqual(['new', 'new'])
+  })
+
+  it('prioritizes repeatedly encountered new questions for active recall practice', () => {
+    let progress = createDefaultProgress('2026-06-15T00:00:00')
+    const candidates = [
+      baseQuestion(20, 'Redis'),
+      baseQuestion(21, 'Java 并发'),
+      baseQuestion(22, 'MySQL'),
+    ]
+    progress = rememberQuestions(progress, candidates, '2026-06-15T09:00:00')
+    progress = recordQuestionEncounter(progress, candidates[1], '2026-06-15T10:00:00')
+    progress = recordQuestionEncounter(progress, candidates[1], '2026-06-15T11:00:00')
+
+    const queue = buildPracticeQueue(progress, candidates, 3)
+
+    expect(queue.map(item => item.id)).toEqual([21, 20, 22])
+    expect(queue.map(item => item.source)).toEqual(['active-recall', 'new', 'new'])
+    expect(queue[0]).toMatchObject({
+      status: 'new',
+      categoryName: 'Java 并发',
+    })
   })
 
   it('keeps daily plan questions practiceable when snapshots are missing', () => {

@@ -13,6 +13,9 @@ import { buildScheduledReviewQueue } from './reviewSchedule'
 import { describeInterviewStatusSync, getQuestionState } from './studyProgress'
 import { buildDailyPracticePath } from './practiceRoute'
 
+const DAILY_PLAN_SOURCE = 'daily-plan'
+const REVIEW_DUE_SOURCE = 'review-due'
+
 export function buildDailyPlanCompletion(
   progress: StudyProgress,
   now = new Date().toISOString(),
@@ -196,28 +199,28 @@ function buildPrimaryAction(
     return {
       label: '先清复习债',
       description: '计划内存在到期或逾期题，先复盘再继续扩展。',
-      to: buildDailyPracticePath(reviewDebtIds),
+      to: buildDailyPracticePath(reviewDebtIds, 12, REVIEW_DUE_SOURCE),
     }
   }
   if (weakIds.length > 0) {
     return {
       label: '修复薄弱题',
       description: '先把薄弱题讲清，再判断今日计划是否闭环。',
-      to: buildDailyPracticePath(weakIds),
+      to: buildDailyPracticePath(weakIds, 12, DAILY_PLAN_SOURCE),
     }
   }
   if (level === 'active') {
     return {
       label: '继续今日队列',
       description: '还有计划题未掌握，继续按今日队列推进。',
-      to: buildDailyPracticePath(planIds),
+      to: buildDailyPracticePath(planIds, 12, DAILY_PLAN_SOURCE),
     }
   }
   if (level === 'ready') {
     return {
       label: '补一次模拟面试',
       description: '题目已掌握，补一个今日表达样本完成闭环。',
-      to: buildDailyPracticePath(planIds),
+      to: buildDailyPracticePath(planIds, 12, DAILY_PLAN_SOURCE),
     }
   }
   return {
@@ -326,7 +329,7 @@ function buildTodos(
       title: `${reviewDebtIds.length} 道计划题已到期或逾期`,
       description: '复习窗口已经打开，先处理它们能减少遗忘损耗。',
       tone: 'danger',
-      to: buildDailyPracticePath(reviewDebtIds),
+      to: buildDailyPracticePath(reviewDebtIds, 12, REVIEW_DUE_SOURCE),
     })
   }
   if (weakIds.length > 0) {
@@ -335,7 +338,7 @@ function buildTodos(
       title: `${weakIds.length} 道计划题仍是薄弱状态`,
       description: '用原理、边界和项目场景把薄弱点讲清。',
       tone: 'warning',
-      to: buildDailyPracticePath(weakIds),
+      to: buildDailyPracticePath(weakIds, 12, DAILY_PLAN_SOURCE),
     })
   }
   if (remainingCount > 0 && reviewDebtIds.length === 0 && weakIds.length === 0) {
@@ -344,7 +347,7 @@ function buildTodos(
       title: `还有 ${remainingCount} 道计划题未掌握`,
       description: '继续今日队列，完成后再做模拟面试验收。',
       tone: 'default',
-      to: buildDailyPracticePath(planIds),
+      to: buildDailyPracticePath(planIds, 12, DAILY_PLAN_SOURCE),
     })
   }
   if (remainingCount === 0 && interviewTodayCount === 0) {
@@ -353,7 +356,7 @@ function buildTodos(
       title: '还缺今日模拟面试样本',
       description: '掌握不等于能讲清，补一次口述评分完成闭环。',
       tone: 'warning',
-      to: buildDailyPracticePath(planIds),
+      to: buildDailyPracticePath(planIds, 12, DAILY_PLAN_SOURCE),
     })
   }
   if (remainingCount === 0 && interviewTodayCount > 0) {
@@ -453,13 +456,13 @@ function scoreImpactAction(status: StudyQuestionStatus, questionId: number): { l
   if (status === 'weak') {
     return {
       label: '重答补强',
-      to: buildDailyPracticePath([questionId]),
+      to: buildDailyPracticePath([questionId], 12, DAILY_PLAN_SOURCE),
     }
   }
   if (status === 'learning') {
     return {
       label: '继续复盘',
-      to: buildDailyPracticePath([questionId]),
+      to: buildDailyPracticePath([questionId], 12, DAILY_PLAN_SOURCE),
     }
   }
   return {

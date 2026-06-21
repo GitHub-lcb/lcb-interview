@@ -116,6 +116,7 @@ describe('buildInterviewRecoveryAcceptance', () => {
     expect(report.passedCount).toBe(1)
     expect(report.totalCount).toBe(2)
     expect(report.pendingQuestionIds).toEqual([2])
+    expect(report.primaryAction.to).toBe('/practice?queue=1,2&from=interview-retrospective')
   })
 
   it('passes criterion recovery when every affected question latest score is over the threshold', () => {
@@ -165,6 +166,6 @@ describe('buildInterviewRecoveryAcceptance', () => {
     }))
 
     expect(report.status).toBe('passed')
-    expect(report.primaryAction.to).toBe('/practice?queue=3')
+    expect(report.primaryAction.to).toBe('/practice?queue=3&from=interview-retrospective')
   })
 })

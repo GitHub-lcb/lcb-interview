@@ -21,6 +21,7 @@ const MAX_SPRINT_DAYS = 60
 const MAX_ATTEMPTS_PER_QUESTION = 5
 const INTERVIEW_PASS_SCORE = 70
 const INTERVIEW_MASTERED_SCORE = 80
+const ACTIVE_RECALL_ENCOUNTER_THRESHOLD = 2
 
 function isValidQuestionId(questionId: unknown): questionId is number {
   return typeof questionId === 'number' && Number.isInteger(questionId) && questionId > 0
@@ -327,6 +328,28 @@ export function rememberQuestions(
   }
 }
 
+export function recordQuestionEncounter(
+  progress: StudyProgress,
+  question: Question,
+  now = new Date().toISOString(),
+): StudyProgress {
+  const remembered = rememberQuestions(progress, [question], now)
+  const current = getQuestionState(remembered, question.id)
+
+  return {
+    ...remembered,
+    questionStates: {
+      ...remembered.questionStates,
+      [question.id]: {
+        ...current,
+        encounterCount: (current.encounterCount ?? 0) + 1,
+        lastEncounteredAt: now,
+      },
+    },
+    updatedAt: now,
+  }
+}
+
 export function buildDailyPlan(progress: StudyProgress, candidates: Question[], limit = 5): number[] {
   const known = new Set(progress.dailyPlan)
   const ranked = [...candidates]
@@ -424,14 +447,16 @@ export function buildPracticeQueue(
   const freshItems = [
     ...candidates.map(question => snapshots[question.id]),
     ...Object.values(progress.questionSnapshots).filter(snapshot => !candidateIds.has(snapshot.id)),
-  ].filter((question): question is QuestionSnapshot => Boolean(question))
+  ]
+    .filter((question): question is QuestionSnapshot => Boolean(question))
+    .sort((a, b) => rankFreshPracticeItem(progress, a.id) - rankFreshPracticeItem(progress, b.id))
 
   for (const question of freshItems) {
     const state = getQuestionState(progress, question.id)
     if (state.status === 'mastered') {
       continue
     }
-    pushPracticeItem(queue, used, question, state.status, 'new')
+    pushPracticeItem(queue, used, question, state.status, practiceSourceForNewState(state))
   }
 
   return queue.slice(0, limit)
@@ -466,7 +491,7 @@ export function buildFocusedPracticeQueue(
   }
 
   const state = getQuestionState(progress, focusQuestionId)
-  const source: PracticeQueueItem['source'] = state.addedToPlan ? 'plan' : 'new'
+  const source: PracticeQueueItem['source'] = state.addedToPlan ? 'plan' : practiceSourceForNewState(state)
   return [
     {
       ...snapshot,
@@ -541,6 +566,27 @@ function pushPracticeItem(
     status,
     source,
   })
+}
+
+function practiceSourceForNewState(state: QuestionStudyState): PracticeQueueItem['source'] {
+  if (isActiveRecallPracticeState(state)) {
+    return 'active-recall'
+  }
+  return 'new'
+}
+
+function rankFreshPracticeItem(progress: StudyProgress, questionId: number): number {
+  const state = getQuestionState(progress, questionId)
+  if (!isActiveRecallPracticeState(state)) {
+    return 1000
+  }
+  return 100 - (state.encounterCount ?? ACTIVE_RECALL_ENCOUNTER_THRESHOLD)
+}
+
+function isActiveRecallPracticeState(state: QuestionStudyState): boolean {
+  return state.status === 'new'
+    && state.reviewCount === 0
+    && (state.encounterCount ?? 0) >= ACTIVE_RECALL_ENCOUNTER_THRESHOLD
 }
 
 function reviewStatusRank(status: StudyQuestionStatus): number {

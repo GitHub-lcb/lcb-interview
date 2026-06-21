@@ -19,6 +19,7 @@ export function buildStudyPaceCoach(
   const dailyQuestionTarget = resolveDailyTarget(progress.sprintDays)
   const reviewSummary = summarizeReviewSchedule(buildScheduledReviewQueue(progress, now, 1000))
   const reviewDueCount = reviewSummary.overdue + reviewSummary.dueToday
+  const activeRecallCount = reviewSummary.activeRecall
   const interviewAttemptCount = Object.values(progress.interviewAttempts).flat().length
   const weakCount = Object.values(progress.questionStates).filter(state => state.status === 'weak').length
   const level = resolveLevel({
@@ -33,6 +34,7 @@ export function buildStudyPaceCoach(
     plannedCount,
     dailyQuestionTarget,
     reviewDueCount,
+    activeRecallCount,
     interviewAttemptCount,
     practiceQuestionIds: unfinishedPlanIds,
   })
@@ -45,8 +47,9 @@ export function buildStudyPaceCoach(
     dailyQuestionTarget,
     plannedCount,
     reviewDueCount,
+    activeRecallCount,
     interviewAttemptCount,
-    metrics: buildMetrics(dailyQuestionTarget, plannedCount, reviewDueCount, interviewAttemptCount),
+    metrics: buildMetrics(dailyQuestionTarget, plannedCount, reviewDueCount, activeRecallCount, interviewAttemptCount),
     actions,
     primaryAction,
   }
@@ -85,6 +88,7 @@ function renderPaceOverview(coach: StudyPaceCoach): string {
     `- 今日目标：${coach.dailyQuestionTarget} 道`,
     `- 已排计划：${coach.plannedCount} 道`,
     `- 复习债：${coach.reviewDueCount} 道`,
+    `- 主动回忆：${coach.activeRecallCount} 道`,
     `- 模拟样本：${coach.interviewAttemptCount} 次`,
     `- 摘要：${coach.summary}`,
     `- 主行动：${coach.primaryAction.label}`,
@@ -192,6 +196,7 @@ function buildActions(input: {
   plannedCount: number
   dailyQuestionTarget: number
   reviewDueCount: number
+  activeRecallCount: number
   interviewAttemptCount: number
   practiceQuestionIds: number[]
 }): StudyPaceAction[] {
@@ -205,6 +210,14 @@ function buildActions(input: {
   }
 
   const actions: StudyPaceAction[] = []
+  if (input.activeRecallCount > 0) {
+    actions.push({
+      key: 'activeRecall',
+      label: '先做主动回忆',
+      description: `${input.activeRecallCount} 道题已多次遇见但还没脱稿回忆，先完成一次开口验证。`,
+      to: '/study',
+    })
+  }
   if (input.reviewDueCount > 0) {
     actions.push({
       key: 'review',
@@ -234,7 +247,7 @@ function buildActions(input: {
       key: 'practice',
       label: '按今日计划训练',
       description: '计划、复习和面试样本都具备后，直接进入今日队列。',
-      to: `/practice?queue=${input.practiceQuestionIds.slice(0, 12).join(',')}`,
+      to: `/practice?queue=${input.practiceQuestionIds.slice(0, 12).join(',')}&from=pace-coach`,
     })
   } else if (input.plannedCount > 0) {
     actions.push({
@@ -263,6 +276,7 @@ function buildMetrics(
   dailyQuestionTarget: number,
   plannedCount: number,
   reviewDueCount: number,
+  activeRecallCount: number,
   interviewAttemptCount: number,
 ): StudyPaceMetric[] {
   return [
@@ -283,6 +297,12 @@ function buildMetrics(
       label: '复习债',
       value: `${reviewDueCount} 道`,
       detail: reviewDueCount > 0 ? '先处理到期与逾期' : '暂无明显复习压力',
+    },
+    {
+      key: 'activeRecall',
+      label: '主动回忆',
+      value: `${activeRecallCount} 道`,
+      detail: activeRecallCount > 0 ? '多次遇见题先脱稿开口' : '暂无主动回忆压力',
     },
     {
       key: 'interview',

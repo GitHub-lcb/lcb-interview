@@ -92,7 +92,7 @@ describe('buildInterviewEmergencyKit', () => {
     expect(kit.level).toBe('critical')
     expect(kit.items[0].kind).toBe('review')
     expect(kit.items[0].questionIds).toEqual([1])
-    expect(kit.items[0].to).toBe('/practice?queue=1')
+    expect(kit.items[0].to).toBe('/practice?queue=1&from=review-due')
     expect(kit.reviewDebtCount).toBe(1)
   })
 
@@ -104,8 +104,21 @@ describe('buildInterviewEmergencyKit', () => {
     const kit = buildInterviewEmergencyKit(progress, NOW)
 
     expect(kit.items.some(item => item.kind === 'mistake')).toBe(true)
-    expect(kit.primaryAction.to).toBe('/practice?queue=3')
+    expect(kit.primaryAction.to).toBe('/practice?queue=3&from=interview-retrospective')
     expect(kit.mistakeCount).toBeGreaterThan(0)
+  })
+
+  it('keeps weak unspoken drills inside the generic next-training context', () => {
+    const progress = emptyProgress()
+    addQuestion(progress, 4, 'weak', NOW)
+    addQuestion(progress, 5, 'mastered', NOW)
+    progress.dailyPlan = [4, 5]
+
+    const kit = buildInterviewEmergencyKit(progress, NOW)
+    const weakItem = kit.items.find(item => item.kind === 'weak')
+
+    expect(weakItem?.to).toBe('/practice?queue=4&from=next-training')
+    expect(kit.primaryAction.to).toBe('/practice?queue=4&from=next-training')
   })
 
   it('keeps the emergency plan inside a 30 minute and 5 action budget', () => {
@@ -132,7 +145,7 @@ describe('buildInterviewEmergencyKit', () => {
 
     expect(kit.level).toBe('ready')
     expect(kit.title).toContain('可以轻量热身')
-    expect(kit.primaryAction.to).toBe('/practice?queue=9')
+    expect(kit.primaryAction.to).toBe('/practice?queue=9&from=next-training')
   })
 
   it('exports critical emergency kit as portable markdown', () => {
@@ -151,6 +164,7 @@ describe('buildInterviewEmergencyKit', () => {
     expect(markdown).toContain('预计耗时')
     expect(markdown).toContain('1 道复习债先清掉')
     expect(markdown).toContain('入口：/practice?queue=1')
+    expect(markdown).toContain('/practice?queue=1&from=review-due')
     expect(markdown).not.toContain('undefined')
   })
 

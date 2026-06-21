@@ -6,6 +6,7 @@ import { getCategories } from '../../api/category'
 import { getCategoryIcon } from '../../utils/categoryIcons'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { summarizeProgress } from '../../utils/studyProgress'
+import { buildContinuePracticePath } from '../../utils/practiceRoute'
 import type { Category } from '../../types'
 
 const trackFilters = [
@@ -42,6 +43,7 @@ export default function QuestionBank() {
   const navigate = useNavigate()
   const { progress } = useStudyProgress()
   const summary = summarizeProgress(progress)
+  const continueTrainingPath = useMemo(() => buildContinuePracticePath(progress), [progress])
 
   const fetch = () => {
     setLoading(true)
@@ -119,7 +121,7 @@ export default function QuestionBank() {
             <h1>全部题库</h1>
             <p>按岗位方向快速定位题库，优先处理已跟踪和今日计划里的题。</p>
             <div className="bank-hero-actions">
-              <Button type="primary" icon={<PlayCircleOutlined />} aria-label="继续训练" onClick={() => navigate('/practice')}>
+              <Button type="primary" icon={<PlayCircleOutlined />} aria-label="继续训练" onClick={() => navigate(continueTrainingPath)}>
                 继续训练
               </Button>
               <Button icon={<CalendarOutlined />} aria-label="学习计划" onClick={() => navigate('/study')}>

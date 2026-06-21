@@ -35,7 +35,7 @@ export interface Question {
 
 export interface QuestionAdmin extends Question {
   status: 'DRAFT' | 'PUBLISHED' | 'REJECTED'
-  source: 'AI_GENERATED' | 'MANUAL'
+  source: 'AI_GENERATED' | 'AI_REWRITE' | 'MANUAL'
 }
 
 export type DraftRiskType =
@@ -74,6 +74,11 @@ export interface AdminCategoryQuality {
   missingRisk: number
   missingProjectExp: number
   missingCodeExamples: number
+  missingSummary: number
+  missingComparison: number
+  missingScenario: number
+  missingContentSections: number
+  invalidDifficulty: number
   completionRate: number
   riskScore: number
 }
@@ -126,6 +131,14 @@ export interface BatchProgress {
   errors: string[]
 }
 
+export interface AdminAiConfigStatus {
+  available: boolean
+  apiKeyConfigured: boolean
+  model: string
+  endpointHost: string
+  message: string
+}
+
 export interface GenerationTask {
   taskId: number
   status: 'RUNNING' | 'COMPLETED' | 'FAILED' | 'PARTIAL'
@@ -158,6 +171,8 @@ export interface QuestionStudyState {
   addedToPlan: boolean
   lastReviewedAt?: string
   reviewCount: number
+  lastEncounteredAt?: string
+  encounterCount?: number
 }
 
 export interface QuestionSnapshot {
@@ -220,12 +235,13 @@ export interface StudyStrategy {
   actions: StudyStrategyAction[]
 }
 
-export type DailyMissionKind = 'review' | 'ability' | 'interview' | 'plan'
+export type DailyMissionKind = 'draft' | 'review' | 'ability' | 'experience' | 'interview' | 'plan'
 
 export interface DailyMissionItem {
   id: string
   kind: DailyMissionKind
   title: string
+  actionLabel: string
   description: string
   reason: string
   to: string
@@ -241,7 +257,7 @@ export interface DailyMissionPlan {
 
 export type StudyPaceCoachLevel = 'empty' | 'behind' | 'balanced' | 'ahead'
 
-export type StudyPaceActionKey = 'start' | 'review' | 'plan' | 'interview' | 'practice'
+export type StudyPaceActionKey = 'start' | 'review' | 'activeRecall' | 'plan' | 'interview' | 'practice'
 
 export interface StudyPaceAction {
   key: StudyPaceActionKey
@@ -251,7 +267,7 @@ export interface StudyPaceAction {
 }
 
 export interface StudyPaceMetric {
-  key: 'target' | 'planned' | 'review' | 'interview'
+  key: 'target' | 'planned' | 'review' | 'activeRecall' | 'interview'
   label: string
   value: string
   detail: string
@@ -264,6 +280,7 @@ export interface StudyPaceCoach {
   dailyQuestionTarget: number
   plannedCount: number
   reviewDueCount: number
+  activeRecallCount: number
   interviewAttemptCount: number
   metrics: StudyPaceMetric[]
   actions: StudyPaceAction[]
@@ -429,6 +446,8 @@ export interface ReviewQueueItem extends QuestionSnapshot {
   status: StudyQuestionStatus
   lastReviewedAt?: string
   reviewCount: number
+  lastEncounteredAt?: string
+  encounterCount?: number
   reason: string
 }
 
@@ -445,6 +464,7 @@ export interface ReviewScheduleSummary {
   overdue: number
   dueToday: number
   upcoming: number
+  activeRecall: number
   nextReviewAt?: string
 }
 
@@ -746,7 +766,7 @@ export interface InterviewFollowUpDefense {
   primaryAction: InterviewFollowUpDefenseAction
 }
 
-export type PracticeQueueSource = 'review' | 'plan' | 'page' | 'new'
+export type PracticeQueueSource = 'review' | 'plan' | 'page' | 'active-recall' | 'new'
 
 export interface PracticeQueueItem extends QuestionSnapshot {
   status: StudyQuestionStatus
@@ -769,6 +789,20 @@ export interface PracticeSessionReportAction {
   label: string
   description: string
   to: string
+}
+
+export interface PracticeSessionReportPressureItem {
+  questionId: number
+  signal: string
+  detail: string
+  interviewerProbe?: string
+  passCriteria?: string
+}
+
+export interface PracticeSessionReportContext {
+  sourceLabel: string
+  queuePath?: string
+  pressureItems?: PracticeSessionReportPressureItem[]
 }
 
 export interface PracticeSessionRepairAction {

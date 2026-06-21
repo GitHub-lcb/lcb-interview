@@ -13,6 +13,10 @@ export const getBatchStatus = () =>
   api.get<{ data: import('../types').BatchProgress }>('/admin/ai/batch/status')
     .then(res => res.data.data)
 
+export const getAiConfigStatus = () =>
+  api.get<{ data: import('../types').AdminAiConfigStatus }>('/admin/ai/config-status')
+    .then(res => res.data.data)
+
 export const getAdminQualitySummary = (options: AxiosRequestConfig = {}) =>
   api.get<{ data: import('../types').AdminQualitySummary }>('/admin/dashboard/quality-summary', options)
     .then(res => res.data.data)

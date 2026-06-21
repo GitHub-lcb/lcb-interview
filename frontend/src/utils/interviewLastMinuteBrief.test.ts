@@ -84,7 +84,7 @@ describe('buildInterviewLastMinuteBrief', () => {
 
     expect(brief.level).toBe('risk')
     expect(brief.items[0]).toMatchObject({ kind: 'must-review', questionIds: [1] })
-    expect(brief.items[0].to).toBe('/practice?queue=1')
+    expect(brief.items[0].to).toBe('/practice?queue=1&from=review-due')
     expect(brief.metrics.some(metric => metric.label === '复习债' && metric.value === '1 道')).toBe(true)
   })
 
@@ -95,6 +95,7 @@ describe('buildInterviewLastMinuteBrief', () => {
 
     const brief = buildInterviewLastMinuteBrief(target, NOW)
     const avoid = brief.items.find(item => item.kind === 'avoid')
+    expect(avoid?.to).toBe('/practice?queue=3&from=interview-retrospective')
 
     expect(avoid?.title).toContain('风险意识')
     expect(avoid?.detail).toContain('主动补')
@@ -115,6 +116,7 @@ describe('buildInterviewLastMinuteBrief', () => {
     expect(brief.confidenceScore).toBeGreaterThanOrEqual(80)
     expect(brief.items.some(item => item.kind === 'talk-track')).toBe(true)
     expect(brief.items.some(item => item.kind === 'closing')).toBe(true)
+    expect(brief.items.find(item => item.kind === 'talk-track')?.to).toBe('/practice?queue=4,5&from=next-training')
   })
 
   it('exports risky last-minute brief as portable markdown', () => {
@@ -133,6 +135,7 @@ describe('buildInterviewLastMinuteBrief', () => {
     expect(markdown).toContain('## 进场动作')
     expect(markdown).toContain('1 道复习债面试前必须回看')
     expect(markdown).toContain('入口：/practice?queue=1')
+    expect(markdown).toContain('/practice?queue=1&from=review-due')
     expect(markdown).not.toContain('undefined')
   })
 

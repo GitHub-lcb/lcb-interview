@@ -85,6 +85,7 @@ import type {
   PracticeSessionTrainingScheduleItem,
   PracticeSessionReport,
   PracticeSessionReportAction,
+  PracticeSessionReportContext,
   PracticeSessionReportLevel,
   PracticeSessionReportMetric,
   PracticeSessionQueueProfile,
@@ -101,6 +102,7 @@ import { buildInterviewRecoveryAcceptance } from './interviewRecoveryAcceptance'
 import { buildInterviewRecoveryPlan } from './interviewRecoveryPlan'
 import { buildNextTrainingQueue, formatNextTrainingQueueItemMeta } from './nextTrainingQueue'
 import { buildPracticeInterviewerScriptProgress } from './practiceInterviewerScriptProgress'
+import { appendPracticeHandoffSource, extractPracticeHandoffSource, preservePracticeHandoffSourceInText } from './practiceRoute'
 
 const PASSING_SCORE = 70
 const STRONG_SESSION_SCORE = 80
@@ -111,6 +113,7 @@ const queueSourceLabels: Record<PracticeQueueItem['source'], string> = {
   review: '复习优先',
   plan: '今日计划',
   page: '当前筛选',
+  'active-recall': '主动回忆',
   new: '新题训练',
 }
 
@@ -207,6 +210,7 @@ export interface PracticeSessionScriptCommand {
 export function buildPracticeSessionReport(
   queue: PracticeQueueItem[],
   progress: StudyProgress,
+  context?: PracticeSessionReportContext,
 ): PracticeSessionReport {
   // 只取当前队列每题的最新一次尝试，避免历史旧分数或队列外训练污染本轮战报。
   const sessionItems = queue.map(question => ({
@@ -217,8 +221,9 @@ export function buildPracticeSessionReport(
   const totalCount = queue.length
   const answeredCount = answeredItems.length
   const weakQuestionIds = resolveWeakQuestionIds(sessionItems, progress)
-  const repairActions = buildRepairActions(sessionItems, progress)
-  const queueProfile = buildQueueProfile(queue, progress, weakQuestionIds)
+  const handoffSource = extractPracticeHandoffSource(context?.queuePath)
+  const repairActions = buildRepairActions(sessionItems, progress, handoffSource)
+  const queueProfile = buildQueueProfile(queue, progress, weakQuestionIds, context)
 
   if (totalCount === 0 || answeredCount === 0) {
     return buildEmptyReport(totalCount, repairActions, weakQuestionIds, queueProfile)
@@ -238,7 +243,7 @@ export function buildPracticeSessionReport(
     totalCount,
     weakQuestionIds,
   })
-  const primaryAction = buildPrimaryAction(level, weakQuestionIds, unansweredIds)
+  const primaryAction = buildPrimaryAction(level, weakQuestionIds, unansweredIds, handoffSource)
 
   return {
     level,
@@ -267,10 +272,11 @@ export function buildPracticeSessionReportMarkdown(
   queue: PracticeQueueItem[],
   progress: StudyProgress,
   now = new Date().toISOString(),
+  context?: PracticeSessionReportContext,
 ): string {
-  const report = buildPracticeSessionReport(queue, progress)
+  const report = buildPracticeSessionReport(queue, progress, context)
 
-  return [
+  const markdown = [
     `# ${progress.targetRole} 本轮模拟面试战报`,
     '',
     `生成时间：${formatDate(now)}`,
@@ -325,9 +331,11 @@ export function buildPracticeSessionReportMarkdown(
     renderSessionFirstQuestionReuseReviewHandoffReleaseReceipt(queue, progress, now),
     renderSessionNextTraining(queue, progress, now),
     renderSessionRepairActions(report.repairActions),
-    renderSessionQueue(queue, progress),
+    renderSessionQueue(queue, progress, context),
     renderSessionAction(report.primaryAction),
   ].join('\n')
+
+  return preservePracticeHandoffSourceInText(markdown, context?.queuePath)
 }
 
 export function buildPracticeSessionNextTrainingQueue(
@@ -3752,12 +3760,27 @@ function indentRepairDraft(draft: string): string {
     .join('\n')
 }
 
-function renderSessionQueue(queue: PracticeQueueItem[], progress: StudyProgress): string {
+function renderSessionQueue(
+  queue: PracticeQueueItem[],
+  progress: StudyProgress,
+  context?: PracticeSessionReportContext,
+): string {
   const lines = queue.length > 0
-    ? queue.map((item, index) => {
+    ? queue.flatMap((item, index) => {
       const latestScore = latestAttemptForQuestion(progress, item.id)?.feedback.score
       const status = progress.questionStates[item.id]?.status ?? item.status
-      return `- ${index + 1}. ${item.title}：${item.categoryName}，${formatDifficulty(item.difficulty)}，来源 ${formatQueueSource(item.source)}，状态 ${formatStatus(status)}，最近评分 ${formatScore(latestScore)}`
+      const baseLine = `- ${index + 1}. ${item.title}：${item.categoryName}，${formatDifficulty(item.difficulty)}，来源 ${formatQueueSource(item.source)}，状态 ${formatStatus(status)}，最近评分 ${formatScore(latestScore)}`
+      const pressureItem = context?.pressureItems?.find(reason => reason.questionId === item.id)
+      if (!pressureItem) {
+        return [baseLine]
+      }
+      return [
+        baseLine,
+        `  - 押题理由：${pressureItem.signal}`,
+        `  - 追问方向：${pressureItem.detail}`,
+        ...(pressureItem.interviewerProbe ? [`  - 面试官追问：${pressureItem.interviewerProbe}`] : []),
+        ...(pressureItem.passCriteria ? [`  - 通过口径：${pressureItem.passCriteria}`] : []),
+      ]
     })
     : ['- 暂无题目，先从学习计划、弱题或题库进入模拟面试。']
 
@@ -3783,6 +3806,7 @@ function buildEmptyReport(
   queueProfile: PracticeSessionQueueProfile,
 ): PracticeSessionReport {
   const hasRepairActions = repairActions.length > 0
+  const handoffSource = extractPracticeHandoffSource(queueProfile.queuePath)
 
   return {
     level: hasRepairActions ? 'risk' : 'empty',
@@ -3815,7 +3839,7 @@ function buildEmptyReport(
         kind: 'repair',
         label: '补弱重练',
         description: '先回到已标记薄弱的题目，完成评分并按最低维度补弱。',
-        to: buildQueuePath(repairActions.map(action => action.questionId)),
+        to: buildQueuePath(repairActions.map(action => action.questionId), handoffSource),
       }
       : {
         kind: 'start',
@@ -4163,9 +4187,10 @@ function buildInterviewerDecisionAction(
 function buildRepairActions(
   items: SessionAttemptItem[],
   progress: StudyProgress,
+  handoffSource?: string,
 ): PracticeSessionRepairAction[] {
   return items
-    .map(item => buildRepairAction(item, progress))
+    .map(item => buildRepairAction(item, progress, handoffSource))
     .filter((action): action is PracticeSessionRepairAction => Boolean(action))
     .sort((a, b) => repairPriority(a) - repairPriority(b))
 }
@@ -4173,6 +4198,7 @@ function buildRepairActions(
 function buildRepairAction(
   item: SessionAttemptItem,
   progress: StudyProgress,
+  handoffSource?: string,
 ): PracticeSessionRepairAction | undefined {
   const latestScore = item.attempt?.feedback.score
   const trackedStatus = progress.questionStates[item.question.id]?.status ?? item.question.status
@@ -4189,7 +4215,7 @@ function buildRepairAction(
       criterionLabel: '未评分',
       reason: '已标记薄弱但本轮还没有评分记录。',
       action: '先完成一次模拟评分，再按最低维度补弱。',
-      to: buildQuestionPath(item.question.id),
+      to: buildQuestionPath(item.question.id, handoffSource),
     }
   }
 
@@ -4204,7 +4230,7 @@ function buildRepairAction(
     criterionScore: weakest.score,
     reason: `最近评分 ${item.attempt.feedback.score} 分，${weakest.label} ${weakest.score} 分拖低本轮表现。`,
     action: actionForCriterion(weakest.key),
-    to: buildQuestionPath(item.question.id),
+    to: buildQuestionPath(item.question.id, handoffSource),
   }
 }
 
@@ -4242,13 +4268,14 @@ function buildPrimaryAction(
   level: PracticeSessionReportLevel,
   weakQuestionIds: number[],
   unansweredIds: number[],
+  handoffSource?: string,
 ): PracticeSessionReportAction {
   if (level === 'risk') {
     return {
       kind: 'repair',
       label: '补弱重练',
       description: '优先回到低分题和标弱题，先把本轮短板修到通过线。',
-      to: buildQueuePath(weakQuestionIds),
+      to: buildQueuePath(weakQuestionIds, handoffSource),
     }
   }
 
@@ -4266,7 +4293,7 @@ function buildPrimaryAction(
       kind: 'continue',
       label: '继续未答题',
       description: '先完成剩余题目，再判断整轮是否需要补弱。',
-      to: buildQueuePath(unansweredIds),
+      to: buildQueuePath(unansweredIds, handoffSource),
     }
   }
 
@@ -4278,11 +4305,11 @@ function buildPrimaryAction(
   }
 }
 
-function buildQueuePath(questionIds: number[]): string {
+function buildQueuePath(questionIds: number[], handoffSource?: string): string {
   if (questionIds.length === 0) {
     return '/practice'
   }
-  return `/practice?queue=${questionIds.join(',')}`
+  return appendPracticeHandoffSource(`/practice?queue=${questionIds.join(',')}`, handoffSource)
 }
 
 function uniqueNumbers(values: number[]): number[] {
@@ -6296,6 +6323,7 @@ function buildQueueProfile(
   queue: PracticeQueueItem[],
   progress: StudyProgress,
   weakQuestionIds: number[],
+  context?: PracticeSessionReportContext,
 ): PracticeSessionQueueProfile {
   if (queue.length === 0) {
     return {
@@ -6318,12 +6346,12 @@ function buildQueueProfile(
 
   return {
     isEmpty: false,
-    sourceSummary: summarizeQueueSources(queue),
+    sourceSummary: context?.sourceLabel ? `${context.sourceLabel} ${queue.length} 道` : summarizeQueueSources(queue),
     nextQuestionTitle: nextQuestion.title,
     nextQuestionMeta: `${nextQuestion.categoryName}，${formatStatus(nextStatus)}，${formatScore(nextScore)}`,
     unansweredQuestionIds,
     weakQuestionIds,
-    queuePath: buildQueuePath(queue.map(item => item.id)),
+    queuePath: context?.queuePath ?? buildQueuePath(queue.map(item => item.id)),
   }
 }
 
@@ -6427,8 +6455,8 @@ function formatDifficulty(difficulty: string): string {
   return difficultyLabels[difficulty] ?? difficulty
 }
 
-function buildQuestionPath(questionId: number): string {
-  return `/practice?question=${questionId}`
+function buildQuestionPath(questionId: number, handoffSource?: string): string {
+  return appendPracticeHandoffSource(`/practice?question=${questionId}`, handoffSource)
 }
 
 function titleForLevel(level: PracticeSessionReportLevel, unansweredCount: number): string {

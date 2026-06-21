@@ -129,7 +129,7 @@ function renderRoutePlaybookItems(routeProgressList: RouteProgress[]): string {
 
 function renderRouteNextStep(routeProgress: RouteProgress): string {
   if (routeProgress.nextQuestionIds.length > 0) {
-    return `/practice?queue=${routeProgress.nextQuestionIds.slice(0, 12).join(',')}`
+    return `/practice?queue=${routeProgress.nextQuestionIds.slice(0, 12).join(',')}&from=ability-gap`
   }
   if (routeProgress.totalRemembered === 0) {
     return '先搜索并打开几道题建立本地轨迹。'

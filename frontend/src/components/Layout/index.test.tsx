@@ -91,7 +91,7 @@ describe('AppLayout global recovery dock', () => {
 
     await userEvent.click(within(dock).getByRole('button', { name: /恢复 1 份草稿/ }))
 
-    expect(navigate).toHaveBeenCalledWith('/practice?queue=2')
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=2&from=resume-draft')
   })
 
   it('lets users hide the current recovery dock until draft content changes', async () => {

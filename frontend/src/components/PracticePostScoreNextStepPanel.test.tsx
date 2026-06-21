@@ -86,10 +86,10 @@ describe('PracticePostScoreNextStepPanel', () => {
     expect(within(panel).getByLabelText('下一轮 2')).toBeInTheDocument()
 
     await user.click(within(panel).getByRole('button', { name: /开始下一轮训练/ }))
-    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2&from=next-training')
 
     await user.click(within(panel).getByRole('button', { name: /先清复习债/ }))
-    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=2')
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=2&from=review-due')
   })
 
   it('prioritizes the next first-run question before generic next training', async () => {
@@ -106,7 +106,7 @@ describe('PracticePostScoreNextStepPanel', () => {
         ]}
         progress={progress()}
         now={NOW}
-        firstRunProgress={{
+        scopedQueueProgress={{
           answeredCount: 1,
           totalCount: 3,
           nextQuestionTitle: 'Redis 缓存雪崩',
@@ -125,6 +125,80 @@ describe('PracticePostScoreNextStepPanel', () => {
     await user.click(within(panel).getByRole('button', { name: /继续第 2 题/ }))
 
     expect(onContinueFirstRun).toHaveBeenCalledTimes(1)
+    expect(onNavigate).not.toHaveBeenCalled()
+  })
+
+  it('keeps daily-plan progress before generic next training', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+    const onContinueDailyPlan = vi.fn()
+
+    render(
+      <PracticePostScoreNextStepPanel
+        queue={[
+          queueItem(1, 'HashMap 并发问题', 'learning'),
+          queueItem(2, 'Redis 缓存雪崩', 'learning'),
+        ]}
+        progress={progress()}
+        now={NOW}
+        scopedQueueProgress={{
+          answeredCount: 1,
+          totalCount: 2,
+          nextQuestionTitle: 'Redis 缓存雪崩',
+          onContinue: onContinueDailyPlan,
+          variant: 'daily-plan',
+        }}
+        onNavigate={onNavigate}
+      />,
+    )
+
+    const panel = screen.getByLabelText('评分后下一步')
+
+    expect(within(panel).getByText('继续今日计划队列')).toBeInTheDocument()
+    expect(within(panel).getByText('已完成 1 / 2，下一题继续回答「Redis 缓存雪崩」。')).toBeInTheDocument()
+    expect(within(panel).getByLabelText('计划进度 1 / 2')).toBeInTheDocument()
+    expect(within(panel).getByText('今日计划题')).toBeInTheDocument()
+
+    await user.click(within(panel).getByRole('button', { name: /继续第 2 题/ }))
+
+    expect(onContinueDailyPlan).toHaveBeenCalledTimes(1)
+    expect(onNavigate).not.toHaveBeenCalled()
+  })
+
+  it('keeps resumed draft progress before generic next training', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+    const onContinueDraft = vi.fn()
+
+    render(
+      <PracticePostScoreNextStepPanel
+        queue={[
+          queueItem(1, 'HashMap 并发问题', 'learning'),
+          queueItem(2, 'Redis 缓存雪崩', 'learning'),
+        ]}
+        progress={progress()}
+        now={NOW}
+        scopedQueueProgress={{
+          answeredCount: 1,
+          totalCount: 2,
+          nextQuestionTitle: 'Redis 缓存雪崩',
+          onContinue: onContinueDraft,
+          variant: 'resume-draft',
+        }}
+        onNavigate={onNavigate}
+      />,
+    )
+
+    const panel = screen.getByLabelText('评分后下一步')
+
+    expect(within(panel).getByText('继续恢复未提交回答')).toBeInTheDocument()
+    expect(within(panel).getByText('已恢复 1 / 2，下一题继续评分「Redis 缓存雪崩」。')).toBeInTheDocument()
+    expect(within(panel).getByLabelText('恢复进度 1 / 2')).toBeInTheDocument()
+    expect(within(panel).getByText('草稿题')).toBeInTheDocument()
+
+    await user.click(within(panel).getByRole('button', { name: /继续第 2 题/ }))
+
+    expect(onContinueDraft).toHaveBeenCalledTimes(1)
     expect(onNavigate).not.toHaveBeenCalled()
   })
 
@@ -151,7 +225,7 @@ describe('PracticePostScoreNextStepPanel', () => {
           },
         }}
         now={NOW}
-        firstRunProgress={{
+        scopedQueueProgress={{
           answeredCount: 1,
           totalCount: 2,
           nextQuestionTitle: 'Redis 缓存雪崩',
@@ -201,7 +275,7 @@ describe('PracticePostScoreNextStepPanel', () => {
           },
         }}
         now={NOW}
-        firstRunProgress={{
+        scopedQueueProgress={{
           answeredCount: 3,
           totalCount: 3,
           onContinue: onContinueFirstRun,
@@ -235,7 +309,7 @@ describe('PracticePostScoreNextStepPanel', () => {
         ]}
         progress={progress()}
         now={NOW}
-        firstRunProgress={{
+        scopedQueueProgress={{
           answeredCount: 1,
           totalCount: 2,
           nextQuestionTitle: 'Redis 缓存雪崩',
@@ -258,6 +332,49 @@ describe('PracticePostScoreNextStepPanel', () => {
     expect(onNavigate).not.toHaveBeenCalled()
   })
 
+  it('keeps active recall wording before generic due review wording', async () => {
+    const user = userEvent.setup()
+    const onNavigate = vi.fn()
+    const onContinueActiveRecall = vi.fn()
+
+    render(
+      <PracticePostScoreNextStepPanel
+        queue={[
+          queueItem(1, 'ThreadLocal 内存泄漏', 'learning'),
+          queueItem(2, 'Redis 缓存雪崩', 'learning'),
+        ]}
+        progress={{
+          ...progress(),
+          questionStates: {
+            1: { status: 'new', addedToPlan: false, reviewCount: 0, encounterCount: 2 },
+            2: { status: 'new', addedToPlan: false, reviewCount: 0, encounterCount: 2 },
+          },
+        }}
+        now={NOW}
+        scopedQueueProgress={{
+          answeredCount: 1,
+          totalCount: 2,
+          nextQuestionTitle: 'Redis 缓存雪崩',
+          onContinue: onContinueActiveRecall,
+          variant: 'active-recall',
+        }}
+        onNavigate={onNavigate}
+      />,
+    )
+
+    const panel = screen.getByLabelText('评分后下一步')
+
+    expect(within(panel).getByText('继续主动回忆队列')).toBeInTheDocument()
+    expect(within(panel).getByText('已回忆 1 / 2，下一题继续脱稿回忆「Redis 缓存雪崩」。')).toBeInTheDocument()
+    expect(within(panel).getByLabelText('回忆进度 1 / 2')).toBeInTheDocument()
+    expect(within(panel).getByText('主动回忆题')).toBeInTheDocument()
+
+    await user.click(within(panel).getByRole('button', { name: /继续第 2 题/ }))
+
+    expect(onContinueActiveRecall).toHaveBeenCalledTimes(1)
+    expect(onNavigate).not.toHaveBeenCalled()
+  })
+
   it('keeps first-run repair context when opening a listed risk item', async () => {
     const user = userEvent.setup()
     const onNavigate = vi.fn()
@@ -270,7 +387,7 @@ describe('PracticePostScoreNextStepPanel', () => {
         ]}
         progress={progress()}
         now={NOW}
-        firstRunProgress={{
+        scopedQueueProgress={{
           answeredCount: 2,
           totalCount: 2,
           onContinue: vi.fn(),
@@ -309,7 +426,7 @@ describe('PracticePostScoreNextStepPanel', () => {
           },
         }}
         now={NOW}
-        firstRunProgress={{
+        scopedQueueProgress={{
           answeredCount: 2,
           totalCount: 2,
           onContinue: vi.fn(),
@@ -351,7 +468,7 @@ describe('PracticePostScoreNextStepPanel', () => {
           },
         }}
         now={NOW}
-        firstRunProgress={{
+        scopedQueueProgress={{
           answeredCount: 2,
           totalCount: 2,
           onContinue: vi.fn(),
@@ -397,7 +514,7 @@ describe('PracticePostScoreNextStepPanel', () => {
           },
         }}
         now={NOW}
-        firstRunProgress={{
+        scopedQueueProgress={{
           answeredCount: 2,
           totalCount: 2,
           onContinue: vi.fn(),

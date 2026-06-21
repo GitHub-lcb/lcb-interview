@@ -30,6 +30,14 @@ function setProgress(progress: StudyProgress) {
   window.localStorage.setItem(STUDY_PROGRESS_STORAGE_KEY, JSON.stringify(progress))
 }
 
+function directSimulateButton(): HTMLButtonElement {
+  const button = document.querySelector('.first-run-secondary-actions .ant-btn:last-child')
+  if (!(button instanceof HTMLButtonElement)) {
+    throw new Error('Direct simulate action was not rendered')
+  }
+  return button
+}
+
 function scoredAttempt(questionId: number, score: number, createdAt: string): InterviewAttempt {
   return {
     questionId,
@@ -121,7 +129,7 @@ describe('FirstRunLaunchpad', () => {
     expect(screen.getByLabelText('本轮题单预览')).toHaveTextContent('Redis 缓存雪崩')
     await userEvent.click(screen.getByRole('button', { name: /恢复 1 份回答草稿/ }))
 
-    expect(navigate).toHaveBeenCalledWith('/practice?queue=2')
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=2&from=resume-draft')
     const stored = JSON.parse(window.localStorage.getItem(STUDY_PROGRESS_STORAGE_KEY) ?? '{}') as StudyProgress
     expect(stored.dailyPlan).toEqual([2])
     expect(stored.questionStates[2].addedToPlan).toBe(true)
@@ -164,7 +172,7 @@ describe('FirstRunLaunchpad', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /恢复 1 份回答草稿/ }))
 
-    expect(navigate).toHaveBeenCalledWith('/practice?queue=2')
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=2&from=resume-draft')
     const stored = JSON.parse(window.localStorage.getItem(STUDY_PROGRESS_STORAGE_KEY) ?? '{}') as StudyProgress
     expect(stored.dailyPlan).toEqual([4, 2])
     expect(stored.questionStates[4].addedToPlan).toBe(true)
@@ -191,7 +199,7 @@ describe('FirstRunLaunchpad', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /继续 2 题队列/ }))
 
-    expect(navigate).toHaveBeenCalledWith('/practice?queue=2,4')
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=2,4&from=daily-plan')
     const stored = JSON.parse(window.localStorage.getItem(STUDY_PROGRESS_STORAGE_KEY) ?? '{}') as StudyProgress
     expect(stored.dailyPlan).toEqual([2, 4])
     expect(stored.questionSnapshots[2].title).toBe('Redis 缓存雪崩')
@@ -225,7 +233,7 @@ describe('FirstRunLaunchpad', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /继续 1 题队列/ }))
 
-    expect(navigate).toHaveBeenCalledWith('/practice?queue=2')
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=2&from=daily-plan')
     const stored = JSON.parse(window.localStorage.getItem(STUDY_PROGRESS_STORAGE_KEY) ?? '{}') as StudyProgress
     expect(stored.dailyPlan).toEqual([2])
     expect(stored.questionStates[2].addedToPlan).toBe(true)
@@ -259,7 +267,7 @@ describe('FirstRunLaunchpad', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /修复 1 道风险题/ }))
 
-    expect(navigate).toHaveBeenCalledWith('/practice?queue=2')
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=2&from=first-run-repair')
     const stored = JSON.parse(window.localStorage.getItem(STUDY_PROGRESS_STORAGE_KEY) ?? '{}') as StudyProgress
     expect(stored.dailyPlan).toEqual([2])
     expect(stored.questionStates[2].addedToPlan).toBe(true)
@@ -302,7 +310,7 @@ describe('FirstRunLaunchpad', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /修复 2 道风险题/ }))
 
-    expect(navigate).toHaveBeenCalledWith('/practice?queue=2,4')
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=2,4&from=first-run-repair')
     const stored = JSON.parse(window.localStorage.getItem(STUDY_PROGRESS_STORAGE_KEY) ?? '{}') as StudyProgress
     expect(stored.dailyPlan).toEqual([4, 2])
     expect(stored.questionStates[4].addedToPlan).toBe(true)
@@ -418,5 +426,49 @@ describe('FirstRunLaunchpad', () => {
     await userEvent.click(screen.getByRole('button', { name: /^按岗位选路线$/ }))
 
     expect(navigate).toHaveBeenCalledWith('/routes')
+  })
+
+  it('shows distinct fallback actions when no first-run questions are available', () => {
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <FirstRunLaunchpad hotQuestions={[]} />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getAllByText('按岗位选路线')).toHaveLength(1)
+    expect(screen.getByText('打开学习计划')).toBeInTheDocument()
+    expect(screen.getByText('直接模拟')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^打开学习计划$/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^直接模拟$/ })).toBeInTheDocument()
+  })
+
+  it('routes direct simulation to the unfinished daily plan when one exists', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-20T00:00:00.000Z'),
+      dailyPlan: [2],
+      questionStates: {
+        2: { status: 'learning', addedToPlan: true, reviewCount: 1 },
+      },
+      questionSnapshots: {
+        2: {
+          id: 2,
+          title: 'Redis 缓存雪崩',
+          difficulty: 'MEDIUM',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 240,
+        },
+      },
+    })
+
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <FirstRunLaunchpad hotQuestions={[]} />
+      </MemoryRouter>,
+    )
+
+    await userEvent.click(directSimulateButton())
+
+    expect(navigate).toHaveBeenCalledWith('/practice?queue=2&from=daily-plan')
   })
 })

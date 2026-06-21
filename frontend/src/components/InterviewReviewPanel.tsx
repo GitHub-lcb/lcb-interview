@@ -4,7 +4,11 @@ import { ArrowRightOutlined, CopyOutlined, LineChartOutlined, WarningOutlined } 
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { InterviewTrend, StudyProgress } from '../types'
-import { buildInterviewReviewMarkdown, buildInterviewReviewSummary } from '../utils/interviewReview'
+import {
+  buildInterviewReviewMarkdown,
+  buildInterviewReviewNextStep,
+  buildInterviewReviewSummary,
+} from '../utils/interviewReview'
 
 interface InterviewReviewPanelProps {
   progress: StudyProgress
@@ -47,6 +51,7 @@ function formatAttemptTime(value: string) {
 export default function InterviewReviewPanel({ progress, compact = false }: InterviewReviewPanelProps) {
   const navigate = useNavigate()
   const summary = useMemo(() => buildInterviewReviewSummary(progress), [progress])
+  const nextStep = useMemo(() => buildInterviewReviewNextStep(summary), [summary])
   const tone = trendTone(summary.trend)
 
   const handleCopyReview = async () => {
@@ -78,8 +83,8 @@ export default function InterviewReviewPanel({ progress, compact = false }: Inte
             </Button>
           </div>
         </div>
-        <Button type="primary" icon={<ArrowRightOutlined />} onClick={() => navigate('/practice')}>
-          开始模拟面试
+        <Button type="primary" icon={<ArrowRightOutlined />} onClick={() => navigate(nextStep.to)}>
+          {nextStep.label}
         </Button>
       </section>
     )
@@ -98,6 +103,15 @@ export default function InterviewReviewPanel({ progress, compact = false }: Inte
             {summary.trend === 'declining' ? <WarningOutlined /> : <LineChartOutlined />}
             {trendLabels[summary.trend]}
           </span>
+          <Button
+            size="small"
+            type="primary"
+            icon={<ArrowRightOutlined />}
+            aria-label={nextStep.questionTitle ? `${nextStep.label}：${nextStep.questionTitle}` : nextStep.label}
+            onClick={() => navigate(nextStep.to)}
+          >
+            {nextStep.label}
+          </Button>
           <Button size="small" icon={<CopyOutlined />} onClick={handleCopyReview}>
             复制复盘
           </Button>

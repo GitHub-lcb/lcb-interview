@@ -4,10 +4,13 @@ import type {
   InterviewRecoveryPlan,
   InterviewRecoveryStep,
 } from '../types'
+import { appendPracticeHandoffSource } from './practiceRoute'
 
 const EMPTY_PLAN_MINUTES = 12
 const REPAIR_MINUTES = [12, 10, 15]
 const ADVANCED_MINUTES = [15, 15, 12]
+const INTERVIEW_RETROSPECTIVE_SOURCE = 'interview-retrospective'
+const PRACTICE_RECOVERY_TARGET_PATTERN = /[?&](queue|question)=/
 
 export function buildInterviewRecoveryPlan(ledger: InterviewMistakeLedger): InterviewRecoveryPlan {
   if (ledger.level === 'empty' || ledger.items.length === 0) {
@@ -61,6 +64,8 @@ function buildEmptyStep(): InterviewRecoveryStep {
 }
 
 function buildRepairSteps(item: InterviewMistakeLedgerItem): InterviewRecoveryStep[] {
+  const to = withInterviewRetrospectiveSource(item.to)
+
   return [
     {
       id: `${item.id}-replay`,
@@ -69,7 +74,7 @@ function buildRepairSteps(item: InterviewMistakeLedgerItem): InterviewRecoverySt
       reason: item.summary,
       durationMinutes: REPAIR_MINUTES[0],
       questionIds: item.affectedQuestionIds,
-      to: item.to || '/practice',
+      to,
       actionLabel: item.actionLabel,
       priority: 3,
     },
@@ -80,7 +85,7 @@ function buildRepairSteps(item: InterviewMistakeLedgerItem): InterviewRecoverySt
       reason: '二次作答前先补齐表达材料，能减少同一错因反复出现。',
       durationMinutes: REPAIR_MINUTES[1],
       questionIds: item.affectedQuestionIds,
-      to: item.to || '/practice',
+      to,
       actionLabel: '补齐表达',
       priority: 2,
     },
@@ -91,7 +96,7 @@ function buildRepairSteps(item: InterviewMistakeLedgerItem): InterviewRecoverySt
       reason: '只看答案不等于能在追问下稳定表达，必须用复测闭环。',
       durationMinutes: REPAIR_MINUTES[2],
       questionIds: item.affectedQuestionIds,
-      to: item.to || '/practice',
+      to,
       actionLabel: '复测加压',
       priority: 1,
     },
@@ -99,7 +104,7 @@ function buildRepairSteps(item: InterviewMistakeLedgerItem): InterviewRecoverySt
 }
 
 function buildAdvancedSteps(item: InterviewMistakeLedgerItem): InterviewRecoveryStep[] {
-  const to = item.to || '/practice'
+  const to = withInterviewRetrospectiveSource(item.to)
   const questionIds = item.affectedQuestionIds
 
   return [
@@ -161,6 +166,15 @@ function actionFromStep(step: InterviewRecoveryStep) {
     description: step.description,
     to: step.to,
   }
+}
+
+function withInterviewRetrospectiveSource(to?: string): string {
+  const target = to || '/practice'
+  if (!target.startsWith('/practice') || !PRACTICE_RECOVERY_TARGET_PATTERN.test(target)) {
+    return target
+  }
+
+  return appendPracticeHandoffSource(target, INTERVIEW_RETROSPECTIVE_SOURCE, { replace: false })
 }
 
 function sumMinutes(steps: InterviewRecoveryStep[]): number {

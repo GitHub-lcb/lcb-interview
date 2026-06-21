@@ -97,7 +97,7 @@ describe('abilityMap', () => {
     expect(markdown).toContain('## 总览')
     expect(markdown).toContain('## 岗位画像')
     expect(markdown).toContain('准备度：')
-    expect(markdown).toContain('入口：/practice?queue=2')
+    expect(markdown).toContain('入口：/practice?queue=2&from=ability-gap')
     expect(markdown).not.toContain('undefined')
   })
 

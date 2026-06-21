@@ -168,6 +168,59 @@ describe('Practice page answer draft lifecycle', () => {
     expect(readPracticeAnswerDraft(2)).toBeNull()
   })
 
+  it('keeps resumed draft context and ignores historical scores for this scoped session', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-20T00:00:00.000Z'),
+      dailyPlan: [2],
+      questionSnapshots: {
+        2: {
+          id: 2,
+          title: 'Redis 缓存雪崩',
+          difficulty: 'MEDIUM',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 240,
+        },
+      },
+      questionStates: {
+        2: { status: 'learning', addedToPlan: true, reviewCount: 1 },
+      },
+      interviewAttempts: {
+        2: [{
+          questionId: 2,
+          answer: '历史回答：只提到了随机过期。',
+          feedback: { ...mocks.feedback, score: 72, level: 'pass' },
+          createdAt: '2026-06-20T08:30:00.000Z',
+        }],
+      },
+    })
+    writePracticeAnswerDraft(2, '草稿回答：先恢复未提交内容，再补齐限流降级。', '2026-06-20T09:30:00.000Z')
+
+    render(
+      <MemoryRouter
+        initialEntries={['/practice?queue=2&from=resume-draft']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Practice />
+      </MemoryRouter>,
+    )
+
+    const context = await screen.findByLabelText('未提交回答恢复上下文')
+    expect(context).toHaveTextContent('未提交回答恢复')
+    expect(context).toHaveTextContent('先补完这 1 份未提交回答')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('0 / 1')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('草稿恢复')
+    expect(screen.getByDisplayValue('草稿回答：先恢复未提交内容，再补齐限流降级。')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: /提交评分/ }))
+
+    await waitFor(() => expect(screen.getByText('面试官评分')).toBeInTheDocument())
+    const panel = screen.getByLabelText('评分后下一步')
+    expect(panel).toHaveTextContent('未提交回答已恢复')
+    expect(panel).toHaveTextContent('恢复进度1 / 1草稿题')
+    expect(readPracticeAnswerDraft(2)).toBeNull()
+  })
+
   it('moves to the next unanswered question instead of cycling through already scored questions', async () => {
     setProgress({
       ...createDefaultProgress('2026-06-20T00:00:00.000Z'),
@@ -235,6 +288,582 @@ describe('Practice page answer draft lifecycle', () => {
 
     expect(await screen.findByRole('heading', { name: 'Java 后端 · 第 3 题' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'MySQL 索引失效' })).toBeInTheDocument()
+  })
+
+  it('keeps active recall context when practice starts from repeated encounters', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-21T00:00:00.000Z'),
+      questionSnapshots: {
+        7: {
+          id: 7,
+          title: 'ThreadLocal 内存泄漏',
+          difficulty: 'MEDIUM',
+          categoryName: 'Java 并发',
+          tags: ['ThreadLocal'],
+          viewCount: 180,
+        },
+      },
+      questionStates: {
+        7: {
+          status: 'new',
+          addedToPlan: false,
+          reviewCount: 0,
+          encounterCount: 2,
+          lastEncounteredAt: '2026-06-20T20:00:00.000Z',
+        },
+      },
+    })
+
+    render(
+      <MemoryRouter
+        initialEntries={['/practice?queue=7&from=review-due']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Practice />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('heading', { name: 'ThreadLocal 内存泄漏' })).toBeInTheDocument()
+
+    const context = screen.getByLabelText('主动回忆队列上下文')
+    expect(context).toHaveTextContent('主动回忆队列')
+    expect(context).toHaveTextContent('先脱稿回忆这 1 道多次遇见题')
+    expect(context).toHaveTextContent('还没完成复习')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('当前来源主动回忆')
+    expect(screen.getByText('主动回忆 · Java 并发')).toBeInTheDocument()
+  })
+
+  it('continues active recall wording after scoring a repeated-encounter question', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-21T00:00:00.000Z'),
+      questionSnapshots: {
+        7: {
+          id: 7,
+          title: 'ThreadLocal 内存泄漏',
+          difficulty: 'MEDIUM',
+          categoryName: 'Java 并发',
+          tags: ['ThreadLocal'],
+          viewCount: 180,
+        },
+        8: {
+          id: 8,
+          title: 'AQS 独占锁释放',
+          difficulty: 'HARD',
+          categoryName: 'Java 并发',
+          tags: ['AQS'],
+          viewCount: 220,
+        },
+      },
+      questionStates: {
+        7: {
+          status: 'new',
+          addedToPlan: false,
+          reviewCount: 0,
+          encounterCount: 2,
+          lastEncounteredAt: '2026-06-20T20:00:00.000Z',
+        },
+        8: {
+          status: 'new',
+          addedToPlan: false,
+          reviewCount: 0,
+          encounterCount: 3,
+          lastEncounteredAt: '2026-06-20T20:05:00.000Z',
+        },
+      },
+    })
+
+    render(
+      <MemoryRouter
+        initialEntries={['/practice?queue=7,8&from=review-due']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Practice />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('heading', { name: 'ThreadLocal 内存泄漏' })).toBeInTheDocument()
+
+    const editor = screen.getByRole('textbox')
+    fireEvent.change(editor, { target: { value: '结论：ThreadLocal 要及时 remove，并说明线程池复用导致的引用滞留风险。' } })
+    await userEvent.click(screen.getByRole('button', { name: /提交评分/ }))
+
+    const panel = await screen.findByLabelText('评分后下一步')
+    expect(panel).toHaveTextContent('继续主动回忆队列')
+    expect(panel).toHaveTextContent('已回忆 1 / 2，下一题继续脱稿回忆「AQS 独占锁释放」。')
+    expect(panel).toHaveTextContent('回忆进度1 / 2主动回忆题')
+
+    await userEvent.click(screen.getByRole('button', { name: /继续第 2 题/ }))
+
+    expect(await screen.findByRole('heading', { name: 'AQS 独占锁释放' })).toBeInTheDocument()
+    expect(screen.getByLabelText('主动回忆队列上下文')).toHaveTextContent('先脱稿回忆这 2 道多次遇见题')
+  })
+
+  it('keeps due review context when practice starts from the review debt queue', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-21T00:00:00.000Z'),
+      dailyPlan: [1, 2],
+      questionSnapshots: {
+        1: {
+          id: 1,
+          title: 'HashMap 并发问题',
+          difficulty: 'HARD',
+          categoryName: 'Java 基础',
+          tags: ['HashMap'],
+          viewCount: 500,
+        },
+        2: {
+          id: 2,
+          title: 'Redis 缓存雪崩',
+          difficulty: 'MEDIUM',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 240,
+        },
+      },
+      questionStates: {
+        1: { status: 'learning', addedToPlan: true, reviewCount: 1, lastReviewedAt: '2020-01-01T00:00:00.000Z' },
+        2: { status: 'weak', addedToPlan: true, reviewCount: 2, lastReviewedAt: '2020-01-02T00:00:00.000Z' },
+      },
+    })
+
+    render(
+      <MemoryRouter
+        initialEntries={['/practice?queue=1,2&from=review-due']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Practice />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('heading', { name: 'HashMap 并发问题' })).toBeInTheDocument()
+
+    const context = screen.getByLabelText('到期复习队列上下文')
+    expect(context).toHaveTextContent('到期复习队列')
+    expect(context).toHaveTextContent('先补回这 2 道到期题')
+    expect(context).toHaveTextContent('这轮训练来自智能复习排期')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('当前来源到期复习')
+    expect(screen.getByText('到期复习 · Java 基础')).toBeInTheDocument()
+  })
+
+  it('continues the next due review question from the post-score next-step panel', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-21T00:00:00.000Z'),
+      dailyPlan: [1, 2],
+      questionSnapshots: {
+        1: {
+          id: 1,
+          title: 'HashMap 并发问题',
+          difficulty: 'HARD',
+          categoryName: 'Java 基础',
+          tags: ['HashMap'],
+          viewCount: 500,
+        },
+        2: {
+          id: 2,
+          title: 'Redis 缓存雪崩',
+          difficulty: 'MEDIUM',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 240,
+        },
+      },
+      questionStates: {
+        1: { status: 'learning', addedToPlan: true, reviewCount: 1, lastReviewedAt: '2020-01-01T00:00:00.000Z' },
+        2: { status: 'weak', addedToPlan: true, reviewCount: 2, lastReviewedAt: '2020-01-02T00:00:00.000Z' },
+      },
+      interviewAttempts: {
+        1: [{
+          questionId: 1,
+          answer: '旧答案：HashMap 并发写入需要规避共享修改。',
+          feedback: { ...mocks.feedback, score: 72, level: 'pass' },
+          createdAt: '2026-06-20T09:00:00.000Z',
+        }],
+        2: [{
+          questionId: 2,
+          answer: '旧答案：缓存雪崩需要随机过期和限流兜底。',
+          feedback: { ...mocks.feedback, score: 76, level: 'pass' },
+          createdAt: '2026-06-20T09:10:00.000Z',
+        }],
+      },
+    })
+
+    render(
+      <MemoryRouter
+        initialEntries={['/practice?queue=1,2&from=review-due']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Practice />
+      </MemoryRouter>,
+    )
+
+    const editor = await screen.findByRole('textbox')
+    fireEvent.change(editor, { target: { value: '结论：HashMap 并发写入要避免共享修改，并说明扩容和数据一致性风险。' } })
+    await userEvent.click(screen.getByRole('button', { name: /提交评分/ }))
+
+    const panel = await screen.findByLabelText('评分后下一步')
+    expect(panel).toHaveTextContent('继续清理到期复习队列')
+    expect(panel).toHaveTextContent('已复习 1 / 2，下一题继续补回「Redis 缓存雪崩」。')
+    expect(panel).toHaveTextContent('复习进度1 / 2到期复习题')
+
+    await userEvent.click(screen.getByRole('button', { name: /继续第 2 题/ }))
+
+    expect(await screen.findByRole('heading', { name: 'Redis 缓存雪崩' })).toBeInTheDocument()
+    expect(screen.getByLabelText('到期复习队列上下文')).toHaveTextContent('先补回这 2 道到期题')
+  })
+
+  it('keeps daily plan context and ignores historical scores for this scoped session', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-21T00:00:00.000Z'),
+      dailyPlan: [1, 2],
+      questionSnapshots: {
+        1: {
+          id: 1,
+          title: 'HashMap 并发问题',
+          difficulty: 'HARD',
+          categoryName: 'Java 基础',
+          tags: ['HashMap'],
+          viewCount: 500,
+        },
+        2: {
+          id: 2,
+          title: 'Redis 缓存雪崩',
+          difficulty: 'MEDIUM',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 240,
+        },
+      },
+      questionStates: {
+        1: { status: 'learning', addedToPlan: true, reviewCount: 1, lastReviewedAt: '2026-06-20T09:00:00.000Z' },
+        2: { status: 'learning', addedToPlan: true, reviewCount: 1, lastReviewedAt: '2026-06-20T09:10:00.000Z' },
+      },
+      interviewAttempts: {
+        1: [{
+          questionId: 1,
+          answer: '旧答案：HashMap 并发写入需要规避共享修改。',
+          feedback: { ...mocks.feedback, score: 72, level: 'pass' },
+          createdAt: '2026-06-20T09:00:00.000Z',
+        }],
+        2: [{
+          questionId: 2,
+          answer: '旧答案：缓存雪崩需要随机过期和限流兜底。',
+          feedback: { ...mocks.feedback, score: 76, level: 'pass' },
+          createdAt: '2026-06-20T09:10:00.000Z',
+        }],
+      },
+    })
+
+    render(
+      <MemoryRouter
+        initialEntries={['/practice?queue=1,2&from=daily-plan']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Practice />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('heading', { name: 'HashMap 并发问题' })).toBeInTheDocument()
+
+    const context = screen.getByLabelText('今日计划队列上下文')
+    expect(context).toHaveTextContent('今日计划队列')
+    expect(context).toHaveTextContent('先完成这 2 道今日计划题')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('0 / 2')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('当前来源今日计划')
+    expect(screen.getByText('今日计划 · Java 基础')).toBeInTheDocument()
+
+    const editor = screen.getByRole('textbox')
+    fireEvent.change(editor, { target: { value: '结论：HashMap 并发写入要避免共享修改，并说明扩容和数据一致性风险。' } })
+    await userEvent.click(screen.getByRole('button', { name: /提交评分/ }))
+
+    const panel = await screen.findByLabelText('评分后下一步')
+    expect(panel).toHaveTextContent('继续今日计划队列')
+    expect(panel).toHaveTextContent('已完成 1 / 2，下一题继续回答「Redis 缓存雪崩」。')
+    expect(panel).toHaveTextContent('计划进度1 / 2今日计划题')
+  })
+
+  it('keeps next-training context when practice starts from the generic training queue', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-21T00:00:00.000Z'),
+      questionSnapshots: {
+        1: {
+          id: 1,
+          title: 'Redis 热 key 怎么处理',
+          difficulty: 'HARD',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 320,
+        },
+        2: {
+          id: 2,
+          title: 'Spring 循环依赖怎么解决',
+          difficulty: 'MEDIUM',
+          categoryName: 'Spring',
+          tags: ['Spring'],
+          viewCount: 210,
+        },
+      },
+      questionStates: {
+        1: { status: 'weak', addedToPlan: false, reviewCount: 1, lastReviewedAt: '2026-06-20T08:00:00.000Z' },
+        2: { status: 'learning', addedToPlan: false, reviewCount: 2, lastReviewedAt: '2026-06-20T08:30:00.000Z' },
+      },
+    })
+
+    render(
+      <MemoryRouter
+        initialEntries={['/practice?queue=1,2&from=next-training']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Practice />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('heading', { name: 'Redis 热 key 怎么处理' })).toBeInTheDocument()
+
+    const context = screen.getByLabelText('下一轮训练队列上下文')
+    expect(context).toHaveTextContent('下一轮训练队列')
+    expect(context).toHaveTextContent('按系统排好的 2 道风险题继续训练')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('当前来源下一轮训练')
+    expect(screen.getByText('下一轮训练 · Redis')).toBeInTheDocument()
+  })
+
+  it('keeps interview brief context when practice starts from the warmup queue', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-21T00:00:00.000Z'),
+      questionSnapshots: {
+        1: {
+          id: 1,
+          title: 'HashMap 并发问题',
+          difficulty: 'HARD',
+          categoryName: 'Java 基础',
+          tags: ['HashMap'],
+          viewCount: 500,
+        },
+        2: {
+          id: 2,
+          title: 'Redis 缓存雪崩',
+          difficulty: 'MEDIUM',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 240,
+        },
+      },
+      questionStates: {
+        1: { status: 'learning', addedToPlan: true, reviewCount: 1, lastReviewedAt: '2026-06-20T08:00:00.000Z' },
+        2: { status: 'learning', addedToPlan: true, reviewCount: 1, lastReviewedAt: '2026-06-20T08:30:00.000Z' },
+      },
+    })
+
+    render(
+      <MemoryRouter
+        initialEntries={['/practice?queue=1,2&from=interview-brief']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Practice />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('heading', { name: 'HashMap 并发问题' })).toBeInTheDocument()
+
+    const context = screen.getByLabelText('面试简报热身队列上下文')
+    expect(context).toHaveTextContent('面试简报热身')
+    expect(context).toHaveTextContent('先完成这 2 道面试前热身题')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('当前来源面试简报')
+    expect(screen.getByText('面试简报 · Java 基础')).toBeInTheDocument()
+
+    const editor = screen.getByRole('textbox')
+    fireEvent.change(editor, { target: { value: '结论：HashMap 并发写入需要避免共享修改，并说明扩容和数据一致性风险。' } })
+    await userEvent.click(screen.getByRole('button', { name: /提交评分/ }))
+
+    const panel = await screen.findByLabelText('评分后下一步')
+    expect(panel).toHaveTextContent('继续面试简报热身队列')
+    expect(panel).toHaveTextContent('已热身 1 / 2')
+    expect(panel).toHaveTextContent('热身进度1 / 2面试简报题')
+  })
+
+  it('keeps interview retrospective context when practice starts from the daily mission', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-21T00:00:00.000Z'),
+      questionSnapshots: {
+        2: {
+          id: 2,
+          title: 'Redis 缓存雪崩',
+          difficulty: 'MEDIUM',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 240,
+        },
+      },
+      interviewAttempts: {
+        2: [{
+          questionId: 2,
+          answer: '旧答案：只说了随机过期。',
+          feedback: { ...mocks.feedback, score: 58, level: 'needs-work' },
+          createdAt: '2026-06-20T09:00:00.000Z',
+        }],
+      },
+    })
+
+    render(
+      <MemoryRouter
+        initialEntries={['/practice?queue=2&from=interview-retrospective']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Practice />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('heading', { name: 'Redis 缓存雪崩' })).toBeInTheDocument()
+
+    const context = screen.getByLabelText('面试复盘队列上下文')
+    expect(context).toHaveTextContent('面试复盘队列')
+    expect(context).toHaveTextContent('先重答这 1 道低分面试题')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('当前来源面试复盘')
+    expect(screen.getByText('面试复盘 · Redis')).toBeInTheDocument()
+  })
+
+  it('continues the next ability-gap question from the post-score next-step panel', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-21T00:00:00.000Z'),
+      dailyPlan: [1, 2],
+      questionSnapshots: {
+        1: {
+          id: 1,
+          title: 'HashMap 并发问题',
+          difficulty: 'HARD',
+          categoryName: 'Java 基础',
+          tags: ['HashMap'],
+          viewCount: 500,
+        },
+        2: {
+          id: 2,
+          title: 'Redis 缓存雪崩',
+          difficulty: 'MEDIUM',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 240,
+        },
+      },
+      questionStates: {
+        1: { status: 'weak', addedToPlan: true, reviewCount: 1, lastReviewedAt: '2026-06-20T08:00:00.000Z' },
+        2: { status: 'learning', addedToPlan: true, reviewCount: 1, lastReviewedAt: '2026-06-20T08:30:00.000Z' },
+      },
+      interviewAttempts: {
+        1: [{
+          questionId: 1,
+          answer: '旧答案：HashMap 并发写入需要规避共享修改。',
+          feedback: { ...mocks.feedback, score: 52, level: 'needs-work' },
+          createdAt: '2026-06-20T09:00:00.000Z',
+        }],
+        2: [{
+          questionId: 2,
+          answer: '旧答案：缓存雪崩需要随机过期和限流兜底。',
+          feedback: { ...mocks.feedback, score: 68, level: 'pass' },
+          createdAt: '2026-06-20T09:10:00.000Z',
+        }],
+      },
+    })
+
+    render(
+      <MemoryRouter
+        initialEntries={['/practice?queue=1,2&from=ability-gap']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Practice />
+      </MemoryRouter>,
+    )
+
+    const context = await screen.findByLabelText('能力短板队列上下文')
+    expect(context).toHaveTextContent('能力短板训练')
+    expect(context).toHaveTextContent('先突破这 2 道短板题')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('当前来源能力短板')
+
+    const editor = screen.getByRole('textbox')
+    fireEvent.change(editor, { target: { value: '结论：HashMap 并发写入要避免共享修改，并说明扩容和数据一致性风险。' } })
+    await userEvent.click(screen.getByRole('button', { name: /提交评分/ }))
+
+    const panel = await screen.findByLabelText('评分后下一步')
+    expect(panel).toHaveTextContent('继续补齐能力短板')
+    expect(panel).toHaveTextContent('已训练 1 / 2，下一题继续突破「Redis 缓存雪崩」。')
+    expect(panel).toHaveTextContent('能力进度1 / 2短板题')
+
+    await userEvent.click(screen.getByRole('button', { name: /继续第 2 题/ }))
+
+    expect(await screen.findByRole('heading', { name: 'Redis 缓存雪崩' })).toBeInTheDocument()
+    expect(screen.getByLabelText('能力短板队列上下文')).toHaveTextContent('先突破这 2 道短板题')
+  })
+
+  it('keeps real interview pressure context from the experience playbook queue', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-21T00:00:00.000Z'),
+      dailyPlan: [1, 2],
+      questionSnapshots: {
+        1: {
+          id: 1,
+          title: 'HashMap 并发问题',
+          difficulty: 'HARD',
+          categoryName: 'Java 基础',
+          tags: ['HashMap'],
+          viewCount: 500,
+        },
+        2: {
+          id: 2,
+          title: 'Redis 缓存雪崩',
+          difficulty: 'MEDIUM',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 240,
+        },
+      },
+      questionStates: {
+        1: { status: 'weak', addedToPlan: true, reviewCount: 2, lastReviewedAt: '2026-06-20T08:00:00.000Z' },
+        2: { status: 'learning', addedToPlan: true, reviewCount: 1, lastReviewedAt: '2026-06-20T08:30:00.000Z' },
+      },
+      interviewAttempts: {
+        1: [{
+          questionId: 1,
+          answer: '旧答案：HashMap 并发写入需要规避共享修改。',
+          feedback: { ...mocks.feedback, score: 52, level: 'needs-work' },
+          createdAt: '2026-06-20T09:00:00.000Z',
+        }],
+      },
+    })
+
+    render(
+      <MemoryRouter
+        initialEntries={['/practice?queue=1,2&from=experience-playbook']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Practice />
+      </MemoryRouter>,
+    )
+
+    const context = await screen.findByLabelText('真实面试押题队列上下文')
+    expect(context).toHaveTextContent('真实面试押题')
+    expect(context).toHaveTextContent('先压测这 2 道高压题')
+    expect(context).toHaveTextContent('来自面经场景和个人低分/薄弱轨迹')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('当前来源真实面试')
+    expect(screen.getByText('真实面试 · Java 基础')).toBeInTheDocument()
+    expect(screen.getByLabelText('队列画像')).toHaveTextContent('真实面试押题 2 道')
+    expect(screen.getByLabelText('本题押题理由')).toHaveTextContent('薄弱题、模拟 52 分')
+    expect(screen.getByLabelText('本题押题理由')).toHaveTextContent('项目场景、失败边界')
+    expect(screen.getByLabelText('本题押题追问')).toHaveTextContent('面试官追问')
+    expect(screen.getByLabelText('本题押题追问')).toHaveTextContent('请用一个真实项目说明「HashMap 并发问题」的触发场景、排查证据和失败边界。')
+    expect(screen.getByLabelText('本题押题追问')).toHaveTextContent('通过口径')
+    expect(screen.getByLabelText('本题押题追问')).toHaveTextContent('能在 60 秒内讲清结论、项目证据、失败边界和下一步兜底。')
+
+    const editor = screen.getByRole('textbox')
+    fireEvent.change(editor, { target: { value: '结论：HashMap 并发写入要避免共享修改，并补充项目失败边界。' } })
+    await userEvent.click(screen.getByRole('button', { name: /提交评分/ }))
+
+    const panel = await screen.findByLabelText('评分后下一步')
+    expect(panel).toHaveTextContent('继续真实面试押题队列')
+    expect(panel).toHaveTextContent('已压测 1 / 2，下一题继续拆解「Redis 缓存雪崩」。')
+    expect(panel).toHaveTextContent('押题进度1 / 2高压题')
+
+    await userEvent.click(screen.getByRole('button', { name: /继续第 2 题/ }))
+
+    expect(await screen.findByRole('heading', { name: 'Redis 缓存雪崩' })).toBeInTheDocument()
+    expect(screen.getByLabelText('真实面试押题队列上下文')).toHaveTextContent('先压测这 2 道高压题')
   })
 
   it('keeps first-run launchpad context when a homepage queue starts practice', async () => {
@@ -841,6 +1470,174 @@ describe('Practice page answer draft lifecycle', () => {
     await userEvent.click(screen.getByRole('button', { name: '回到题目详情' }))
 
     expect(screen.getByText('题目详情页 /question/2')).toBeInTheDocument()
+  })
+
+  it('labels explicit detail-page handoff as calibration practice', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-20T00:00:00.000Z'),
+      questionSnapshots: {
+        2: {
+          id: 2,
+          title: 'Redis 缓存雪崩',
+          difficulty: 'MEDIUM',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 240,
+        },
+      },
+      questionStates: {
+        2: { status: 'learning', addedToPlan: false, reviewCount: 0 },
+      },
+    })
+
+    render(
+      <MemoryRouter
+        initialEntries={['/practice?question=2&from=question-detail']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Routes>
+          <Route path="/practice" element={<Practice />} />
+          <Route path="/question/:id" element={<QuestionDetailLocationProbe />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('heading', { name: 'Redis 缓存雪崩' })).toBeInTheDocument()
+
+    const context = screen.getByLabelText('题目详情校准上下文')
+    expect(context).toHaveTextContent('题目详情校准')
+    expect(context).toHaveTextContent('刚从题目详情进入，先把阅读理解转成一轮无提示回答。')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('当前来源题目详情校准')
+    await waitFor(() => expect(screen.getByRole('textbox', { name: '模拟面试回答' })).toHaveFocus())
+
+    await userEvent.click(screen.getByRole('button', { name: '回到题目详情' }))
+
+    expect(screen.getByText('题目详情页 /question/2')).toBeInTheDocument()
+  })
+
+  it('keeps filtered-list practice progress separate from historical attempts', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-21T00:00:00.000Z'),
+      questionSnapshots: {
+        2: {
+          id: 2,
+          title: 'Redis 缓存雪崩',
+          difficulty: 'MEDIUM',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 240,
+        },
+        3: {
+          id: 3,
+          title: 'MySQL 索引失效',
+          difficulty: 'HARD',
+          categoryName: 'MySQL',
+          tags: ['MySQL'],
+          viewCount: 360,
+        },
+      },
+      questionStates: {
+        2: { status: 'learning', addedToPlan: false, reviewCount: 1 },
+        3: { status: 'new', addedToPlan: false, reviewCount: 0 },
+      },
+      interviewAttempts: {
+        2: [{
+          questionId: 2,
+          answer: '历史回答：只讲了随机过期。',
+          feedback: { ...mocks.feedback, score: 72, level: 'pass' },
+          createdAt: '2026-06-20T08:00:00.000Z',
+        }],
+      },
+    })
+
+    render(
+      <MemoryRouter
+        initialEntries={['/practice?queue=2,3&from=filtered-list']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Practice />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('heading', { name: 'Redis 缓存雪崩' })).toBeInTheDocument()
+
+    const context = screen.getByLabelText('当前筛选题单上下文')
+    expect(context).toHaveTextContent('当前筛选题单')
+    expect(context).toHaveTextContent('先完成这 2 道筛选题')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('0 / 2')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('当前来源当前筛选')
+
+    const editor = screen.getByRole('textbox')
+    fireEvent.change(editor, { target: { value: '结论：缓存雪崩需要随机过期、预热、限流降级和多级缓存兜底。' } })
+    await userEvent.click(screen.getByRole('button', { name: /提交评分/ }))
+
+    const panel = await screen.findByLabelText('评分后下一步')
+    expect(panel).toHaveTextContent('继续当前筛选题单')
+    expect(panel).toHaveTextContent('已训练 1 / 2，下一题继续回答「MySQL 索引失效」。')
+    expect(panel).toHaveTextContent('筛选进度1 / 2筛选题')
+  })
+
+  it('keeps pace-coach practice progress separate from historical attempts', async () => {
+    setProgress({
+      ...createDefaultProgress('2026-06-21T00:00:00.000Z'),
+      dailyPlan: [2, 3],
+      questionSnapshots: {
+        2: {
+          id: 2,
+          title: 'Redis 缓存雪崩',
+          difficulty: 'MEDIUM',
+          categoryName: 'Redis',
+          tags: ['Redis'],
+          viewCount: 240,
+        },
+        3: {
+          id: 3,
+          title: 'MySQL 索引失效',
+          difficulty: 'HARD',
+          categoryName: 'MySQL',
+          tags: ['MySQL'],
+          viewCount: 360,
+        },
+      },
+      questionStates: {
+        2: { status: 'learning', addedToPlan: true, reviewCount: 1 },
+        3: { status: 'new', addedToPlan: true, reviewCount: 0 },
+      },
+      interviewAttempts: {
+        2: [{
+          questionId: 2,
+          answer: '历史回答：只讲了随机过期。',
+          feedback: { ...mocks.feedback, score: 72, level: 'pass' },
+          createdAt: '2026-06-20T08:00:00.000Z',
+        }],
+      },
+    })
+
+    render(
+      <MemoryRouter
+        initialEntries={['/practice?queue=2,3&from=pace-coach']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Practice />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('heading', { name: 'Redis 缓存雪崩' })).toBeInTheDocument()
+
+    const context = screen.getByLabelText('配速训练队列上下文')
+    expect(context).toHaveTextContent('配速训练队列')
+    expect(context).toHaveTextContent('先收口这 2 道今日配速题')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('0 / 2')
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('当前来源配速训练')
+
+    const editor = screen.getByRole('textbox')
+    fireEvent.change(editor, { target: { value: '结论：缓存雪崩需要随机过期、预热、限流降级和多级缓存兜底。' } })
+    await userEvent.click(screen.getByRole('button', { name: /提交评分/ }))
+
+    const panel = await screen.findByLabelText('评分后下一步')
+    expect(panel).toHaveTextContent('继续配速训练队列')
+    expect(panel).toHaveTextContent('已收口 1 / 2，下一题继续完成今日配速「MySQL 索引失效」。')
+    expect(panel).toHaveTextContent('配速进度1 / 2配速题')
   })
 
   it('drops invalid queue ids before loading scoped practice questions', async () => {

@@ -127,6 +127,26 @@ describe('PracticeSessionReportPanel', () => {
     expect(onNavigate).toHaveBeenCalledWith('/practice?queue=2')
   }, 30000)
 
+  it('keeps filtered list source when navigating from session actions', async () => {
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={progress()}
+        queueContext={{
+          sourceLabel: '当前筛选',
+          queuePath: '/practice?queue=1,2&from=filtered-list',
+        }}
+        onNavigate={onNavigate}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /继续未答题/ }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=2&from=filtered-list')
+  })
+
   it('renders high-score materials from the current session queue', async () => {
     const onNavigate = vi.fn()
 
@@ -179,7 +199,7 @@ describe('PracticeSessionReportPanel', () => {
 
     await userEvent.click(within(defenseBlock).getAllByRole('button', { name: /Java 面试题 1/ })[0])
 
-    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1')
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1&from=interview-retrospective')
   })
 
   it('renders script command from the current session queue', async () => {
@@ -242,7 +262,7 @@ describe('PracticeSessionReportPanel', () => {
 
     await user.click(within(ledgerBlock).getByRole('button', { name: /场景细节反复失分/ }))
 
-    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1')
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1&from=interview-retrospective')
   })
 
   it('renders recovery acceptance from the current session queue', async () => {
@@ -274,7 +294,7 @@ describe('PracticeSessionReportPanel', () => {
 
     await user.click(within(acceptanceBlock).getByRole('button', { name: /继续复测/ }))
 
-    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2')
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1,2&from=interview-retrospective')
   })
 
   it('renders ability radar from the current session queue', async () => {
@@ -1560,5 +1580,30 @@ describe('PracticeSessionReportPanel', () => {
     await userEvent.click(screen.getAllByRole('button', { name: /去补弱/ })[0])
 
     expect(onNavigate).toHaveBeenCalledWith('/practice?question=1')
+  })
+
+  it('keeps filtered list source when falling back to repair action navigation', async () => {
+    const onNavigate = vi.fn()
+
+    render(
+      <PracticeSessionReportPanel
+        queue={[question(1), question(2)]}
+        progress={{
+          ...progress(),
+          interviewAttempts: {
+            1: [attempt(1, 56, 38)],
+          },
+        }}
+        queueContext={{
+          sourceLabel: 'filtered list',
+          queuePath: '/practice?queue=1,2&from=filtered-list',
+        }}
+        onNavigate={onNavigate}
+      />,
+    )
+
+    await userEvent.click(within(screen.getByLabelText('本轮补弱动作')).getAllByRole('button')[0])
+
+    expect(onNavigate).toHaveBeenCalledWith('/practice?question=1&from=filtered-list')
   })
 })

@@ -19,6 +19,11 @@ public record AdminCategoryQualityVO(
         @Schema(description = "缺少风险边界题目数") long missingRisk,
         @Schema(description = "缺少项目经验题目数") long missingProjectExp,
         @Schema(description = "缺少代码示例题目数") long missingCodeExamples,
+        @Schema(description = "缺少摘要题目数") long missingSummary,
+        @Schema(description = "缺少对比分析题目数") long missingComparison,
+        @Schema(description = "缺少场景说明题目数") long missingScenario,
+        @Schema(description = "缺少结构化答案段落题目数") long missingContentSections,
+        @Schema(description = "难度值异常题目数") long invalidDifficulty,
         @Schema(description = "质量完成率，0-100") int completionRate,
         @Schema(description = "风险分，越高越需要优先处理") int riskScore
 ) {

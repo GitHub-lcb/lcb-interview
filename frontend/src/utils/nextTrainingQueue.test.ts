@@ -97,7 +97,7 @@ describe('buildNextTrainingQueue', () => {
       source: 'score-impact',
       sourceLabel: '评分影响',
       actionLabel: '重答补强',
-      to: '/practice?queue=1',
+      to: '/practice?queue=1&from=next-training',
     })
     expect(queue.items.filter(item => item.questionId === 1)).toHaveLength(1)
     expect(queue.primaryAction).toMatchObject({
@@ -125,6 +125,59 @@ describe('buildNextTrainingQueue', () => {
     expect(queue.urgentCount).toBeGreaterThan(0)
     expect(queue.weakCount).toBeGreaterThan(0)
     expect(queue.interviewRepairCount).toBeGreaterThan(0)
+    expect(queue.primaryAction.to).toMatch(/^\/practice\?queue=[0-9,]+&from=next-training$/)
+  })
+
+  it('labels repeatedly encountered new questions as active recall training', () => {
+    const progress: StudyProgress = {
+      ...createDefaultProgress(NOW),
+      questionSnapshots: {
+        7: snapshot(7, 'ThreadLocal 内存泄漏怎么处理', 'Java 并发'),
+      },
+      questionStates: {
+        7: {
+          status: 'new',
+          addedToPlan: false,
+          reviewCount: 0,
+          encounterCount: 2,
+          lastEncounteredAt: '2026-06-17T20:00:00.000Z',
+        },
+      },
+    }
+
+    const queue = buildNextTrainingQueue(progress, NOW)
+
+    expect(queue.items[0]).toMatchObject({
+      questionId: 7,
+      source: 'review-debt',
+      sourceLabel: '主动回忆',
+      actionLabel: '做一次主动回忆',
+      reason: '多次遇见但还没完成复习，先安排一次主动回忆。',
+      to: '/practice?queue=7&from=review-due',
+    })
+    expect(queue.primaryAction.to).toBe('/practice?queue=7&from=review-due')
+  })
+
+  it('keeps generic next-training context for weak and learning repair queues', () => {
+    const progress: StudyProgress = {
+      ...createDefaultProgress(NOW),
+      questionSnapshots: {
+        11: snapshot(11, 'Redis 热 key 怎么处理', 'Redis'),
+        12: snapshot(12, 'Spring 循环依赖怎么解决', 'Spring'),
+      },
+      questionStates: {
+        11: state('weak', false, NOW, 1),
+        12: state('learning', false, NOW, 2),
+      },
+    }
+
+    const queue = buildNextTrainingQueue(progress, NOW)
+
+    expect(queue.items.map(item => item.to)).toEqual([
+      '/practice?queue=11&from=next-training',
+      '/practice?queue=12&from=next-training',
+    ])
+    expect(queue.primaryAction.to).toBe('/practice?queue=11,12&from=next-training')
   })
 
   it('falls back to a mock interview entry when no queue evidence exists', () => {
@@ -152,9 +205,9 @@ describe('buildNextTrainingQueue', () => {
     expect(queue.items[0]).toMatchObject({
       questionId: 10,
       source: 'plan',
-      to: '/practice?queue=10',
+      to: '/practice?queue=10&from=daily-plan',
     })
-    expect(queue.primaryAction.to).toBe('/practice?queue=10')
+    expect(queue.primaryAction.to).toBe('/practice?queue=10&from=daily-plan')
     expect(markdown).toContain('题目 #10')
     expect(markdown).not.toContain('题目 #2.5')
     expect(markdown).not.toContain('题目 #NaN')

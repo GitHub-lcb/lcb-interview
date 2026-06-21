@@ -115,6 +115,27 @@ describe('buildPracticeSessionReport', () => {
     expect(report.queueProfile.unansweredQuestionIds).toEqual([2, 3])
   })
 
+  it('keeps the incoming queue source on unfinished session actions', () => {
+    const report = buildPracticeSessionReport(
+      [question(1), question(2), question(3)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 72)],
+        },
+      }),
+      {
+        sourceLabel: '当前筛选',
+        queuePath: '/practice?queue=1,2,3&from=filtered-list',
+      },
+    )
+
+    expect(report.primaryAction).toMatchObject({
+      kind: 'continue',
+      to: '/practice?queue=2,3&from=filtered-list',
+    })
+    expect(report.queueProfile.queuePath).toBe('/practice?queue=1,2,3&from=filtered-list')
+  })
+
   it('prioritizes low score and weak questions for repair', () => {
     const report = buildPracticeSessionReport(
       [question(1), question(2), question(3, { status: 'weak' })],
@@ -144,6 +165,51 @@ describe('buildPracticeSessionReport', () => {
     expect(report.repairActions[0].reason).toContain('55 分')
     expect(report.repairActions[0].action).toContain('结构')
     expect(report.repairActions.some(action => action.questionId === 3)).toBe(true)
+  })
+
+  it('keeps the incoming queue source on repair actions', () => {
+    const report = buildPracticeSessionReport(
+      [question(1), question(2)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 55, { structure: 42 })],
+          2: [attempt(2, 82)],
+        },
+      }),
+      {
+        sourceLabel: '当前筛选',
+        queuePath: '/practice?queue=1,2&from=filtered-list',
+      },
+    )
+
+    expect(report.primaryAction).toMatchObject({
+      kind: 'repair',
+      to: '/practice?queue=1&from=filtered-list',
+    })
+    expect(report.repairActions[0]).toMatchObject({
+      questionId: 1,
+      to: '/practice?question=1&from=filtered-list',
+    })
+  })
+
+  it('keeps the incoming queue source on empty weak-session repair actions', () => {
+    const report = buildPracticeSessionReport(
+      [question(1, { status: 'weak' }), question(2)],
+      progress(),
+      {
+        sourceLabel: '当前筛选',
+        queuePath: '/practice?queue=1,2&from=filtered-list',
+      },
+    )
+
+    expect(report.primaryAction).toMatchObject({
+      kind: 'repair',
+      to: '/practice?queue=1&from=filtered-list',
+    })
+    expect(report.repairActions[0]).toMatchObject({
+      questionId: 1,
+      to: '/practice?question=1&from=filtered-list',
+    })
   })
 
   it('marks the session as passed when all answered questions are strong', () => {
@@ -213,6 +279,63 @@ describe('buildPracticeSessionReport', () => {
     expect(markdown).toContain('最近评分 55 分')
     expect(markdown).toContain('## 下一步行动')
     expect(markdown).toContain('/practice?queue=1,2,3')
+  })
+
+  it('exports experience pressure reasons with the session queue', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1, { title: 'HashMap 并发问题', categoryName: 'Java 基础' })],
+      progress({
+        questionStates: {
+          1: { status: 'weak', addedToPlan: true, reviewCount: 2 },
+        },
+        interviewAttempts: {
+          1: [attempt(1, 52, { specificity: 42 })],
+        },
+      }),
+      NOW,
+      {
+        sourceLabel: '真实面试押题',
+        queuePath: '/practice?queue=1&from=experience-playbook',
+        pressureItems: [
+          {
+            questionId: 1,
+            signal: '薄弱题、模拟 52 分',
+            detail: '需要把答案从会看推进到能讲清项目场景、失败边界和取舍理由。',
+            interviewerProbe: '请用一个真实项目说明「HashMap 并发问题」的触发场景、排查证据和失败边界。',
+            passCriteria: '能在 60 秒内讲清结论、项目证据、失败边界和下一步兜底。',
+          },
+        ],
+      },
+    )
+
+    expect(markdown).toContain('来源构成：真实面试押题 1 道')
+    expect(markdown).toContain('队列入口：/practice?queue=1&from=experience-playbook')
+    expect(markdown).toContain('押题理由：薄弱题、模拟 52 分')
+    expect(markdown).toContain('追问方向：需要把答案从会看推进到能讲清项目场景、失败边界和取舍理由。')
+    expect(markdown).toContain('面试官追问：请用一个真实项目说明「HashMap 并发问题」的触发场景、排查证据和失败边界。')
+    expect(markdown).toContain('通过口径：能在 60 秒内讲清结论、项目证据、失败边界和下一步兜底。')
+  })
+
+  it('keeps filtered list source in exported session handoff actions', () => {
+    const markdown = buildPracticeSessionReportMarkdown(
+      [question(1), question(2), question(3)],
+      progress({
+        interviewAttempts: {
+          1: [attempt(1, 82)],
+          2: [attempt(2, 55, { structure: 42 })],
+        },
+      }),
+      NOW,
+      {
+        sourceLabel: '当前筛选',
+        queuePath: '/practice?queue=1,2,3&from=filtered-list',
+      },
+    )
+
+    expect(markdown).toContain('/practice?queue=1,2,3&from=filtered-list')
+    expect(markdown).toContain('/practice?queue=2&from=filtered-list')
+    expect(markdown).toContain('/practice?question=2&from=filtered-list')
+    expect(markdown).not.toMatch(/\/practice\?question=2(?!&from=)/)
   })
 
   it('exports high-score materials from the current session queue', () => {

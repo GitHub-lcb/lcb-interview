@@ -7,10 +7,43 @@ import StudyActionButtons from '../../components/StudyActionButtons'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { summarizeQuestionSetProgress } from '../../utils/studyProgress'
+import { buildContinuePracticePath } from '../../utils/practiceRoute'
 import type { Question } from '../../types'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
+type SearchSortMode = 'relevance' | 'latest' | 'hot'
+
+const sortLabels: Record<SearchSortMode, string> = {
+  relevance: '按相关',
+  latest: '按最新',
+  hot: '按热度',
+}
+
 const { Search } = Input
+const RECENT_SEARCH_STORAGE_KEY = 'lcb-recent-searches'
+const RECENT_SEARCH_LIMIT = 6
+
+function parseDifficulty(value: string | null): string | undefined {
+  if (!value || !(value in difficultyLabels)) {
+    return undefined
+  }
+  return value
+}
+
+function parseSort(value: string | null): SearchSortMode {
+  if (value === 'latest' || value === 'hot' || value === 'relevance') {
+    return value
+  }
+  return 'relevance'
+}
+
+function parsePage(value: string | null): number {
+  const parsed = Number(value)
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    return 1
+  }
+  return parsed
+}
 
 function previewQuestion(question: Question): string {
   return (question.summary || question.content || question.answer || '')
@@ -20,13 +53,56 @@ function previewQuestion(question: Question): string {
     .slice(0, 120)
 }
 
+function normalizeRecentKeyword(value: string): string {
+  return value.trim().slice(0, 40)
+}
+
+function readRecentSearches(): string[] {
+  try {
+    const raw = window.localStorage.getItem(RECENT_SEARCH_STORAGE_KEY)
+    const parsed = raw ? JSON.parse(raw) : []
+    if (!Array.isArray(parsed)) {
+      return []
+    }
+
+    return parsed
+      .filter((item): item is string => typeof item === 'string')
+      .map(normalizeRecentKeyword)
+      .filter(Boolean)
+      .slice(0, RECENT_SEARCH_LIMIT)
+  } catch {
+    return []
+  }
+}
+
+function buildRecentSearches(current: string[], keyword: string): string[] {
+  const normalizedKeyword = normalizeRecentKeyword(keyword)
+  if (!normalizedKeyword) {
+    return current
+  }
+
+  const existing = current.filter(item => item.toLowerCase() !== normalizedKeyword.toLowerCase())
+  return [normalizedKeyword, ...existing].slice(0, RECENT_SEARCH_LIMIT)
+}
+
+function writeRecentSearches(searches: string[]): void {
+  if (searches.length === 0) {
+    window.localStorage.removeItem(RECENT_SEARCH_STORAGE_KEY)
+    return
+  }
+
+  window.localStorage.setItem(RECENT_SEARCH_STORAGE_KEY, JSON.stringify(searches))
+}
+
 export default function SearchResult() {
   const [searchParams, setSearchParams] = useSearchParams()
   const keyword = searchParams.get('q') || ''
+  const difficulty = parseDifficulty(searchParams.get('difficulty'))
+  const sort = parseSort(searchParams.get('sort'))
+  const page = parsePage(searchParams.get('page'))
   const [questions, setQuestions] = useState<Question[]>([])
   const [searchDraft, setSearchDraft] = useState(keyword)
-  const [difficulty, setDifficulty] = useState<string>()
-  const [page, setPage] = useState(1)
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => readRecentSearches())
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
@@ -46,7 +122,7 @@ export default function SearchResult() {
     }
     setLoading(true)
     setError(false)
-    getQuestions({ keyword, difficulty, page: page - 1, size: 20 }, { silentGlobalError: true })
+    getQuestions({ keyword, difficulty, page: page - 1, size: 20, sort }, { silentGlobalError: true })
       .then(res => {
         if (requestId !== requestSeq.current) {
           return
@@ -54,6 +130,11 @@ export default function SearchResult() {
         setQuestions(res.content)
         setTotal(res.total)
         rememberQuestions(res.content)
+        setRecentSearches(current => {
+          const next = buildRecentSearches(current, keyword)
+          writeRecentSearches(next)
+          return next
+        })
       }).catch(() => {
         if (requestId !== requestSeq.current) {
           return
@@ -68,24 +149,72 @@ export default function SearchResult() {
 
   useEffect(() => {
     doSearch()
-  }, [keyword, difficulty, page])
+  }, [keyword, difficulty, page, sort])
 
   useEffect(() => {
     setSearchDraft(keyword)
-    setPage(1)
   }, [keyword])
+
+  const updateSearchState = (next: {
+    q?: string
+    difficulty?: string
+    sort?: SearchSortMode
+    page?: number
+    clear?: boolean
+  }) => {
+    if (next.clear) {
+      setSearchParams({})
+      return
+    }
+    const params = new URLSearchParams(searchParams)
+    if ('q' in next) {
+      if (next.q) {
+        params.set('q', next.q)
+      } else {
+        params.delete('q')
+      }
+    }
+    if ('difficulty' in next) {
+      if (next.difficulty) {
+        params.set('difficulty', next.difficulty)
+      } else {
+        params.delete('difficulty')
+      }
+    }
+    if ('sort' in next) {
+      if (next.sort === 'relevance') {
+        params.delete('sort')
+      } else if (next.sort) {
+        params.set('sort', next.sort)
+      }
+    }
+    if ('page' in next) {
+      const nextPage = next.page ?? 1
+      if (nextPage <= 1) {
+        params.delete('page')
+      } else {
+        params.set('page', String(nextPage))
+      }
+    }
+    setSearchParams(params)
+  }
 
   const submitSearch = (value: string) => {
     const nextKeyword = value.trim()
     if (nextKeyword) {
-      setSearchParams({ q: nextKeyword })
+      updateSearchState({ q: nextKeyword, page: 1 })
       return
     }
-    setSearchParams({})
+    updateSearchState({ clear: true })
     setQuestions([])
     setTotal(0)
     setError(false)
     setLoading(false)
+  }
+
+  const clearRecentSearches = () => {
+    writeRecentSearches([])
+    setRecentSearches([])
   }
 
   const pageQuestionIds = questions.map(question => question.id)
@@ -94,6 +223,10 @@ export default function SearchResult() {
   const hasPageQuestions = pageProgress.hasQuestions
   const canAddPageToPlan = hasPageQuestions && !pageProgress.allPlanned
   const addPageButtonText = pageProgress.allPlanned ? '本页已加入' : '本页入计划'
+  const filterSummary = [
+    difficulty ? `难度：${difficultyLabels[difficulty] || difficulty}` : '全部难度',
+    `排序：${sortLabels[sort]}`,
+  ].join(' · ')
 
   const addCurrentPageToPlan = () => {
     if (!canAddPageToPlan) {
@@ -104,10 +237,10 @@ export default function SearchResult() {
 
   const startPagePractice = () => {
     if (pageQuestionIds.length === 0) {
-      navigate('/practice')
+      navigate(buildContinuePracticePath(progress))
       return
     }
-    navigate(`/practice?queue=${pageQuestionIds.join(',')}`)
+    navigate(`/practice?queue=${pageQuestionIds.join(',')}&from=filtered-list`)
   }
 
   return (
@@ -126,6 +259,25 @@ export default function SearchResult() {
             onChange={event => setSearchDraft(event.target.value)}
             onSearch={submitSearch}
           />
+          {recentSearches.length > 0 && (
+            <div className="search-recent-panel" aria-label="最近搜索">
+              <div className="search-recent-head">
+                <span>最近搜索</span>
+                <Button size="small" type="text" onClick={clearRecentSearches}>清空最近搜索</Button>
+              </div>
+              <div className="search-recent-list">
+                {recentSearches.map(item => (
+                  <Button
+                    key={item}
+                    size="small"
+                    onClick={() => updateSearchState({ q: item, page: 1 })}
+                  >
+                    {item}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <div className="search-hero-stats">
           <div>
@@ -142,21 +294,33 @@ export default function SearchResult() {
       <div className="search-toolbar">
         <div>
           <FilterOutlined />
-          <span>{difficulty ? `已筛选：${difficultyLabels[difficulty] || difficulty}` : '全部难度'}</span>
+          <span>{filterSummary}</span>
         </div>
         <div className="search-toolbar-actions">
           <Select
+            aria-label="按难度筛选"
             placeholder="难度"
             allowClear
             value={difficulty}
             onChange={(value) => {
-              setDifficulty(value)
-              setPage(1)
+              updateSearchState({ difficulty: value, page: 1 })
             }}
             options={[
               { value: 'EASY', label: '简单' },
               { value: 'MEDIUM', label: '中等' },
               { value: 'HARD', label: '困难' },
+            ]}
+          />
+          <Select
+            aria-label="按排序方式选择"
+            value={sort}
+            onChange={(value: SearchSortMode) => {
+              updateSearchState({ sort: value, page: 1 })
+            }}
+            options={[
+              { value: 'relevance', label: sortLabels.relevance },
+              { value: 'latest', label: sortLabels.latest },
+              { value: 'hot', label: sortLabels.hot },
             ]}
           />
           {hasPageQuestions && (
@@ -196,8 +360,7 @@ export default function SearchResult() {
               <Button
                 type="primary"
                 onClick={() => {
-                  setDifficulty(undefined)
-                  setPage(1)
+                  updateSearchState({ difficulty: '', page: 1 })
                 }}
               >
                 清除难度筛选
@@ -279,7 +442,7 @@ export default function SearchResult() {
             current={page}
             total={total}
             pageSize={20}
-            onChange={paginationPage => setPage(paginationPage)}
+            onChange={paginationPage => updateSearchState({ page: paginationPage })}
             showSizeChanger={false}
             hideOnSinglePage
             showTotal={count => `共 ${count} 条`}

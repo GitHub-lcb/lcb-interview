@@ -3,6 +3,7 @@ package com.lcbinterview.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lcbinterview.dto.AdminAiConfigStatusVO;
 import com.lcbinterview.dto.GenerationRequest;
 import com.lcbinterview.dto.QuestionTagName;
 import com.lcbinterview.mapper.CategoryMapper;
@@ -58,6 +59,29 @@ public class AiQuestionService {
 
     @Value("${ai.deepseek.max-tokens:65536}")
     private int maxTokens;
+
+    /**
+     * 查询远程 AI 生成服务配置状态，不返回任何密钥原文。
+     *
+     * @return AI 配置状态
+     */
+    public AdminAiConfigStatusVO configStatus() {
+        boolean apiKeyConfigured = isApiKeyConfigured();
+        boolean modelConfigured = model != null && !model.isBlank();
+        boolean endpointConfigured = apiUrl != null && !apiUrl.isBlank();
+        boolean available = apiKeyConfigured && modelConfigured && endpointConfigured;
+        String message;
+        if (!apiKeyConfigured) {
+            message = "AI 生成服务未配置密钥，请设置 AI_OPENCODE_API_KEY";
+        } else if (!modelConfigured) {
+            message = "AI 生成服务未配置模型，请设置 AI_DEEPSEEK_MODEL";
+        } else if (!endpointConfigured) {
+            message = "AI 生成服务未配置接口地址，请设置 AI_DEEPSEEK_URL";
+        } else {
+            message = "AI 生成服务已配置";
+        }
+        return new AdminAiConfigStatusVO(available, apiKeyConfigured, model, endpointHost(), message);
+    }
 
     // ==================== 同步方法（供 BatchGenerationRunner 使用） ====================
 
@@ -721,6 +745,7 @@ public class AiQuestionService {
 
     /** 流式调用 DeepSeek，将 thinking/content 实时推送到 emitter。 */
     private StreamResult callDeepSeekStreamInternal(String prompt, SseStreamSession session, StreamPushMode pushMode) {
+        assertApiKeyConfigured();
         if (pushMode.stopOnClosed && !session.isOpen()) {
             throw new SseStreamClosedException("SSE 连接已关闭");
         }
@@ -825,6 +850,7 @@ public class AiQuestionService {
 
     /** 非流式调用 DeepSeek（供 generateSync 使用）。 */
     private String callDeepSeek(String prompt) {
+        assertApiKeyConfigured();
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", model);
         requestBody.put("messages", List.of(
@@ -873,6 +899,28 @@ public class AiQuestionService {
         } catch (Exception e) {
             log.error("调用 DeepSeek API 异常: {}", e.getMessage());
             throw new RuntimeException("调用 DeepSeek API 失败: " + e.getMessage(), e);
+        }
+    }
+
+    private void assertApiKeyConfigured() {
+        if (!isApiKeyConfigured()) {
+            throw new IllegalStateException("AI 生成服务未配置密钥，请设置 AI_OPENCODE_API_KEY");
+        }
+    }
+
+    private boolean isApiKeyConfigured() {
+        return apiKey != null && !apiKey.isBlank();
+    }
+
+    private String endpointHost() {
+        if (apiUrl == null || apiUrl.isBlank()) {
+            return "";
+        }
+        try {
+            String host = URI.create(apiUrl).getHost();
+            return host == null ? "" : host;
+        } catch (IllegalArgumentException e) {
+            return "";
         }
     }
 

@@ -66,10 +66,10 @@ describe('InterviewFollowUpDefensePanel', () => {
     expect(screen.getAllByText(/面试官在追项目场景/).length).toBeGreaterThan(0)
 
     await userEvent.click(screen.getByRole('button', { name: /先修追问短板/ }))
-    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1')
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1&from=interview-retrospective')
 
     await userEvent.click(screen.getByRole('button', { name: /如果面试官追问线上场景/ }))
-    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1')
+    expect(onNavigate).toHaveBeenCalledWith('/practice?queue=1&from=interview-retrospective')
   })
 
   it('copies follow-up defense markdown', async () => {

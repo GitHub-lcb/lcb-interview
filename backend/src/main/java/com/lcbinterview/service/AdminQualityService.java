@@ -345,6 +345,11 @@ public class AdminQualityService {
                     missingRisk,
                     missingProjectExp,
                     missingCodeExamples,
+                    missingSummary,
+                    missingComparison,
+                    missingScenario,
+                    missingContentSections,
+                    invalidDifficulty,
                     completionRate(total, qualityRisk),
                     riskScore);
         }

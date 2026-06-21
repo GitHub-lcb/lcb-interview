@@ -22,6 +22,8 @@ import { buildAbilityMap } from './abilityMap'
 import { buildDailyMissionPlan } from './dailyMission'
 import { buildDailyPlanBrief } from './dailyPlanBrief'
 import { buildDailyPlanCompletion } from './dailyPlanCompletion'
+import { buildExperiencePressureQueue } from './experiencePlaybook'
+import type { ExperiencePressureQueue } from './experiencePlaybook'
 import { buildInterviewBrief } from './interviewBrief'
 import { buildInterviewEmergencyKit } from './interviewEmergencyKit'
 import { buildInterviewFollowUpDefense } from './interviewFollowUpDefense'
@@ -58,6 +60,7 @@ export function buildSprintReportMarkdown(
   const lastMinuteBrief = buildInterviewLastMinuteBrief(progress, now)
   const materialVault = buildInterviewMaterialVault(progress)
   const followUpDefense = buildInterviewFollowUpDefense(progress)
+  const pressureQueue = buildExperiencePressureQueue(progress)
   const generatedDate = formatDate(now)
 
   return [
@@ -72,6 +75,7 @@ export function buildSprintReportMarkdown(
     renderLastMinuteBriefSection(lastMinuteBrief),
     renderMaterialVaultSection(materialVault),
     renderFollowUpDefenseSection(followUpDefense),
+    renderExperiencePressureSection(pressureQueue),
     renderAbilityMapSection(abilityMap),
     renderHealthSection(health),
     renderDimensionsSection(health.dimensions),
@@ -84,7 +88,7 @@ export function buildSprintReportMarkdown(
     renderMistakeLedgerSection(mistakeLedger),
     renderRecoveryPlanSection(recoveryPlan),
     renderRecoveryAcceptanceSection(recoveryAcceptance),
-    renderActionSection(health, brief, completion, recoveryPlan, materialVault, followUpDefense, recoveryAcceptance, dailyMission, abilityMap, nextTrainingQueue),
+    renderActionSection(health, brief, completion, recoveryPlan, materialVault, followUpDefense, recoveryAcceptance, dailyMission, abilityMap, nextTrainingQueue, pressureQueue),
   ].join('\n')
 }
 
@@ -212,6 +216,27 @@ function renderFollowUpDefenseSection(defense: InterviewFollowUpDefense): string
   ].join('\n')
 }
 
+function renderExperiencePressureSection(queue: ExperiencePressureQueue): string {
+  const itemLines = queue.items.length > 0
+    ? queue.items.slice(0, 5).flatMap((item, index) => [
+      `- ${index + 1}. ${item.title}`,
+      `  - 压力信号：${item.signal}`,
+      `  - 面试场景：${item.categoryName} · ${item.difficulty}`,
+      `  - 追问方向：${item.detail}`,
+      `  - 入口：${item.to}`,
+    ])
+    : ['- 暂无个人押题，先完成一次模拟面试或把题目标记为薄弱。']
+
+  return [
+    '## 真实面试押题',
+    `- 状态：${queue.title}`,
+    `- 摘要：${queue.summary}`,
+    `- 训练入口：${queue.queuePath}`,
+    ...itemLines,
+    '',
+  ].join('\n')
+}
+
 function renderAbilityMapSection(items: AbilityMapItem[]): string {
   const focus = items.find(item => item.nextQuestionIds.length > 0)
   const first = items[0]
@@ -223,7 +248,7 @@ function renderAbilityMapSection(items: AbilityMapItem[]): string {
   const lines = items.length > 0
     ? items.slice(0, 5).map(item => {
       const to = item.nextQuestionIds.length > 0
-        ? `/practice?queue=${item.nextQuestionIds.join(',')}`
+        ? `/practice?queue=${item.nextQuestionIds.join(',')}&from=ability-gap`
         : '/routes'
       return `- ${item.title}｜${item.role}：准备度 ${item.readinessScore} 分，薄弱 ${item.weak} 道，学习中 ${item.learning} 道，已掌握 ${item.mastered} 道，已记录 ${item.remembered} 道；${item.summary}；入口：${to}`
     })
@@ -390,6 +415,7 @@ function renderActionSection(
   dailyMission: DailyMissionPlan,
   abilityMap: AbilityMapItem[],
   nextTrainingQueue: NextTrainingQueue,
+  pressureQueue: ExperiencePressureQueue,
 ): string {
   // 报告被复制到外部文档后仍要能指导下一步，所以保留今日任务、下一轮训练、能力地图、健康、表达、今日闭环、错题恢复、高分素材、追问防线和错题验收行动线。
   const primaryMission = dailyMission.missions[0]
@@ -401,6 +427,7 @@ function renderActionSection(
     '## 下一步行动',
     missionLine,
     `- 下一轮训练：${nextTrainingQueue.primaryAction.label} - ${nextTrainingQueue.primaryAction.description}（${nextTrainingQueue.primaryAction.to}）`,
+    `- 真实面试押题：${pressureQueue.totalCount > 0 ? '开始押题练习' : '建立押题样本'} - ${pressureQueue.summary}（${pressureQueue.queuePath}）`,
     buildAbilityActionLine(abilityMap),
     `- 健康雷达：${health.primaryAction.label} - ${health.primaryAction.description}（${health.primaryAction.to}）`,
     `- 面试简报：${brief.primaryAction.label} - ${brief.primaryAction.description}（${brief.primaryAction.to}）`,
@@ -416,7 +443,7 @@ function renderActionSection(
 function buildAbilityActionLine(items: AbilityMapItem[]): string {
   const focus = items.find(item => item.nextQuestionIds.length > 0)
   if (focus) {
-    return `- 能力地图：训练 ${focus.title} - 先补 ${focus.nextQuestionIds.length} 道未掌握题，把岗位能力短板拉回学习中。（/practice?queue=${focus.nextQuestionIds.join(',')}）`
+    return `- 能力地图：训练 ${focus.title} - 先补 ${focus.nextQuestionIds.length} 道未掌握题，把岗位能力短板拉回学习中。（/practice?queue=${focus.nextQuestionIds.join(',')}&from=ability-gap）`
   }
   const first = items[0]
   if (first && first.remembered > 0) {

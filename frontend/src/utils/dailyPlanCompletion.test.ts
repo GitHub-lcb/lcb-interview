@@ -72,6 +72,8 @@ describe('buildDailyPlanCompletion', () => {
 
     expect(completion.level).toBe('risk')
     expect(completion.reviewDebtCount).toBe(1)
+    expect(completion.primaryAction.to).toBe('/practice?queue=1&from=review-due')
+    expect(completion.todos[0].to).toBe('/practice?queue=1&from=review-due')
     expect(completion.primaryAction.label).toBe('先清复习债')
     expect(completion.todos[0].title).toBe('1 道计划题已到期或逾期')
   })
@@ -85,6 +87,8 @@ describe('buildDailyPlanCompletion', () => {
 
     expect(completion.level).toBe('risk')
     expect(completion.weakCount).toBe(1)
+    expect(completion.primaryAction.to).toBe('/practice?queue=1&from=daily-plan')
+    expect(completion.todos[0].to).toBe('/practice?queue=1&from=daily-plan')
     expect(completion.primaryAction.label).toBe('修复薄弱题')
     expect(completion.todos[0].tone).toBe('warning')
   })
@@ -99,6 +103,8 @@ describe('buildDailyPlanCompletion', () => {
     expect(completion.level).toBe('active')
     expect(completion.completionRate).toBe(50)
     expect(completion.remainingCount).toBe(1)
+    expect(completion.primaryAction.to).toBe('/practice?queue=1,2&from=daily-plan')
+    expect(completion.todos[0].to).toBe('/practice?queue=1,2&from=daily-plan')
     expect(completion.primaryAction.label).toBe('继续今日队列')
   })
 
@@ -111,6 +117,8 @@ describe('buildDailyPlanCompletion', () => {
 
     expect(completion.level).toBe('ready')
     expect(completion.completionRate).toBe(100)
+    expect(completion.primaryAction.to).toBe('/practice?queue=1,2&from=daily-plan')
+    expect(completion.todos[0].to).toBe('/practice?queue=1,2&from=daily-plan')
     expect(completion.primaryAction.label).toBe('补一次模拟面试')
   })
 
@@ -184,7 +192,7 @@ describe('buildDailyPlanCompletion', () => {
       status: 'weak',
       message: '已自动标记薄弱，并留在今日计划继续补强。',
       actionLabel: '重答补强',
-      to: '/practice?queue=1',
+      to: '/practice?queue=1&from=daily-plan',
     })
   })
 

@@ -32,7 +32,7 @@ public class QuestionController {
     public ResponseEntity<ApiResponse<PageResult<QuestionVO>>> list(@Valid QuestionQuery query) {
         PageResult<QuestionVO> page = questionService.searchVo(
                 query.category(), query.difficulty(), query.keyword(),
-                query.tag(), query.page(), query.size());
+                query.tag(), query.page(), query.size(), query.sort());
         log.info("搜索题目返回 {} 条（共 {} 条）", page.content().size(), page.total());
         return ResponseEntity.ok(ApiResponse.success(page));
     }

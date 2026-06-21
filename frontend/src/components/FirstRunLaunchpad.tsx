@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom'
 import type { Question } from '../types'
 import { useStudyProgress } from '../hooks/useStudyProgress'
 import { buildFirstRunLaunchpad } from '../utils/firstRunLaunchpad'
+import { buildContinuePracticePath } from '../utils/practiceRoute'
 import { readPracticeAnswerDrafts } from '../utils/practiceAnswerDraftStore'
 
 interface Props {
@@ -106,13 +107,18 @@ export default function FirstRunLaunchpad({ hotQuestions, loading = false }: Pro
           {model.secondaryActions.map(action => (
             <Button
               key={action.to}
+              aria-label={action.label}
               icon={action.kind === 'route' ? <ReadOutlined /> : <CalendarOutlined />}
               onClick={() => navigate(action.to)}
             >
               {action.label}
             </Button>
           ))}
-          <Button icon={<PlayCircleOutlined />} onClick={() => navigate('/practice')}>
+          <Button
+            aria-label="直接模拟"
+            icon={<PlayCircleOutlined />}
+            onClick={() => navigate(buildContinuePracticePath(progress))}
+          >
             直接模拟
           </Button>
         </div>
