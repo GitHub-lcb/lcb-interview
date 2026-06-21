@@ -240,6 +240,37 @@ describe('QuestionDetail', () => {
     expect(utterances[0].text).toContain('开场，序列化是把对象转换成字节流')
   })
 
+  it('lets users stop the active speech reading from the same action area', async () => {
+    const user = userEvent.setup()
+    const cancel = vi.fn()
+    const speak = vi.fn()
+    const SpeechSynthesisUtterance = vi.fn().mockImplementation((text: string) => ({
+      text,
+      lang: '',
+      rate: 0,
+    }))
+    vi.stubGlobal('speechSynthesis', { cancel, speak })
+    vi.stubGlobal('SpeechSynthesisUtterance', SpeechSynthesisUtterance)
+
+    render(
+      <MemoryRouter initialEntries={['/question/101']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/question/:id" element={<QuestionDetail />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    const speakButton = await screen.findByRole('button', { name: /朗读口径/ })
+    await user.click(speakButton)
+
+    const stopButton = screen.getByRole('button', { name: /停止朗读/ })
+    await user.click(stopButton)
+
+    expect(speak).toHaveBeenCalledTimes(1)
+    expect(cancel).toHaveBeenCalledTimes(2)
+    expect(screen.getByRole('button', { name: /朗读口径/ })).toBeInTheDocument()
+  })
+
   it('runs a 60 second oral rehearsal timer and prompts self check after finishing', async () => {
     render(
       <MemoryRouter initialEntries={['/question/101']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>

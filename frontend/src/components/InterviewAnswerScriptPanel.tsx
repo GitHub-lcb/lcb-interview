@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button, Checkbox } from 'antd'
-import { CopyOutlined, EyeInvisibleOutlined, EyeOutlined, PlayCircleOutlined, SoundOutlined, ThunderboltOutlined } from '@ant-design/icons'
+import { CopyOutlined, EyeInvisibleOutlined, EyeOutlined, PlayCircleOutlined, SoundOutlined, StopOutlined, ThunderboltOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import {
@@ -48,10 +48,17 @@ export default function InterviewAnswerScriptPanel({
   const [running, setRunning] = useState(false)
   const [completed, setCompleted] = useState(false)
   const [blindMode, setBlindMode] = useState(false)
+  const [speaking, setSpeaking] = useState(false)
+  const speakingRef = useRef(false)
   const [acceptance, setAcceptance] = useState<AcceptanceState>(EMPTY_ACCEPTANCE)
   const [acceptanceNotified, setAcceptanceNotified] = useState(false)
   const acceptanceCount = ACCEPTANCE_ITEMS.filter(item => acceptance[item.key]).length
   const acceptanceComplete = acceptanceCount === ACCEPTANCE_ITEMS.length
+
+  const updateSpeaking = (nextSpeaking: boolean) => {
+    speakingRef.current = nextSpeaking
+    setSpeaking(nextSpeaking)
+  }
 
   useEffect(() => {
     if (!running) {
@@ -83,6 +90,12 @@ export default function InterviewAnswerScriptPanel({
     setAcceptanceNotified(true)
   }, [acceptanceComplete, acceptanceNotified, blindMode])
 
+  useEffect(() => () => {
+    if (speakingRef.current && window.speechSynthesis) {
+      window.speechSynthesis.cancel()
+    }
+  }, [])
+
   const handleCopy = async () => {
     const markdown = buildInterviewAnswerScriptMarkdown(question)
     const copied = await copyMarkdown(markdown)
@@ -105,9 +118,20 @@ export default function InterviewAnswerScriptPanel({
     const utterance = new SpeechSynthesisUtterance(buildInterviewAnswerSpeechText(question))
     utterance.lang = 'zh-CN'
     utterance.rate = 0.96
+    utterance.onend = () => updateSpeaking(false)
+    utterance.onerror = () => updateSpeaking(false)
     window.speechSynthesis.cancel()
     window.speechSynthesis.speak(utterance)
+    updateSpeaking(true)
     emitFeedbackSuccess('正在朗读 60 秒面试口径')
+  }
+
+  const handleStopSpeak = () => {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel()
+    }
+    updateSpeaking(false)
+    emitFeedbackSuccess('已停止朗读')
   }
 
   const handleStartRehearsal = () => {
@@ -151,8 +175,13 @@ export default function InterviewAnswerScriptPanel({
           <h2>60 秒面试口径</h2>
         </div>
         <div className="interview-answer-script-actions">
-          <Button size="small" icon={<SoundOutlined />} onClick={handleSpeak}>
-            朗读口径
+          <Button
+            size="small"
+            danger={speaking}
+            icon={speaking ? <StopOutlined /> : <SoundOutlined />}
+            onClick={speaking ? handleStopSpeak : handleSpeak}
+          >
+            {speaking ? '停止朗读' : '朗读口径'}
           </Button>
           <Button size="small" icon={<CopyOutlined />} onClick={handleCopy}>
             复制口径
