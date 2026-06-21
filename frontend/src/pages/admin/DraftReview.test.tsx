@@ -123,6 +123,26 @@ describe('DraftReview', () => {
     expect(screen.getAllByText('空答案').length).toBeGreaterThan(0)
   })
 
+  it('applies the content status filter from the URL', async () => {
+    const listDrafts = vi.mocked(adminApi.listDrafts)
+    listDrafts.mockResolvedValue({
+      records: [draft(41, '待补答案草稿')],
+      total: 1,
+      current: 1,
+      pages: 1,
+    })
+
+    renderDraftReview('/admin/draft-review?contentStatus=EMPTY')
+
+    expect(await screen.findByText('待补答案草稿')).toBeInTheDocument()
+    await waitFor(() => expect(listDrafts).toHaveBeenCalledWith(
+      0,
+      20,
+      { contentStatus: 'EMPTY' },
+      { silentGlobalError: true },
+    ))
+  })
+
   it('shows a recoverable inline error when the draft list fails silently', async () => {
     const user = userEvent.setup()
     const listDrafts = vi.mocked(adminApi.listDrafts)

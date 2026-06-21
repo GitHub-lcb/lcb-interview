@@ -42,13 +42,14 @@ public class QuestionAdminController {
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String difficulty,
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String riskType) {
+            @RequestParam(required = false) String riskType,
+            @RequestParam(required = false) String contentStatus) {
         Page<Question> mpPage = new Page<>(Math.max(1, page + 1), Math.min(100, Math.max(1, size)));
         QueryWrapper<Question> wrapper = new QueryWrapper<Question>()
                 .eq("status", "DRAFT")
                 .orderByAsc("id")
                 .orderByDesc("update_time");
-        applyDraftFilters(wrapper, categoryId, difficulty, keyword, riskType);
+        applyDraftFilters(wrapper, categoryId, difficulty, keyword, riskType, contentStatus);
         IPage<Question> result = questionMapper.selectPage(mpPage, wrapper);
         Page<QuestionAdminVO> voPage = new Page<>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream().map(QuestionAdminVO::from).toList());
@@ -60,7 +61,8 @@ public class QuestionAdminController {
             Long categoryId,
             String difficulty,
             String keyword,
-            String riskType) {
+            String riskType,
+            String contentStatus) {
         if (categoryId != null) {
             wrapper.eq("category_id", categoryId);
         }
@@ -75,7 +77,27 @@ public class QuestionAdminController {
                     .or()
                     .like("content", normalizedKeyword));
         }
+        applyContentStatusFilter(wrapper, contentStatus);
         applyRiskFilter(wrapper, riskType);
+    }
+
+    private void applyContentStatusFilter(QueryWrapper<Question> wrapper, String contentStatus) {
+        if (isBlank(contentStatus)) {
+            return;
+        }
+        switch (contentStatus.trim().toUpperCase()) {
+            case "EMPTY" -> wrapper.apply("""
+                    ((content IS NULL OR TRIM(content) = '')
+                    AND (answer IS NULL OR TRIM(answer) = ''))
+                    """);
+            case "WITH_CONTENT" -> wrapper.apply("""
+                    ((content IS NOT NULL AND TRIM(content) <> '')
+                    OR (answer IS NOT NULL AND TRIM(answer) <> ''))
+                    """);
+            default -> {
+                // 未识别的内容筛选不参与过滤，避免旧 URL 或手工参数让审核列表不可用。
+            }
+        }
     }
 
     private void applyRiskFilter(QueryWrapper<Question> wrapper, String riskType) {

@@ -51,11 +51,14 @@ export type DraftRiskType =
   | 'MISSING_CONTENT_SECTIONS'
   | 'INVALID_DIFFICULTY'
 
+export type DraftContentStatus = 'EMPTY' | 'WITH_CONTENT'
+
 export interface DraftReviewFilters {
   categoryId?: number
   difficulty?: string
   keyword?: string
   riskType?: DraftRiskType
+  contentStatus?: DraftContentStatus
 }
 
 export interface AdminCategoryQuality {

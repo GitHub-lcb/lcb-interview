@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom'
 import { listDrafts, getDraft, approveDraft, rejectDraft, batchApproveDrafts, batchRejectDrafts } from '../../api/admin'
 import ContentView from '../QuestionDetail/ContentView'
 import { getDraftQualityWarnings } from './draftQuality'
-import type { DraftReviewFilters, DraftRiskType, QuestionAdmin } from '../../types'
+import type { DraftContentStatus, DraftReviewFilters, DraftRiskType, QuestionAdmin } from '../../types'
 import type { ColumnsType } from 'antd/es/table'
 
 const riskOptions: { label: string; value: DraftRiskType }[] = [
@@ -22,6 +22,11 @@ const riskOptions: { label: string; value: DraftRiskType }[] = [
   { label: '难度异常', value: 'INVALID_DIFFICULTY' },
 ]
 
+const contentStatusOptions: { label: string; value: DraftContentStatus }[] = [
+  { label: '无答案内容', value: 'EMPTY' },
+  { label: '有答案内容', value: 'WITH_CONTENT' },
+]
+
 export default function DraftReview() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [data, setData] = useState<QuestionAdmin[]>([])
@@ -35,6 +40,9 @@ export default function DraftReview() {
   const [riskType, setRiskType] = useState<DraftRiskType | undefined>(() =>
     normalizeRiskType(searchParams.get('risk'))
   )
+  const [contentStatus, setContentStatus] = useState<DraftContentStatus | undefined>(() =>
+    normalizeContentStatus(searchParams.get('contentStatus'))
+  )
   const [keyword, setKeyword] = useState(() => searchParams.get('keyword') || '')
   const [categoryId] = useState(() => {
     const value = Number(searchParams.get('categoryId'))
@@ -42,8 +50,8 @@ export default function DraftReview() {
   })
 
   const filters = useMemo(
-    () => buildDraftFilters(riskType, keyword, categoryId),
-    [riskType, keyword, categoryId],
+    () => buildDraftFilters(riskType, contentStatus, keyword, categoryId),
+    [riskType, contentStatus, keyword, categoryId],
   )
 
   const load = useCallback((p: number) => {
@@ -64,9 +72,14 @@ export default function DraftReview() {
 
   useEffect(() => { load(0) }, [load])
 
-  const syncSearchParams = (nextRiskType: DraftRiskType | undefined, nextKeyword: string) => {
+  const syncSearchParams = (
+    nextRiskType: DraftRiskType | undefined,
+    nextContentStatus: DraftContentStatus | undefined,
+    nextKeyword: string,
+  ) => {
     const next = new URLSearchParams()
     if (nextRiskType) { next.set('risk', nextRiskType) }
+    if (nextContentStatus) { next.set('contentStatus', nextContentStatus) }
     if (nextKeyword.trim()) { next.set('keyword', nextKeyword.trim()) }
     if (categoryId) { next.set('categoryId', String(categoryId)) }
     setSearchParams(next, { replace: true })
@@ -76,22 +89,30 @@ export default function DraftReview() {
     setRiskType(value)
     setCurrent(1)
     setSelectedIds([])
-    syncSearchParams(value, keyword)
+    syncSearchParams(value, contentStatus, keyword)
+  }
+
+  const handleContentStatusChange = (value?: DraftContentStatus) => {
+    setContentStatus(value)
+    setCurrent(1)
+    setSelectedIds([])
+    syncSearchParams(riskType, value, keyword)
   }
 
   const handleSearch = (value: string) => {
     setKeyword(value)
     setCurrent(1)
     setSelectedIds([])
-    syncSearchParams(riskType, value)
+    syncSearchParams(riskType, contentStatus, value)
   }
 
   const handleClearFilters = () => {
     setRiskType(undefined)
+    setContentStatus(undefined)
     setKeyword('')
     setCurrent(1)
     setSelectedIds([])
-    syncSearchParams(undefined, '')
+    syncSearchParams(undefined, undefined, '')
   }
 
   const handleApprove = async (id: number) => {
@@ -170,6 +191,14 @@ export default function DraftReview() {
       <Space style={{ marginBottom: 12 }} wrap>
         <Select
           allowClear
+          placeholder="答案内容"
+          style={{ width: 140 }}
+          options={contentStatusOptions}
+          value={contentStatus}
+          onChange={handleContentStatusChange}
+        />
+        <Select
+          allowClear
           placeholder="质量风险"
           style={{ width: 160 }}
           options={riskOptions}
@@ -184,7 +213,7 @@ export default function DraftReview() {
           onSearch={handleSearch}
           style={{ width: 240 }}
         />
-        {(riskType || keyword || categoryId) && (
+        {(riskType || contentStatus || keyword || categoryId) && (
           <Button onClick={handleClearFilters}>清空筛选</Button>
         )}
         <span>已选 {selectedIds.length} 题</span>
@@ -234,11 +263,13 @@ export default function DraftReview() {
 
 function buildDraftFilters(
   riskType: DraftRiskType | undefined,
+  contentStatus: DraftContentStatus | undefined,
   keyword: string,
   categoryId?: number,
 ): DraftReviewFilters {
   const filters: DraftReviewFilters = {}
   if (riskType) { filters.riskType = riskType }
+  if (contentStatus) { filters.contentStatus = contentStatus }
   if (keyword.trim()) { filters.keyword = keyword.trim() }
   if (categoryId) { filters.categoryId = categoryId }
   return filters
@@ -246,6 +277,10 @@ function buildDraftFilters(
 
 function normalizeRiskType(value: string | null): DraftRiskType | undefined {
   return riskOptions.some(option => option.value === value) ? value as DraftRiskType : undefined
+}
+
+function normalizeContentStatus(value: string | null): DraftContentStatus | undefined {
+  return contentStatusOptions.some(option => option.value === value) ? value as DraftContentStatus : undefined
 }
 
 function renderQualityTags(question: QuestionAdmin) {

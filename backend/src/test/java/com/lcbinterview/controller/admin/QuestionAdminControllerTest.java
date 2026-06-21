@@ -91,6 +91,48 @@ class QuestionAdminControllerTest {
     }
 
     @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    void listDraftsFiltersEmptyContentDrafts() throws Exception {
+        when(questionMapper.selectPage(any(Page.class), any(Wrapper.class)))
+                .thenReturn(new Page<Question>(1, 20, 0));
+
+        mockMvc.perform(get("/api/admin/questions/draft")
+                        .header("Authorization", "Bearer test-token")
+                        .param("contentStatus", "EMPTY"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code", is(200)));
+
+        ArgumentCaptor<Wrapper<Question>> wrapperCaptor = ArgumentCaptor.forClass((Class) Wrapper.class);
+        verify(questionMapper).selectPage(any(Page.class), wrapperCaptor.capture());
+        QueryWrapper<Question> queryWrapper = (QueryWrapper<Question>) wrapperCaptor.getValue();
+        assertThat(queryWrapper.getCustomSqlSegment())
+                .contains("TRIM(content) = ''")
+                .contains("TRIM(answer) = ''");
+    }
+
+    @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    void listDraftsFiltersDraftsWithContent() throws Exception {
+        when(questionMapper.selectPage(any(Page.class), any(Wrapper.class)))
+                .thenReturn(new Page<Question>(1, 20, 0));
+
+        mockMvc.perform(get("/api/admin/questions/draft")
+                        .header("Authorization", "Bearer test-token")
+                        .param("contentStatus", "WITH_CONTENT"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code", is(200)));
+
+        ArgumentCaptor<Wrapper<Question>> wrapperCaptor = ArgumentCaptor.forClass((Class) Wrapper.class);
+        verify(questionMapper).selectPage(any(Page.class), wrapperCaptor.capture());
+        QueryWrapper<Question> queryWrapper = (QueryWrapper<Question>) wrapperCaptor.getValue();
+        assertThat(queryWrapper.getCustomSqlSegment())
+                .contains("content IS NOT NULL")
+                .contains("TRIM(content) <> ''")
+                .contains("answer IS NOT NULL")
+                .contains("TRIM(answer) <> ''");
+    }
+
+    @Test
     void approveRejectsDraftWithoutContent() throws Exception {
         Question draft = new Question();
         draft.setId(10L);
