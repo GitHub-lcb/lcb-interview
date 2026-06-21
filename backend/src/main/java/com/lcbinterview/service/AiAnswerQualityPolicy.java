@@ -68,6 +68,55 @@ public class AiAnswerQualityPolicy {
     }
 
     /**
+     * 构建已发布题目答案重写提示词。提示词带上旧答案上下文，方便新模型保留题意但完整重写表达。
+     *
+     * @param question     已发布题目
+     * @param categoryName 分类名称
+     * @param tags         标签名称列表
+     * @return 可直接发送给大模型的重写提示词
+     */
+    public String buildRewritePrompt(Question question, String categoryName, List<String> tags) {
+        String safeCategoryName = textOrDefault(categoryName, "未知分类");
+        String safeDifficulty = textOrDefault(question.getDifficulty(), "MEDIUM");
+        String tagText = tags == null || tags.isEmpty() ? "无" : String.join("、", tags);
+        String currentAnswer = textOrDefault(question.getContent(), textOrDefault(question.getAnswer(), "无"));
+
+        return """
+                请为下面这道已发布题目完整重写一份可审核的新答案。不要只局部补丁，要以新模型能力重新组织表达。
+
+                ## 已发布题目上下文
+                题目：%s
+                分类：%s
+                难度：%s
+                标签：%s
+
+                ## 当前已发布答案
+                %s
+
+                ## 输出格式
+                只返回 JSON 对象，不要返回 Markdown 代码围栏，不要输出额外解释。
+                JSON 字段必须包含：
+                - summary: 50-120 字纯文本，给出 30 秒速览结论
+                - content: Markdown，至少 500 字，必须包含「30 秒口述版」「标准答案」「面试官评分点」「高频追问」四段
+                - principle: Markdown，至少 120 字，解释底层机制和关键链路
+                - comparison: Markdown，至少 80 字，对比相近方案、概念或常见误解
+                - scenario: Markdown，至少 80 字，说明适用场景和不适用场景
+                - risk: Markdown，至少 80 字，列出线上风险、边界条件和常见坑
+                - project_exp: Markdown，至少 80 字，给出可以在面试中复述的项目经验表达
+                - code_examples: 数组。涉及代码、SQL、算法、配置、并发、框架用法时必须至少 1 个示例；每项包含 lang、title、code、description
+                - difficulty: EASY/MEDIUM/HARD
+
+                ## 质量门槛
+                - 保持原题题意，不要改题目方向
+                - 先给可口述的答案，再展开原理，不要只堆概念
+                - 必须说明为什么这样做，不能只说是什么
+                - 必须有面试官视角的评分点和追问
+                - 必须有项目表达，能让候选人迁移到真实经历
+                - 不确定的事实不要编造版本号、源码细节或性能数字
+                """.formatted(question.getTitle(), safeCategoryName, safeDifficulty, tagText, currentAnswer);
+    }
+
+    /**
      * 构建生成题目提示词。生成题和补答案使用相同质量门槛，避免批量生成绕过答案质量标准。
      *
      * @param req 生成请求

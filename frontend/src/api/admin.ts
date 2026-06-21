@@ -131,3 +131,41 @@ export function streamFillAnswer(
 
   return abort
 }
+
+/**
+ * SSE 流式重写已发布题目答案（结果进入草稿审核）。
+ */
+export function streamRewritePublishedAnswers(
+  onEvent: (event: import('../types').StreamEvent) => void,
+  categoryId?: number,
+  keyword?: string,
+  count: number = 5
+): AbortController {
+  const baseUrl = window.location.origin
+  const params = new URLSearchParams()
+  if (categoryId) params.set('categoryId', String(categoryId))
+  if (keyword?.trim()) params.set('keyword', keyword.trim())
+  params.set('count', String(count))
+  const token = localStorage.getItem('adminToken')
+  if (token) params.set('token', token)
+
+  const abort = new AbortController()
+  const es = new EventSource(`${baseUrl}/api/admin/ai/rewrite-published-stream?${params}`)
+
+  es.addEventListener('thinking', (e: MessageEvent) => onEvent({ type: 'thinking', data: e.data }))
+  es.addEventListener('content', (e: MessageEvent) => onEvent({ type: 'content', data: e.data }))
+  es.addEventListener('progress', (e: MessageEvent) => onEvent({ type: 'progress', data: e.data }))
+  es.addEventListener('question_result', (e: MessageEvent) => onEvent({ type: 'question_result', data: e.data }))
+  es.addEventListener('total', (e: MessageEvent) => onEvent({ type: 'total', data: e.data }))
+  es.addEventListener('done', (e: MessageEvent) => { onEvent({ type: 'done', data: e.data }); es.close() })
+  es.addEventListener('error', (e: MessageEvent) => { onEvent({ type: 'error', data: e.data || '连接错误' }); es.close() })
+  es.addEventListener('info', (e: MessageEvent) => onEvent({ type: 'info', data: e.data }))
+
+  es.onerror = () => { onEvent({ type: 'error', data: '连接中断' }); es.close() }
+
+  ;(abort as any).__es = es
+  const origAbort = abort.abort.bind(abort)
+  abort.abort = () => { es.close(); origAbort() }
+
+  return abort
+}

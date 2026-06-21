@@ -15,6 +15,7 @@ vi.mock('../../api/admin', () => ({
   getBatchStatus: vi.fn(),
   streamGenerate: vi.fn(),
   streamFillAnswer: vi.fn(),
+  streamRewritePublishedAnswers: vi.fn(),
   listDrafts: vi.fn(),
 }))
 
@@ -42,6 +43,7 @@ describe('AIGenerate category loading', () => {
 
     vi.mocked(adminApi.getBatchStatus).mockResolvedValue({ status: 'IDLE' } as never)
     vi.mocked(adminApi.listDrafts).mockResolvedValue({ total: 0 } as never)
+    vi.mocked(adminApi.streamRewritePublishedAnswers).mockReturnValue(new AbortController())
   })
 
   afterEach(() => {
@@ -76,5 +78,32 @@ describe('AIGenerate category loading', () => {
     await waitFor(() => expect(vi.mocked(getCategories)).toHaveBeenCalledTimes(2))
     expect(vi.mocked(getCategories)).toHaveBeenLastCalledWith({ silentGlobalError: true })
     await waitFor(() => expect(screen.queryByText('分类加载失败')).not.toBeInTheDocument())
+  })
+
+  it('starts published answer rewrite stream from the new admin mode', async () => {
+    const user = userEvent.setup()
+    vi.mocked(getCategories).mockResolvedValue([
+      {
+        id: 1,
+        name: 'Java 基础',
+        icon: 'java',
+        description: 'Java 基础题库',
+        sortOrder: 1,
+      },
+    ])
+
+    render(<AIGenerate />)
+
+    await user.click(await screen.findByText('重写已发布'))
+    await user.click(screen.getByRole('button', { name: '逐题流式重写答案' }))
+
+    await waitFor(() => {
+      expect(adminApi.streamRewritePublishedAnswers).toHaveBeenCalledWith(
+        expect.any(Function),
+        undefined,
+        undefined,
+        5,
+      )
+    })
   })
 })

@@ -1,6 +1,7 @@
 package com.lcbinterview.controller.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +30,7 @@ public class QuestionAdminController {
     private static final int SUMMARY_MIN_CHARS = 40;
     private static final int PRINCIPLE_MIN_CHARS = 120;
     private static final int DETAIL_MIN_CHARS = 80;
+    private static final String SOURCE_AI_REWRITE = "AI_REWRITE";
 
     private final QuestionMapper questionMapper;
     private final AiAnswerQualityPolicy aiAnswerQualityPolicy;
@@ -189,6 +192,9 @@ public class QuestionAdminController {
         if (!qualityReport.passed()) {
             return ResponseEntity.ok(ApiResponse.error(400, "题目质量未达标：" + summarizeQualityIssues(qualityReport)));
         }
+        if (isRewriteDraft(existing)) {
+            return ResponseEntity.ok(applyRewriteDraft(existing));
+        }
         Question q = new Question();
         q.setId(id);
         q.setStatus("PUBLISHED");
@@ -232,13 +238,29 @@ public class QuestionAdminController {
                 }
             }
         }
-        questionMapper.update(null, new LambdaUpdateWrapper<Question>()
-                .set(Question::getStatus, "PUBLISHED")
-                .in(Question::getId, ids)
-                .eq(Question::getStatus, "DRAFT")
-                // 校验和更新都限制非空内容，避免并发窗口把空答案发布出去。
-                .isNotNull(Question::getContent)
-                .apply("TRIM(content) <> ''"));
+        List<Long> regularDraftIds = new ArrayList<>();
+        for (Question draft : drafts) {
+            if (!"DRAFT".equals(draft.getStatus())) {
+                continue;
+            }
+            if (isRewriteDraft(draft)) {
+                ApiResponse<Void> rewriteResponse = applyRewriteDraft(draft);
+                if (rewriteResponse.code() != 200) {
+                    return ResponseEntity.ok(rewriteResponse);
+                }
+            } else {
+                regularDraftIds.add(draft.getId());
+            }
+        }
+        if (!regularDraftIds.isEmpty()) {
+            questionMapper.update(null, new UpdateWrapper<Question>()
+                    .set("status", "PUBLISHED")
+                    .in("id", regularDraftIds)
+                    .eq("status", "DRAFT")
+                    // 校验和更新都限制非空内容，避免并发窗口把空答案发布出去。
+                    .isNotNull("content")
+                    .apply("TRIM(content) <> ''"));
+        }
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
@@ -260,6 +282,67 @@ public class QuestionAdminController {
     private boolean isContentBlank(Question question) {
         String content = question.getContent();
         return content == null || content.isBlank();
+    }
+
+    private boolean isRewriteDraft(Question question) {
+        return SOURCE_AI_REWRITE.equals(question.getSource());
+    }
+
+    private ApiResponse<Void> applyRewriteDraft(Question rewriteDraft) {
+        Long originalId = parseRewriteOriginalId(rewriteDraft);
+        if (originalId == null) {
+            return ApiResponse.error(400, "重写草稿缺少原题关联 ID");
+        }
+        Question original = questionMapper.selectById(originalId);
+        if (original == null || !"PUBLISHED".equals(original.getStatus())) {
+            return ApiResponse.error(400, "原已发布题目不存在或状态不是已发布");
+        }
+
+        Question update = buildOriginalAnswerUpdate(originalId, rewriteDraft);
+        questionMapper.updateById(update);
+        // 重写草稿只是审核载体，应用成功后逻辑删除，避免前台出现重复题目。
+        questionMapper.deleteById(rewriteDraft.getId());
+        return ApiResponse.success(null);
+    }
+
+    private Question buildOriginalAnswerUpdate(Long originalId, Question rewriteDraft) {
+        Question update = new Question();
+        update.setId(originalId);
+        update.setSummary(rewriteDraft.getSummary());
+        update.setContent(rewriteDraft.getContent());
+        update.setAnswer(rewriteDraft.getAnswer());
+        update.setPrinciple(rewriteDraft.getPrinciple());
+        update.setComparison(rewriteDraft.getComparison());
+        update.setScenario(rewriteDraft.getScenario());
+        update.setRisk(rewriteDraft.getRisk());
+        update.setProjectExp(rewriteDraft.getProjectExp());
+        update.setCodeExamples(rewriteDraft.getCodeExamples());
+        update.setDiagrams(rewriteDraft.getDiagrams());
+        return update;
+    }
+
+    private Long parseRewriteOriginalId(Question rewriteDraft) {
+        String relatedIds = rewriteDraft.getRelatedIds();
+        if (relatedIds == null || relatedIds.isBlank()) {
+            return null;
+        }
+        String normalized = relatedIds.trim();
+        if (normalized.startsWith("[") && normalized.endsWith("]")) {
+            normalized = normalized.substring(1, normalized.length() - 1).trim();
+        }
+        int commaIndex = normalized.indexOf(',');
+        if (commaIndex >= 0) {
+            normalized = normalized.substring(0, commaIndex).trim();
+        }
+        normalized = normalized.replace("\"", "").replace("'", "").trim();
+        if (normalized.isBlank()) {
+            return null;
+        }
+        try {
+            return Long.valueOf(normalized);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private AiAnswerQualityPolicy.QualityReport evaluateDraftQuality(Question question) {

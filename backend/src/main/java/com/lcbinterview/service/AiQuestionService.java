@@ -43,6 +43,9 @@ public class AiQuestionService {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
     private static final int ANSWER_QUALITY_MAX_ATTEMPTS = 3;
     private static final int STREAM_HEARTBEAT_CHUNK_INTERVAL = 120;
+    private static final String STATUS_PUBLISHED = "PUBLISHED";
+    private static final String STATUS_DRAFT = "DRAFT";
+    private static final String SOURCE_AI_REWRITE = "AI_REWRITE";
 
     @Value("${ai.deepseek.api-key}")
     private String apiKey;
@@ -397,6 +400,155 @@ public class AiQuestionService {
         });
     }
 
+    /**
+     * 流式重写已发布题目的答案。生成结果保存为 AI_REWRITE 草稿，审核通过后再替换原题答案。
+     */
+    public void streamRewritePublishedAnswers(Long categoryId, String keyword, int count, SseEmitter emitter) {
+        int safeCount = requestPolicy.clampCount(count);
+        String normalizedKeyword = keyword == null ? "" : keyword.trim();
+        SseStreamSession session = SseStreamSession.open(emitter);
+        log.info("流式重写已发布答案启动: categoryId={}, keyword='{}', count={}",
+                categoryId, normalizedKeyword, safeCount);
+
+        scheduler.submit(() -> {
+            long totalStart = System.currentTimeMillis();
+            try {
+                List<Question> publishedQuestions = loadPublishedRewriteCandidates(
+                        categoryId, normalizedKeyword, safeCount);
+                if (publishedQuestions.isEmpty()) {
+                    log.warn("流式重写已发布答案: 没有可重写题目, categoryId={}, keyword='{}'",
+                            categoryId, normalizedKeyword);
+                    session.sendEvent("error", "没有可重写的已发布题目");
+                    session.complete();
+                    return;
+                }
+
+                int total = publishedQuestions.size();
+                int success = 0;
+                int fail = 0;
+                int resultCount = 0;
+                sendEventBestEffort(session, "total", String.valueOf(total));
+
+                for (int i = 0; i < total; i++) {
+                    long iterStart = System.currentTimeMillis();
+                    Question original = publishedQuestions.get(i);
+
+                    Map<String, Object> progressData = new HashMap<>();
+                    progressData.put("current", i + 1);
+                    progressData.put("total", total);
+                    progressData.put("title", original.getTitle());
+                    progressData.put("originalQuestionId", original.getId());
+                    progressData.put("status", "generating");
+                    sendJsonBestEffort(session, "progress", progressData);
+
+                    log.info("流式重写已发布答案 [{}/{}]: originalId={}, title='{}'",
+                            i + 1, total, original.getId(), truncate(original.getTitle(), 50));
+
+                    FillContext context = loadFillContext(original);
+                    Question rewriteDraft = null;
+                    int reasoningLength = 0;
+                    AiAnswerQualityPolicy.QualityReport qualityReport = null;
+                    String lastError = null;
+
+                    for (int attempt = 1; attempt <= ANSWER_QUALITY_MAX_ATTEMPTS; attempt++) {
+                        String prompt = answerQualityPolicy.buildRewritePrompt(
+                                original, context.categoryName(), context.tags());
+                        if (qualityReport != null) {
+                            prompt = prompt + buildQualityRetryInstruction(qualityReport);
+                        }
+                        log.info("流式重写已发布答案 [{}/{}]: 第 {} 次生成, prompt={}字符",
+                                i + 1, total, attempt, prompt.length());
+
+                        try {
+                            StreamResult sr = callDeepSeekStreamInternal(prompt, session, StreamPushMode.HEARTBEAT_ONLY);
+                            reasoningLength = sr.reasoningLength();
+                            log.info("流式重写已发布答案 [{}/{}]: 第 {} 次收到响应, content={}字符, reasoning={}字符",
+                                    i + 1, total, attempt, sr.content().length(), sr.reasoningLength());
+
+                            JsonNode parsed = parseAnswerObject(sr.content());
+                            if (parsed == null) {
+                                lastError = "响应中无有效答案对象";
+                                log.warn("流式重写已发布答案 [{}/{}]: 第 {} 次解析失败, originalId={}",
+                                        i + 1, total, attempt, original.getId());
+                                continue;
+                            }
+
+                            qualityReport = answerQualityPolicy.evaluate(
+                                    original, context.categoryName(), context.tags(), parsed);
+                            if (!qualityReport.passed()) {
+                                lastError = formatQualityIssues(qualityReport);
+                                log.warn("流式重写已发布答案 [{}/{}]: 第 {} 次质量未达标, originalId={}, {}",
+                                        i + 1, total, attempt, original.getId(), lastError);
+                                continue;
+                            }
+
+                            rewriteDraft = toRewriteDraft(original, parsed);
+                            break;
+                        } catch (SseStreamClosedException e) {
+                            throw e;
+                        } catch (Exception e) {
+                            lastError = e.getMessage();
+                            log.warn("流式重写已发布答案 [{}/{}]: 第 {} 次生成异常, originalId={}, error={}",
+                                    i + 1, total, attempt, original.getId(), e.getMessage());
+                        }
+                    }
+
+                    if (rewriteDraft != null) {
+                        questionMapper.insert(rewriteDraft);
+                        success++;
+
+                        long iterTime = System.currentTimeMillis() - iterStart;
+                        log.info("=== 流式重写已发布答案 [{}/{}] 草稿保存成功: draftId={}, originalId={}, 耗时={}ms ===",
+                                i + 1, total, rewriteDraft.getId(), original.getId(), iterTime);
+
+                        Map<String, Object> qResult = new HashMap<>(progressData);
+                        qResult.put("status", "completed");
+                        qResult.put("questionId", rewriteDraft.getId());
+                        qResult.put("originalQuestionId", original.getId());
+                        qResult.put("source", SOURCE_AI_REWRITE);
+                        qResult.put("qualityScore", qualityReport == null ? null : qualityReport.score());
+                        qResult.put("reasoningLength", reasoningLength);
+                        sendJsonBestEffort(session, "question_result", qResult);
+                        resultCount++;
+                    } else {
+                        fail++;
+                        log.warn("流式重写已发布答案 [{}/{}]: 多次生成后仍未达标, originalId={}, error={}",
+                                i + 1, total, original.getId(), lastError);
+                        Map<String, Object> errData = new HashMap<>(progressData);
+                        errData.put("status", "failed");
+                        errData.put("error", lastError == null ? "答案质量未达标" : lastError);
+                        if (qualityReport != null) {
+                            errData.put("qualityScore", qualityReport.score());
+                            errData.put("qualityIssues", qualityReport.issues());
+                        }
+                        sendJsonBestEffort(session, "question_result", errData);
+                        resultCount++;
+                    }
+                }
+
+                long totalTime = System.currentTimeMillis() - totalStart;
+                log.info("===== 流式重写已发布答案全部完成: 成功={}, 失败={}, 总耗时={}ms =====",
+                        success, fail, totalTime);
+
+                Map<String, Object> doneData = new HashMap<>();
+                doneData.put("total", total);
+                doneData.put("success", success);
+                doneData.put("fail", fail);
+                doneData.put("resultCount", resultCount);
+                doneData.put("totalTime", totalTime);
+                sendJsonBestEffort(session, "done", doneData);
+                session.complete();
+
+            } catch (SseStreamClosedException e) {
+                log.info("流式重写已发布答案连接已关闭，停止后台任务: {}", e.getMessage());
+            } catch (Exception e) {
+                log.error("流式重写已发布答案异常", e);
+                session.sendEvent("error", e.getMessage());
+                session.completeWithError(e);
+            }
+        });
+    }
+
     // ==================== 内部方法 ====================
 
     private record StreamResult(String content, String reasoning, int reasoningLength, int chunkCount) {}
@@ -495,6 +647,30 @@ public class AiQuestionService {
             update.setDifficulty(parsed.path("difficulty").asText());
         }
         return update;
+    }
+
+    private Question toRewriteDraft(Question original, JsonNode parsed) {
+        Question draft = new Question();
+        draft.setCategoryId(original.getCategoryId());
+        draft.setTitle(original.getTitle());
+        draft.setSummary(nullIfEmpty(parsed.path("summary").asText()));
+        draft.setContent(parsed.path("content").asText(""));
+        draft.setAnswer(parsed.path("content").asText(""));
+        draft.setPrinciple(nullIfEmpty(parsed.path("principle").asText()));
+        draft.setComparison(nullIfEmpty(parsed.path("comparison").asText()));
+        draft.setScenario(nullIfEmpty(parsed.path("scenario").asText()));
+        draft.setRisk(nullIfEmpty(parsed.path("risk").asText()));
+        draft.setProjectExp(nullIfEmpty(parsed.path("project_exp").asText()));
+        draft.setCodeExamples(nullIfEmpty(parsed.path("code_examples").toString()));
+        draft.setDiagrams(original.getDiagrams());
+        draft.setDifficulty(nullIfEmpty(original.getDifficulty()) == null
+                ? parsed.path("difficulty").asText("MEDIUM")
+                : original.getDifficulty());
+        draft.setStatus(STATUS_DRAFT);
+        draft.setSource(SOURCE_AI_REWRITE);
+        // 重写草稿只用 related_ids 记录原题 ID，避免新增数据库列即可完成审核替换链路。
+        draft.setRelatedIds("[" + original.getId() + "]");
+        return draft;
     }
 
     private String buildQualityRetryInstruction(AiAnswerQualityPolicy.QualityReport report) {
@@ -754,6 +930,25 @@ public class AiQuestionService {
                         .select(Question::getId, Question::getTitle)
                         .eq(Question::getCategoryId, categoryId)
                         .in(Question::getStatus, List.of("DRAFT", "PUBLISHED"))));
+    }
+
+    private List<Question> loadPublishedRewriteCandidates(Long categoryId, String keyword, int count) {
+        LambdaQueryWrapper<Question> wrapper = new LambdaQueryWrapper<Question>()
+                .eq(Question::getStatus, STATUS_PUBLISHED);
+        if (categoryId != null) {
+            wrapper.eq(Question::getCategoryId, categoryId);
+        }
+        if (keyword != null && !keyword.isBlank()) {
+            String normalizedKeyword = keyword.trim();
+            wrapper.and(q -> q.like(Question::getTitle, normalizedKeyword)
+                    .or()
+                    .like(Question::getSummary, normalizedKeyword)
+                    .or()
+                    .like(Question::getContent, normalizedKeyword));
+        }
+        wrapper.orderByAsc(Question::getId)
+                .last("LIMIT " + count);
+        return questionMapper.selectList(wrapper);
     }
 
     /**

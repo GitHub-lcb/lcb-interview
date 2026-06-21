@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Card, Form, Select, InputNumber, Input, Button, Progress, Alert, Segmented, Tag, Divider, Statistic, Row, Col, Collapse, List, Badge, Space } from 'antd'
 import { emitFeedbackError, emitFeedbackSuccess } from '../../utils/feedbackMessage'
-import { batchGenerate, getBatchStatus, streamGenerate, streamFillAnswer } from '../../api/admin'
+import { batchGenerate, getBatchStatus, streamGenerate, streamFillAnswer, streamRewritePublishedAnswers } from '../../api/admin'
 import { getCategories } from '../../api/category'
 import { listDrafts } from '../../api/admin'
 import type { Category, BatchProgress, StreamEvent } from '../../types'
 import { getStreamResultMeta } from './aiGenerateResult'
 
 export default function AIGenerate() {
-  const [mode, setMode] = useState<'batch' | 'stream' | 'streamFill'>('stream')
+  const [mode, setMode] = useState<'batch' | 'stream' | 'streamFill' | 'rewritePublished'>('stream')
   const [categories, setCategories] = useState<Category[]>([])
   const [categoryLoadError, setCategoryLoadError] = useState(false)
   const [categoryLoading, setCategoryLoading] = useState(false)
@@ -149,6 +149,24 @@ export default function AIGenerate() {
     streamAbortRef.current = abort
   }
 
+  const onRewritePublishedFinish = (values: any) => {
+    setStreamStatus('connecting')
+    setStreamCurrent(0)
+    setStreamTotal(0)
+    setStreamThinking('')
+    setStreamContent('')
+    setStreamResults([])
+    setStreamDoneResult(null)
+
+    const abort = streamRewritePublishedAnswers(
+      handleStreamEvent,
+      values.categoryId,
+      values.keyword,
+      values.count ?? 5
+    )
+    streamAbortRef.current = abort
+  }
+
   useEffect(() => {
     return () => { streamAbortRef.current?.abort() }
   }, [])
@@ -236,6 +254,7 @@ export default function AIGenerate() {
         options={[
           { value: 'stream', label: '流式生成' },
           { value: 'streamFill', label: '流式补答案' },
+          { value: 'rewritePublished', label: '重写已发布' },
           { value: 'batch', label: '批量生成' },
         ]}
         style={{ marginBottom: 24 }}
@@ -308,6 +327,43 @@ export default function AIGenerate() {
               <Button type="primary" htmlType="submit" loading={streamStatus === 'connecting' || streamStatus === 'streaming'}
                 disabled={streamStatus === 'connecting' || streamStatus === 'streaming'}>
                 逐题流式补答案
+              </Button>
+              {(streamStatus === 'connecting' || streamStatus === 'streaming') && (
+                <Button danger onClick={() => { streamAbortRef.current?.abort(); setStreamStatus('idle') }}>
+                  取消
+                </Button>
+              )}
+            </Space>
+          </Form>
+
+          {streamStatus !== 'idle' && renderStreamResult()}
+        </>
+      )}
+
+      {/* 重写已发布答案 */}
+      {mode === 'rewritePublished' && (
+        <>
+          <Alert
+            type="info"
+            showIcon
+            message="已发布答案重写"
+            description="按分类和关键词选取已发布题目，使用当前模型生成新版答案草稿；审核通过后替换原题答案，前台不会出现重复题。"
+            style={{ marginBottom: 16 }}
+          />
+          <Form layout="vertical" onFinish={onRewritePublishedFinish} style={{ maxWidth: 500 }}>
+            <Form.Item name="categoryId" label="分类（留空则重写所有分类）">
+              <Select allowClear options={categories.map(c => ({ value: c.id, label: c.name }))} showSearch placeholder="选择分类" />
+            </Form.Item>
+            <Form.Item name="keyword" label="关键词（可选）">
+              <Input placeholder="如：线程池、HashMap、缓存击穿" />
+            </Form.Item>
+            <Form.Item name="count" label="重写数量" initialValue={5} tooltip="一次最多重写 20 道">
+              <InputNumber min={1} max={20} />
+            </Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit" loading={streamStatus === 'connecting' || streamStatus === 'streaming'}
+                disabled={streamStatus === 'connecting' || streamStatus === 'streaming'}>
+                逐题流式重写答案
               </Button>
               {(streamStatus === 'connecting' || streamStatus === 'streaming') && (
                 <Button danger onClick={() => { streamAbortRef.current?.abort(); setStreamStatus('idle') }}>

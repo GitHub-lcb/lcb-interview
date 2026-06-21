@@ -42,4 +42,18 @@ class AiGenerationControllerTest {
         verify(aiQuestionService).streamFillAnswer(any(), any(Integer.class), emitterCaptor.capture());
         assertThat(emitterCaptor.getValue().getTimeout()).isZero();
     }
+
+    @Test
+    void rewritePublishedStreamUsesLongLivedEmitterAndDelegatesFilters() {
+        SseEmitter emitter = controller.rewritePublishedStream(3L, "线程池", 4);
+
+        assertThat(emitter.getTimeout()).isZero();
+        ArgumentCaptor<SseEmitter> emitterCaptor = ArgumentCaptor.forClass(SseEmitter.class);
+        verify(aiQuestionService).streamRewritePublishedAnswers(
+                org.mockito.Mockito.eq(3L),
+                org.mockito.Mockito.eq("线程池"),
+                org.mockito.Mockito.eq(4),
+                emitterCaptor.capture());
+        assertThat(emitterCaptor.getValue().getTimeout()).isZero();
+    }
 }

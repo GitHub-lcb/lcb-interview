@@ -64,6 +64,19 @@ public class AiGenerationController {
     }
 
     /**
+     * SSE 流式重写已发布题目答案。生成结果进入草稿审核，不直接覆盖线上答案。
+     */
+    @GetMapping(value = "/rewrite-published-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter rewritePublishedStream(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "5") int count) {
+        SseEmitter emitter = new SseEmitter(SSE_TIMEOUT_NEVER);
+        aiQuestionService.streamRewritePublishedAnswers(categoryId, keyword, requestPolicy.clampCount(count), emitter);
+        return emitter;
+    }
+
+    /**
      * 批量生成所有分类的题目。异步执行，通过日志和 /batch/status 查看进度。
      */
     @PostMapping("/batch")

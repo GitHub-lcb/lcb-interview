@@ -36,6 +36,24 @@ class AiAnswerQualityPolicyTest {
     }
 
     @Test
+    void buildRewritePromptIncludesExistingPublishedAnswerContext() {
+        Question question = question();
+        question.setSummary("旧摘要");
+        question.setContent("旧答案内容，需要被新模型完整改写。");
+        question.setPrinciple("旧原理");
+
+        String prompt = policy.buildRewritePrompt(question, "Java 并发", List.of("线程池"));
+
+        assertThat(prompt)
+                .contains("完整重写")
+                .contains("已发布题目")
+                .contains("旧答案内容，需要被新模型完整改写。")
+                .contains("只返回 JSON 对象")
+                .contains("质量门槛")
+                .contains("不要只局部补丁");
+    }
+
+    @Test
     void buildQuestionPromptUsesSameQualityRubricForGeneratedQuestions() {
         GenerationRequest request = new GenerationRequest("Java 并发", "HARD", 3, "线程池参数配置");
 

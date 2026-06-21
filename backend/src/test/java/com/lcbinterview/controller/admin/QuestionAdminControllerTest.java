@@ -184,6 +184,46 @@ class QuestionAdminControllerTest {
     }
 
     @Test
+    void approveAppliesAiRewriteDraftToOriginalPublishedQuestion() throws Exception {
+        Question rewriteDraft = qualityDraft(20L);
+        rewriteDraft.setSource("AI_REWRITE");
+        rewriteDraft.setRelatedIds("[99]");
+        rewriteDraft.setSummary("新摘要");
+        rewriteDraft.setContent("新答案内容");
+        rewriteDraft.setAnswer("新答案内容");
+        rewriteDraft.setPrinciple("新原理");
+        rewriteDraft.setComparison("新对比");
+        rewriteDraft.setScenario("新场景");
+        rewriteDraft.setRisk("新风险");
+        rewriteDraft.setProjectExp("新项目经验");
+        rewriteDraft.setCodeExamples("[{\"lang\":\"java\",\"code\":\"new answer\"}]");
+
+        Question original = qualityDraft(99L);
+        original.setStatus("PUBLISHED");
+        original.setSource("AI_GENERATED");
+        when(questionMapper.selectById(20L)).thenReturn(rewriteDraft);
+        when(questionMapper.selectById(99L)).thenReturn(original);
+        when(aiAnswerQualityPolicy.evaluateGeneratedQuestion("未知分类", rewriteDraft))
+                .thenReturn(new AiAnswerQualityPolicy.QualityReport(95, List.of()));
+
+        mockMvc.perform(post("/api/admin/questions/draft/20/approve")
+                        .header("Authorization", "Bearer test-token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code", is(200)));
+
+        ArgumentCaptor<Question> questionCaptor = ArgumentCaptor.forClass(Question.class);
+        verify(questionMapper).updateById(questionCaptor.capture());
+        Question originalUpdate = questionCaptor.getValue();
+        assertThat(originalUpdate.getId()).isEqualTo(99L);
+        assertThat(originalUpdate.getSummary()).isEqualTo("新摘要");
+        assertThat(originalUpdate.getContent()).isEqualTo("新答案内容");
+        assertThat(originalUpdate.getAnswer()).isEqualTo("新答案内容");
+        assertThat(originalUpdate.getPrinciple()).isEqualTo("新原理");
+        assertThat(originalUpdate.getStatus()).isNull();
+        verify(questionMapper).deleteById(20L);
+    }
+
+    @Test
     void batchApproveRejectsWhenAnyDraftHasNoContent() throws Exception {
         Question emptyDraft = new Question();
         emptyDraft.setId(10L);
@@ -218,6 +258,38 @@ class QuestionAdminControllerTest {
                 .andExpect(jsonPath("$.code", is(400)))
                 .andExpect(jsonPath("$.message", is("存在质量未达标的草稿：Redis 缓存击穿是什么；risk 风险与避坑缺失或过短")));
 
+        verify(questionMapper, never()).update(any(), any());
+    }
+
+    @Test
+    void batchApproveAppliesAiRewriteDraftToOriginalPublishedQuestion() throws Exception {
+        Question rewriteDraft = qualityDraft(21L);
+        rewriteDraft.setSource("AI_REWRITE");
+        rewriteDraft.setRelatedIds("[101]");
+        rewriteDraft.setSummary("批量新摘要");
+        rewriteDraft.setContent("批量新答案");
+        rewriteDraft.setAnswer("批量新答案");
+
+        Question original = qualityDraft(101L);
+        original.setStatus("PUBLISHED");
+        when(questionMapper.selectBatchIds(List.of(21L))).thenReturn(List.of(rewriteDraft));
+        when(questionMapper.selectById(101L)).thenReturn(original);
+        when(aiAnswerQualityPolicy.evaluateGeneratedQuestion("未知分类", rewriteDraft))
+                .thenReturn(new AiAnswerQualityPolicy.QualityReport(95, List.of()));
+
+        mockMvc.perform(post("/api/admin/questions/draft/batch-approve")
+                        .header("Authorization", "Bearer test-token")
+                        .contentType("application/json")
+                        .content("[21]"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code", is(200)));
+
+        ArgumentCaptor<Question> questionCaptor = ArgumentCaptor.forClass(Question.class);
+        verify(questionMapper).updateById(questionCaptor.capture());
+        assertThat(questionCaptor.getValue().getId()).isEqualTo(101L);
+        assertThat(questionCaptor.getValue().getSummary()).isEqualTo("批量新摘要");
+        assertThat(questionCaptor.getValue().getContent()).isEqualTo("批量新答案");
+        verify(questionMapper).deleteById(21L);
         verify(questionMapper, never()).update(any(), any());
     }
 
