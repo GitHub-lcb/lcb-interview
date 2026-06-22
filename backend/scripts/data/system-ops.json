@@ -1,0 +1,1739 @@
+{
+  "categoryId": 44,
+  "categoryName": "系统运维",
+  "bankIds": [
+    "1811358545672855553"
+  ],
+  "totalQuestions": 101,
+  "questions": [
+    {
+      "title": "解释如何在 Linux 和 Windows 操作系统上设置环境变量。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "Windows",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361660191899649",
+      "sourceId": "1811361660191899649",
+      "viewNum": 3468,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述 Linux 文件系统的结构，并解释每个目录的作用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361661320167426",
+      "sourceId": "1811361661320167426",
+      "viewNum": 2543,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 系统上查看和管理进程？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361661425025026",
+      "sourceId": "1811361661425025026",
+      "viewNum": 3136,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Windows 操作系统中如何使用任务管理器进行进程监控？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Windows",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361661517299714",
+      "sourceId": "1811361661517299714",
+      "viewNum": 864,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Windows 中，如何使用命令行工具检查网络连接状况？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361661626351618",
+      "sourceId": "1811361661626351618",
+      "viewNum": 731,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 系统中使用 crontab 定时执行任务？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361661752180738",
+      "sourceId": "1811361661752180738",
+      "viewNum": 1975,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Windows 中，如何设置计划任务来自动运行脚本？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361661861232642",
+      "sourceId": "1811361661861232642",
+      "viewNum": 610,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述如何在 Linux 和 Windows 操作系统中安装和卸载软件包。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Linux",
+        "Windows",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361661970284546",
+      "sourceId": "1811361661970284546",
+      "viewNum": 1934,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何检查系统的磁盘使用情况？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361662062559234",
+      "sourceId": "1811361662062559234",
+      "viewNum": 1979,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Windows 操作系统中管理磁盘分区？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Windows",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361662167416833",
+      "sourceId": "1811361662167416833",
+      "viewNum": 598,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Linux 系统中的权限管理机制。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361662280663041",
+      "sourceId": "1811361662280663041",
+      "viewNum": 2022,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Windows 系统中配置防火墙规则？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Windows",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361662410686466",
+      "sourceId": "1811361662410686466",
+      "viewNum": 551,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何查看和管理系统服务？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361662519738370",
+      "sourceId": "1811361662519738370",
+      "viewNum": 1925,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述 Windows 操作系统中的用户和组管理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361662637178882",
+      "sourceId": "1811361662637178882",
+      "viewNum": 401,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 系统中使用 SSH 进行远程登录？",
+      "difficulty": "EASY",
+      "tags": [
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361662763008002",
+      "sourceId": "1811361662763008002",
+      "viewNum": 2415,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Windows 注册表的作用及其基本结构。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361662880448514",
+      "sourceId": "1811361662880448514",
+      "viewNum": 374,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 系统中配置静态 IP 地址？",
+      "difficulty": "EASY",
+      "tags": [
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361662993694722",
+      "sourceId": "1811361662993694722",
+      "viewNum": 2015,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述如何在 Windows 系统中管理设备驱动程序。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361663098552322",
+      "sourceId": "1811361663098552322",
+      "viewNum": 291,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何设置文件的权限和拥有者？",
+      "difficulty": "EASY",
+      "tags": [
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361663199215618",
+      "sourceId": "1811361663199215618",
+      "viewNum": 1715,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Windows 系统中使用命令行管理用户账户？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Windows",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361663291490306",
+      "sourceId": "1811361663291490306",
+      "viewNum": 297,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Ansible 的基本架构和工作原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Ansible",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361663396347906",
+      "sourceId": "1811361663396347906",
+      "viewNum": 744,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Puppet 来管理多个服务器上的配置？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Puppet",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361663488622593",
+      "sourceId": "1811361663488622593",
+      "viewNum": 297,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Chef 的工作流程以及它在配置管理中的应用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Chef",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361663627034626",
+      "sourceId": "1811361663627034626",
+      "viewNum": 227,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Ansible 中，如何编写一个简单的 Playbook 来安装 Apache 服务？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Ansible",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361663727697921",
+      "sourceId": "1811361663727697921",
+      "viewNum": 463,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Puppet 使用的清单（Manifest）文件是什么？请举例说明。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Puppet",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361663824166914",
+      "sourceId": "1811361663824166914",
+      "viewNum": 176,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Chef 来实现一个自动化部署任务？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "Chef",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361663920635905",
+      "sourceId": "1811361663920635905",
+      "viewNum": 273,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Ansible、Puppet 和 Chef 之间的主要区别和应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Ansible",
+        "Puppet",
+        "Chef",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361664017104897",
+      "sourceId": "1811361664017104897",
+      "viewNum": 261,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Ansible Tower 提高 Ansible 的管理能力？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Ansible",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361664109379585",
+      "sourceId": "1811361664109379585",
+      "viewNum": 251,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Puppet 中的 Hiera 是什么，有什么用途？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Puppet",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361664205848578",
+      "sourceId": "1811361664205848578",
+      "viewNum": 132,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Chef 中的 Cookbook 和 Recipe 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Chef",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361664302317570",
+      "sourceId": "1811361664302317570",
+      "viewNum": 124,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Ansible 的模块化设计及其主要模块。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Ansible",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361664398786561",
+      "sourceId": "1811361664398786561",
+      "viewNum": 331,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Puppet 中使用 Facter 来收集节点信息？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Puppet",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361664499449858",
+      "sourceId": "1811361664499449858",
+      "viewNum": 116,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Chef 中的资源和提供者的概念。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Chef",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361664595918849",
+      "sourceId": "1811361664595918849",
+      "viewNum": 104,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Ansible 中，如何使用角色来组织 Playbook？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Ansible",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361664692387841",
+      "sourceId": "1811361664692387841",
+      "viewNum": 282,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Puppet 的代码分布是如何组织的？请详细说明。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Puppet",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361664780468226",
+      "sourceId": "1811361664780468226",
+      "viewNum": 101,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Chef 实现对应用程序的自动化部署？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "Chef",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361664868548610",
+      "sourceId": "1811361664868548610",
+      "viewNum": 141,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Ansible 中，如何管理变量和加密数据？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Ansible",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361664981794817",
+      "sourceId": "1811361664981794817",
+      "viewNum": 211,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Puppet 中的分级分类（Class）系统是如何运作的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Puppet",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361665078263809",
+      "sourceId": "1811361665078263809",
+      "viewNum": 81,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Chef 的节点（Node）和环境（Environment）概念。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Chef",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361665170538498",
+      "sourceId": "1811361665170538498",
+      "viewNum": 76,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Ansible 中，如何处理多个环境的配置？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Ansible",
+        "系统管理"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361665262813185",
+      "sourceId": "1811361665262813185",
+      "viewNum": 274,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Shell 脚本中实现字符串的截取和拼接？",
+      "difficulty": "EASY",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361665367670786",
+      "sourceId": "1811361665367670786",
+      "viewNum": 3206,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请写出一个 Python 脚本，读取并打印指定文件的内容。",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361665464139778",
+      "sourceId": "1811361665464139778",
+      "viewNum": 660,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Shell 中，如何通过循环处理多个文件？",
+      "difficulty": "EASY",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361665577385985",
+      "sourceId": "1811361665577385985",
+      "viewNum": 1741,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Python 实现文件的复制和移动操作？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361665673854978",
+      "sourceId": "1811361665673854978",
+      "viewNum": 367,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述在 Shell 脚本中如何使用条件判断语句。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361665782906881",
+      "sourceId": "1811361665782906881",
+      "viewNum": 1280,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Python 的 requests 库发送 HTTP 请求？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361665879375873",
+      "sourceId": "1811361665879375873",
+      "viewNum": 335,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写一个 Shell 脚本，检查服务器的磁盘使用率，并发送告警邮件。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361665980039169",
+      "sourceId": "1811361665980039169",
+      "viewNum": 1296,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用 Python 编写一个脚本，实现定时备份 MySQL 数据库。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        72,
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361666076508162",
+      "sourceId": "1811361666076508162",
+      "viewNum": 384,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请写出一个 Shell 脚本，用于监控指定进程是否运行，并在停止时重新启动该进程。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361666168782850",
+      "sourceId": "1811361666168782850",
+      "viewNum": 1026,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Python 中，如何使用多线程来提高脚本的执行效率？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361666277834753",
+      "sourceId": "1811361666277834753",
+      "viewNum": 245,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Shell 脚本中处理命令行参数？",
+      "difficulty": "EASY",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361666382692354",
+      "sourceId": "1811361666382692354",
+      "viewNum": 854,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请写一个 Python 脚本，计算一个目录下所有文件的总大小。",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361666474967041",
+      "sourceId": "1811361666474967041",
+      "viewNum": 270,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Shell 中，如何实现一个简单的文件监控脚本？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361666567241730",
+      "sourceId": "1811361666567241730",
+      "viewNum": 872,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Python 的 subprocess 模块执行外部命令？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361666697265153",
+      "sourceId": "1811361666697265153",
+      "viewNum": 182,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Shell 脚本中的管道（Pipeline）机制及其应用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361666823094274",
+      "sourceId": "1811361666823094274",
+      "viewNum": 865,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Python 实现对一个文件的增量备份？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        72,
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361666923757569",
+      "sourceId": "1811361666923757569",
+      "viewNum": 183,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写一个 Shell 脚本，定期清理系统中的临时文件。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361667011837953",
+      "sourceId": "1811361667011837953",
+      "viewNum": 961,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请写一个 Python 脚本，连接并查询一个 MySQL 数据库。",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361667108306946",
+      "sourceId": "1811361667108306946",
+      "viewNum": 265,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Shell 中，如何使用 awk 命令处理文本文件？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Shell",
+        "脚本编写"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361667196387330",
+      "sourceId": "1811361667196387330",
+      "viewNum": 836,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Python 的 threading 模块实现并发执行任务？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "脚本编写"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361667288662017",
+      "sourceId": "1811361667288662017",
+      "viewNum": 139,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Nagios 的基本架构和监控机制。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Nagios",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361667406102529",
+      "sourceId": "1811361667406102529",
+      "viewNum": 439,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Zabbix 中添加一个新的监控主机？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Zabbix",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361667502571521",
+      "sourceId": "1811361667502571521",
+      "viewNum": 615,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述 Prometheus 的数据采集和存储流程。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Prometheus",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361667594846209",
+      "sourceId": "1811361667594846209",
+      "viewNum": 747,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Nagios 中，如何配置邮件告警功能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Nagios",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361667678732290",
+      "sourceId": "1811361667678732290",
+      "viewNum": 228,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Zabbix 的模板机制，并举例说明如何使用模板。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Zabbix",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361667775201282",
+      "sourceId": "1811361667775201282",
+      "viewNum": 330,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Prometheus 实现对 Linux 系统的基础监控？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Prometheus",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361667863281665",
+      "sourceId": "1811361667863281665",
+      "viewNum": 721,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Nagios 中，如何监控一个自定义的服务？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Nagios",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361667955556353",
+      "sourceId": "1811361667955556353",
+      "viewNum": 182,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Zabbix 和 Prometheus 之间的主要区别。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Zabbix",
+        "Prometheus",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361668043636737",
+      "sourceId": "1811361668043636737",
+      "viewNum": 530,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Prometheus 中设置报警规则？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Prometheus",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361668135911425",
+      "sourceId": "1811361668135911425",
+      "viewNum": 482,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用 Zabbix 监控网络设备的基本步骤是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Zabbix",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361668249157634",
+      "sourceId": "1811361668249157634",
+      "viewNum": 309,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释如何在 Nagios 中设置一个自定义插件。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Nagios",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361668341432322",
+      "sourceId": "1811361668341432322",
+      "viewNum": 149,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Zabbix 实现对 MySQL 数据库的监控？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Zabbix",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361668429512706",
+      "sourceId": "1811361668429512706",
+      "viewNum": 355,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述 Prometheus 的报警机制及其配置方法。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Prometheus",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361668521787394",
+      "sourceId": "1811361668521787394",
+      "viewNum": 417,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Nagios 中，如何实现分布式监控？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Nagios",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361668618256385",
+      "sourceId": "1811361668618256385",
+      "viewNum": 159,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Zabbix 的自动发现功能及其应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Zabbix",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361668735696898",
+      "sourceId": "1811361668735696898",
+      "viewNum": 255,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Prometheus 和 Grafana 进行数据可视化？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Prometheus",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361668844748802",
+      "sourceId": "1811361668844748802",
+      "viewNum": 485,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Nagios 中，如何配置 SNMP 监控？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Nagios",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361668945412098",
+      "sourceId": "1811361668945412098",
+      "viewNum": 142,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Zabbix 的代理（Agent）和代理器（Proxy）的区别。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Zabbix",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361669037686786",
+      "sourceId": "1811361669037686786",
+      "viewNum": 280,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Prometheus 中使用 Exporter 收集特定服务的指标？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Prometheus",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361669138350081",
+      "sourceId": "1811361669138350081",
+      "viewNum": 388,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用 Zabbix 进行 Windows 系统监控的步骤是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Zabbix",
+        "系统监控"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361669234819073",
+      "sourceId": "1811361669234819073",
+      "viewNum": 253,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Linux 系统中常用的日志文件及其位置。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361669322899458",
+      "sourceId": "1811361669322899458",
+      "viewNum": 2748,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Windows 系统中，如何使用事件查看器进行故障排查？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361669427757058",
+      "sourceId": "1811361669427757058",
+      "viewNum": 678,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述一次常见的 Linux 系统故障及其解决过程。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361669532614658",
+      "sourceId": "1811361669532614658",
+      "viewNum": 2385,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Windows 系统中，如何使用 PowerShell 进行故障排查？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361669633277954",
+      "sourceId": "1811361669633277954",
+      "viewNum": 514,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释如何使用 strace 工具调试和排查 Linux 程序的问题。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361669729746945",
+      "sourceId": "1811361669729746945",
+      "viewNum": 1634,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Windows 系统中排查网络连接故障？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361669822021634",
+      "sourceId": "1811361669822021634",
+      "viewNum": 470,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述一次常见的 Windows 系统故障及其解决过程。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361669914296322",
+      "sourceId": "1811361669914296322",
+      "viewNum": 396,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释如何使用 tcpdump 工具分析网络流量。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670006571009",
+      "sourceId": "1811361670006571009",
+      "viewNum": 1858,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何检查并修复文件系统错误？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670103040002",
+      "sourceId": "1811361670103040002",
+      "viewNum": 1654,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Windows 系统中使用命令行工具排查磁盘问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670207897601",
+      "sourceId": "1811361670207897601",
+      "viewNum": 311,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何使用 dmesg 命令查看内核日志？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670312755201",
+      "sourceId": "1811361670312755201",
+      "viewNum": 1675,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述 Windows 系统中的蓝屏错误及其常见解决方法。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670421807105",
+      "sourceId": "1811361670421807105",
+      "viewNum": 346,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 系统中使用 lsof 命令排查文件占用问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670526664705",
+      "sourceId": "1811361670526664705",
+      "viewNum": 2019,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Windows 系统中 BSOD（蓝屏死机）的排查步骤。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670627328001",
+      "sourceId": "1811361670627328001",
+      "viewNum": 436,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Linux 系统中的 top 命令进行性能监控？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670723796993",
+      "sourceId": "1811361670723796993",
+      "viewNum": 2513,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Windows 系统中，如何使用 netstat 命令检查网络连接？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670824460289",
+      "sourceId": "1811361670824460289",
+      "viewNum": 393,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Linux 系统中一次常见的网络故障及其解决方案。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670925123585",
+      "sourceId": "1811361670925123585",
+      "viewNum": 2102,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Windows 系统中排查和解决应用程序崩溃问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361671046758402",
+      "sourceId": "1811361671046758402",
+      "viewNum": 329,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Linux 系统中的内存泄漏问题及其排查方法。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361671143227394",
+      "sourceId": "1811361671143227394",
+      "viewNum": 2731,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Windows 系统中，如何通过注册表进行故障排查？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Windows",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361671239696386",
+      "sourceId": "1811361671239696386",
+      "viewNum": 420,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Linux 有哪些常用命令？",
+      "difficulty": "EASY",
+      "tags": [
+        "Linux",
+        "运维"
+      ],
+      "tagIds": [
+        35,
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1829357266472964097",
+      "sourceId": "1829357266472964097",
+      "viewNum": 5636,
+      "needVip": false,
+      "hasAnswer": false
+    }
+  ]
+}

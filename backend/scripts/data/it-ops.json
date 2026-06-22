@@ -1,0 +1,1782 @@
+{
+  "categoryId": 45,
+  "categoryName": "IT 运维",
+  "bankIds": [
+    "1811358325988474882"
+  ],
+  "totalQuestions": 101,
+  "questions": [
+    {
+      "title": "请解释 Linux 操作系统中的进程与线程的区别，并举例说明它们各自的应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361107185541122",
+      "sourceId": "1811361107185541122",
+      "viewNum": 8002,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述 Linux 系统中 crontab 的工作原理，并给出一个每天凌晨 3 点执行备份脚本的 crontab 配置例子。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361108368334849",
+      "sourceId": "1811361108368334849",
+      "viewNum": 4964,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 系统中查看某个特定进程的内存使用情况？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361108477386754",
+      "sourceId": "1811361108477386754",
+      "viewNum": 5653,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释 Linux 系统中软链接和硬链接的区别，并给出创建软链接的命令。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361108586438657",
+      "sourceId": "1811361108586438657",
+      "viewNum": 4298,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "说明在 Linux 中如何修改文件的权限，并解释 chmod 755 命令的含义。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361108708073474",
+      "sourceId": "1811361108708073474",
+      "viewNum": 4743,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Windows 操作系统中如何配置系统环境变量，并给出配置 JAVA_HOME 的具体步骤。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Windows"
+      ],
+      "tagIds": [
+        72,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361108812931074",
+      "sourceId": "1811361108812931074",
+      "viewNum": 1357,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何查找某个目录下包含特定字符串的所有文件？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361108913594369",
+      "sourceId": "1811361108913594369",
+      "viewNum": 3876,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释 Windows 和 Linux 操作系统中的虚拟内存机制有什么不同。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Windows",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109001674754",
+      "sourceId": "1811361109001674754",
+      "viewNum": 3743,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 Linux 系统中如何使用 top 命令监控系统资源，并解释关键字段的含义。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109102338050",
+      "sourceId": "1811361109102338050",
+      "viewNum": 3650,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何查看和管理磁盘分区？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109203001345",
+      "sourceId": "1811361109203001345",
+      "viewNum": 3712,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Linux 系统中的内核模块管理，并描述如何加载和卸载模块。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109303664642",
+      "sourceId": "1811361109303664642",
+      "viewNum": 2573,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 Linux 系统中如何配置网络接口，并给出具体命令。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109395939330",
+      "sourceId": "1811361109395939330",
+      "viewNum": 2839,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释 Linux 系统中的文件系统层次结构，并举例说明重要目录的用途。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109534351362",
+      "sourceId": "1811361109534351362",
+      "viewNum": 2378,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Windows 操作系统中，如何进行磁盘清理和系统优化？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Windows"
+      ],
+      "tagIds": [
+        72,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109630820353",
+      "sourceId": "1811361109630820353",
+      "viewNum": 749,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是 SELinux，并描述其在 Linux 系统中的作用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109723095041",
+      "sourceId": "1811361109723095041",
+      "viewNum": 2262,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Linux 系统中的日志管理机制，并解释如何查看和管理系统日志。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109827952642",
+      "sourceId": "1811361109827952642",
+      "viewNum": 2330,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何配置静态 IP 地址？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109924421633",
+      "sourceId": "1811361109924421633",
+      "viewNum": 3169,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 Windows 操作系统中如何配置防火墙规则。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Windows"
+      ],
+      "tagIds": [
+        72,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361110029279233",
+      "sourceId": "1811361110029279233",
+      "viewNum": 672,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是系统调用，并描述其在操作系统中的作用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "系统调用"
+      ],
+      "tagIds": [
+        72,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361110129942529",
+      "sourceId": "1811361110129942529",
+      "viewNum": 521,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述在 Linux 系统中如何进行磁盘配额管理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361110226411521",
+      "sourceId": "1811361110226411521",
+      "viewNum": 1973,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 OSI 七层模型中的每一层的作用及其协议。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "网络基础"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361110327074818",
+      "sourceId": "1811361110327074818",
+      "viewNum": 834,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述 TCP 三次握手和四次挥手的过程及其原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "TCP/IP"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361110423543810",
+      "sourceId": "1811361110423543810",
+      "viewNum": 1197,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 系统中查看和管理网络接口？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361110524207106",
+      "sourceId": "1811361110524207106",
+      "viewNum": 2410,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是 DNS，并描述其工作原理。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "DNS"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361110620676097",
+      "sourceId": "1811361110620676097",
+      "viewNum": 795,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在网络故障排查中，如何使用 ping 和 traceroute 命令？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361110721339393",
+      "sourceId": "1811361110721339393",
+      "viewNum": 1452,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述 NAT 的工作原理，并说明它在家庭路由器中的应用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "NAT"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361110826196994",
+      "sourceId": "1811361110826196994",
+      "viewNum": 465,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释防火墙的基本原理，并描述 Linux 系统中如何配置 iptables。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "防火墙"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361110922665986",
+      "sourceId": "1811361110922665986",
+      "viewNum": 485,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述 HTTPS 协议的工作原理，并解释 SSL/TLS 的作用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "HTTPS"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111044300802",
+      "sourceId": "1811361111044300802",
+      "viewNum": 792,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是负载均衡，并描述常见的负载均衡算法。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "负载均衡"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111144964098",
+      "sourceId": "1811361111144964098",
+      "viewNum": 684,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何使用 netstat 命令查看当前的网络连接情况？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111237238786",
+      "sourceId": "1811361111237238786",
+      "viewNum": 2432,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 VLAN 的基本概念，并解释其在网络中的作用。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "VLAN"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111350484994",
+      "sourceId": "1811361111350484994",
+      "viewNum": 457,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是 ARP 欺骗攻击，并描述如何防范此类攻击。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111446953986",
+      "sourceId": "1811361111446953986",
+      "viewNum": 1719,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述什么是 BGP，并解释其在互联网中的作用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111535034369",
+      "sourceId": "1811361111535034369",
+      "viewNum": 1020,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在网络管理中，什么是 SNMP，并描述其工作原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111631503361",
+      "sourceId": "1811361111631503361",
+      "viewNum": 730,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是 CDN，并描述其加速原理。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "CDN"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111740555266",
+      "sourceId": "1811361111740555266",
+      "viewNum": 622,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在计算机网络中，描述 IPSec 协议的作用及其工作原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111832829954",
+      "sourceId": "1811361111832829954",
+      "viewNum": 552,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释什么是网络拓扑结构，并描述常见的拓扑类型。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "计算机网络"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111925104641",
+      "sourceId": "1811361111925104641",
+      "viewNum": 341,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述什么是 VPN，并解释其工作原理和常见的应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361112025767938",
+      "sourceId": "1811361112025767938",
+      "viewNum": 419,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在计算机网络中，描述什么是 QoS，并解释其作用和配置方法。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361112134819841",
+      "sourceId": "1811361112134819841",
+      "viewNum": 324,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是网络地址转换（NAT），并描述其工作原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361112235483137",
+      "sourceId": "1811361112235483137",
+      "viewNum": 653,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Apache 和 Nginx 的区别，并描述各自的应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Apache",
+        "Nginx"
+      ],
+      "tagIds": [
+        72,
+        31
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361112365506561",
+      "sourceId": "1811361112365506561",
+      "viewNum": 2738,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述 Tomcat 服务器的架构及其工作原理。",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Tomcat"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361112470364161",
+      "sourceId": "1811361112470364161",
+      "viewNum": 1040,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Nginx 中，如何配置反向代理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Nginx"
+      ],
+      "tagIds": [
+        72,
+        31
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361112562638850",
+      "sourceId": "1811361112562638850",
+      "viewNum": 3823,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释在 Web 服务器中，什么是负载均衡，并如何在 Nginx 中配置负载均衡？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Nginx",
+        "负载均衡"
+      ],
+      "tagIds": [
+        72,
+        31
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361112663302146",
+      "sourceId": "1811361112663302146",
+      "viewNum": 2169,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Tomcat 中部署一个 Java Web 应用程序？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Tomcat"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361112759771138",
+      "sourceId": "1811361112759771138",
+      "viewNum": 670,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Apache 中如何启用和配置 HTTPS？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Apache"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361112860434433",
+      "sourceId": "1811361112860434433",
+      "viewNum": 390,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是 WebSocket？并描述如何在 Nginx 中配置 WebSocket 代理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Nginx"
+      ],
+      "tagIds": [
+        72,
+        31
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361112956903425",
+      "sourceId": "1811361112956903425",
+      "viewNum": 2821,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Tomcat 中的 Session 管理机制。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Tomcat"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361113053372418",
+      "sourceId": "1811361113053372418",
+      "viewNum": 533,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Nginx 中，如何配置静态文件的缓存？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Nginx"
+      ],
+      "tagIds": [
+        72,
+        31
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361113154035713",
+      "sourceId": "1811361113154035713",
+      "viewNum": 1574,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 Apache 中如何配置虚拟主机。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Apache"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361113305030658",
+      "sourceId": "1811361113305030658",
+      "viewNum": 279,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释在 Nginx 中如何实现动静分离，并描述其原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Nginx"
+      ],
+      "tagIds": [
+        72,
+        31
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361113397305346",
+      "sourceId": "1811361113397305346",
+      "viewNum": 1476,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 Tomcat 中如何配置数据源连接池。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Tomcat"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361113497968642",
+      "sourceId": "1811361113497968642",
+      "viewNum": 488,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Apache 服务器中，如何设置自定义错误页面？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Apache"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361113602826241",
+      "sourceId": "1811361113602826241",
+      "viewNum": 252,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是 CGI，并描述其在 Web 服务器中的作用。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "应用服务器"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361113699295233",
+      "sourceId": "1811361113699295233",
+      "viewNum": 350,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述在 Nginx 中如何配置访问控制，并给出具体示例。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Nginx"
+      ],
+      "tagIds": [
+        72,
+        31
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361113812541442",
+      "sourceId": "1811361113812541442",
+      "viewNum": 1065,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述 Tomcat 服务器的连接器及其作用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Tomcat"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361113909010434",
+      "sourceId": "1811361113909010434",
+      "viewNum": 1118,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Apache 中，如何配置和使用 mod_rewrite 模块？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Apache"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361113997090817",
+      "sourceId": "1811361113997090817",
+      "viewNum": 211,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释反向代理和正向代理的区别，并描述各自的应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361114089365505",
+      "sourceId": "1811361114089365505",
+      "viewNum": 419,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 Nginx 中如何配置限流，并解释其作用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "应用服务器",
+        "Nginx"
+      ],
+      "tagIds": [
+        72,
+        31
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361114177445890",
+      "sourceId": "1811361114177445890",
+      "viewNum": 1215,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是负载均衡，并描述常见的负载均衡算法。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "负载均衡"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361114269720577",
+      "sourceId": "1811361114269720577",
+      "viewNum": 325,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Docker 的基本概念及其核心组件。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361114366189570",
+      "sourceId": "1811361114366189570",
+      "viewNum": 6388,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述 Docker 镜像的构建过程，并解释 Dockerfile 的作用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361114462658562",
+      "sourceId": "1811361114462658562",
+      "viewNum": 4609,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Docker 中，如何管理和查看容器日志？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361114546544641",
+      "sourceId": "1811361114546544641",
+      "viewNum": 4758,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是 Kubernetes，并描述其主要组件及其作用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361114638819330",
+      "sourceId": "1811361114638819330",
+      "viewNum": 6297,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述如何在 Kubernetes 中创建一个 Pod，并给出示例配置文件。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361114743676929",
+      "sourceId": "1811361114743676929",
+      "viewNum": 3770,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Docker 中，如何进行数据卷管理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361114840145922",
+      "sourceId": "1811361114840145922",
+      "viewNum": 3488,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Kubernetes 中的 Service 和 Ingress 的区别，并描述各自的用途。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361114928226306",
+      "sourceId": "1811361114928226306",
+      "viewNum": 2995,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 Kubernetes 中如何进行滚动更新和回滚操作。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361115016306690",
+      "sourceId": "1811361115016306690",
+      "viewNum": 2537,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Docker 中，如何配置容器的网络？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361115121164289",
+      "sourceId": "1811361115121164289",
+      "viewNum": 3321,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Kubernetes 中的 ConfigMap 和 Secret 的作用及其使用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361115217633281",
+      "sourceId": "1811361115217633281",
+      "viewNum": 2145,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 Kubernetes 中如何配置资源配额，并解释其作用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361115309907969",
+      "sourceId": "1811361115309907969",
+      "viewNum": 1983,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Docker 中，如何优化容器启动时间？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Docker",
+        "性能优化"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361115406376962",
+      "sourceId": "1811361115406376962",
+      "viewNum": 2649,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Kubernetes 中的 Namespace 的作用，并解释其使用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361115511234561",
+      "sourceId": "1811361115511234561",
+      "viewNum": 1975,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Docker 中，如何实现容器之间的通信？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361115620286466",
+      "sourceId": "1811361115620286466",
+      "viewNum": 2991,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 Kubernetes 中如何进行日志管理，并解释常用的方法。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361115737726978",
+      "sourceId": "1811361115737726978",
+      "viewNum": 1907,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释什么是 Docker Swarm，并描述其主要功能。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361115830001666",
+      "sourceId": "1811361115830001666",
+      "viewNum": 2030,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在Kubernetes中如何配置持久化存储，并解释其工作原理。",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361115939053569",
+      "sourceId": "1811361115939053569",
+      "viewNum": 2129,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Docker 中，如何配置和管理环境变量？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Docker"
+      ],
+      "tagIds": [
+        72,
+        32
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361116060688386",
+      "sourceId": "1811361116060688386",
+      "viewNum": 2250,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Kubernetes 中的 Helm 的作用，并解释其使用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361116148768770",
+      "sourceId": "1811361116148768770",
+      "viewNum": 1717,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 Kubernetes 中如何进行安全配置，并解释常用的方法。",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "Kubernetes"
+      ],
+      "tagIds": [
+        72,
+        33
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361116241043458",
+      "sourceId": "1811361116241043458",
+      "viewNum": 1833,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述关系型数据库和非关系型数据库的区别，并举例说明。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361116329123841",
+      "sourceId": "1811361116329123841",
+      "viewNum": 593,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释数据库索引的作用，并描述常见的索引类型。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库",
+        "索引"
+      ],
+      "tagIds": [
+        72,
+        5
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361116429787137",
+      "sourceId": "1811361116429787137",
+      "viewNum": 353,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MySQL 中如何执行数据库备份和恢复操作？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库",
+        "MySQL",
+        "数据备份恢复"
+      ],
+      "tagIds": [
+        72,
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361116517867522",
+      "sourceId": "1811361116517867522",
+      "viewNum": 821,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 NoSQL 数据库的基本概念，并描述其适用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库",
+        "NoSQL"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361116610142210",
+      "sourceId": "1811361116610142210",
+      "viewNum": 263,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 Oracle 数据库中，如何优化查询性能。",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "数据库",
+        "Oracle",
+        "性能优化"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361116706611201",
+      "sourceId": "1811361116706611201",
+      "viewNum": 1576,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MySQL 中查看和管理用户权限？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库",
+        "MySQL"
+      ],
+      "tagIds": [
+        72,
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361116798885889",
+      "sourceId": "1811361116798885889",
+      "viewNum": 251,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释数据库事务的 ACID 特性，并描述其重要性。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库",
+        "事务"
+      ],
+      "tagIds": [
+        72,
+        6
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361116933103618",
+      "sourceId": "1811361116933103618",
+      "viewNum": 657,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 MongoDB 中，如何进行数据分片？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "数据库",
+        "MongoDB"
+      ],
+      "tagIds": [
+        72,
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361117033766913",
+      "sourceId": "1811361117033766913",
+      "viewNum": 342,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 PostgreSQL 中，如何创建和管理表？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库",
+        "PostgreSQL"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361117121847298",
+      "sourceId": "1811361117121847298",
+      "viewNum": 1295,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释数据库正则化的概念，并描述其主要步骤。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361117218316290",
+      "sourceId": "1811361117218316290",
+      "viewNum": 139,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MySQL 中进行查询优化？常用的优化方法有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库",
+        "MySQL",
+        "性能优化"
+      ],
+      "tagIds": [
+        72,
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361117310590978",
+      "sourceId": "1811361117310590978",
+      "viewNum": 503,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Oracle 数据库中，如何配置和管理用户角色？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库",
+        "Oracle"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361117419642882",
+      "sourceId": "1811361117419642882",
+      "viewNum": 805,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是数据库连接池，并描述其工作原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361117511917570",
+      "sourceId": "1811361117511917570",
+      "viewNum": 459,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 MongoDB 中如何进行数据备份和恢复。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库",
+        "MongoDB",
+        "数据备份恢复"
+      ],
+      "tagIds": [
+        72,
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361117599997954",
+      "sourceId": "1811361117599997954",
+      "viewNum": 326,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 PostgreSQL 中，如何设置和管理数据库索引？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库",
+        "PostgreSQL",
+        "索引"
+      ],
+      "tagIds": [
+        72,
+        5
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361117717438465",
+      "sourceId": "1811361117717438465",
+      "viewNum": 758,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释关系型数据库中的范式，并描述常见的几种范式。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361117826490369",
+      "sourceId": "1811361117826490369",
+      "viewNum": 274,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中如何配置主从复制？",
+      "difficulty": "HARD",
+      "tags": [
+        "运维",
+        "数据库",
+        "MySQL"
+      ],
+      "tagIds": [
+        72,
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361117994262530",
+      "sourceId": "1811361117994262530",
+      "viewNum": 1009,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是全文索引，并描述其在数据库中的应用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库",
+        "索引"
+      ],
+      "tagIds": [
+        72,
+        5
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361118086537218",
+      "sourceId": "1811361118086537218",
+      "viewNum": 243,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Oracle 数据库中，如何进行表的分区管理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库",
+        "Oracle"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361118174617601",
+      "sourceId": "1811361118174617601",
+      "viewNum": 726,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述在 PostgreSQL 中如何进行数据导入和导出，并给出具体命令。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "数据库",
+        "PostgreSQL"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361118275280898",
+      "sourceId": "1811361118275280898",
+      "viewNum": 680,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Linux 有哪些常用命令？",
+      "difficulty": "EASY",
+      "tags": [
+        "Linux",
+        "运维"
+      ],
+      "tagIds": [
+        35,
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1829357266472964097",
+      "sourceId": "1829357266472964097",
+      "viewNum": 5636,
+      "needVip": false,
+      "hasAnswer": false
+    }
+  ]
+}

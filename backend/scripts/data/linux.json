@@ -1,0 +1,811 @@
+{
+  "categoryId": 23,
+  "categoryName": "Linux",
+  "bankIds": [
+    "1812067560819048449"
+  ],
+  "totalQuestions": 44,
+  "questions": [
+    {
+      "title": "Linux 中的硬链接和软连接是什么，二者有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Linux"
+      ],
+      "tagIds": [
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772892114301009921",
+      "sourceId": "1772892114301009921",
+      "viewNum": 7629,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "CC 攻击是什么？什么叫 DDOS 攻击？什么是网站数据库注入？",
+      "difficulty": "EASY",
+      "tags": [
+        "Linux"
+      ],
+      "tagIds": [
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772892490454581250",
+      "sourceId": "1772892490454581250",
+      "viewNum": 5043,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 中查看系统资源使用情况？比如内存、CPU、网络端口。",
+      "difficulty": "EASY",
+      "tags": [
+        "Linux"
+      ],
+      "tagIds": [
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772892870856982530",
+      "sourceId": "1772892870856982530",
+      "viewNum": 5381,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Linux 操作系统中的进程与线程的区别，并举例说明它们各自的应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361107185541122",
+      "sourceId": "1811361107185541122",
+      "viewNum": 8002,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述 Linux 系统中 crontab 的工作原理，并给出一个每天凌晨 3 点执行备份脚本的 crontab 配置例子。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361108368334849",
+      "sourceId": "1811361108368334849",
+      "viewNum": 4964,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 系统中查看某个特定进程的内存使用情况？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361108477386754",
+      "sourceId": "1811361108477386754",
+      "viewNum": 5653,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释 Linux 系统中软链接和硬链接的区别，并给出创建软链接的命令。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361108586438657",
+      "sourceId": "1811361108586438657",
+      "viewNum": 4298,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "说明在 Linux 中如何修改文件的权限，并解释 chmod 755 命令的含义。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361108708073474",
+      "sourceId": "1811361108708073474",
+      "viewNum": 4743,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何查找某个目录下包含特定字符串的所有文件？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361108913594369",
+      "sourceId": "1811361108913594369",
+      "viewNum": 3876,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释 Windows 和 Linux 操作系统中的虚拟内存机制有什么不同。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Windows",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109001674754",
+      "sourceId": "1811361109001674754",
+      "viewNum": 3743,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 Linux 系统中如何使用 top 命令监控系统资源，并解释关键字段的含义。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109102338050",
+      "sourceId": "1811361109102338050",
+      "viewNum": 3650,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何查看和管理磁盘分区？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109203001345",
+      "sourceId": "1811361109203001345",
+      "viewNum": 3712,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Linux 系统中的内核模块管理，并描述如何加载和卸载模块。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109303664642",
+      "sourceId": "1811361109303664642",
+      "viewNum": 2573,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述在 Linux 系统中如何配置网络接口，并给出具体命令。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109395939330",
+      "sourceId": "1811361109395939330",
+      "viewNum": 2839,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释 Linux 系统中的文件系统层次结构，并举例说明重要目录的用途。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109534351362",
+      "sourceId": "1811361109534351362",
+      "viewNum": 2378,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是 SELinux，并描述其在 Linux 系统中的作用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109723095041",
+      "sourceId": "1811361109723095041",
+      "viewNum": 2262,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Linux 系统中的日志管理机制，并解释如何查看和管理系统日志。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109827952642",
+      "sourceId": "1811361109827952642",
+      "viewNum": 2330,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何配置静态 IP 地址？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361109924421633",
+      "sourceId": "1811361109924421633",
+      "viewNum": 3169,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述在 Linux 系统中如何进行磁盘配额管理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361110226411521",
+      "sourceId": "1811361110226411521",
+      "viewNum": 1973,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 系统中查看和管理网络接口？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361110524207106",
+      "sourceId": "1811361110524207106",
+      "viewNum": 2410,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何使用 netstat 命令查看当前的网络连接情况？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "Linux"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111237238786",
+      "sourceId": "1811361111237238786",
+      "viewNum": 2432,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释如何在 Linux 和 Windows 操作系统上设置环境变量。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "Windows",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361660191899649",
+      "sourceId": "1811361660191899649",
+      "viewNum": 3468,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述 Linux 文件系统的结构，并解释每个目录的作用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361661320167426",
+      "sourceId": "1811361661320167426",
+      "viewNum": 2544,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 系统上查看和管理进程？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361661425025026",
+      "sourceId": "1811361661425025026",
+      "viewNum": 3138,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 系统中使用 crontab 定时执行任务？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361661752180738",
+      "sourceId": "1811361661752180738",
+      "viewNum": 1975,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述如何在 Linux 和 Windows 操作系统中安装和卸载软件包。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Linux",
+        "Windows",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361661970284546",
+      "sourceId": "1811361661970284546",
+      "viewNum": 1934,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何检查系统的磁盘使用情况？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361662062559234",
+      "sourceId": "1811361662062559234",
+      "viewNum": 1979,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Linux 系统中的权限管理机制。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361662280663041",
+      "sourceId": "1811361662280663041",
+      "viewNum": 2022,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何查看和管理系统服务？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        72,
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361662519738370",
+      "sourceId": "1811361662519738370",
+      "viewNum": 1925,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 系统中使用 SSH 进行远程登录？",
+      "difficulty": "EASY",
+      "tags": [
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361662763008002",
+      "sourceId": "1811361662763008002",
+      "viewNum": 2415,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 系统中配置静态 IP 地址？",
+      "difficulty": "EASY",
+      "tags": [
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361662993694722",
+      "sourceId": "1811361662993694722",
+      "viewNum": 2015,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何设置文件的权限和拥有者？",
+      "difficulty": "EASY",
+      "tags": [
+        "Linux",
+        "操作系统"
+      ],
+      "tagIds": [
+        35,
+        25
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361663199215618",
+      "sourceId": "1811361663199215618",
+      "viewNum": 1715,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Linux 系统中常用的日志文件及其位置。",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361669322899458",
+      "sourceId": "1811361669322899458",
+      "viewNum": 2749,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述一次常见的 Linux 系统故障及其解决过程。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361669532614658",
+      "sourceId": "1811361669532614658",
+      "viewNum": 2386,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释如何使用 strace 工具调试和排查 Linux 程序的问题。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361669729746945",
+      "sourceId": "1811361669729746945",
+      "viewNum": 1635,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释如何使用 tcpdump 工具分析网络流量。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670006571009",
+      "sourceId": "1811361670006571009",
+      "viewNum": 1859,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何检查并修复文件系统错误？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670103040002",
+      "sourceId": "1811361670103040002",
+      "viewNum": 1655,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Linux 系统中，如何使用 dmesg 命令查看内核日志？",
+      "difficulty": "EASY",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670312755201",
+      "sourceId": "1811361670312755201",
+      "viewNum": 1675,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Linux 系统中使用 lsof 命令排查文件占用问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670526664705",
+      "sourceId": "1811361670526664705",
+      "viewNum": 2019,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Linux 系统中的 top 命令进行性能监控？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670723796993",
+      "sourceId": "1811361670723796993",
+      "viewNum": 2513,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Linux 系统中一次常见的网络故障及其解决方案。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361670925123585",
+      "sourceId": "1811361670925123585",
+      "viewNum": 2102,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Linux 系统中的内存泄漏问题及其排查方法。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "Linux",
+        "系统故障排查"
+      ],
+      "tagIds": [
+        72,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361671143227394",
+      "sourceId": "1811361671143227394",
+      "viewNum": 2732,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Linux 有哪些常用命令？",
+      "difficulty": "EASY",
+      "tags": [
+        "Linux",
+        "运维"
+      ],
+      "tagIds": [
+        35,
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1829357266472964097",
+      "sourceId": "1829357266472964097",
+      "viewNum": 5637,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "听说过 CFS 吗？（Linux ）",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "操作系统",
+        "Linux"
+      ],
+      "tagIds": [
+        25,
+        35
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1863459885228146689",
+      "sourceId": "1863459885228146689",
+      "viewNum": 4799,
+      "needVip": true,
+      "hasAnswer": false
+    }
+  ]
+}

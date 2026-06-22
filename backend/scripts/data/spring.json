@@ -1,0 +1,1146 @@
+{
+  "categoryId": 8,
+  "categoryName": "Spring",
+  "bankIds": [
+    "1790683494127804418"
+  ],
+  "totalQuestions": 71,
+  "questions": [
+    {
+      "title": "什么是循环依赖（常问）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295379345410",
+      "sourceId": "1780933295379345410",
+      "viewNum": 29673,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 如何解决循环依赖？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295383539714",
+      "sourceId": "1780933295383539714",
+      "viewNum": 27004,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Spring 循环依赖需要三级缓存，二级不够吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295387734017",
+      "sourceId": "1780933295387734017",
+      "viewNum": 22040,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "看过源码吗？说下 Spring 由哪些重要的模块组成？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295320625154",
+      "sourceId": "1780933295320625154",
+      "viewNum": 22484,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Spring IOC？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295329013762",
+      "sourceId": "1780933295329013762",
+      "viewNum": 23261,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring IOC 有什么好处？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295329013763",
+      "sourceId": "1780933295329013763",
+      "viewNum": 15600,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 DI 是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295333208066",
+      "sourceId": "1780933295333208066",
+      "viewNum": 17805,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Spring Bean？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295337402370",
+      "sourceId": "1780933295337402370",
+      "viewNum": 15529,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 BeanFactory 是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295341596674",
+      "sourceId": "1780933295341596674",
+      "viewNum": 14146,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 FactoryBean 是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295345790977",
+      "sourceId": "1780933295345790977",
+      "viewNum": 12165,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 ObjectFactory 是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295349985282",
+      "sourceId": "1780933295349985282",
+      "viewNum": 10080,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 ApplicationContext 是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295349985283",
+      "sourceId": "1780933295349985283",
+      "viewNum": 11377,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring Bean 一共有几种作用域？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295354179585",
+      "sourceId": "1780933295354179585",
+      "viewNum": 13688,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 一共有几种注入方式？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295358373890",
+      "sourceId": "1780933295358373890",
+      "viewNum": 14186,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 AOP？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295362568194",
+      "sourceId": "1780933295362568194",
+      "viewNum": 19116,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring AOP默认用的是什么动态代理，两者的区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295366762497",
+      "sourceId": "1780933295366762497",
+      "viewNum": 16064,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "能说说 Spring 拦截链的实现吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295370956802",
+      "sourceId": "1780933295370956802",
+      "viewNum": 10987,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring AOP 和 AspectJ 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295375151105",
+      "sourceId": "1780933295375151105",
+      "viewNum": 10936,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "说下 Spring Bean 的生命周期？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295396122626",
+      "sourceId": "1780933295396122626",
+      "viewNum": 17879,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "说下对 Spring MVC 的理解？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295400316930",
+      "sourceId": "1780933295400316930",
+      "viewNum": 12781,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring MVC 具体的工作原理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295400316931",
+      "sourceId": "1780933295400316931",
+      "viewNum": 13161,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "SpringMVC 父子容器是什么知道吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295404511234",
+      "sourceId": "1780933295404511234",
+      "viewNum": 8428,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你了解的 Spring 都用到哪些设计模式？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295408705538",
+      "sourceId": "1780933295408705538",
+      "viewNum": 15916,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 事务有几个隔离级别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295412899842",
+      "sourceId": "1780933295412899842",
+      "viewNum": 13311,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 有哪几种事务传播行为?",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295417094146",
+      "sourceId": "1780933295417094146",
+      "viewNum": 16825,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 事务传播行为有什么用?",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295421288449",
+      "sourceId": "1780933295421288449",
+      "viewNum": 9445,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 的优点",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797566381592543233",
+      "sourceId": "1797566381592543233",
+      "viewNum": 8246,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring AOP 相关术语都有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797567289697107970",
+      "sourceId": "1797567289697107970",
+      "viewNum": 8987,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 通知有哪些类型？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797567441497358338",
+      "sourceId": "1797567441497358338",
+      "viewNum": 7710,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring IOC 容器初始化过程？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797567625069461506",
+      "sourceId": "1797567625069461506",
+      "viewNum": 9803,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring Bean 注册到容器有哪些方式？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797568008391098369",
+      "sourceId": "1797568008391098369",
+      "viewNum": 8581,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 自动装配的方式有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797568244295532545",
+      "sourceId": "1797568244295532545",
+      "viewNum": 9280,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "@Qualifier 注解有什么作用",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797568550655885313",
+      "sourceId": "1797568550655885313",
+      "viewNum": 8260,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "@Bean和@Component有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797568672965984258",
+      "sourceId": "1797568672965984258",
+      "viewNum": 9294,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "@Component、@Controller、@Repository和@Service 的区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797568918223716354",
+      "sourceId": "1797568918223716354",
+      "viewNum": 8671,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 事务在什么情况下会失效？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797569076432863234",
+      "sourceId": "1797569076432863234",
+      "viewNum": 11272,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "说说 Spring 启动过程？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797569186902441985",
+      "sourceId": "1797569186902441985",
+      "viewNum": 16283,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 的单例 Bean 是否有并发安全问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797871296856588289",
+      "sourceId": "1797871296856588289",
+      "viewNum": 8345,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring中的@Primary注解的作用是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797871576671191041",
+      "sourceId": "1797871576671191041",
+      "viewNum": 6925,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring中的@Value注解的作用是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1797871888496721922",
+      "sourceId": "1797871888496721922",
+      "viewNum": 7498,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @Profile 注解的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798286739119407105",
+      "sourceId": "1798286739119407105",
+      "viewNum": 6110,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @PostConstruct 和 @PreDestroy 注解的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798286958892548098",
+      "sourceId": "1798286958892548098",
+      "viewNum": 6404,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @RequestBody 和 @ResponseBody 注解的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798287130959675393",
+      "sourceId": "1798287130959675393",
+      "viewNum": 6901,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @PathVariable 注解的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798287283456180225",
+      "sourceId": "1798287283456180225",
+      "viewNum": 6007,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring中的 @ModelAttribute 注解的作用是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798287430349094914",
+      "sourceId": "1798287430349094914",
+      "viewNum": 5515,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @ExceptionHandler 注解的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798504655559458817",
+      "sourceId": "1798504655559458817",
+      "viewNum": 5446,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @ResponseStatus 注解的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798504849663459330",
+      "sourceId": "1798504849663459330",
+      "viewNum": 4748,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @RequestHeader 和 @CookieValue 注解的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798505040298770433",
+      "sourceId": "1798505040298770433",
+      "viewNum": 4767,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @SessionAttribute 注解的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798505207139794946",
+      "sourceId": "1798505207139794946",
+      "viewNum": 4499,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @Validated 和 @Valid 注解有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798505343446286338",
+      "sourceId": "1798505343446286338",
+      "viewNum": 5357,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @Scheduled 注解的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798881385799016449",
+      "sourceId": "1798881385799016449",
+      "viewNum": 5403,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @Cacheable 和 @CacheEvict 注解的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798881517214949377",
+      "sourceId": "1798881517214949377",
+      "viewNum": 4801,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @Conditional 注解的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798881653496274945",
+      "sourceId": "1798881653496274945",
+      "viewNum": 5864,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @Lazy 注解的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798881778599780354",
+      "sourceId": "1798881778599780354",
+      "viewNum": 6165,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @PropertySource 注解的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798881894198992898",
+      "sourceId": "1798881894198992898",
+      "viewNum": 4452,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 @EventListener 注解的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799247364458094593",
+      "sourceId": "1799247364458094593",
+      "viewNum": 4687,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "@Async 注解的原理是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799247492220788737",
+      "sourceId": "1799247492220788737",
+      "viewNum": 3952,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 和 Spring MVC 的关系是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799247626304299009",
+      "sourceId": "1799247626304299009",
+      "viewNum": 7023,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring WebFlux 是什么？它与 Spring MVC 有何不同？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799247812644642818",
+      "sourceId": "1799247812644642818",
+      "viewNum": 5262,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "介绍下 Spring MVC 的核心组件？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799247961315942402",
+      "sourceId": "1799247961315942402",
+      "viewNum": 6844,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Restful 风格的接口？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799588814148411394",
+      "sourceId": "1799588814148411394",
+      "viewNum": 8373,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring MVC中的Controller是什么？如何定义一个Controller？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799588907668807681",
+      "sourceId": "1799588907668807681",
+      "viewNum": 6336,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring MVC 中如何处理表单提交？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799589002485243906",
+      "sourceId": "1799589002485243906",
+      "viewNum": 5580,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring MVC 中的视图解析器有什么作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1799589090989252610",
+      "sourceId": "1799589090989252610",
+      "viewNum": 4912,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring MVC 中的拦截器是什么？如何定义一个拦截器？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800045311198306305",
+      "sourceId": "1800045311198306305",
+      "viewNum": 6422,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring MVC 中的国际化支持是如何实现的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800045620675026946",
+      "sourceId": "1800045620675026946",
+      "viewNum": 4860,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring MVC 中如何处理异常？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800045723246731266",
+      "sourceId": "1800045723246731266",
+      "viewNum": 6107,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Spring 中的 JPA 和 Hibernate 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798882065557282817",
+      "sourceId": "1798882065557282817",
+      "viewNum": 5448,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "@Async 如何避免内部调用失效？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1894050379616694274",
+      "sourceId": "1894050379616694274",
+      "viewNum": 3720,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "@Async 什么时候会失效？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Spring"
+      ],
+      "tagIds": [
+        13
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1894048136616161282",
+      "sourceId": "1894048136616161282",
+      "viewNum": 6720,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Spring 中，拦截器和过滤器有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "Spring",
+        "Java"
+      ],
+      "tagIds": [
+        13,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1907425766060380162",
+      "sourceId": "1907425766060380162",
+      "viewNum": 6037,
+      "needVip": false,
+      "hasAnswer": false
+    }
+  ]
+}

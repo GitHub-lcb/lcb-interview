@@ -1,0 +1,1090 @@
+{
+  "categoryId": 7,
+  "categoryName": "MongoDB",
+  "bankIds": [
+    "1837028071614509057"
+  ],
+  "totalQuestions": 72,
+  "questions": [
+    {
+      "title": "什么是 MongoDB？它与传统关系型数据库的区别是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028071773892610",
+      "sourceId": "1837028071773892610",
+      "viewNum": 1593,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，什么是文档？它与表中的行有何不同？",
+      "difficulty": "EASY",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028071987802113",
+      "sourceId": "1837028071987802113",
+      "viewNum": 776,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的 BSON 格式是什么？与 JSON 有何区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028072247848961",
+      "sourceId": "1837028072247848961",
+      "viewNum": 676,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MongoDB 中创建一个集合？",
+      "difficulty": "EASY",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028072474341378",
+      "sourceId": "1837028072474341378",
+      "viewNum": 673,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的数据类型有哪些？如何在插入文档时使用不同的数据类型？",
+      "difficulty": "EASY",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028072696639490",
+      "sourceId": "1837028072696639490",
+      "viewNum": 534,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何使用 find() 方法查询文档？",
+      "difficulty": "EASY",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028072952492034",
+      "sourceId": "1837028072952492034",
+      "viewNum": 486,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 MongoDB 中的索引？如何创建索引？",
+      "difficulty": "EASY",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028073195761666",
+      "sourceId": "1837028073195761666",
+      "viewNum": 607,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MongoDB 中进行分页查询？",
+      "difficulty": "EASY",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028073464197122",
+      "sourceId": "1837028073464197122",
+      "viewNum": 535,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 MongoDB 中的主键 _id？如何自定义 _id 字段？",
+      "difficulty": "EASY",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028073665523714",
+      "sourceId": "1837028073665523714",
+      "viewNum": 416,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的复制集是什么？它的作用是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028073904599041",
+      "sourceId": "1837028073904599041",
+      "viewNum": 339,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何实现数据的增删改查操作？",
+      "difficulty": "EASY",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028074122702850",
+      "sourceId": "1837028074122702850",
+      "viewNum": 408,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 MongoDB 中的分片？如何配置分片？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028074336612354",
+      "sourceId": "1837028074336612354",
+      "viewNum": 611,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何通过 aggregate() 进行数据聚合？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028074575687681",
+      "sourceId": "1837028074575687681",
+      "viewNum": 296,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的索引优化有哪些策略？如何提高查询效率？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028074818957313",
+      "sourceId": "1837028074818957313",
+      "viewNum": 327,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何实现多字段索引？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028075041255426",
+      "sourceId": "1837028075041255426",
+      "viewNum": 266,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 MongoDB 中的复合索引？如何创建并优化复合索引？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028075267747841",
+      "sourceId": "1837028075267747841",
+      "viewNum": 255,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的数据复制机制是如何工作的？如何保证数据的一致性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028075515211778",
+      "sourceId": "1837028075515211778",
+      "viewNum": 234,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何实现备份和恢复？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028075762675714",
+      "sourceId": "1837028075762675714",
+      "viewNum": 242,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的事务是如何实现的？如何在 MongoDB 中进行多文档事务？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028076018528257",
+      "sourceId": "1837028076018528257",
+      "viewNum": 277,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何实现全文检索功能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028076790280194",
+      "sourceId": "1837028076790280194",
+      "viewNum": 266,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的查询优化器是如何工作的？如何分析查询性能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028077020966913",
+      "sourceId": "1837028077020966913",
+      "viewNum": 186,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何管理大规模的分布式集群？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028077247459330",
+      "sourceId": "1837028077247459330",
+      "viewNum": 256,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MongoDB 中使用 $group 和 $match 进行复杂的聚合查询？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028077486534657",
+      "sourceId": "1837028077486534657",
+      "viewNum": 167,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 中的 explain() 方法是如何帮助查询优化的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028077721415682",
+      "sourceId": "1837028077721415682",
+      "viewNum": 215,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MongoDB 中处理数据的并发性问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028077943713794",
+      "sourceId": "1837028077943713794",
+      "viewNum": 178,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何处理数据一致性和高可用性之间的权衡？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028078178594817",
+      "sourceId": "1837028078178594817",
+      "viewNum": 161,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 MongoDB 中的 CAP 理论？它如何应用于 MongoDB 的架构设计？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028078413475841",
+      "sourceId": "1837028078413475841",
+      "viewNum": 186,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MongoDB 中使用管道进行数据流处理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028078656745474",
+      "sourceId": "1837028078656745474",
+      "viewNum": 143,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 是如何通过分片实现水平扩展的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028078891626497",
+      "sourceId": "1837028078891626497",
+      "viewNum": 172,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MongoDB 中优化写操作的性能？有哪些常用方法？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028079118118913",
+      "sourceId": "1837028079118118913",
+      "viewNum": 135,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的副本集是如何处理故障转移和自动恢复的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028079394942977",
+      "sourceId": "1837028079394942977",
+      "viewNum": 118,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何实现延迟副本？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028079646601217",
+      "sourceId": "1837028079646601217",
+      "viewNum": 134,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 是如何支持多数据中心的部署和复制的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028079864705026",
+      "sourceId": "1837028079864705026",
+      "viewNum": 113,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何配置分片键以保证数据分布均匀？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028080091197442",
+      "sourceId": "1837028080091197442",
+      "viewNum": 123,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 中的 writeConcern 是什么？如何影响数据的一致性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028080309301250",
+      "sourceId": "1837028080309301250",
+      "viewNum": 104,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MongoDB 中实现复杂的事务管理？有哪些场景适合使用事务？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028080514822146",
+      "sourceId": "1837028080514822146",
+      "viewNum": 121,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何通过 mapReduce 实现分布式数据处理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028080737120258",
+      "sourceId": "1837028080737120258",
+      "viewNum": 111,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的 changeStream 是如何工作的？它有哪些应用场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028080972001281",
+      "sourceId": "1837028080972001281",
+      "viewNum": 99,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何设计 Schema 以优化查询和存储效率？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028081206882305",
+      "sourceId": "1837028081206882305",
+      "viewNum": 107,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的并发控制机制是如何实现的？如何管理并发读写操作？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028081445957633",
+      "sourceId": "1837028081445957633",
+      "viewNum": 117,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何处理大规模集合的性能问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028081689227265",
+      "sourceId": "1837028081689227265",
+      "viewNum": 104,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的 ttl 索引是如何实现的？它在什么场景下使用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028081907331073",
+      "sourceId": "1837028081907331073",
+      "viewNum": 97,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何处理数据一致性、分布式事务和性能之间的平衡？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028082133823489",
+      "sourceId": "1837028082133823489",
+      "viewNum": 115,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的主从同步机制是如何工作的？如何配置从节点？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028082377093122",
+      "sourceId": "1837028082377093122",
+      "viewNum": 124,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何实现热备份和冷备份？它们各自的优缺点是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028082586808321",
+      "sourceId": "1837028082586808321",
+      "viewNum": 100,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MongoDB 中使用 GridFS 存储大文件？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028082830077953",
+      "sourceId": "1837028082830077953",
+      "viewNum": 116,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何使用 $lookup 实现关联查询？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028083060764673",
+      "sourceId": "1837028083060764673",
+      "viewNum": 99,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 是如何处理多副本集的同步和冲突解决的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028083333394434",
+      "sourceId": "1837028083333394434",
+      "viewNum": 94,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何实现分布式事务和 ACID 特性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028083572469762",
+      "sourceId": "1837028083572469762",
+      "viewNum": 174,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的存储引擎 WiredTiger 是如何工作的？它与 MMAPv1 有何区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028083807350785",
+      "sourceId": "1837028083807350785",
+      "viewNum": 95,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何处理二次索引和覆盖索引以优化查询性能？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028084063203330",
+      "sourceId": "1837028084063203330",
+      "viewNum": 121,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 中的 `oplog` 是如何工作的？它在复制集中的作用是什么？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028084310667265",
+      "sourceId": "1837028084310667265",
+      "viewNum": 107,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何通过分区提高数据的读写性能？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028084562325506",
+      "sourceId": "1837028084562325506",
+      "viewNum": 107,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 如何处理大规模数据集的并行查询和负载均衡？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028084813983746",
+      "sourceId": "1837028084813983746",
+      "viewNum": 118,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何通过自定义聚合函数优化复杂查询？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028085053059074",
+      "sourceId": "1837028085053059074",
+      "viewNum": 78,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 中的 aggregation pipeline 是如何优化数据流处理的？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028085266968577",
+      "sourceId": "1837028085266968577",
+      "viewNum": 75,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MongoDB 中设计跨集群的高可用性方案？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028085493460993",
+      "sourceId": "1837028085493460993",
+      "viewNum": 99,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 是如何通过 journal 实现数据的持久化和一致性的？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028085724147714",
+      "sourceId": "1837028085724147714",
+      "viewNum": 74,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何处理大规模并发写入的性能优化问题？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028085954834433",
+      "sourceId": "1837028085954834433",
+      "viewNum": 89,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的水平扩展机制是如何实现的？如何动态增加节点？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028086227464193",
+      "sourceId": "1837028086227464193",
+      "viewNum": 98,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何处理数据倾斜和负载不均的问题？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028086474928129",
+      "sourceId": "1837028086474928129",
+      "viewNum": 92,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 是如何保证分布式集群中数据的一致性和可用性的？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028086730780673",
+      "sourceId": "1837028086730780673",
+      "viewNum": 97,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何优化跨分片的查询性能？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028086953078786",
+      "sourceId": "1837028086953078786",
+      "viewNum": 92,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的 two-phase commit 机制是如何保证分布式事务的？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028087179571201",
+      "sourceId": "1837028087179571201",
+      "viewNum": 87,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何通过性能监控和日志分析优化集群性能？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028087473172482",
+      "sourceId": "1837028087473172482",
+      "viewNum": 82,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 是如何通过异步复制实现高可用性的？如何配置异步复制？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028087703859202",
+      "sourceId": "1837028087703859202",
+      "viewNum": 82,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何通过自定义存储引擎优化数据的持久化策略？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028087951323137",
+      "sourceId": "1837028087951323137",
+      "viewNum": 122,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的 readConcern 是如何配置的？它如何影响查询的结果一致性？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028088223952897",
+      "sourceId": "1837028088223952897",
+      "viewNum": 91,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何通过数据分布策略优化集群的存储和计算效率？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028088458833921",
+      "sourceId": "1837028088458833921",
+      "viewNum": 75,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MongoDB 中通过分布式聚合优化大规模数据的处理效率？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028088702103554",
+      "sourceId": "1837028088702103554",
+      "viewNum": 106,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MongoDB 的 causal consistency 是如何保证事件顺序的？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028088966344705",
+      "sourceId": "1837028088966344705",
+      "viewNum": 75,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MongoDB 中，如何结合 Spark 实现大规模数据的实时处理？",
+      "difficulty": "HARD",
+      "tags": [
+        "MongoDB"
+      ],
+      "tagIds": [
+        19
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1837028089213808641",
+      "sourceId": "1837028089213808641",
+      "viewNum": 139,
+      "needVip": false,
+      "hasAnswer": false
+    }
+  ]
+}

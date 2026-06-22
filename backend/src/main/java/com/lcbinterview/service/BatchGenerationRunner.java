@@ -35,7 +35,6 @@ public class BatchGenerationRunner {
             new BatchProgressVO("IDLE", 0, 0, 0, 0, 0, null, null, List.of()));
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    /** 分类 → 生成主题提示词映射 */
     private static final Map<String, String> CATEGORY_TOPICS = new LinkedHashMap<>();
 
     static {
@@ -70,31 +69,28 @@ public class BatchGenerationRunner {
         CATEGORY_TOPICS.put("HR 面试", "自我介绍、职业规划、项目亮点、团队协作、压力管理、离职原因、薪资谈判、对公司了解");
     }
 
-    /** 已有足够种子题目的分类 ID（跳过） */
     private static final Set<String> SKIP_CATEGORIES = Set.of();
 
     /**
      * 启动批量生成任务（异步执行）。
-     *
-     * @param countPerCategory 每个分类生成数量
-     * @param categoryName     指定分类名称，null 则生成所有
-     * @param delaySeconds     API 调用间隔秒数
-     * @return 任务是否成功启动
      */
     public boolean start(int countPerCategory, String categoryName, int delaySeconds) {
         if (!running.compareAndSet(false, true)) {
-            log.warn("批量生成任务已在运行中");
+            log.warn("批量生成任务已在运行中，拒绝新请求");
             return false;
         }
 
+        log.info("批量生成任务排队启动: countPerCategory={}, categoryName={}, delay={}s",
+                countPerCategory, categoryName, delaySeconds);
         executor.submit(() -> {
             try {
                 runBatch(countPerCategory, categoryName, delaySeconds);
             } catch (Exception e) {
-                log.error("批量生成任务异常", e);
+                log.error("批量生成任务异常终止", e);
             } finally {
                 running.set(false);
                 progress.set(new BatchProgressVO("IDLE", 0, 0, 0, 0, 0, null, null, List.of()));
+                log.info("批量生成任务已释放运行锁");
             }
         });
         return true;
@@ -108,7 +104,8 @@ public class BatchGenerationRunner {
     }
 
     private void runBatch(int countPerCategory, String categoryName, int delaySeconds) {
-        log.info("===== 批量生成任务启动: countPerCategory={}, delay={}s =====", countPerCategory, delaySeconds);
+        log.info("===== 批量生成任务启动: countPerCategory={}, delay={}s, 时间={} =====",
+                countPerCategory, delaySeconds, new Date());
 
         List<Category> categories;
         if (categoryName != null && !categoryName.isBlank()) {
@@ -116,29 +113,29 @@ public class BatchGenerationRunner {
                     new LambdaQueryWrapper<Category>()
                             .like(Category::getName, categoryName)
                             .orderByAsc(Category::getSortOrder));
+            log.info("筛选分类 '{}': 匹配 {} 个", categoryName, categories.size());
         } else {
             categories = categoryMapper.selectList(
                     new LambdaQueryWrapper<Category>().orderByAsc(Category::getSortOrder));
+            log.info("加载全部分类: {} 个", categories.size());
         }
-
-        log.info("待生成分类数: {}", categories.size());
 
         int totalSuccess = 0;
         int totalFail = 0;
         int totalToGenerate = 0;
         List<String> errorList = new ArrayList<>();
 
-        // 先估算总题数
         for (Category cat : categories) {
             if (SKIP_CATEGORIES.contains(cat.getName())) { continue; }
             long existing = questionMapper.selectCount(
                     new LambdaQueryWrapper<Question>()
                             .eq(Question::getCategoryId, cat.getId())
-                            .eq(Question::getStatus, "PUBLISHED"));
+                            .in(Question::getStatus, List.of("DRAFT", "PUBLISHED")));
             if (existing < countPerCategory) {
                 totalToGenerate += (int) (countPerCategory - existing);
             }
         }
+        log.info("估算总生成量: {} 道题（已有足够题目的分类已排除）", totalToGenerate);
 
         progress.set(new BatchProgressVO("RUNNING",
                 categories.size(), 0, totalToGenerate, 0, 0, null, "准备中...", List.of()));
@@ -148,29 +145,30 @@ public class BatchGenerationRunner {
             Category cat = categories.get(i);
 
             if (SKIP_CATEGORIES.contains(cat.getName())) {
-                log.info("[{}/{}] 跳过已有题目的分类: {}", i + 1, categories.size(), cat.getName());
+                log.info("[{}/{}] 跳过跳过列表中的分类: '{}'", i + 1, categories.size(), cat.getName());
                 continue;
             }
 
             long existingCount = questionMapper.selectCount(
                     new LambdaQueryWrapper<Question>()
                             .eq(Question::getCategoryId, cat.getId())
-                            .eq(Question::getStatus, "PUBLISHED"));
+                            .in(Question::getStatus, List.of("DRAFT", "PUBLISHED")));
 
             if (existingCount >= countPerCategory) {
-                log.info("[{}/{}] 分类 '{}' 已有 {} 道题，跳过",
-                        i + 1, categories.size(), cat.getName(), existingCount);
+                log.info("[{}/{}] 分类 '{}' 已有 {} 道题 >= {}，跳过",
+                        i + 1, categories.size(), cat.getName(), existingCount, countPerCategory);
                 continue;
             }
 
             int toGenerate = (int) (countPerCategory - existingCount);
-            log.info("[{}/{}] 开始生成分类 '{}': 已有 {} 道，需生成 {} 道",
-                    i + 1, categories.size(), cat.getName(), existingCount, toGenerate);
+            log.info("=== [{}/{}] 开始生成分类: '{}', 已有 {} 道, 需生成 {} 道, 难度={} ===",
+                    i + 1, categories.size(), cat.getName(), existingCount, toGenerate, pickDifficulty(i));
 
             progress.set(new BatchProgressVO("RUNNING",
                     categories.size(), completedCategories, totalToGenerate, totalSuccess, totalFail,
                     cat.getName(), "调用 AI 生成中...", List.copyOf(errorList)));
 
+            long catStart = System.currentTimeMillis();
             try {
                 String topic = CATEGORY_TOPICS.getOrDefault(cat.getName(), cat.getDescription());
                 String difficulty = pickDifficulty(i);
@@ -178,14 +176,22 @@ public class BatchGenerationRunner {
                 GenerationRequest req = new GenerationRequest(
                         cat.getName(), difficulty, toGenerate, topic);
 
+                log.info("调用 generateSync: category='{}', difficulty={}, count={}, topic长度={}字符",
+                        cat.getName(), difficulty, toGenerate, topic != null ? topic.length() : 0);
+
                 List<Long> ids = aiQuestionService.generateSync(req, cat.getId());
                 totalSuccess += ids.size();
                 completedCategories++;
-                log.info("[{}/{}] 分类 '{}' 生成完成: {} 道",
-                        i + 1, categories.size(), cat.getName(), ids.size());
+
+                long catTime = System.currentTimeMillis() - catStart;
+                log.info("=== [{}/{}] 分类 '{}' 生成完成: 成功 {} 道, 耗时 {}ms ===",
+                        i + 1, categories.size(), cat.getName(), ids.size(), catTime);
 
             } catch (Exception e) {
-                log.error("[{}/{}] 分类 '{}' 生成失败", i + 1, categories.size(), cat.getName(), e);
+                long catTime = System.currentTimeMillis() - catStart;
+                log.error("=== [{}/{}] 分类 '{}' 生成失败, 耗时 {}ms: {} ===",
+                        i + 1, categories.size(), cat.getName(), catTime, e.getMessage());
+                log.debug("异常详情", e);
                 totalFail++;
                 completedCategories++;
                 errorList.add(cat.getName() + ": " + e.getMessage());
@@ -201,7 +207,7 @@ public class BatchGenerationRunner {
                     progress.set(new BatchProgressVO("RUNNING",
                             categories.size(), completedCategories, totalToGenerate, totalSuccess, totalFail,
                             null, "等待 " + delaySeconds + "s 后继续...", List.copyOf(errorList)));
-                    log.info("等待 {}s 后继续...", delaySeconds);
+                    log.info("等待 {}s 后处理下一个分类...", delaySeconds);
                     Thread.sleep(delaySeconds * 1000L);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -211,15 +217,13 @@ public class BatchGenerationRunner {
             }
         }
 
-        log.info("===== 批量生成任务完成: 成功 {} 道, 失败 {} 个分类 =====", totalSuccess, totalFail);
+        log.info("===== 批量生成任务完成: 成功 {} 道, 失败 {} 个分类, 处理 {} 个分类 =====",
+                totalSuccess, totalFail, completedCategories);
         if (!errorList.isEmpty()) {
-            log.warn("失败分类: {}", errorList);
+            log.warn("失败分类列表: {}", errorList);
         }
     }
 
-    /**
-     * 按分类序号轮换难度，保证每个分类都有混合难度。
-     */
     private String pickDifficulty(int index) {
         return switch (index % 3) {
             case 0 -> "MEDIUM";

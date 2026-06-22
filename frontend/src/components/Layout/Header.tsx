@@ -1,29 +1,91 @@
-import { Layout, Input, theme } from 'antd'
-import { useNavigate } from 'react-router-dom'
-import { BookOutlined } from '@ant-design/icons'
+import { useEffect, useState } from 'react'
+import { Layout, Input } from 'antd'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import {
+  BookOutlined,
+  CalendarOutlined,
+  FireOutlined,
+  PlayCircleOutlined,
+  ReadOutlined,
+  SearchOutlined,
+  SolutionOutlined,
+} from '@ant-design/icons'
 
 const { Header } = Layout
+const { Search } = Input
+
+const navItems = [
+  { path: '/', label: '热门', icon: <FireOutlined /> },
+  { path: '/banks', label: '题库', icon: <BookOutlined /> },
+  { path: '/routes', label: '路线', icon: <ReadOutlined /> },
+  { path: '/experiences', label: '面经', icon: <SolutionOutlined /> },
+  { path: '/study', label: '计划', icon: <CalendarOutlined /> },
+  { path: '/practice', label: '训练', icon: <PlayCircleOutlined /> },
+]
 
 export default function AppHeader() {
   const navigate = useNavigate()
-  const { token } = theme.useToken()
+  const location = useLocation()
+  const [searchParams] = useSearchParams()
+  const [searchValue, setSearchValue] = useState('')
+
+  useEffect(() => {
+    setSearchValue(searchParams.get('q') || '')
+  }, [searchParams])
+
+  const runSearch = (value: string) => {
+    const keyword = value.trim()
+    if (keyword) {
+      navigate(`/search?q=${encodeURIComponent(keyword)}`)
+      return
+    }
+    if (location.pathname === '/search') {
+      navigate('/search')
+    }
+  }
 
   return (
-    <Header style={{
-      background: token.colorBgContainer,
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0 24px',
-      borderBottom: `1px solid ${token.colorBorderSecondary}`,
-    }}>
-      <div style={{ fontSize: 20, fontWeight: 'bold', cursor: 'pointer', marginRight: 32 }}
-           onClick={() => navigate('/')}>
-        <BookOutlined /> LCB Interview
+    <Header className="app-header">
+      <div
+        className="app-brand"
+        onClick={() => navigate('/')}
+      >
+        <div className="app-brand-mark">
+          L
+        </div>
+        <span className="logo-text app-brand-name">
+          LCB Interview
+        </span>
       </div>
-      <Input.Search
-        placeholder="搜索面试题..."
-        onSearch={(value) => navigate(`/search?q=${encodeURIComponent(value)}`)}
-        style={{ maxWidth: 400 }}
+
+      <nav className="app-nav" aria-label="主导航">
+        {navItems.map(item => {
+          const active = item.path === '/'
+            ? location.pathname === '/'
+            : location.pathname.startsWith(item.path)
+          return (
+            <button
+              key={item.path}
+              type="button"
+              className={active ? 'app-nav-item active' : 'app-nav-item'}
+              onClick={() => navigate(item.path)}
+            >
+              {item.icon}
+              <span className="nav-label">{item.label}</span>
+            </button>
+          )
+        })}
+      </nav>
+
+      <Search
+        className="app-header-search"
+        prefix={<SearchOutlined style={{ color: '#A1A1AA', fontSize: 13 }} />}
+        placeholder="搜索..."
+        variant="filled"
+        allowClear
+        value={searchValue}
+        onChange={event => setSearchValue(event.target.value)}
+        onSearch={runSearch}
       />
     </Header>
   )

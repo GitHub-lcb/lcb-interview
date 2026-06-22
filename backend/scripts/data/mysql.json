@@ -1,0 +1,1392 @@
+{
+  "categoryId": 5,
+  "categoryName": "MySQL",
+  "bankIds": [
+    "1791003439968264194"
+  ],
+  "totalQuestions": 82,
+  "questions": [
+    {
+      "title": "MySQL 中的数据排序是怎么实现的？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295526146049",
+      "sourceId": "1780933295526146049",
+      "viewNum": 55433,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "详细描述一条 SQL 语句在 MySQL 中的执行过程。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295429677057",
+      "sourceId": "1780933295429677057",
+      "viewNum": 49963,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 的索引类型有哪些？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295438065665",
+      "sourceId": "1780933295438065665",
+      "viewNum": 43008,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 的 Change Buffer 是什么？它有什么作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295555506178",
+      "sourceId": "1780933295555506178",
+      "viewNum": 32042,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是批量数据入库？相比单条插入有什么优势？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1976916016243953666",
+      "sourceId": "1976916016243953666",
+      "viewNum": 7259,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是数据全量同步和增量同步？它们各有什么优缺点？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "数据同步"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1976579387243384834",
+      "sourceId": "1976579387243384834",
+      "viewNum": 6201,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是游标 Cursor 分页？相比传统 LIMIT OFFSET 分页有什么优势？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1976592556003184642",
+      "sourceId": "1976592556003184642",
+      "viewNum": 5977,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 的存储引擎有哪些？它们之间有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295433871361",
+      "sourceId": "1780933295433871361",
+      "viewNum": 40796,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL InnoDB 引擎中的聚簇索引和非聚簇索引有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295442259970",
+      "sourceId": "1780933295442259970",
+      "viewNum": 32560,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中的回表是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295446454273",
+      "sourceId": "1780933295446454273",
+      "viewNum": 33095,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 索引的最左前缀匹配原则是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295450648578",
+      "sourceId": "1780933295450648578",
+      "viewNum": 50221,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 的覆盖索引是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295454842881",
+      "sourceId": "1780933295454842881",
+      "viewNum": 31184,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 的索引下推是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295459037186",
+      "sourceId": "1780933295459037186",
+      "viewNum": 29896,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MySQL 中建索引时需要注意哪些事项？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295459037187",
+      "sourceId": "1780933295459037187",
+      "viewNum": 22411,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中使用索引一定有效吗？如何排查索引效果？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库",
+        "场景题"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295463231490",
+      "sourceId": "1780933295463231490",
+      "viewNum": 29171,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中的索引数量是否越多越好？为什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295467425794",
+      "sourceId": "1780933295467425794",
+      "viewNum": 26041,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "请详细描述 MySQL 的 B+ 树中查询数据的全过程",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295471620098",
+      "sourceId": "1780933295471620098",
+      "viewNum": 29871,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 MySQL 选择使用 B+ 树作为索引结构？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295475814402",
+      "sourceId": "1780933295475814402",
+      "viewNum": 26893,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中的日志类型有哪些？binlog、redo log 和 undo log 的作用和区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772575207802904578",
+      "sourceId": "1772575207802904578",
+      "viewNum": 11127,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 是如何实现事务的？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295475814403",
+      "sourceId": "1780933295475814403",
+      "viewNum": 29175,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中长事务可能会导致哪些问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295480008706",
+      "sourceId": "1780933295480008706",
+      "viewNum": 20313,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中的 MVCC 是什么？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295484203009",
+      "sourceId": "1780933295484203009",
+      "viewNum": 28679,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 二级索引有 MVCC 快照吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1963170747031306241",
+      "sourceId": "1963170747031306241",
+      "viewNum": 5032,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果 MySQL 中没有 MVCC，会有什么影响？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295488397313",
+      "sourceId": "1780933295488397313",
+      "viewNum": 13729,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中的事务隔离级别有哪些？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295492591617",
+      "sourceId": "1780933295492591617",
+      "viewNum": 24941,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 默认的事务隔离级别是什么？为什么选择这个级别？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295492591618",
+      "sourceId": "1780933295492591618",
+      "viewNum": 21714,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "数据库的脏读、不可重复读和幻读分别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295496785922",
+      "sourceId": "1780933295496785922",
+      "viewNum": 33544,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中有哪些锁类型？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295500980225",
+      "sourceId": "1780933295500980225",
+      "viewNum": 24207,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 的乐观锁和悲观锁是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295505174530",
+      "sourceId": "1780933295505174530",
+      "viewNum": 22373,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中如果发生死锁应该如何解决？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295505174531",
+      "sourceId": "1780933295505174531",
+      "viewNum": 20744,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 MySQL 的 EXPLAIN 语句进行查询分析？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295509368833",
+      "sourceId": "1780933295509368833",
+      "viewNum": 21038,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中 count(*)、count(1) 和 count(字段名) 有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295513563137",
+      "sourceId": "1780933295513563137",
+      "viewNum": 22605,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中 int(11) 的 11 表示什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295517757441",
+      "sourceId": "1780933295517757441",
+      "viewNum": 13488,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中 varchar 和 char 有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295517757442",
+      "sourceId": "1780933295517757442",
+      "viewNum": 14982,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中如何进行 SQL 调优？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库",
+        "场景题"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295521951745",
+      "sourceId": "1780933295521951745",
+      "viewNum": 24694,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MySQL 中避免单点故障？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295530340354",
+      "sourceId": "1780933295530340354",
+      "viewNum": 11189,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MySQL 中实现读写分离？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295534534657",
+      "sourceId": "1780933295534534657",
+      "viewNum": 12244,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 MySQL 的主从同步机制？它是如何实现的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295538728962",
+      "sourceId": "1780933295538728962",
+      "viewNum": 18740,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何处理 MySQL 的主从同步延迟？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295542923266",
+      "sourceId": "1780933295542923266",
+      "viewNum": 15834,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是分库分表？分库分表有哪些类型（或策略）？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295542923267",
+      "sourceId": "1780933295542923267",
+      "viewNum": 17396,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果组长要求你主导项目中的分库分表，大致的实施流程是？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295547117569",
+      "sourceId": "1780933295547117569",
+      "viewNum": 12337,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "对数据库进行分库分表可能会引发哪些问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295551311873",
+      "sourceId": "1780933295551311873",
+      "viewNum": 10430,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "从 MySQL 获取数据，是从磁盘读取的吗？（buffer pool）",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295555506177",
+      "sourceId": "1780933295555506177",
+      "viewNum": 10779,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 的 Doublewrite Buffer 是什么？它有什么作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295559700482",
+      "sourceId": "1780933295559700482",
+      "viewNum": 8523,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中的 Log Buffer 是什么？它有什么作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295563894785",
+      "sourceId": "1780933295563894785",
+      "viewNum": 9839,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么在 MySQL 中不推荐使用多表 JOIN？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295568089090",
+      "sourceId": "1780933295568089090",
+      "viewNum": 10878,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中如何解决深度分页的问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库",
+        "场景题"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295572283394",
+      "sourceId": "1780933295572283394",
+      "viewNum": 17893,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 MySQL 中监控和优化慢 SQL？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295572283395",
+      "sourceId": "1780933295572283395",
+      "viewNum": 13193,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中 DELETE、DROP 和 TRUNCATE 的区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295576477697",
+      "sourceId": "1780933295576477697",
+      "viewNum": 9395,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中 INNER JOIN、LEFT JOIN 和 RIGHT JOIN 的区别是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295580672002",
+      "sourceId": "1780933295580672002",
+      "viewNum": 10220,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中 `LIMIT 100000000, 10` 和 `LIMIT 10` 的执行速度是否相同？",
+      "difficulty": "EASY",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803235242875019265",
+      "sourceId": "1803235242875019265",
+      "viewNum": 10588,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中 DATETIME 和 TIMESTAMP 类型的区别是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803251044575600642",
+      "sourceId": "1803251044575600642",
+      "viewNum": 8727,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "数据库的三大范式是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803265470015987713",
+      "sourceId": "1803265470015987713",
+      "viewNum": 14225,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MySQL 中，你使用过哪些函数？",
+      "difficulty": "EASY",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803675094573637633",
+      "sourceId": "1803675094573637633",
+      "viewNum": 10472,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中 TEXT 类型最大可以存储多长的文本？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803678280223023105",
+      "sourceId": "1803678280223023105",
+      "viewNum": 8443,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中 AUTO_INCREMENT 列达到最大值时会发生什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803679397849849858",
+      "sourceId": "1803679397849849858",
+      "viewNum": 8309,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 MySQL 中存储金额数据，应该使用什么数据类型？",
+      "difficulty": "EASY",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803683668511154178",
+      "sourceId": "1803683668511154178",
+      "viewNum": 11353,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是数据库的视图？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1804076675288997889",
+      "sourceId": "1804076675288997889",
+      "viewNum": 9498,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是数据库的游标？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1804078313512837122",
+      "sourceId": "1804078313512837122",
+      "viewNum": 8653,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么不推荐在 MySQL 中直接存储图片、音频、视频等大容量内容？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805134256694566913",
+      "sourceId": "1805134256694566913",
+      "viewNum": 9607,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "相比于 Oracle，MySQL 的优势有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805135090346041346",
+      "sourceId": "1805135090346041346",
+      "viewNum": 8930,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中 VARCHAR(100) 和 VARCHAR(10) 的区别是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805142216804081666",
+      "sourceId": "1805142216804081666",
+      "viewNum": 9739,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "在什么情况下，不推荐为数据库建立索引？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805147589229355009",
+      "sourceId": "1805147589229355009",
+      "viewNum": 13762,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中 EXISTS 和 IN 的区别是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805162404970700802",
+      "sourceId": "1805162404970700802",
+      "viewNum": 10481,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Write-Ahead Logging (WAL) 技术？它的优点是什么？MySQL 中是否用到了 WAL？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805421201916108802",
+      "sourceId": "1805421201916108802",
+      "viewNum": 9401,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你们生产环境的 MySQL 中使用了什么事务隔离级别？为什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1805421515868151810",
+      "sourceId": "1805421515868151810",
+      "viewNum": 12310,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么阿里巴巴的 Java 手册不推荐使用存储过程？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL",
+        "后端",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1803252534539182081",
+      "sourceId": "1803252534539182081",
+      "viewNum": 10188,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何实现数据库的不停服迁移？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库",
+        "场景题"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1813456791649378305",
+      "sourceId": "1813456791649378305",
+      "viewNum": 10243,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 数据库的性能优化方法有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1816438385021997058",
+      "sourceId": "1816438385021997058",
+      "viewNum": 11442,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 中 InnoDB 存储引擎与 MyISAM 存储引擎的区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "数据库",
+        "MySQL",
+        "数据库体系结构"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361310328279041",
+      "sourceId": "1811361310328279041",
+      "viewNum": 14278,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 的查询优化器如何选择执行计划？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "数据库",
+        "MySQL",
+        "数据库体系结构"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361311347494913",
+      "sourceId": "1811361311347494913",
+      "viewNum": 10738,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是数据库的逻辑删除？数据库的物理删除和逻辑删除有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1821023107360137217",
+      "sourceId": "1821023107360137217",
+      "viewNum": 9063,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是数据库的逻辑外键？数据库的物理外键和逻辑外键各有什么优缺点？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1821065028363264002",
+      "sourceId": "1821065028363264002",
+      "viewNum": 7938,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 事务的二阶段提交是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1849298413057683458",
+      "sourceId": "1849298413057683458",
+      "viewNum": 17832,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 三层 B+ 树能存多少数据？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1849347477245734913",
+      "sourceId": "1849347477245734913",
+      "viewNum": 20078,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 在设计表（建表）时需要注意什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "数据库",
+        "MySQL"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1854714622329430017",
+      "sourceId": "1854714622329430017",
+      "viewNum": 7900,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL 插入一条 SQL 语句，redo log 记录的是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1860973240398307330",
+      "sourceId": "1860973240398307330",
+      "viewNum": 8065,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "SQL 中 select、from、join、where、group by、having、order by、limit 的执行顺序是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "MySQL",
+        "后端"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1889252459911045121",
+      "sourceId": "1889252459911045121",
+      "viewNum": 8949,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 MySQL 索引用的是 B+ 树而不是红黑树？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "MySQL",
+        "数据库"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1915294533699280898",
+      "sourceId": "1915294533699280898",
+      "viewNum": 6040,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "MySQL一张表最多可以有多少列？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "MySQL"
+      ],
+      "tagIds": [
+        17
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1963412684237783041",
+      "sourceId": "1963412684237783041",
+      "viewNum": 3955,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 CDC（Change Data Capture）？常见的 CDC 工具有哪些？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "数据库",
+        "数据同步"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1976910717332246529",
+      "sourceId": "1976910717332246529",
+      "viewNum": 2671,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "多线程并发同步数据时（数据库的数据同步到数仓中）需要注意什么问题？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "多线程",
+        "并发",
+        "数据库"
+      ],
+      "tagIds": [
+        3
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1976928525747245058",
+      "sourceId": "1976928525747245058",
+      "viewNum": 4321,
+      "needVip": true,
+      "hasAnswer": false
+    }
+  ]
+}

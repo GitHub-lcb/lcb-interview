@@ -1,14 +1,22 @@
-import { Skeleton as AntSkeleton, Card } from 'antd'
+import { Skeleton as AntSkeleton } from 'antd'
 
 export default function Skeleton() {
   return (
-    <Card>
-      <AntSkeleton active paragraph={{ rows: 1 }} />
-      <div style={{ margin: '16px 0' }}>
-        <AntSkeleton.Input active size="small" style={{ width: 80, marginRight: 8 }} />
-        <AntSkeleton.Input active size="small" style={{ width: 60 }} />
+    <article style={{ maxWidth: 800, margin: '0 auto' }}>
+      <div style={{ marginBottom: 32 }}>
+        <AntSkeleton active title={{ width: '40%' }} paragraph={false} />
+        <div style={{ marginTop: 16 }}>
+          <AntSkeleton active title={{ width: '80%' }} paragraph={{ rows: 1, width: '50%' }} />
+        </div>
       </div>
-      <AntSkeleton active paragraph={{ rows: 6 }} />
-    </Card>
+
+      <div className="magazine-card" style={{ padding: 32 }}>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} style={{ padding: '16px 0', borderBottom: i < 3 ? '1px solid #F1F1F3' : 'none' }}>
+            <AntSkeleton active title={{ width: '30%' }} paragraph={{ rows: 2 }} />
+          </div>
+        ))}
+      </div>
+    </article>
   )
 }

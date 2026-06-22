@@ -1,0 +1,2947 @@
+{
+  "categoryId": 27,
+  "categoryName": "Elasticsearch",
+  "bankIds": [
+    "1805423815382736897",
+    "1827358190473416705",
+    "1827358467955986434",
+    "1827358734998933505",
+    "1827358816850776065",
+    "1827358930059235329",
+    "1827359213040537602"
+  ],
+  "totalQuestions": 177,
+  "questions": [
+    {
+      "title": "什么是 Elasticsearch？它有哪些优势和应用场景？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340947394940929",
+      "sourceId": "1827340947394940929",
+      "viewNum": 5338,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 支持哪些类型的数据查询搜索方式？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340948133138434",
+      "sourceId": "1827340948133138434",
+      "viewNum": 3541,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 的 REST API 有什么优点？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch API"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340948875530242",
+      "sourceId": "1827340948875530242",
+      "viewNum": 2650,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "安装 Elasticsearch 时，系统需要依赖哪些组件？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340949605339138",
+      "sourceId": "1827340949605339138",
+      "viewNum": 2572,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何操作 Elasticsearch 进行文档的更新和删除？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340950339342337",
+      "sourceId": "1827340950339342337",
+      "viewNum": 2364,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Kibana 对 Elasticsearch 的数据进行可视化和操作？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Kibana",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340951014625282",
+      "sourceId": "1827340951014625282",
+      "viewNum": 2198,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中 cat API 有什么作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch API"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340951744434177",
+      "sourceId": "1827340951744434177",
+      "viewNum": 1449,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 的副本？创建副本有什么好处？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340952503603202",
+      "sourceId": "1827340952503603202",
+      "viewNum": 1669,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 的分片？它在集群中的作用是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340953204051970",
+      "sourceId": "1827340953204051970",
+      "viewNum": 1797,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 keyword 和 text 字段有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340953891917825",
+      "sourceId": "1827340953891917825",
+      "viewNum": 1705,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 支持哪些数据类型，如何选择合适的数据类型？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch配置",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340954567200770",
+      "sourceId": "1827340954567200770",
+      "viewNum": 1865,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何启动并配置 Elasticsearch 服务器？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340955229900801",
+      "sourceId": "1827340955229900801",
+      "viewNum": 1309,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch Cluster？它有什么作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340956144259073",
+      "sourceId": "1827340956144259073",
+      "viewNum": 1185,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 的 Document 文档？如何存储和检索文档？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340956840513537",
+      "sourceId": "1827340956840513537",
+      "viewNum": 1401,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 的 Index 索引？如何管理索引？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340957591293954",
+      "sourceId": "1827340957591293954",
+      "viewNum": 1557,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中列出集群中的所有索引？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch API"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340958291742721",
+      "sourceId": "1827340958291742721",
+      "viewNum": 982,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 ID 检索 Elasticsearch 中的文档？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340959021551618",
+      "sourceId": "1827340959021551618",
+      "viewNum": 1062,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "ElasticSearch 精准匹配和全文检索匹配有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340959759749122",
+      "sourceId": "1827340959759749122",
+      "viewNum": 1177,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 的 Node 节点？它有哪些角色和功能？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340960397283330",
+      "sourceId": "1827340960397283330",
+      "viewNum": 883,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 Mapping 有哪些常见的数据类型？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340961160646658",
+      "sourceId": "1827340961160646658",
+      "viewNum": 1044,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Lucene？它和 Elasticsearch 有什么关系？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Lucene",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340961911427074",
+      "sourceId": "1827340961911427074",
+      "viewNum": 1121,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 的基本概念有哪些？请举例说明",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340962783842306",
+      "sourceId": "1827340962783842306",
+      "viewNum": 1193,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 支持哪些配置管理工具？如何使用这些工具？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340963492679681",
+      "sourceId": "1827340963492679681",
+      "viewNum": 728,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中不同节点类型（如主节点和数据节点等）的区别是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340964277014529",
+      "sourceId": "1827340964277014529",
+      "viewNum": 734,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 支持哪些语言的客户端？如何选择合适的客户端？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch客户端"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340965120069634",
+      "sourceId": "1827340965120069634",
+      "viewNum": 654,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中实现全文搜索的分页功能？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340965803741186",
+      "sourceId": "1827340965803741186",
+      "viewNum": 1042,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 Search Suggestion 是什么？有哪些类型的搜索建议？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340966445469697",
+      "sourceId": "1827340966445469697",
+      "viewNum": 666,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 Search Template 功能是什么？如何使用它？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340967250776065",
+      "sourceId": "1827340967250776065",
+      "viewNum": 713,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Elasticsearch 实现高亮显示搜索结果？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340967988973569",
+      "sourceId": "1827340967988973569",
+      "viewNum": 1004,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中创建只读索引？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch配置",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340968739753985",
+      "sourceId": "1827340968739753985",
+      "viewNum": 942,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 提供了哪些核心 API？请举例说明每个 API 的功能",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch API"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340969628946434",
+      "sourceId": "1827340969628946434",
+      "viewNum": 829,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 的 Bulk API？它有什么作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch API",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340970316812290",
+      "sourceId": "1827340970316812290",
+      "viewNum": 704,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Elasticsearch 的 _analyze API 来调试分析器？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch分析",
+        "Elasticsearch API"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340970983706625",
+      "sourceId": "1827340970983706625",
+      "viewNum": 631,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 支持哪些排序类型？请举例说明",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340971612852225",
+      "sourceId": "1827340971612852225",
+      "viewNum": 930,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Elasticsearch 中，如何使用 boost 参数提高某个字段的相关性得分？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340972292329474",
+      "sourceId": "1827340972292329474",
+      "viewNum": 751,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 的 explain API？它有什么作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch API",
+        "Elasticsearch评分"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340973030526977",
+      "sourceId": "1827340973030526977",
+      "viewNum": 1246,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 min_score 参数的作用是什么？如何使用它来过滤低相关性的结果？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340973827444737",
+      "sourceId": "1827340973827444737",
+      "viewNum": 791,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 中的 match_phrase 查询？match_phrase 查询如何处理评分？",
+      "difficulty": "EASY",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询",
+        "Elasticsearch评分"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340974632751106",
+      "sourceId": "1827340974632751106",
+      "viewNum": 672,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch？Elasticsearch 和 MySQL 分别有哪些应用场景和优缺点？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Elasticsearch",
+        "编程导航"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772958710109396994",
+      "sourceId": "1772958710109396994",
+      "viewNum": 2709,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 为什么能实现更灵活的查询？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Elasticsearch",
+        "编程导航"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772959022333386754",
+      "sourceId": "1772959022333386754",
+      "viewNum": 2035,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在高并发场景下保证 Elasticsearch 的读写一致性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340975308034049",
+      "sourceId": "1827340975308034049",
+      "viewNum": 1492,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何利用 Elasticsearch 实现拼写纠错功能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340976016871425",
+      "sourceId": "1827340976016871425",
+      "viewNum": 606,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Elasticsearch 中的 Elastic Reporting 来生成报告？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340976700542978",
+      "sourceId": "1827340976700542978",
+      "viewNum": 477,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "部署 Elasticsearch 时，如何优化 Linux 系统的设置？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch配置",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340977388408834",
+      "sourceId": "1827340977388408834",
+      "viewNum": 523,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 集群中添加和创建新索引？详细过程是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340978109829122",
+      "sourceId": "1827340978109829122",
+      "viewNum": 528,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 索引文档的具体流程是怎样的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340978848026625",
+      "sourceId": "1827340978848026625",
+      "viewNum": 719,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何对 Elasticsearch 中的数据进行预热操作？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340979707858945",
+      "sourceId": "1827340979707858945",
+      "viewNum": 583,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 的 Tokenizer？如何使用它？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340980492193794",
+      "sourceId": "1827340980492193794",
+      "viewNum": 480,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 数据写入的工作原理是什么？要经历哪些流程？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340981188448258",
+      "sourceId": "1827340981188448258",
+      "viewNum": 702,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中是否可以更改主分片的数量？原因是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340982023114753",
+      "sourceId": "1827340982023114753",
+      "viewNum": 491,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何监控 Elasticsearch 集群的运行状态和性能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340982782283778",
+      "sourceId": "1827340982782283778",
+      "viewNum": 452,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "客户端与 Elasticsearch 集群通信时，如何选择合适的节点来执行请求？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群",
+        "Elasticsearch客户端"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340983465955330",
+      "sourceId": "1827340983465955330",
+      "viewNum": 407,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中倒排索引的实现原理是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340984241901570",
+      "sourceId": "1827340984241901570",
+      "viewNum": 1412,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 如何处理一次数据搜索请求？要经历哪些流程？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340984900407297",
+      "sourceId": "1827340984900407297",
+      "viewNum": 576,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是全文检索？Elasticsearch 的全文检索是如何实现的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340985542135809",
+      "sourceId": "1827340985542135809",
+      "viewNum": 704,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何利用 Beats 完成 Elasticsearch 的数据采集和传输？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Beats",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340986221613057",
+      "sourceId": "1827340986221613057",
+      "viewNum": 365,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "当前稳定版本的 Elasticsearch 具备哪些核心特性和改进？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch特性"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340986901090305",
+      "sourceId": "1827340986901090305",
+      "viewNum": 321,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中 Explore API 的功能和应用场景是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch API"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340987622510594",
+      "sourceId": "1827340987622510594",
+      "viewNum": 280,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 的 Master 节点与候选 Master 节点有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340988255850498",
+      "sourceId": "1827340988255850498",
+      "viewNum": 373,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 的 X-Pack？它的主要功能和命令是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340988998242306",
+      "sourceId": "1827340988998242306",
+      "viewNum": 326,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何操作 Elasticsearch 实现高效的全文检索功能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340989832908802",
+      "sourceId": "1827340989832908802",
+      "viewNum": 448,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 集群中，节点如何分配和管理分片？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340990503997441",
+      "sourceId": "1827340990503997441",
+      "viewNum": 409,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 与 Solr 有哪些区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Solr"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340991179280385",
+      "sourceId": "1827340991179280385",
+      "viewNum": 368,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是正向索引？Elasticsearch 的倒排索引和正向索引有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340991804231682",
+      "sourceId": "1827340991804231682",
+      "viewNum": 699,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 的数据模型有哪些核心概念？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340992592760834",
+      "sourceId": "1827340992592760834",
+      "viewNum": 476,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 如何确保数据的一致性和可靠性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340993519702017",
+      "sourceId": "1827340993519702017",
+      "viewNum": 715,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 的中文分词机制是如何实现的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340994232733698",
+      "sourceId": "1827340994232733698",
+      "viewNum": 639,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "ElasticSearch 有哪些分片策略？如何设定分片数量和副本数量？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340994987708418",
+      "sourceId": "1827340994987708418",
+      "viewNum": 566,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 和关系型数据库有哪些区别？比如数据存储和查询等方面",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340995566522370",
+      "sourceId": "1827340995566522370",
+      "viewNum": 373,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 的 Mapping 映射？如何定义映射？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340996262776833",
+      "sourceId": "1827340996262776833",
+      "viewNum": 435,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 的 Analyzer 分析器？如何定义分析器？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340996959031298",
+      "sourceId": "1827340996959031298",
+      "viewNum": 360,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 中的相关性得分？有哪些影响因素？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340997500096514",
+      "sourceId": "1827340997500096514",
+      "viewNum": 342,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 Token Filter 是如何工作的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340998175379458",
+      "sourceId": "1827340998175379458",
+      "viewNum": 311,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 提供了哪些内置的分析器？每个分析器的特点是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340998833885186",
+      "sourceId": "1827340998833885186",
+      "viewNum": 349,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中，文档的设计原则和最佳实践是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827340999484002306",
+      "sourceId": "1827340999484002306",
+      "viewNum": 337,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 的 Term、Match 和 Keyword 检索类型有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341000150896641",
+      "sourceId": "1827341000150896641",
+      "viewNum": 449,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是字典树？Elasticsearch 是如何利用字典树的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341000872316929",
+      "sourceId": "1827341000872316929",
+      "viewNum": 450,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 中的倒排索引？它有什么作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341001606320130",
+      "sourceId": "1827341001606320130",
+      "viewNum": 975,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何让 Elasticsearch 和数据库（比如 MySQL）的数据保持同步？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        39,
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341002285797377",
+      "sourceId": "1827341002285797377",
+      "viewNum": 1272,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中 Term Dictionary 词典是如何实现和管理的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341003023994882",
+      "sourceId": "1827341003023994882",
+      "viewNum": 331,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何利用 Elasticsearch 实现高性能的电商搜索系统？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341003648946177",
+      "sourceId": "1827341003648946177",
+      "viewNum": 605,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 分析器的组成部分有哪些？作用分别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341004349394946",
+      "sourceId": "1827341004349394946",
+      "viewNum": 354,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何优化 Elasticsearch 索引阶段的性能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341005054038017",
+      "sourceId": "1827341005054038017",
+      "viewNum": 398,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中分词功能的实现原理是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341005779652610",
+      "sourceId": "1827341005779652610",
+      "viewNum": 609,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何优化 Elasticsearch 的查询性能以减少查询延迟？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341006509461505",
+      "sourceId": "1827341006509461505",
+      "viewNum": 383,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 NRT 近实时搜索？其在 Elasticsearch 中的应用场景是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341007197327361",
+      "sourceId": "1827341007197327361",
+      "viewNum": 481,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何优化和提升 Elasticsearch 的近实时搜索性能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341007885193218",
+      "sourceId": "1827341007885193218",
+      "viewNum": 359,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 的索引设计阶段进行调优？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341008602419202",
+      "sourceId": "1827341008602419202",
+      "viewNum": 359,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的分析器具体是如何工作的？如何处理和解析数据？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341009378365441",
+      "sourceId": "1827341009378365441",
+      "viewNum": 362,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 的倒排索引与 MySQL 的正排索引有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341010154311682",
+      "sourceId": "1827341010154311682",
+      "viewNum": 607,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 如何根据词汇找到对应的倒排索引？经历哪些步骤？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341010829594626",
+      "sourceId": "1827341010829594626",
+      "viewNum": 372,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中倒排索引的结构具体是怎样的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341011542626305",
+      "sourceId": "1827341011542626305",
+      "viewNum": 676,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中 Ingest 节点有什么作用？其工作原理是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341012226297857",
+      "sourceId": "1827341012226297857",
+      "viewNum": 246,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何通过 Spring Data Elasticsearch 实现复杂的查询操作？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "Elasticsearch客户端"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341012905775105",
+      "sourceId": "1827341012905775105",
+      "viewNum": 318,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Spring Boot 项目中集成 Elasticsearch 并实现搜索功能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "Elasticsearch客户端"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341013509754882",
+      "sourceId": "1827341013509754882",
+      "viewNum": 456,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 在分布式环境下的数据分布是如何实现的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341014155677697",
+      "sourceId": "1827341014155677697",
+      "viewNum": 400,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 Nested 类型字段如何使用，有哪些适用场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch配置",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341014881292289",
+      "sourceId": "1827341014881292289",
+      "viewNum": 263,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中进行权限管理和认证？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch安全",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341015590129666",
+      "sourceId": "1827341015590129666",
+      "viewNum": 290,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的查询缓存和结果缓存是如何工作的？如何优化缓存？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341016231858178",
+      "sourceId": "1827341016231858178",
+      "viewNum": 333,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何利用 Elasticsearch 实现实时日志分析系统？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "实时日志分析"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341016835837953",
+      "sourceId": "1827341016835837953",
+      "viewNum": 444,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 Pipeline Aggregation 如何使用？有哪些典型应用场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341017519509505",
+      "sourceId": "1827341017519509505",
+      "viewNum": 234,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中实现数据的自动化清理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341018173820930",
+      "sourceId": "1827341018173820930",
+      "viewNum": 281,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何通过 Elasticsearch 实现推荐系统？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "系统设计",
+        "场景题"
+      ],
+      "tagIds": [
+        39,
+        36
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341018853298177",
+      "sourceId": "1827341018853298177",
+      "viewNum": 640,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 Shard Allocation Awareness 是如何工作的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341019641827330",
+      "sourceId": "1827341019641827330",
+      "viewNum": 264,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中实现 Auto-scaling 自动分片缩放？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341020291944450",
+      "sourceId": "1827341020291944450",
+      "viewNum": 238,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 如何处理大量数据的删除操作？如何防止性能下降？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341020963033090",
+      "sourceId": "1827341020963033090",
+      "viewNum": 357,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何通过 Elasticsearch 的 Watcher 来实现基于条件触发的报警系统？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341021751562242",
+      "sourceId": "1827341021751562242",
+      "viewNum": 221,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何通过 Elasticsearch 的 Snapshot 功能进行数据备份和恢复？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch配置",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341022414262273",
+      "sourceId": "1827341022414262273",
+      "viewNum": 234,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中处理多租户场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch配置",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341023144071169",
+      "sourceId": "1827341023144071169",
+      "viewNum": 370,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 Reindex API 是如何工作的？有哪些应用场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "Elasticsearch API"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341023815159810",
+      "sourceId": "1827341023815159810",
+      "viewNum": 220,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何利用 Elasticsearch 实现自动补全功能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341024494637057",
+      "sourceId": "1827341024494637057",
+      "viewNum": 558,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Elasticsearch 的 Scripted Fields 实现动态字段计算？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341025148948482",
+      "sourceId": "1827341025148948482",
+      "viewNum": 182,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何通过 Elasticsearch 实现复杂的时间序列数据处理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341025849397249",
+      "sourceId": "1827341025849397249",
+      "viewNum": 242,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何实现 Elasticsearch 中的数据迁移与升级？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341026541457409",
+      "sourceId": "1827341026541457409",
+      "viewNum": 318,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何利用 Elasticsearch 实现基于相似度的文档搜索？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341027300626434",
+      "sourceId": "1827341027300626434",
+      "viewNum": 300,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 ILM 管理 Elasticsearch 索引的生命周期？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch配置",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341027938160642",
+      "sourceId": "1827341027938160642",
+      "viewNum": 228,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Elasticsearch 的 EQL 进行事件查询？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341028709912577",
+      "sourceId": "1827341028709912577",
+      "viewNum": 248,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 Frozen Index 是什么？怎么使用它？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341029347446785",
+      "sourceId": "1827341029347446785",
+      "viewNum": 227,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中处理和存储结构化与非结构化数据？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341030056284162",
+      "sourceId": "1827341030056284162",
+      "viewNum": 245,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Elasticsearch 实现分布式锁？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341030777704450",
+      "sourceId": "1827341030777704450",
+      "viewNum": 667,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何通过 Elasticsearch 实现复杂的查询过滤条件？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341031469764610",
+      "sourceId": "1827341031469764610",
+      "viewNum": 356,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 Pipeline Aggregation 如何优化和调优？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341032170213377",
+      "sourceId": "1827341032170213377",
+      "viewNum": 221,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何利用 Elasticsearch 实现日志的关联查询？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341032845496322",
+      "sourceId": "1827341032845496322",
+      "viewNum": 373,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中处理大规模数据的去重操作？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341033550139393",
+      "sourceId": "1827341033550139393",
+      "viewNum": 336,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何通过 Elasticsearch 实现图数据的存储与查询？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "图数据库"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341034300919809",
+      "sourceId": "1827341034300919809",
+      "viewNum": 262,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中实现全文检索与结构化数据查询的结合？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341034980397058",
+      "sourceId": "1827341034980397058",
+      "viewNum": 309,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何利用 Elasticsearch 实现数据的逐步滚动更新？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341035840229377",
+      "sourceId": "1827341035840229377",
+      "viewNum": 335,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 Search Guard 和 X-Pack Security 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch安全",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341036507123713",
+      "sourceId": "1827341036507123713",
+      "viewNum": 218,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Elasticsearch 实现多语言支持的全文搜索？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341037157240833",
+      "sourceId": "1827341037157240833",
+      "viewNum": 264,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 的深分页问题？它有什么影响？又该如何解决？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341037887049729",
+      "sourceId": "1827341037887049729",
+      "viewNum": 1453,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 中的 River？为什么现在不推荐使用 River？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341038725910529",
+      "sourceId": "1827341038725910529",
+      "viewNum": 333,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在使用 Elasticsearch 的 Bulk API 进行大规模数据导入时，如何优化性能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341039342473217",
+      "sourceId": "1827341039342473217",
+      "viewNum": 346,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 的 Bulk API 中常见的错误处理机制是什么？如何处理部分失败的请求？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "Elasticsearch API"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341040059699201",
+      "sourceId": "1827341040059699201",
+      "viewNum": 263,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 的评分算法是如何工作的？它基于哪些因素计算相关性得分？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341040844034049",
+      "sourceId": "1827341040844034049",
+      "viewNum": 297,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 中的 BM25 算法？与传统的 TF-IDF 算法相比，它有哪些改进？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341041645146114",
+      "sourceId": "1827341041645146114",
+      "viewNum": 367,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的评分公式是什么？请解释公式各部分的含义",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341042295263234",
+      "sourceId": "1827341042295263234",
+      "viewNum": 283,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 查询中自定义评分规则？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341043012489217",
+      "sourceId": "1827341043012489217",
+      "viewNum": 272,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中结合多字段的相关性得分？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341043700355073",
+      "sourceId": "1827341043700355073",
+      "viewNum": 291,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在实际项目中，如何优化 Elasticsearch 的评分算法以提高搜索结果的准确性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341044438552578",
+      "sourceId": "1827341044438552578",
+      "viewNum": 405,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 的 dis_max 查询？它如何影响文档的评分？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询",
+        "Elasticsearch评分"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341045155778561",
+      "sourceId": "1827341045155778561",
+      "viewNum": 269,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中通过脚本来调整评分逻辑？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch脚本",
+        "Elasticsearch评分"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341045940113409",
+      "sourceId": "1827341045940113409",
+      "viewNum": 257,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用 Elasticsearch 进行全文检索时，如何确保热门文档不会因为高 term frequency 而获得过高的相关性得分？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341046674116610",
+      "sourceId": "1827341046674116610",
+      "viewNum": 487,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中使用 decay function 来对评分进行时间衰减处理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341047617835010",
+      "sourceId": "1827341047617835010",
+      "viewNum": 285,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 script_score 查询如何工作？在什么情况下会使用到它？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch脚本",
+        "Elasticsearch评分"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341048402169857",
+      "sourceId": "1827341048402169857",
+      "viewNum": 268,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Elasticsearch 的 rescore API 来重新排序已经返回的搜索结果？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch API",
+        "Elasticsearch评分"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341049211670530",
+      "sourceId": "1827341049211670530",
+      "viewNum": 244,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 tie_breaker 参数在相关性评分中起什么作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341050205720577",
+      "sourceId": "1827341050205720577",
+      "viewNum": 234,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 coord 和 queryNorm 参数在评分中的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341051094913025",
+      "sourceId": "1827341051094913025",
+      "viewNum": 268,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何处理 Elasticsearch 中评分结果的偏差问题？例如文档过多导致评分失真",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341051925385217",
+      "sourceId": "1827341051925385217",
+      "viewNum": 498,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Elasticsearch 中，如何通过 field_value_factor 调整评分？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341052642611201",
+      "sourceId": "1827341052642611201",
+      "viewNum": 320,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 的 bool 查询如何组合多个查询条件来影响评分？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询",
+        "Elasticsearch评分"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341053376614402",
+      "sourceId": "1827341053376614402",
+      "viewNum": 437,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何优化 Elasticsearch 的评分算法以避免因高频词语导致的评分偏差？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341054240641026",
+      "sourceId": "1827341054240641026",
+      "viewNum": 327,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中结合地理位置相关的评分？比如基于距离的评分",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch查询",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341055100473346",
+      "sourceId": "1827341055100473346",
+      "viewNum": 321,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何利用 Elasticsearch 中 BM25 算法的关键因素（比如 TF、IDF、Field Norm）优化文档的评分？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch评分",
+        "Elasticsearch查询"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341055897391105",
+      "sourceId": "1827341055897391105",
+      "viewNum": 402,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 的 RestHighLevelClient 与 RestClient 有什么区别？如何选择使用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch客户端"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341056484593665",
+      "sourceId": "1827341056484593665",
+      "viewNum": 531,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用 Elasticsearch 的客户端时，如何实现连接池配置和优化？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch客户端",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341057252151298",
+      "sourceId": "1827341057252151298",
+      "viewNum": 520,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何通过 Spring Data Elasticsearch 简化与 Elasticsearch 的集成？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch客户端"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341057801605122",
+      "sourceId": "1827341057801605122",
+      "viewNum": 456,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在使用 Elasticsearch 客户端时，如何处理网络连接的错误和异常？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch客户端",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341058560774146",
+      "sourceId": "1827341058560774146",
+      "viewNum": 373,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 底层如何执行文档的更新和删除操作？详细流程是什么？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341059227668481",
+      "sourceId": "1827341059227668481",
+      "viewNum": 702,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 集群如何实现 Master 主节点的选举？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341060129443841",
+      "sourceId": "1827341060129443841",
+      "viewNum": 646,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何优化 Elasticsearch 的 GC 来提升整体性能？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341060884418561",
+      "sourceId": "1827341060884418561",
+      "viewNum": 714,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何优化 Elasticsearch 的写入性能以应对大数据量？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341061568090114",
+      "sourceId": "1827341061568090114",
+      "viewNum": 768,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 集群什么情况下会出现脑裂？如何解决脑裂？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341062344036354",
+      "sourceId": "1827341062344036354",
+      "viewNum": 853,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何对 Elasticsearch 的 JVM 进行调优以提升性能？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "JVM"
+      ],
+      "tagIds": [
+        39,
+        4
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341063266783234",
+      "sourceId": "1827341063266783234",
+      "viewNum": 859,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 底层是如何实现数据存储的？比如数据的存储流程和管理机制",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341064009175042",
+      "sourceId": "1827341064009175042",
+      "viewNum": 790,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何解决 Elasticsearch 集群中的双 Master 问题？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341064751566850",
+      "sourceId": "1827341064751566850",
+      "viewNum": 812,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 集群架构有哪些调优策略？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341065468792834",
+      "sourceId": "1827341065468792834",
+      "viewNum": 844,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Lucene 中实现倒排索引？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Lucene",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341066206990338",
+      "sourceId": "1827341066206990338",
+      "viewNum": 1251,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Elasticsearch 的 Posting List 倒排列表？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341066890661890",
+      "sourceId": "1827341066890661890",
+      "viewNum": 728,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何利用 Elasticsearch 实现大数据量（上亿量级）的聚合查询？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341067679191042",
+      "sourceId": "1827341067679191042",
+      "viewNum": 1292,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是倒排表的 FOR 和 RBM 压缩算法？工作原理分别是什么？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理",
+        "Elasticsearch优化"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341068631298050",
+      "sourceId": "1827341068631298050",
+      "viewNum": 891,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在确保数据一致性的前提下更新 Elasticsearch 的倒排索引？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch集群"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341069424021506",
+      "sourceId": "1827341069424021506",
+      "viewNum": 1070,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 FST？在 Elasticsearch 中有哪些应用场景？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch原理",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341070158024705",
+      "sourceId": "1827341070158024705",
+      "viewNum": 1813,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Elasticsearch 中的 Fielddata 是什么？如何优化其性能？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch原理"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341071017857025",
+      "sourceId": "1827341071017857025",
+      "viewNum": 1130,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何实现 Elasticsearch 集群的滚动升级？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341071806386177",
+      "sourceId": "1827341071806386177",
+      "viewNum": 1035,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Elasticsearch 实现机器学习模型的推理？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch应用",
+        "机器学习"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341072540389378",
+      "sourceId": "1827341072540389378",
+      "viewNum": 931,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何通过 Elasticsearch 实现分布式事务？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch集群",
+        "Elasticsearch应用"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341073278586881",
+      "sourceId": "1827341073278586881",
+      "viewNum": 3434,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Elasticsearch 中设计和实现数据的多层次缓存机制？",
+      "difficulty": "HARD",
+      "tags": [
+        "Elasticsearch",
+        "Elasticsearch优化",
+        "Elasticsearch配置"
+      ],
+      "tagIds": [
+        39
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1827341074012590081",
+      "sourceId": "1827341074012590081",
+      "viewNum": 4950,
+      "needVip": false,
+      "hasAnswer": false
+    }
+  ]
+}

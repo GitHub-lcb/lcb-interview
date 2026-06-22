@@ -1,5 +1,11 @@
 import axios from 'axios'
-import { message } from 'antd'
+import { emitFeedbackError } from '../utils/feedbackMessage'
+
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    silentGlobalError?: boolean
+  }
+}
 
 const api = axios.create({
   baseURL: '/api',
@@ -17,13 +23,17 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   (res) => {
     if (res.data.code !== 200) {
-      message.error(res.data.message || '请求失败')
+      if (!res.config.silentGlobalError) {
+        emitFeedbackError(res.data.message || '请求失败')
+      }
       return Promise.reject(new Error(res.data.message))
     }
     return res
   },
   (err) => {
-    message.error('网络错误，请稍后重试')
+    if (!err.config?.silentGlobalError) {
+      emitFeedbackError('网络错误，请稍后重试')
+    }
     return Promise.reject(err)
   }
 )

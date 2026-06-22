@@ -13,7 +13,11 @@ target/
 node_modules/
 dist/
 *.tsbuildinfo
-
+r
 # Env
 .env
 .env.local
+
+# Generated
+.superpowers/
+backend/app.log

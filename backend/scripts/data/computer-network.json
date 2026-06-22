@@ -1,0 +1,2280 @@
+{
+  "categoryId": 13,
+  "categoryName": "计算机网络",
+  "bankIds": [
+    "1790948499480616961",
+    "1812069526632792065",
+    "1812069585160110082",
+    "1812069636204789761",
+    "1812070025851437058",
+    "1811358473925091330"
+  ],
+  "totalQuestions": 161,
+  "questions": [
+    {
+      "title": "HTTP 1.0 和 2.0 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295710695425",
+      "sourceId": "1780933295710695425",
+      "viewNum": 26786,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "HTTP 2.0 和 3.0 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295710695426",
+      "sourceId": "1780933295710695426",
+      "viewNum": 21616,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "常见的 HTTP 状态码有哪些？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1828371336037654530",
+      "sourceId": "1828371336037654530",
+      "viewNum": 16701,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "HTTP 请求包含哪些内容，请求头和请求体有哪些类型？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1828679423048978433",
+      "sourceId": "1828679423048978433",
+      "viewNum": 13339,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "HTTP 和 HTTPS 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295714889729",
+      "sourceId": "1780933295714889729",
+      "viewNum": 20790,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "HTTP 中 GET 和 POST 的区别是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "Web"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1853639415351156737",
+      "sourceId": "1853639415351156737",
+      "viewNum": 11136,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "WebSocket 与 HTTP 有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1861283789963190273",
+      "sourceId": "1861283789963190273",
+      "viewNum": 8021,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "服务端是如何解析 HTTP 请求的数据？（考察 HTTP 请求格式的了解程度）",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1861300406956777474",
+      "sourceId": "1861300406956777474",
+      "viewNum": 6124,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "到底什么是 TCP 连接？",
+      "difficulty": "EASY",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295706501122",
+      "sourceId": "1780933295706501122",
+      "viewNum": 19802,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "TCP 是用来解决什么问题？",
+      "difficulty": "EASY",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295719084033",
+      "sourceId": "1780933295719084033",
+      "viewNum": 15750,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "一台服务器，最多能建立多少 TCP 连接？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1980188286236348417",
+      "sourceId": "1980188286236348417",
+      "viewNum": 2265,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "TCP 和 UDP 有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295719084034",
+      "sourceId": "1780933295719084034",
+      "viewNum": 17210,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么要 TCP，IP 层实现控制不行么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295723278337",
+      "sourceId": "1780933295723278337",
+      "viewNum": 7184,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "TCP 的粘包和拆包能说说吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295727472641",
+      "sourceId": "1780933295727472641",
+      "viewNum": 14541,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "说说 TCP 的三次握手？",
+      "difficulty": "EASY",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295731666945",
+      "sourceId": "1780933295731666945",
+      "viewNum": 22319,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "TCP 初始序列号 ISN 怎么取值的？",
+      "difficulty": "HARD",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295731666946",
+      "sourceId": "1780933295731666946",
+      "viewNum": 6278,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "TCP 三次握手时，发送 SYN 之后就宕机了会怎么样？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295735861250",
+      "sourceId": "1780933295735861250",
+      "viewNum": 6874,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 SYN Flood 攻击？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295740055553",
+      "sourceId": "1780933295740055553",
+      "viewNum": 5701,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "TCP 协议是如何保证可靠传输的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络协议",
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1913501273419739137",
+      "sourceId": "1913501273419739137",
+      "viewNum": 3458,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "说说 TCP 的四次挥手？",
+      "difficulty": "EASY",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295740055554",
+      "sourceId": "1780933295740055554",
+      "viewNum": 17864,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 TCP 挥手需要有 TIME_WAIT 状态?",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295748444163",
+      "sourceId": "1780933295748444163",
+      "viewNum": 12280,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "除了四次挥手，还有什么方法断开连接？",
+      "difficulty": "HARD",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1828727071814619137",
+      "sourceId": "1828727071814619137",
+      "viewNum": 7387,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "TCP 超时重传机制是为了解决什么问题？",
+      "difficulty": "EASY",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295761027073",
+      "sourceId": "1780933295761027073",
+      "viewNum": 11234,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "TCP 中何时会出现 RST（reset）报文？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1853282734041370626",
+      "sourceId": "1853282734041370626",
+      "viewNum": 4155,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "TCP 有超时重传为什么还需要快速重传机制？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295761027074",
+      "sourceId": "1780933295761027074",
+      "viewNum": 4759,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "TCP 的 SACK 的引入是为了解决什么问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295773609986",
+      "sourceId": "1780933295773609986",
+      "viewNum": 4210,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "TCP 滑动窗口的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295777804290",
+      "sourceId": "1780933295777804290",
+      "viewNum": 11674,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "说说 TCP 拥塞控制的步骤？",
+      "difficulty": "EASY",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295781998594",
+      "sourceId": "1780933295781998594",
+      "viewNum": 7624,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "ARP 和 RARP 分别是什么？有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295790387201",
+      "sourceId": "1780933295790387201",
+      "viewNum": 5092,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "TCP/IP 四层模型是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295790387202",
+      "sourceId": "1780933295790387202",
+      "viewNum": 15481,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "OSI 七层模型是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295798775809",
+      "sourceId": "1780933295798775809",
+      "viewNum": 13198,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Cookie、Session、Token 之间有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295798775810",
+      "sourceId": "1780933295798775810",
+      "viewNum": 18503,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "JWT Token 能说说吗？",
+      "difficulty": "EASY",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295802970113",
+      "sourceId": "1780933295802970113",
+      "viewNum": 9370,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "简单谈谈你对 DNS 的理解？",
+      "difficulty": "EASY",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295802970114",
+      "sourceId": "1780933295802970114",
+      "viewNum": 8171,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "简单谈谈你对 CDN 的理解？",
+      "difficulty": "EASY",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295807164417",
+      "sourceId": "1780933295807164417",
+      "viewNum": 6758,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "从网络角度来看，用户从输入网址到网页显示，期间发生了什么？",
+      "difficulty": "HARD",
+      "tags": [
+        "网络"
+      ],
+      "tagIds": [
+        22
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1826556994582671361",
+      "sourceId": "1826556994582671361",
+      "viewNum": 15836,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "常见的登录鉴权方式有哪些？各自的优缺点是？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "前端",
+        "前端场景",
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1835157125712117762",
+      "sourceId": "1835157125712117762",
+      "viewNum": 8306,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Cisco 路由器上配置静态路由？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361505879322625",
+      "sourceId": "1811361505879322625",
+      "viewNum": 774,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在交换机上配置链路聚合？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361505967403010",
+      "sourceId": "1811361505967403010",
+      "viewNum": 544,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在防火墙上如何配置基本的访问控制列表（ACL）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361506068066305",
+      "sourceId": "1811361506068066305",
+      "viewNum": 429,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何配置并管理 DHCP 服务器？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361506164535298",
+      "sourceId": "1811361506164535298",
+      "viewNum": 544,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在路由器上进行端口转发设置？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361506273587201",
+      "sourceId": "1811361506273587201",
+      "viewNum": 334,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述在交换机上配置 Spanning Tree Protocol 的过程。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361506361667586",
+      "sourceId": "1811361506361667586",
+      "viewNum": 276,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在防火墙上设置 NAT 规则？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361506479108097",
+      "sourceId": "1811361506479108097",
+      "viewNum": 388,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 OSPF 的基本配置步骤及其常见用途。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361506575577089",
+      "sourceId": "1811361506575577089",
+      "viewNum": 410,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在交换机上进行 Trunk 端口的配置？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361506663657473",
+      "sourceId": "1811361506663657473",
+      "viewNum": 303,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在防火墙上配置 VPN 连接？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361506751737857",
+      "sourceId": "1811361506751737857",
+      "viewNum": 368,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Cisco 交换机上配置端口安全性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361506827235330",
+      "sourceId": "1811361506827235330",
+      "viewNum": 220,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在路由器上配置 OSPF 多区域？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361506927898626",
+      "sourceId": "1811361506927898626",
+      "viewNum": 295,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在防火墙上配置 NAT Overload？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361506999201794",
+      "sourceId": "1811361506999201794",
+      "viewNum": 176,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在路由器上配置 GRE 隧道？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361507083087873",
+      "sourceId": "1811361507083087873",
+      "viewNum": 213,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在交换机上配置端口镜像？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361507175362562",
+      "sourceId": "1811361507175362562",
+      "viewNum": 204,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在防火墙上配置 IPSec VPN？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361507267637250",
+      "sourceId": "1811361507267637250",
+      "viewNum": 249,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在路由器上配置动态 NAT？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361507359911937",
+      "sourceId": "1811361507359911937",
+      "viewNum": 219,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在交换机上配置 VLAN 间路由？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361507443798017",
+      "sourceId": "1811361507443798017",
+      "viewNum": 254,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在防火墙上配置 SSL VPN？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361507536072706",
+      "sourceId": "1811361507536072706",
+      "viewNum": 253,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在路由器上配置 EIGRP？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络配置"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361507611570177",
+      "sourceId": "1811361507611570177",
+      "viewNum": 175,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "描述什么是 BGP，并解释其在互联网中的作用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111535034369",
+      "sourceId": "1811361111535034369",
+      "viewNum": 1021,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在网络管理中，什么是 SNMP，并描述其工作原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111631503361",
+      "sourceId": "1811361111631503361",
+      "viewNum": 731,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在计算机网络中，描述 IPSec 协议的作用及其工作原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111832829954",
+      "sourceId": "1811361111832829954",
+      "viewNum": 553,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是网络地址转换（NAT），并描述其工作原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361112235483137",
+      "sourceId": "1811361112235483137",
+      "viewNum": 653,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 TCP/IP 协议的四层模型及其每一层的主要功能。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361502913949697",
+      "sourceId": "1811361502913949697",
+      "viewNum": 2357,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 ARP 协议的作用及其工作原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361504142880769",
+      "sourceId": "1811361504142880769",
+      "viewNum": 1109,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 NAT？它在网络中的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361504235155457",
+      "sourceId": "1811361504235155457",
+      "viewNum": 999,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 TCP 三次握手和四次挥手的过程。",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361504432287745",
+      "sourceId": "1811361504432287745",
+      "viewNum": 1980,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 ICMP 协议？它的主要作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361504625225730",
+      "sourceId": "1811361504625225730",
+      "viewNum": 895,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "路由协议与路由选择算法之间有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361504717500417",
+      "sourceId": "1811361504717500417",
+      "viewNum": 644,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "TCP 和 UDP 有哪些区别？各自的应用场景是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361504813969409",
+      "sourceId": "1811361504813969409",
+      "viewNum": 1678,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 ICMP 重定向的作用及其工作原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361505204039682",
+      "sourceId": "1811361505204039682",
+      "viewNum": 583,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 RIP 协议的工作原理及其特点。",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361505594109954",
+      "sourceId": "1811361505594109954",
+      "viewNum": 556,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 HTTP 和 HTTPS 之间的区别及工作原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361507691261954",
+      "sourceId": "1811361507691261954",
+      "viewNum": 1720,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "DNS 协议的作用是什么？请描述其解析过程。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361507783536642",
+      "sourceId": "1811361507783536642",
+      "viewNum": 766,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 BGP 协议的工作原理及其应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361507884199938",
+      "sourceId": "1811361507884199938",
+      "viewNum": 364,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 SMTP 和 IMAP 协议的区别及各自的应用场景。",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361507959697410",
+      "sourceId": "1811361507959697410",
+      "viewNum": 367,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 FTP 协议？它的主要用途是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361508056166401",
+      "sourceId": "1811361508056166401",
+      "viewNum": 490,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 SNMP 协议的基本工作机制及其应用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361508140052481",
+      "sourceId": "1811361508140052481",
+      "viewNum": 283,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 PPP 协议？请描述其基本工作流程。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361508215549954",
+      "sourceId": "1811361508215549954",
+      "viewNum": 348,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 DHCP 协议的工作原理及其应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361508295241729",
+      "sourceId": "1811361508295241729",
+      "viewNum": 400,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 Telnet 和 SSH 的区别及其应用场景。",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361508374933505",
+      "sourceId": "1811361508374933505",
+      "viewNum": 414,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 TLS/SSL 的工作原理及其在网络安全中的应用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361508488179714",
+      "sourceId": "1811361508488179714",
+      "viewNum": 462,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 HTTPS 中的 SSL/TLS 握手过程。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361508597231617",
+      "sourceId": "1811361508597231617",
+      "viewNum": 889,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 DHCP 中继代理的作用及配置方法。",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361508672729089",
+      "sourceId": "1811361508672729089",
+      "viewNum": 320,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 SIP 协议的基本工作原理及应用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361508752420866",
+      "sourceId": "1811361508752420866",
+      "viewNum": 245,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 TFTP 和 FTP 之间的区别及应用场景。",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361508840501250",
+      "sourceId": "1811361508840501250",
+      "viewNum": 301,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 LDAP 协议？请解释其主要用途。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361508936970241",
+      "sourceId": "1811361508936970241",
+      "viewNum": 257,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 IGMP 协议的作用及其工作机制。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361509025050626",
+      "sourceId": "1811361509025050626",
+      "viewNum": 235,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 MPLS 协议？请解释其基本原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361509113131010",
+      "sourceId": "1811361509113131010",
+      "viewNum": 237,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "HTTP2 有哪些新特性和优势？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361509192822786",
+      "sourceId": "1811361509192822786",
+      "viewNum": 422,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Radius 和 TACACS+ 的区别及应用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361509276708866",
+      "sourceId": "1811361509276708866",
+      "viewNum": 183,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 NTP 协议的工作原理及其重要性。",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361509360594946",
+      "sourceId": "1811361509360594946",
+      "viewNum": 242,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 IPv6 的基本特性及其优势。",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络协议"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361513613619202",
+      "sourceId": "1811361513613619202",
+      "viewNum": 428,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释什么是 ARP 欺骗攻击，并描述如何防范此类攻击。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361111446953986",
+      "sourceId": "1811361111446953986",
+      "viewNum": 1719,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释防火墙的基本原理及其主要功能。",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361509444481025",
+      "sourceId": "1811361509444481025",
+      "viewNum": 997,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 VPN？请解释其工作原理及应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361509519978497",
+      "sourceId": "1811361509519978497",
+      "viewNum": 974,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 DDoS 攻击的原理及防御措施。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361509599670273",
+      "sourceId": "1811361509599670273",
+      "viewNum": 987,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 IPS 和 IDS 之间的区别及其各自的作用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361509687750657",
+      "sourceId": "1811361509687750657",
+      "viewNum": 599,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是蜜罐技术？它在网络安全中的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361509792608257",
+      "sourceId": "1811361509792608257",
+      "viewNum": 658,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释常见的加密算法及其应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361509876494338",
+      "sourceId": "1811361509876494338",
+      "viewNum": 1327,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在企业网络中实施安全审计？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361509956186114",
+      "sourceId": "1811361509956186114",
+      "viewNum": 488,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是双因素认证？它有什么优点？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361510048460801",
+      "sourceId": "1811361510048460801",
+      "viewNum": 461,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述常见的网络攻击类型及其防御措施。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361510132346881",
+      "sourceId": "1811361510132346881",
+      "viewNum": 490,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是零信任安全模型？请解释其基本理念。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361510216232962",
+      "sourceId": "1811361510216232962",
+      "viewNum": 453,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是网络防火墙？它有哪些分类？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361510304313346",
+      "sourceId": "1811361510304313346",
+      "viewNum": 607,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 WAF 的工作原理及其应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361510392393730",
+      "sourceId": "1811361510392393730",
+      "viewNum": 500,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是安全信息和事件管理（SIEM）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361510509834241",
+      "sourceId": "1811361510509834241",
+      "viewNum": 322,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是社交工程攻击？以及有哪些防范措施？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361510593720322",
+      "sourceId": "1811361510593720322",
+      "viewNum": 344,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何实施网络入侵检测系统（NIDS）？",
+      "difficulty": "HARD",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361510673412098",
+      "sourceId": "1811361510673412098",
+      "viewNum": 530,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释数据泄露的主要原因及防护措施。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361510753103874",
+      "sourceId": "1811361510753103874",
+      "viewNum": 343,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何进行网络安全风险评估？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361510836989953",
+      "sourceId": "1811361510836989953",
+      "viewNum": 396,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 BYOD 策略？请解释其安全风险及对策。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361510908293122",
+      "sourceId": "1811361510908293122",
+      "viewNum": 305,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是勒索软件？有哪些防护方法？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361510992179201",
+      "sourceId": "1811361510992179201",
+      "viewNum": 392,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述网络安全事件响应的基本步骤。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络安全"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361511071870977",
+      "sourceId": "1811361511071870977",
+      "viewNum": 545,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在网络故障排查中，如何使用 ping 和 traceroute 命令？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "运维",
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [
+        72
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361110721339393",
+      "sourceId": "1811361110721339393",
+      "viewNum": 1452,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何进行网络连通性测试？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361511155757057",
+      "sourceId": "1811361511155757057",
+      "viewNum": 747,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "当用户无法访问某网站时，如何逐步排查问题？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361511239643138",
+      "sourceId": "1811361511239643138",
+      "viewNum": 848,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Wireshark 进行网络数据包分析？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361511323529218",
+      "sourceId": "1811361511323529218",
+      "viewNum": 603,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何排查和解决网络带宽瓶颈问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361511419998210",
+      "sourceId": "1811361511419998210",
+      "viewNum": 453,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "当出现网络延迟时，如何进行排查和优化？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361511503884290",
+      "sourceId": "1811361511503884290",
+      "viewNum": 459,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何通过日志分析来排查网络故障？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361511587770369",
+      "sourceId": "1811361511587770369",
+      "viewNum": 474,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何排查和解决网络中出现的 IP 地址冲突问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361511667462145",
+      "sourceId": "1811361511667462145",
+      "viewNum": 391,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "当路由器无法正常工作时，如何进行排查？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361511755542529",
+      "sourceId": "1811361511755542529",
+      "viewNum": 351,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何处理交换机端口故障？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361511839428610",
+      "sourceId": "1811361511839428610",
+      "viewNum": 342,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何进行无线网络故障排查？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361511931703298",
+      "sourceId": "1811361511931703298",
+      "viewNum": 278,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Traceroute 进行网络故障排查？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361512011395073",
+      "sourceId": "1811361512011395073",
+      "viewNum": 348,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "当无线网络信号弱时，如何进行故障排查？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361512103669761",
+      "sourceId": "1811361512103669761",
+      "viewNum": 292,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "当某台主机无法访问互联网时，如何进行故障排查？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361512183361538",
+      "sourceId": "1811361512183361538",
+      "viewNum": 349,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Netstat 工具进行网络故障排查？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361512271441921",
+      "sourceId": "1811361512271441921",
+      "viewNum": 389,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何排查和解决网络中断问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361512359522305",
+      "sourceId": "1811361512359522305",
+      "viewNum": 320,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "当某个网络设备无法正常工作时，如何排查故障？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361512435019778",
+      "sourceId": "1811361512435019778",
+      "viewNum": 293,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何通过网络流量监控来排查故障？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361512518905857",
+      "sourceId": "1811361512518905857",
+      "viewNum": 282,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "当出现 DNS 解析问题时，如何进行故障排查？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络",
+        "网络故障排查"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361512615374849",
+      "sourceId": "1811361512615374849",
+      "viewNum": 465,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是子网掩码？如何通过子网掩码划分子网？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361503966720002",
+      "sourceId": "1811361503966720002",
+      "viewNum": 1330,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "OSI 模型中，每一层的主要功能是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361504046411777",
+      "sourceId": "1811361504046411777",
+      "viewNum": 903,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 VLAN？如何在交换机上配置 VLAN？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361504352595969",
+      "sourceId": "1811361504352595969",
+      "viewNum": 734,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 MTU 的概念及其在网络传输中的重要性。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361504520368129",
+      "sourceId": "1811361504520368129",
+      "viewNum": 541,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 IP 地址？IP 地址有哪些分类？",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361504902049793",
+      "sourceId": "1811361504902049793",
+      "viewNum": 702,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是网络掩码？它的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361504994324482",
+      "sourceId": "1811361504994324482",
+      "viewNum": 475,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "广播域和碰撞域有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361505111764993",
+      "sourceId": "1811361505111764993",
+      "viewNum": 413,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是多播？请解释多播的基本原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361505346646017",
+      "sourceId": "1811361505346646017",
+      "viewNum": 360,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释网络拓扑结构的概念及常见类型。",
+      "difficulty": "EASY",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361505464086529",
+      "sourceId": "1811361505464086529",
+      "viewNum": 384,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 MAC 地址？它在网络中有什么作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361505686384642",
+      "sourceId": "1811361505686384642",
+      "viewNum": 483,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是粘性 MAC 地址及其应用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361505774465026",
+      "sourceId": "1811361505774465026",
+      "viewNum": 284,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释什么是 CDN 及其工作原理。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361512703455233",
+      "sourceId": "1811361512703455233",
+      "viewNum": 244,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述物联网（IoT）的基本概念及应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361512783147010",
+      "sourceId": "1811361512783147010",
+      "viewNum": 202,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 SDN？请解释其基本原理及优势。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361512871227394",
+      "sourceId": "1811361512871227394",
+      "viewNum": 161,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释云计算的基本概念及其在网络中的应用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361512946724865",
+      "sourceId": "1811361512946724865",
+      "viewNum": 154,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述边缘计算的概念及其优势。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361513022222337",
+      "sourceId": "1811361513022222337",
+      "viewNum": 94,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释网络虚拟化的概念及其应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361513110302722",
+      "sourceId": "1811361513110302722",
+      "viewNum": 86,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释大数据技术对网络工程的影响。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361513189994498",
+      "sourceId": "1811361513189994498",
+      "viewNum": 100,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述 5G 技术的基本特性及其应用前景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361513265491969",
+      "sourceId": "1811361513265491969",
+      "viewNum": 92,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是容器化技术？请解释其在网络中的应用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361513349378050",
+      "sourceId": "1811361513349378050",
+      "viewNum": 147,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释零信任架构在企业网络中的实施方法。",
+      "difficulty": "HARD",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361513450041346",
+      "sourceId": "1811361513450041346",
+      "viewNum": 135,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是网络中立性？请解释其重要性。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361513538121729",
+      "sourceId": "1811361513538121729",
+      "viewNum": 84,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释虚拟专用网络（VPN）的不同类型。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361513697505282",
+      "sourceId": "1811361513697505282",
+      "viewNum": 128,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述边缘计算和云计算的区别及应用场景。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361513768808450",
+      "sourceId": "1811361513768808450",
+      "viewNum": 163,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是大数据分析？请解释其在网络中的应用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361513869471745",
+      "sourceId": "1811361513869471745",
+      "viewNum": 165,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释什么是网络功能虚拟化（NFV）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361513957552130",
+      "sourceId": "1811361513957552130",
+      "viewNum": 124,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请描述智能网络管理的概念及其优势。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361514058215425",
+      "sourceId": "1811361514058215425",
+      "viewNum": 88,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是网络带宽管理？请解释其重要性。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361514171461634",
+      "sourceId": "1811361514171461634",
+      "viewNum": 99,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释软件定义广域网（SD-WAN）的概念及优势。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361514242764801",
+      "sourceId": "1811361514242764801",
+      "viewNum": 151,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是区块链技术？请解释其在网络中的应用。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1811361514322456577",
+      "sourceId": "1811361514322456577",
+      "viewNum": 246,
+      "needVip": false,
+      "hasAnswer": false
+    }
+  ]
+}

@@ -14,5 +14,6 @@ public record GenerationTaskVO(
         int failCount,
         String message,
         List<String> errors,
-        List<Long> generatedIds
+        List<Long> generatedIds,
+        String thinking   // AI 思考过程（reasoning_content），实时累加
 ) {}

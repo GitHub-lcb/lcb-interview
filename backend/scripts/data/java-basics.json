@@ -1,0 +1,3814 @@
+{
+  "categoryId": 1,
+  "categoryName": "Java 基础",
+  "bankIds": [
+    "1787463103423897602",
+    "1983888023644901377",
+    "1776477775448772610",
+    "1828639330652094465"
+  ],
+  "totalQuestions": 237,
+  "questions": [
+    {
+      "title": "Java 中的序列化和反序列化是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294448209922",
+      "sourceId": "1780933294448209922",
+      "viewNum": 75865,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 Exception 和 Error 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294469181442",
+      "sourceId": "1780933294469181442",
+      "viewNum": 48304,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的多态特性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294406266881",
+      "sourceId": "1780933294406266881",
+      "viewNum": 52935,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你认为 Java 的优势是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294381101057",
+      "sourceId": "1780933294381101057",
+      "viewNum": 68364,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的参数传递是按值还是按引用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294414655490",
+      "sourceId": "1780933294414655490",
+      "viewNum": 43344,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Java 不支持多重继承？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294435627010",
+      "sourceId": "1780933294435627010",
+      "viewNum": 41316,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 面向对象编程与面向过程编程的区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294477570050",
+      "sourceId": "1780933294477570050",
+      "viewNum": 34227,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 方法重载和方法重写之间的区别是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294490152961",
+      "sourceId": "1780933294490152961",
+      "viewNum": 33697,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 内部类？它有什么作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294498541569",
+      "sourceId": "1780933294498541569",
+      "viewNum": 32941,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java8 有哪些新特性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294502735873",
+      "sourceId": "1780933294502735873",
+      "viewNum": 33651,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java25 有哪些新特性？ ",
+      "difficulty": "EASY",
+      "tags": [
+        "Java基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1968958432691322881",
+      "sourceId": "1968958432691322881",
+      "viewNum": 6743,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java11 有哪些新特性？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1968962884961796098",
+      "sourceId": "1968962884961796098",
+      "viewNum": 5675,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java17 有哪些新特性？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1968965327011520514",
+      "sourceId": "1968965327011520514",
+      "viewNum": 5970,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java21 有哪些新特性？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1968967024358268929",
+      "sourceId": "1968967024358268929",
+      "viewNum": 5780,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 String、StringBuffer 和 StringBuilder 的区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294519513089",
+      "sourceId": "1780933294519513089",
+      "viewNum": 33734,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 的 StringBuilder 是怎么实现的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294532096002",
+      "sourceId": "1780933294532096002",
+      "viewNum": 28982,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中包装类型和基本类型的区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294544678914",
+      "sourceId": "1780933294544678914",
+      "viewNum": 27547,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "接口和抽象类有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294427238401",
+      "sourceId": "1780933294427238401",
+      "viewNum": 37402,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "JDK 和 JRE 有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294557261825",
+      "sourceId": "1780933294557261825",
+      "viewNum": 27593,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你使用过哪些 JDK 提供的工具？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294561456129",
+      "sourceId": "1780933294561456129",
+      "viewNum": 26720,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 hashCode 和 equals 方法是什么？它们与 == 操作符有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772568783219695618",
+      "sourceId": "1772568783219695618",
+      "viewNum": 30029,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 hashCode 和 equals 方法之间有什么关系？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294574039042",
+      "sourceId": "1780933294574039042",
+      "viewNum": 28414,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的动态代理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294590816257",
+      "sourceId": "1780933294590816257",
+      "viewNum": 27623,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "JDK 动态代理和 CGLIB 动态代理有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294599204866",
+      "sourceId": "1780933294599204866",
+      "viewNum": 27458,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的注解原理是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294607593473",
+      "sourceId": "1780933294607593473",
+      "viewNum": 26144,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你使用过 Java 的反射机制吗？如何应用反射？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294611787778",
+      "sourceId": "1780933294611787778",
+      "viewNum": 27473,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的不可变类？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294456598529",
+      "sourceId": "1780933294456598529",
+      "viewNum": 43306,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 SPI（Service Provider Interface）机制？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294620176386",
+      "sourceId": "1780933294620176386",
+      "viewNum": 22844,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 泛型的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294628564993",
+      "sourceId": "1780933294628564993",
+      "viewNum": 24009,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 泛型擦除是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Java",
+        "Java 基础"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1833434214495657985",
+      "sourceId": "1833434214495657985",
+      "viewNum": 17879,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 泛型的上下界限定符？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294636953601",
+      "sourceId": "1780933294636953601",
+      "viewNum": 18848,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的深拷贝和浅拷贝有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294641147906",
+      "sourceId": "1780933294641147906",
+      "viewNum": 22599,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 Integer 缓存池？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294657925121",
+      "sourceId": "1780933294657925121",
+      "viewNum": 20620,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 的类加载过程是怎样的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294662119426",
+      "sourceId": "1780933294662119426",
+      "viewNum": 24973,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 BigDecimal？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294674702337",
+      "sourceId": "1780933294674702337",
+      "viewNum": 19815,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "BigDecimal 为什么能保证精度不丢失?\n",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java",
+        "Java 基础"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1861417708154970114",
+      "sourceId": "1861417708154970114",
+      "viewNum": 12386,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用 new String(\"yupi\") 语句在 Java 中会创建多少个对象？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294678896641",
+      "sourceId": "1780933294678896641",
+      "viewNum": 20953,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 final、finally 和 finalize 各有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294687285250",
+      "sourceId": "1780933294687285250",
+      "viewNum": 19868,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么在 Java 中编写代码时会遇到乱码问题？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294691479554",
+      "sourceId": "1780933294691479554",
+      "viewNum": 17672,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 JDK 9 中将 String 的 char 数组改为 byte 数组？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294511124482",
+      "sourceId": "1780933294511124482",
+      "viewNum": 17477,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Java 中调用外部可执行程序或系统命令？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1798608674087317506",
+      "sourceId": "1798608674087317506",
+      "viewNum": 16406,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如果一个线程在 Java 中被两次调用 start() 方法，会发生什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800331617560240129",
+      "sourceId": "1800331617560240129",
+      "viewNum": 19380,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "栈和队列在 Java 中的区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800343420860178433",
+      "sourceId": "1800343420860178433",
+      "viewNum": 18416,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 的 Optional 类是什么？它有什么用？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800345746421391361",
+      "sourceId": "1800345746421391361",
+      "viewNum": 19718,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 的 I/O 流是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800347227602100226",
+      "sourceId": "1800347227602100226",
+      "viewNum": 21812,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的网络编程？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800349212845875202",
+      "sourceId": "1800349212845875202",
+      "viewNum": 18383,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的基本数据类型有哪些？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800392994257707009",
+      "sourceId": "1800392994257707009",
+      "viewNum": 18748,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的自动装箱和拆箱？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800393156791181313",
+      "sourceId": "1800393156791181313",
+      "viewNum": 18297,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的迭代器（Iterator）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800708852364419073",
+      "sourceId": "1800708852364419073",
+      "viewNum": 17706,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 运行时异常和编译时异常之间的区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800708991904718849",
+      "sourceId": "1800708991904718849",
+      "viewNum": 16845,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的继承机制？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800783859023159298",
+      "sourceId": "1800783859023159298",
+      "viewNum": 18441,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的封装特性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800784210786852866",
+      "sourceId": "1800784210786852866",
+      "viewNum": 18020,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的访问修饰符有哪些？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800784356723466242",
+      "sourceId": "1800784356723466242",
+      "viewNum": 17090,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中静态方法和实例方法的区别是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800784527800737793",
+      "sourceId": "1800784527800737793",
+      "viewNum": 17447,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 for 循环与 foreach 循环的区别是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800716178584576002",
+      "sourceId": "1800716178584576002",
+      "viewNum": 20488,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的双亲委派模型？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java",
+        "Java 基础"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294670508033",
+      "sourceId": "1780933294670508033",
+      "viewNum": 26828,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 wait() 和 sleep()  的区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Java",
+        "Java 基础"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1828622076837330945",
+      "sourceId": "1828622076837330945",
+      "viewNum": 19396,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 和 Go 的区别",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Java",
+        "Java 基础",
+        "Go",
+        "Go基础"
+      ],
+      "tagIds": [
+        1,
+        51
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1828673006161068034",
+      "sourceId": "1828673006161068034",
+      "viewNum": 17154,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java Object 类中有什么方法，有什么作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Java",
+        "Java 基础"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1828674310883213313",
+      "sourceId": "1828674310883213313",
+      "viewNum": 15878,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的字节码是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Java 基础",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1828676252029325313",
+      "sourceId": "1828676252029325313",
+      "viewNum": 15791,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 BIO、NIO、AIO？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java",
+        "Java 基础"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1772880236942245889",
+      "sourceId": "1772880236942245889",
+      "viewNum": 18322,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Channel？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java",
+        "Java 基础"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295849107457",
+      "sourceId": "1780933295849107457",
+      "viewNum": 14356,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Selector？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java",
+        "Java 基础"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295853301762",
+      "sourceId": "1780933295853301762",
+      "viewNum": 13089,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Float 经过一系列的操作后(加减乘除)，如何判断是否和另一个数相等呢？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java",
+        "Java 基础"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1963426799499132929",
+      "sourceId": "1963426799499132929",
+      "viewNum": 4463,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "PO、VO、BO、DTO、DAO、POJO 有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Java",
+        "Java基础"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1983425518120226817",
+      "sourceId": "1983425518120226817",
+      "viewNum": 4494,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "说说 Java 中 HashMap 的原理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java",
+        "Java 基础"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1834107117591187457",
+      "sourceId": "1834107117591187457",
+      "viewNum": 73846,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "使用 HashMap 时，有哪些提升性能的技巧？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Java 集合"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1821510409319555074",
+      "sourceId": "1821510409319555074",
+      "viewNum": 20693,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Hash 碰撞？怎么解决哈希碰撞？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Java 集合"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1821481519536611330",
+      "sourceId": "1821481519536611330",
+      "viewNum": 21554,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 的 CopyOnWriteArrayList 和 Collections.synchronizedList 有什么区别？分别有什么优缺点？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Java 集合"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1821470164721016833",
+      "sourceId": "1821470164721016833",
+      "viewNum": 16431,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中有哪些集合类？请简单介绍",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294699868162",
+      "sourceId": "1780933294699868162",
+      "viewNum": 49995,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "数组和链表在 Java 中的区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294704062466",
+      "sourceId": "1780933294704062466",
+      "viewNum": 25394,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 List 接口有哪些实现类？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294708256769",
+      "sourceId": "1780933294708256769",
+      "viewNum": 19433,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 ArrayList 和 LinkedList 有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java",
+        "Java 集合"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1839516705798356994",
+      "sourceId": "1839516705798356994",
+      "viewNum": 16471,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java ArrayList 的扩容机制是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java",
+        "Java 集合"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1839515038747066370",
+      "sourceId": "1839515038747066370",
+      "viewNum": 16319,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 HashMap 和 Hashtable 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294720839681",
+      "sourceId": "1780933294720839681",
+      "viewNum": 20750,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "ConcurrentHashMap 和 Hashtable 的区别是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Java",
+        "Java 集合"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1854745940761190402",
+      "sourceId": "1854745940761190402",
+      "viewNum": 13205,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 HashSet 和 HashMap 有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294729228289",
+      "sourceId": "1780933294729228289",
+      "viewNum": 17206,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 HashMap 的扩容机制是怎样的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294750199809",
+      "sourceId": "1780933294750199809",
+      "viewNum": 26372,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 HashMap 在 Java 中扩容时采用 2 的 n 次方倍？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294754394113",
+      "sourceId": "1780933294754394113",
+      "viewNum": 20488,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Java 中 HashMap 的默认负载因子是 0.75？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294758588418",
+      "sourceId": "1780933294758588418",
+      "viewNum": 20549,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 JDK 1.8 对 HashMap 进行了红黑树的改动？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294771171329",
+      "sourceId": "1780933294771171329",
+      "viewNum": 36451,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "JDK 1.8 对 HashMap 除了红黑树还进行了哪些改动？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294775365634",
+      "sourceId": "1780933294775365634",
+      "viewNum": 33141,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 LinkedHashMap 是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294783754241",
+      "sourceId": "1780933294783754241",
+      "viewNum": 18401,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 TreeMap 是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294796337153",
+      "sourceId": "1780933294796337153",
+      "viewNum": 18214,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 IdentityHashMap 是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294800531458",
+      "sourceId": "1780933294800531458",
+      "viewNum": 12465,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 WeakHashMap 是什么 ？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294804725761",
+      "sourceId": "1780933294804725761",
+      "viewNum": 11844,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 ConcurrentHashMap 1.7 和 1.8 之间有哪些区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294813114369",
+      "sourceId": "1780933294813114369",
+      "viewNum": 44206,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 ConcurrentHashMap 的 get 方法是否需要加锁？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294829891585",
+      "sourceId": "1780933294829891585",
+      "viewNum": 14851,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Java 的 ConcurrentHashMap 不支持 key 或 value 为 null？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294834085890",
+      "sourceId": "1780933294834085890",
+      "viewNum": 14051,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 CopyOnWriteArrayList 是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294838280194",
+      "sourceId": "1780933294838280194",
+      "viewNum": 15047,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你遇到过 ConcurrentModificationException 错误吗？它是如何产生的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java 集合",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294846668801",
+      "sourceId": "1780933294846668801",
+      "viewNum": 12401,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的线程同步？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800347821641375745",
+      "sourceId": "1800347821641375745",
+      "viewNum": 29223,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的线程安全是什么意思？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294850863106",
+      "sourceId": "1780933294850863106",
+      "viewNum": 26818,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是协程？Java 支持协程吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294863446018",
+      "sourceId": "1780933294863446018",
+      "viewNum": 22469,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "线程的生命周期在 Java 中是如何定义的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294871834626",
+      "sourceId": "1780933294871834626",
+      "viewNum": 24045,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中线程之间如何进行通信？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294876028930",
+      "sourceId": "1780933294876028930",
+      "viewNum": 20720,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中如何创建多线程？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Java",
+        "Java并发"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1828722732530307073",
+      "sourceId": "1828722732530307073",
+      "viewNum": 24354,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你了解 Java 线程池的原理吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294892806145",
+      "sourceId": "1780933294892806145",
+      "viewNum": 27740,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何合理地设置 Java 线程池的线程数？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294905389057",
+      "sourceId": "1780933294905389057",
+      "viewNum": 22302,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 线程池有哪些拒绝策略？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294909583361",
+      "sourceId": "1780933294909583361",
+      "viewNum": 22769,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 并发库中提供了哪些线程池实现？它们有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294913777665",
+      "sourceId": "1780933294913777665",
+      "viewNum": 18908,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 线程池核心线程数在运行过程中能修改吗？如何修改？",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "Java",
+        "Java并发"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1830885090747584514",
+      "sourceId": "1830885090747584514",
+      "viewNum": 18506,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 线程池中 shutdown 与 shutdownNow 的区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Java",
+        "Java并发"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1828628096288522241",
+      "sourceId": "1828628096288522241",
+      "viewNum": 13311,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 线程池内部任务出异常后，如何知道是哪个线程出了异常？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Java",
+        "Java并发"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1828365977491333121",
+      "sourceId": "1828365977491333121",
+      "viewNum": 16075,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 DelayQueue 和 ScheduledThreadPool 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294917971970",
+      "sourceId": "1780933294917971970",
+      "viewNum": 12993,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 Timer？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294922166273",
+      "sourceId": "1780933294922166273",
+      "viewNum": 12940,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你了解时间轮（Time Wheel）吗？有哪些应用场景？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294926360578",
+      "sourceId": "1780933294926360578",
+      "viewNum": 13227,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你使用过哪些 Java 并发工具类？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294930554882",
+      "sourceId": "1780933294930554882",
+      "viewNum": 20260,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 Semaphore？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294934749186",
+      "sourceId": "1780933294934749186",
+      "viewNum": 13060,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 CyclicBarrier？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294938943489",
+      "sourceId": "1780933294938943489",
+      "viewNum": 11518,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 CountDownLatch？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294943137794",
+      "sourceId": "1780933294943137794",
+      "viewNum": 12399,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 StampedLock？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294947332098",
+      "sourceId": "1780933294947332098",
+      "viewNum": 10695,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 CompletableFuture？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294951526402",
+      "sourceId": "1780933294951526402",
+      "viewNum": 13187,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 ForkJoinPool？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294955720706",
+      "sourceId": "1780933294955720706",
+      "viewNum": 10001,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Java 中控制多个线程的执行顺序？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294959915009",
+      "sourceId": "1780933294959915009",
+      "viewNum": 13310,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你使用过 Java 中的哪些阻塞队列？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294964109313",
+      "sourceId": "1780933294964109313",
+      "viewNum": 12541,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你使用过 Java 中的哪些原子类？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294968303618",
+      "sourceId": "1780933294968303618",
+      "viewNum": 11569,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你使用过 Java 的累加器吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294972497922",
+      "sourceId": "1780933294972497922",
+      "viewNum": 10493,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 CAS（Compare-And-Swap）操作？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295027023873",
+      "sourceId": "1780933295027023873",
+      "viewNum": 22214,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "说说 AQS 吧？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295018635266",
+      "sourceId": "1780933295018635266",
+      "viewNum": 21660,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 ReentrantLock 的实现原理是什么？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295014440961",
+      "sourceId": "1780933295014440961",
+      "viewNum": 16656,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 的 synchronized 是怎么实现的？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294980886530",
+      "sourceId": "1780933294980886530",
+      "viewNum": 20146,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Synchronized 修饰静态方法和修饰普通方法有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1848537245758205954",
+      "sourceId": "1848537245758205954",
+      "viewNum": 6074,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 synchronized 轻量级锁是否会进行自旋？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294993469442",
+      "sourceId": "1780933294993469442",
+      "viewNum": 10987,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Synchronized 能不能禁止指令重排序？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1800771531284226050",
+      "sourceId": "1800771531284226050",
+      "viewNum": 5822,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "当 Java 的 synchronized 升级到重量级锁后，所有线程都释放锁了，此时它还是重量级锁吗？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294997663746",
+      "sourceId": "1780933294997663746",
+      "viewNum": 10141,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的锁自适应自旋？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295006052353",
+      "sourceId": "1780933295006052353",
+      "viewNum": 9902,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Synchronized 和 ReentrantLock 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933294976692225",
+      "sourceId": "1780933294976692225",
+      "viewNum": 18533,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Volatile 与 Synchronized 的区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java",
+        "Java并发"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1906697042079703042",
+      "sourceId": "1906697042079703042",
+      "viewNum": 6434,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何优化 Java 中的锁的使用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295010246658",
+      "sourceId": "1780933295010246658",
+      "viewNum": 13163,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你了解 Java 中的读写锁吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295022829570",
+      "sourceId": "1780933295022829570",
+      "viewNum": 10861,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 内存模型（JMM）？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295031218178",
+      "sourceId": "1780933295031218178",
+      "viewNum": 17390,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的原子性、可见性和有序性？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295035412481",
+      "sourceId": "1780933295035412481",
+      "viewNum": 13904,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 happens-before 规则？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295039606785",
+      "sourceId": "1780933295039606785",
+      "viewNum": 8166,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的指令重排？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295043801090",
+      "sourceId": "1780933295043801090",
+      "viewNum": 9472,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 final 关键字是否能保证变量的可见性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295047995393",
+      "sourceId": "1780933295047995393",
+      "viewNum": 13240,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么在 Java 中需要使用 ThreadLocal？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295056384001",
+      "sourceId": "1780933295056384001",
+      "viewNum": 11858,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 ThreadLocal 是如何实现线程资源隔离的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295064772609",
+      "sourceId": "1780933295064772609",
+      "viewNum": 12382,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Java 中的 ThreadLocal 对 key 的引用为弱引用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295073161218",
+      "sourceId": "1780933295073161218",
+      "viewNum": 13222,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中使用 ThreadLocal 的最佳实践是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295077355521",
+      "sourceId": "1780933295077355521",
+      "viewNum": 10510,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 InheritableThreadLocal 是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295081549826",
+      "sourceId": "1780933295081549826",
+      "viewNum": 7796,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "ThreadLocal 的缺点？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295085744130",
+      "sourceId": "1780933295085744130",
+      "viewNum": 10875,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Netty 不使用 ThreadLocal 而是自定义了一个 FastThreadLocal ？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295094132737",
+      "sourceId": "1780933295094132737",
+      "viewNum": 8926,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 TransmittableThreadLocal？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295098327042",
+      "sourceId": "1780933295098327042",
+      "viewNum": 7152,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 Thread.sleep 和 Thread.yield 的区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Java",
+        "Java并发"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1828715607393472514",
+      "sourceId": "1828715607393472514",
+      "viewNum": 8499,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 Thread.sleep(0) 的作用是什么？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295102521345",
+      "sourceId": "1780933295102521345",
+      "viewNum": 11072,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 wait、notify 和 notifyAll 方法有什么作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295106715650",
+      "sourceId": "1780933295106715650",
+      "viewNum": 9516,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中什么情况会导致死锁？如何避免？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295110909953",
+      "sourceId": "1780933295110909953",
+      "viewNum": 15518,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 volatile 关键字的作用是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295115104258",
+      "sourceId": "1780933295115104258",
+      "viewNum": 16108,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的 ABA 问题？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java并发",
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295123492866",
+      "sourceId": "1780933295123492866",
+      "viewNum": 14655,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Java 中主线程如何知晓创建的子线程是否执行成功？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Java",
+        "Java并发"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1833403457677008897",
+      "sourceId": "1833403457677008897",
+      "viewNum": 8389,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 创建线程池有哪些方式？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java",
+        "Java并发"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1864580497852137473",
+      "sourceId": "1864580497852137473",
+      "viewNum": 9402,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 线程安全的集合有哪些?",
+      "difficulty": "EASY",
+      "tags": [
+        "Java",
+        "Java并发"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1864641723497508866",
+      "sourceId": "1864641723497508866",
+      "viewNum": 8727,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "多线程并发同步数据时（数据库的数据同步到数仓中）需要注意什么问题？",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "多线程",
+        "并发",
+        "数据库"
+      ],
+      "tagIds": [
+        3
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1976928525747245058",
+      "sourceId": "1976928525747245058",
+      "viewNum": 4326,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中有哪些垃圾回收算法？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295236739074",
+      "sourceId": "1780933295236739074",
+      "viewNum": 22769,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "JVM 的 TLAB（Thread-Local Allocation Buffer）是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295253516289",
+      "sourceId": "1780933295253516289",
+      "viewNum": 13650,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 是如何实现跨平台的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295157047297",
+      "sourceId": "1780933295157047297",
+      "viewNum": 14908,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "JVM 由哪些部分组成？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Java",
+        "JVM"
+      ],
+      "tagIds": [
+        1,
+        4
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1854787878122102785",
+      "sourceId": "1854787878122102785",
+      "viewNum": 16335,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编译执行与解释执行的区别是什么？JVM 使用哪种方式？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295161241602",
+      "sourceId": "1780933295161241602",
+      "viewNum": 12936,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "JVM 的内存区域是如何划分的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295169630210",
+      "sourceId": "1780933295169630210",
+      "viewNum": 17418,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "JVM 方法区是否会出现内存溢出?",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Java",
+        "JVM"
+      ],
+      "tagIds": [
+        1,
+        4
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1854818978466832386",
+      "sourceId": "1854818978466832386",
+      "viewNum": 9322,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "JVM 有那几种情况会产生 OOM（内存溢出）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Java",
+        "JVM"
+      ],
+      "tagIds": [
+        1,
+        4
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1855856573426638849",
+      "sourceId": "1855856573426638849",
+      "viewNum": 12298,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中堆和栈的区别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295173824513",
+      "sourceId": "1780933295173824513",
+      "viewNum": 12003,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的直接内存（堆外内存）？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295178018817",
+      "sourceId": "1780933295178018817",
+      "viewNum": 10072,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的常量池？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295182213122",
+      "sourceId": "1780933295182213122",
+      "viewNum": 10140,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你了解 Java 的类加载器吗？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295186407425",
+      "sourceId": "1780933295186407425",
+      "viewNum": 14042,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的 JIT（Just-In-Time）?",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295194796033",
+      "sourceId": "1780933295194796033",
+      "viewNum": 11678,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "JIT 编译后的代码存在哪？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java",
+        "JVM"
+      ],
+      "tagIds": [
+        1,
+        4
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1863492785508106242",
+      "sourceId": "1863492785508106242",
+      "viewNum": 5684,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 AOT（Ahead-Of-Time）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295194796034",
+      "sourceId": "1780933295194796034",
+      "viewNum": 9708,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你了解 Java 的逃逸分析吗？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295198990337",
+      "sourceId": "1780933295198990337",
+      "viewNum": 8484,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的强引用、软引用、弱引用和虚引用分别是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295211573249",
+      "sourceId": "1780933295211573249",
+      "viewNum": 11009,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中常见的垃圾收集器有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295215767553",
+      "sourceId": "1780933295215767553",
+      "viewNum": 12572,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中如何判断对象是否是垃圾？不同实现方式有何区别？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295219961858",
+      "sourceId": "1780933295219961858",
+      "viewNum": 9332,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Java 的垃圾收集器将堆分为老年代和新生代？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295224156162",
+      "sourceId": "1780933295224156162",
+      "viewNum": 8256,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Java 8 移除了永久代（PermGen）并引入了元空间（Metaspace）？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295228350466",
+      "sourceId": "1780933295228350466",
+      "viewNum": 19492,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Java 新生代被划分为 S0、S1 和 Eden 区？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295232544769",
+      "sourceId": "1780933295232544769",
+      "viewNum": 8723,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是三色标记算法？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295236739075",
+      "sourceId": "1780933295236739075",
+      "viewNum": 7975,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 young GC、old GC、full GC 和 mixed GC 的区别是什么？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295240933377",
+      "sourceId": "1780933295240933377",
+      "viewNum": 8781,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么条件会触发 Java 的 young GC？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295245127682",
+      "sourceId": "1780933295245127682",
+      "viewNum": 7275,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么情况下会触发 Java 的 Full GC？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295249321986",
+      "sourceId": "1780933295249321986",
+      "viewNum": 7630,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 PLAB？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295257710593",
+      "sourceId": "1780933295257710593",
+      "viewNum": 5866,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "JVM 垃圾回收时产生的 concurrent mode failure 的原因是什么？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295261904897",
+      "sourceId": "1780933295261904897",
+      "viewNum": 7487,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Java 中 CMS 垃圾收集器在发生 Concurrent Mode Failure 时的 Full GC 是单线程的？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295266099202",
+      "sourceId": "1780933295266099202",
+      "viewNum": 5790,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Java 中某些新生代和老年代的垃圾收集器不能组合使用？比如 ParNew 和 Parallel Old",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295270293506",
+      "sourceId": "1780933295270293506",
+      "viewNum": 5397,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "JVM 新生代垃圾回收如何避免全堆扫描？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295274487810",
+      "sourceId": "1780933295274487810",
+      "viewNum": 5817,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 的 CMS 垃圾回收器和 G1 垃圾回收器在记忆集的维护上有什么不同？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295274487811",
+      "sourceId": "1780933295274487811",
+      "viewNum": 6157,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 G1 垃圾收集器不维护年轻代到老年代的记忆集？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295278682114",
+      "sourceId": "1780933295278682114",
+      "viewNum": 5147,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的 CMS 和 G1 垃圾收集器如何维持并发的正确性？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295282876417",
+      "sourceId": "1780933295282876417",
+      "viewNum": 5221,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java G1 相对于 CMS 有哪些进步的地方?",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java",
+        "JVM"
+      ],
+      "tagIds": [
+        1,
+        4
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1889260086154088449",
+      "sourceId": "1889260086154088449",
+      "viewNum": 5180,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 中的 logging write barrier？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295287070722",
+      "sourceId": "1780933295287070722",
+      "viewNum": 4213,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 的 G1 垃圾回收流程是怎样的？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295291265026",
+      "sourceId": "1780933295291265026",
+      "viewNum": 7926,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 的 CMS 垃圾回收流程是怎样的？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295291265027",
+      "sourceId": "1780933295291265027",
+      "viewNum": 6175,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你了解 Java 的 ZGC（Z Garbage Collector）吗？",
+      "difficulty": "HARD",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295295459330",
+      "sourceId": "1780933295295459330",
+      "viewNum": 5396,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "JVM 垃圾回收调优的主要目标是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295303847937",
+      "sourceId": "1780933295303847937",
+      "viewNum": 9677,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何对 Java 的垃圾回收进行调优？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295308042242",
+      "sourceId": "1780933295308042242",
+      "viewNum": 9870,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "常用的 JVM 配置参数有哪些？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295312236546",
+      "sourceId": "1780933295312236546",
+      "viewNum": 10175,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你常用哪些工具来分析 JVM 性能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295312236547",
+      "sourceId": "1780933295312236547",
+      "viewNum": 7890,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Java 中进行内存泄漏分析？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1780933295316430850",
+      "sourceId": "1780933295316430850",
+      "viewNum": 7650,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 里的对象在虚拟机里面是怎么存储的？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java",
+        "JVM"
+      ],
+      "tagIds": [
+        1,
+        4
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1863464201980657666",
+      "sourceId": "1863464201980657666",
+      "viewNum": 4957,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "说说 Java 的执行流程?",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "JVM",
+        "Java"
+      ],
+      "tagIds": [
+        4,
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1864573924108845058",
+      "sourceId": "1864573924108845058",
+      "viewNum": 6179,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "在什么情况下 Java 类会被加载？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776478862138413058",
+      "sourceId": "1776478862138413058",
+      "viewNum": 5265,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的多态性是什么？如何理解？",
+      "difficulty": "EASY",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776482413849874433",
+      "sourceId": "1776482413849874433",
+      "viewNum": 2120,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Java 中的 String 类被设计为 final？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776483347376115713",
+      "sourceId": "1776483347376115713",
+      "viewNum": 1836,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 MySQL 回表？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "数据库"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1776483465730985986",
+      "sourceId": "1776483465730985986",
+      "viewNum": 1781,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么样的字段适合加索引？索引失效了解吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "数据库"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1776483567317028866",
+      "sourceId": "1776483567317028866",
+      "viewNum": 3872,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "HTTPS 的加密过程了解吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1776517745018408962",
+      "sourceId": "1776517745018408962",
+      "viewNum": 1765,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Spring 的 IOC 和 AOP？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776518079614816257",
+      "sourceId": "1776518079614816257",
+      "viewNum": 3868,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Spring 的事务管理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776518466765852673",
+      "sourceId": "1776518466765852673",
+      "viewNum": 2552,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的值传递是什么意思？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776518567504646145",
+      "sourceId": "1776518567504646145",
+      "viewNum": 832,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的反射机制？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776518648442130434",
+      "sourceId": "1776518648442130434",
+      "viewNum": 2478,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的语法糖？如何提高开发效率？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776520230932058114",
+      "sourceId": "1776520230932058114",
+      "viewNum": 801,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的乐观锁与悲观锁的区别和应用场景是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776520425644232705",
+      "sourceId": "1776520425644232705",
+      "viewNum": 2129,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 动态代理的原理是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776520518787141633",
+      "sourceId": "1776520518787141633",
+      "viewNum": 1361,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的线程池？如何提高并发性能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776520618687074306",
+      "sourceId": "1776520618687074306",
+      "viewNum": 1268,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Java 的 Hashtable、HashMap 和 TreeMap？它们有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776520739436892161",
+      "sourceId": "1776520739436892161",
+      "viewNum": 985,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "杭州某国企 Java 面经",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "面经"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1776521016927850498",
+      "sourceId": "1776521016927850498",
+      "viewNum": 1736,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你真的理解 AQS 原理了吗？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776521161522286594",
+      "sourceId": "1776521161522286594",
+      "viewNum": 2448,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "上海某数字科技公司 Java 面经",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "面经"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1776558444745068546",
+      "sourceId": "1776558444745068546",
+      "viewNum": 1203,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Java 的 CompletableFuture 实现异步编排？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776559515135643650",
+      "sourceId": "1776559515135643650",
+      "viewNum": 1423,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "北京某互联网公司 Java 面经",
+      "difficulty": "EASY",
+      "tags": [
+        "面经"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1776560069765238786",
+      "sourceId": "1776560069765238786",
+      "viewNum": 1125,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 synchronized 的底层实现和锁的升降级机制是什么？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776560221037006849",
+      "sourceId": "1776560221037006849",
+      "viewNum": 1878,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Redis 中的三种高效缓存读写策略是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Redis"
+      ],
+      "tagIds": [
+        18
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776560599812018178",
+      "sourceId": "1776560599812018178",
+      "viewNum": 1306,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Redis 的五种基本数据类型及其优化技巧是什么？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Redis"
+      ],
+      "tagIds": [
+        18
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776560801641926658",
+      "sourceId": "1776560801641926658",
+      "viewNum": 941,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中 AtomicInteger 的实现原理是什么？如何使用 CAS？",
+      "difficulty": "HARD",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776560875277127681",
+      "sourceId": "1776560875277127681",
+      "viewNum": 880,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "杭州某医疗公司  Java 面经",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "面经"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1776561175476047874",
+      "sourceId": "1776561175476047874",
+      "viewNum": 1407,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Redis 中的跳表是什么？你了解多少？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Redis"
+      ],
+      "tagIds": [
+        18
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776561274428067842",
+      "sourceId": "1776561274428067842",
+      "viewNum": 1438,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "你了解哪些网关技术？请详细说明。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776561542624448513",
+      "sourceId": "1776561542624448513",
+      "viewNum": 808,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "面试官：TCP 的半包和粘包了解多少？详细介绍下。。",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1776561633267552258",
+      "sourceId": "1776561633267552258",
+      "viewNum": 646,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "JVM 的哪些内存区域可能会导致 OutOfMemoryError？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776561844316540930",
+      "sourceId": "1776561844316540930",
+      "viewNum": 1121,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "面试官：常见的网络攻击手段有哪些？解决方案了解吗？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "计算机网络"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1776561985815580674",
+      "sourceId": "1776561985815580674",
+      "viewNum": 647,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "Java 中的内存泄漏通常发生在哪些场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Java"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1776562156225957889",
+      "sourceId": "1776562156225957889",
+      "viewNum": 1086,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "美团前端/移动端一面凉经",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "面经"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1776562423688335361",
+      "sourceId": "1776562423688335361",
+      "viewNum": 1595,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "腾讯云智一面客户端开发面经",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "面经"
+      ],
+      "tagIds": [],
+      "sourceUrl": "https://www.mianshiya.com/question/1776562561580273666",
+      "sourceId": "1776562561580273666",
+      "viewNum": 1261,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "手写一个 Java 线程池",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "Java",
+        "手写代码"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1828640794489356290",
+      "sourceId": "1828640794489356290",
+      "viewNum": 2260,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "手写一个 bitmap",
+      "difficulty": "HARD",
+      "tags": [
+        "后端",
+        "Java",
+        "手写代码"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1828639403226136577",
+      "sourceId": "1828639403226136577",
+      "viewNum": 3691,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "手写一个队列",
+      "difficulty": "EASY",
+      "tags": [
+        "后端",
+        "Java",
+        "手写代码"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1828641353917235202",
+      "sourceId": "1828641353917235202",
+      "viewNum": 1816,
+      "needVip": true,
+      "hasAnswer": false
+    },
+    {
+      "title": "手写生产者消费者模型，利用 wait 和 notify 实现",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "后端",
+        "Java",
+        "手写代码"
+      ],
+      "tagIds": [
+        1
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1828671407074279426",
+      "sourceId": "1828671407074279426",
+      "viewNum": 1777,
+      "needVip": true,
+      "hasAnswer": false
+    }
+  ]
+}

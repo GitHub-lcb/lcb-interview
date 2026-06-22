@@ -1,0 +1,2034 @@
+{
+  "categoryId": 31,
+  "categoryName": "Python",
+  "bankIds": [
+    "1810643768400019458",
+    "1810643851299573761",
+    "1810644002890973185"
+  ],
+  "totalQuestions": 126,
+  "questions": [
+    {
+      "title": "解释型语言 Python 和编译型语言有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651261368918018",
+      "sourceId": "1810651261368918018",
+      "viewNum": 15411,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python3 中 is 和 == 有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651262341996546",
+      "sourceId": "1810651262341996546",
+      "viewNum": 13035,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中 read、readline、readlines 有哪些区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651262430076929",
+      "sourceId": "1810651262430076929",
+      "viewNum": 9477,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 面向对象中的继承特点？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651262513963010",
+      "sourceId": "1810651262513963010",
+      "viewNum": 8176,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中 any() 和 all() 方法有什么作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651262597849089",
+      "sourceId": "1810651262597849089",
+      "viewNum": 7226,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "说明 Python3 中装饰器的用法",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651262685929473",
+      "sourceId": "1810651262685929473",
+      "viewNum": 7800,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "说明 Python3 中 yield 的用法",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651262774009857",
+      "sourceId": "1810651262774009857",
+      "viewNum": 6650,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "说明 Python 中 enumerate() 的用法",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651262862090242",
+      "sourceId": "1810651262862090242",
+      "viewNum": 5596,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "解释 Python 中 //、％ 和 ** 运算符",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651262958559233",
+      "sourceId": "1810651262958559233",
+      "viewNum": 5438,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 有哪些特点和优点？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651263042445314",
+      "sourceId": "1810651263042445314",
+      "viewNum": 5338,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中深拷贝和浅拷贝有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651263134720002",
+      "sourceId": "1810651263134720002",
+      "viewNum": 6458,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中的列表和元组有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651263218606082",
+      "sourceId": "1810651263218606082",
+      "viewNum": 6070,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 中的三元表达式？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651263306686466",
+      "sourceId": "1810651263306686466",
+      "viewNum": 5390,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请简单介绍 Python 的 Flask 框架，有什么作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651263390572546",
+      "sourceId": "1810651263390572546",
+      "viewNum": 5593,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Python 中管理内存？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651263470264322",
+      "sourceId": "1810651263470264322",
+      "viewNum": 5526,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中 help() 函数和 dir() 函数有什么作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651263558344706",
+      "sourceId": "1810651263558344706",
+      "viewNum": 4336,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 程序退出时，是否释放所有内存分配？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651263642230785",
+      "sourceId": "1810651263642230785",
+      "viewNum": 4541,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 的字典，有哪些用法？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651263726116866",
+      "sourceId": "1810651263726116866",
+      "viewNum": 4832,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 的负索引？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651263805808642",
+      "sourceId": "1810651263805808642",
+      "viewNum": 4318,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中 join() 和 split() 函数有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651263889694721",
+      "sourceId": "1810651263889694721",
+      "viewNum": 4625,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 是否区分大小写？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651263969386498",
+      "sourceId": "1810651263969386498",
+      "viewNum": 4855,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "说明 Python 中标识符的命名规则",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651264057466881",
+      "sourceId": "1810651264057466881",
+      "viewNum": 3708,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中如何删除字符串中的前置空格？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651264137158657",
+      "sourceId": "1810651264137158657",
+      "viewNum": 3860,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中如何将字符串转换为小写？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651264221044738",
+      "sourceId": "1810651264221044738",
+      "viewNum": 3735,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 的 pass 语句有什么作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651264309125122",
+      "sourceId": "1810651264309125122",
+      "viewNum": 3767,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 的闭包？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651264401399810",
+      "sourceId": "1810651264401399810",
+      "viewNum": 5132,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 的关系运算符？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651264489480193",
+      "sourceId": "1810651264489480193",
+      "viewNum": 3448,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 的赋值和算术运算符？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651264581754881",
+      "sourceId": "1810651264581754881",
+      "viewNum": 3133,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 的逻辑运算符？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651264665640962",
+      "sourceId": "1810651264665640962",
+      "viewNum": 3153,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 的成员运算符？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651264762109953",
+      "sourceId": "1810651264762109953",
+      "viewNum": 3218,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 的身份运算符？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651264850190337",
+      "sourceId": "1810651264850190337",
+      "viewNum": 3182,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 的位运算符？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651264929882113",
+      "sourceId": "1810651264929882113",
+      "viewNum": 3027,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Python 中使用多进制数字？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651265022156802",
+      "sourceId": "1810651265022156802",
+      "viewNum": 2992,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中如何获取字典的所有键？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651265106042882",
+      "sourceId": "1810651265106042882",
+      "viewNum": 3304,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Python 不建议使用下划线开头的标识符？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651265206706178",
+      "sourceId": "1810651265206706178",
+      "viewNum": 3179,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 如何声明多个变量并赋值？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651265290592257",
+      "sourceId": "1810651265290592257",
+      "viewNum": 3005,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 元组的解封装？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651265378672641",
+      "sourceId": "1810651265378672641",
+      "viewNum": 3192,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python？为什么它会这么流行？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651265454170113",
+      "sourceId": "1810651265454170113",
+      "viewNum": 2849,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请列举一些 Python 的应用场景",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651265554833410",
+      "sourceId": "1810651265554833410",
+      "viewNum": 3124,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 有哪些局限性？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651265634525186",
+      "sourceId": "1810651265634525186",
+      "viewNum": 3142,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Python 代码的执行过程？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651265722605570",
+      "sourceId": "1810651265722605570",
+      "viewNum": 3388,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 有哪些内置数据结构？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651265802297346",
+      "sourceId": "1810651265802297346",
+      "viewNum": 3160,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中单引号和双引号有什么区别？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651265890377729",
+      "sourceId": "1810651265890377729",
+      "viewNum": 3387,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中 append、insert 和 extend 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651265974263809",
+      "sourceId": "1810651265974263809",
+      "viewNum": 3286,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中 break、continue、pass 有什么作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651266058149890",
+      "sourceId": "1810651266058149890",
+      "viewNum": 2823,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中 remove、del 和 pop 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651266150424577",
+      "sourceId": "1810651266150424577",
+      "viewNum": 3047,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中如何实现 switch 语句？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651266225922050",
+      "sourceId": "1810651266225922050",
+      "viewNum": 2983,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 的 range 函数如何运用？请举例说明",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651266334973954",
+      "sourceId": "1810651266334973954",
+      "viewNum": 2690,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何更改 Python 列表的数据类型？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651266452414466",
+      "sourceId": "1810651266452414466",
+      "viewNum": 2756,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中怎么注释代码？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651266532106242",
+      "sourceId": "1810651266532106242",
+      "viewNum": 2631,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中的 != 和 is not 运算符有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651266615992321",
+      "sourceId": "1810651266615992321",
+      "viewNum": 3015,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 是否有 main 函数？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651266695684097",
+      "sourceId": "1810651266695684097",
+      "viewNum": 3158,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 的 iterables 和 iterators 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651266796347393",
+      "sourceId": "1810651266796347393",
+      "viewNum": 2759,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中的 Map 函数有什么作用？怎么使用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651266880233474",
+      "sourceId": "1810651266880233474",
+      "viewNum": 2969,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中的 Filter 函数有什么作用？怎么使用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651266959925249",
+      "sourceId": "1810651266959925249",
+      "viewNum": 2566,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中 reduce 函数有什么作用？怎么使用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651267048005633",
+      "sourceId": "1810651267048005633",
+      "viewNum": 2548,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 的 pickling 和 unpickling？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651267131891713",
+      "sourceId": "1810651267131891713",
+      "viewNum": 2396,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 的生成器？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651267224166402",
+      "sourceId": "1810651267224166402",
+      "viewNum": 2998,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中如何使用索引反转字符串？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651267320635394",
+      "sourceId": "1810651267320635394",
+      "viewNum": 2729,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 的 Lambda 函数，有哪些应用场景？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651267404521474",
+      "sourceId": "1810651267404521474",
+      "viewNum": 2792,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 的迭代器和生成器有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651267484213250",
+      "sourceId": "1810651267484213250",
+      "viewNum": 2792,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 正则表达式中 match 和 search 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651267572293633",
+      "sourceId": "1810651267572293633",
+      "viewNum": 2362,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Python 中没有函数重载？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651267651985410",
+      "sourceId": "1810651267651985410",
+      "viewNum": 2473,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 的 __**init__** 和 __**new__** 方法有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651267735871489",
+      "sourceId": "1810651267735871489",
+      "viewNum": 2642,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你知道哪些 Python 魔术方法？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651267811368962",
+      "sourceId": "1810651267811368962",
+      "viewNum": 2816,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 函数参数 *arg 和 **kwargs 有什么区别？怎么使用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651267886866433",
+      "sourceId": "1810651267886866433",
+      "viewNum": 2573,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请介绍 Python 中变量的作用域？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651267962363905",
+      "sourceId": "1810651267962363905",
+      "viewNum": 2297,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 2 和 Python 3 有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651268042055681",
+      "sourceId": "1810651268042055681",
+      "viewNum": 2697,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 “猴子补丁”（monkey patching）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651268142718977",
+      "sourceId": "1810651268142718977",
+      "viewNum": 2531,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何在 Python 中实现字符串替换操作？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651268226605058",
+      "sourceId": "1810651268226605058",
+      "viewNum": 2197,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 在什么情况下会出现 KeyError、TypeError、ValueError？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651268637646849",
+      "sourceId": "1810651268637646849",
+      "viewNum": 2206,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 中的模块和包？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651268729921537",
+      "sourceId": "1810651268729921537",
+      "viewNum": 2387,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你知道哪些 Python 的编码规范？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651268826390529",
+      "sourceId": "1810651268826390529",
+      "viewNum": 2186,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 的类和对象有什么区别？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python面向对象"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651268910276609",
+      "sourceId": "1810651268910276609",
+      "viewNum": 2440,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 类中的 self？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python面向对象"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651268998356993",
+      "sourceId": "1810651268998356993",
+      "viewNum": 2581,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "init 方法在 Python 中有什么作用？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python面向对象"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651269082243073",
+      "sourceId": "1810651269082243073",
+      "viewNum": 2211,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 的 OOPS（面向对象编程）？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python面向对象"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651269170323458",
+      "sourceId": "1810651269170323458",
+      "viewNum": 2726,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 面向对象的抽象特性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python面向对象"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651269250015234",
+      "sourceId": "1810651269250015234",
+      "viewNum": 2315,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 面向对象的封装特性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python面向对象"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651269338095618",
+      "sourceId": "1810651269338095618",
+      "viewNum": 2036,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是 Python 面向对象的多态特性？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python面向对象"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651269434564610",
+      "sourceId": "1810651269434564610",
+      "viewNum": 2130,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 是否支持多重继承？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python面向对象"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651269518450690",
+      "sourceId": "1810651269518450690",
+      "viewNum": 2672,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "什么是鸭子类型（duck typing）？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651269598142466",
+      "sourceId": "1810651269598142466",
+      "viewNum": 2578,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "为什么 Python 执行速度慢，如何改进？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python性能优化"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651269682028546",
+      "sourceId": "1810651269682028546",
+      "viewNum": 2697,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何分析 Python 代码的执行性能？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python性能优化"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651269765914625",
+      "sourceId": "1810651269765914625",
+      "viewNum": 2182,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中如何读取大文件，例如内存只有 4G，如何读取一个大小为 8G 的文件",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python性能优化"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651269853995009",
+      "sourceId": "1810651269853995009",
+      "viewNum": 2755,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "你使用过哪些 Python 标准库模块？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python基础",
+        "Python标准库"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651269929492482",
+      "sourceId": "1810651269929492482",
+      "viewNum": 2549,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 的 re 模块中 split()、sub()、subn() 方法有什么作用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础",
+        "Python标准库"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651270000795649",
+      "sourceId": "1810651270000795649",
+      "viewNum": 2247,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 的 namedtuple 有什么作用？怎么使用？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础",
+        "Python标准库"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651270076293122",
+      "sourceId": "1810651270076293122",
+      "viewNum": 1989,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "说明 Python 中的 zip 函数",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python标准库"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651270168567809",
+      "sourceId": "1810651270168567809",
+      "viewNum": 2542,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "如何使用 Python 的 random 模块生成随机数、实现随机乱序和随机抽样？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "Python标准库"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651270265036802",
+      "sourceId": "1810651270265036802",
+      "viewNum": 2293,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 中如何实现多线程？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础",
+        "Python并发"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651270344728578",
+      "sourceId": "1810651270344728578",
+      "viewNum": 3965,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请介绍 Python 中多线程和多进程的应用场景，以及优缺点？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础",
+        "Python并发"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651270424420354",
+      "sourceId": "1810651270424420354",
+      "viewNum": 3162,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请解释 Python 线程池的工作原理？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "Python基础",
+        "Python并发"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810651270499917826",
+      "sourceId": "1810651270499917826",
+      "viewNum": 3686,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "请讲解以下 Python 代码的含义？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "代码分析"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810658002923958273",
+      "sourceId": "1810658002923958273",
+      "viewNum": 3622,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "假设你使用的是官方的 CPython，说出下面代码的运行结果",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "代码分析"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810658003909619714",
+      "sourceId": "1810658003909619714",
+      "viewNum": 2074,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "以下 Python 程序的运行结果是？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "代码分析"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810658003989311489",
+      "sourceId": "1810658003989311489",
+      "viewNum": 2843,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "以下 Python 程序的运行结果是？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "代码分析"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810658004069003265",
+      "sourceId": "1810658004069003265",
+      "viewNum": 1522,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "以下 Python 程序的运行结果是？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "代码分析"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810658004152889346",
+      "sourceId": "1810658004152889346",
+      "viewNum": 1151,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "以下 Python 程序的运行结果是？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "代码分析"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810658004245164034",
+      "sourceId": "1810658004245164034",
+      "viewNum": 975,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "以下 Python 程序的运行结果是？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "代码分析"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810658004324855809",
+      "sourceId": "1810658004324855809",
+      "viewNum": 864,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "以下 Python 程序的运行结果是？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "代码分析"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810658004412936194",
+      "sourceId": "1810658004412936194",
+      "viewNum": 1056,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 Python 程序，计算文件中的大写字母数量",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652006654713857",
+      "sourceId": "1810652006654713857",
+      "viewNum": 3071,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 如何随机打乱列表中的元素？",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652007673929730",
+      "sourceId": "1810652007673929730",
+      "viewNum": 1335,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 Python 程序，查找文本文件中最长的单词",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652007762010114",
+      "sourceId": "1810652007762010114",
+      "viewNum": 1057,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 Python 程序，检查序列是否为回文",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652007841701889",
+      "sourceId": "1810652007841701889",
+      "viewNum": 908,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 Python 程序，打印斐波那契数列的前十项",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652007929782273",
+      "sourceId": "1810652007929782273",
+      "viewNum": 816,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 Python 程序，计算文件中单词的出现频率",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652008030445569",
+      "sourceId": "1810652008030445569",
+      "viewNum": 683,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 Python 程序，输出给定序列中的所有质数",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652008105943041",
+      "sourceId": "1810652008105943041",
+      "viewNum": 514,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 Python 程序，检查数字是否为 Armstrong 数",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652008202412033",
+      "sourceId": "1810652008202412033",
+      "viewNum": 482,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "用一行 Python 代码，从给定列表中取出所有偶数和奇数",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652008286298113",
+      "sourceId": "1810652008286298113",
+      "viewNum": 480,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "在 Python 中如何实现单例模式？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652008391155714",
+      "sourceId": "1810652008391155714",
+      "viewNum": 756,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "Python 如何不使用中间变量，交换两个变量的值？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652008466653186",
+      "sourceId": "1810652008466653186",
+      "viewNum": 542,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "写一个 Python 删除列表中重复元素的函数，要求去重后元素相对位置保持不变",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652008567316481",
+      "sourceId": "1810652008567316481",
+      "viewNum": 493,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "用 Python 代码实现 Python 内置函数 max",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652008642813954",
+      "sourceId": "1810652008642813954",
+      "viewNum": 546,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "写一个 Python 函数，统计传入的列表中每个数字出现的次数并返回对应的字典",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652008718311426",
+      "sourceId": "1810652008718311426",
+      "viewNum": 397,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 Python 程序来遍历一个文件夹",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652008793808897",
+      "sourceId": "1810652008793808897",
+      "viewNum": 581,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "写一个 Python 函数，给定矩阵的阶数 n，输出一个螺旋式数字矩阵",
+      "difficulty": "HARD",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652008869306369",
+      "sourceId": "1810652008869306369",
+      "viewNum": 627,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写 Python 程序，判断某个日期是这一年的第几天",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652008957386754",
+      "sourceId": "1810652008957386754",
+      "viewNum": 437,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "写一个 Python 记录函数执行时间的装饰器",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652009049661442",
+      "sourceId": "1810652009049661442",
+      "viewNum": 466,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "编写一个 Python 函数实现对逆波兰表达式求值，不能使用Python 的内置函数",
+      "difficulty": "HARD",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652009137741826",
+      "sourceId": "1810652009137741826",
+      "viewNum": 497,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "对下面给出的 Python 字典，按值从大到小对键进行排序",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652009213239297",
+      "sourceId": "1810652009213239297",
+      "viewNum": 479,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "按照题目要求写出对应的 Python 函数",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652009292931074",
+      "sourceId": "1810652009292931074",
+      "viewNum": 620,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "按照题目要求写出对应的 Python 函数",
+      "difficulty": "EASY",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652009368428546",
+      "sourceId": "1810652009368428546",
+      "viewNum": 386,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "按照题目要求写出对应的 Python 装饰器",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652009448120321",
+      "sourceId": "1810652009448120321",
+      "viewNum": 514,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "写一个 Python 函数实现字符串反转，你有多少种实现方法？",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652009544589314",
+      "sourceId": "1810652009544589314",
+      "viewNum": 489,
+      "needVip": false,
+      "hasAnswer": false
+    },
+    {
+      "title": "按照题目要求写出对应的 Python 函数",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "Python",
+        "手写代码"
+      ],
+      "tagIds": [
+        52
+      ],
+      "sourceUrl": "https://www.mianshiya.com/question/1810652009615892482",
+      "sourceId": "1810652009615892482",
+      "viewNum": 511,
+      "needVip": false,
+      "hasAnswer": false
+    }
+  ]
+}

@@ -1,16 +1,107 @@
-import { Typography } from 'antd'
+import { useEffect, useState } from 'react'
+import { Alert } from 'antd'
 import CategoryGrid from './CategoryGrid'
 import HotQuestions from './HotQuestions'
-
-const { Title } = Typography
+import AbilityMapPanel from '../../components/AbilityMapPanel'
+import DailyPlanCompletionPanel from '../../components/DailyPlanCompletionPanel'
+import DailyMissionPanel from '../../components/DailyMissionPanel'
+import FirstRunLaunchpad from '../../components/FirstRunLaunchpad'
+import InterviewReviewPanel from '../../components/InterviewReviewPanel'
+import PrepHealthRadarPanel from '../../components/PrepHealthRadarPanel'
+import StudyCommandCenter from '../../components/StudyCommandCenter'
+import StudyDashboard from '../../components/StudyDashboard'
+import { getHotQuestions } from '../../api/question'
+import { freePromiseItems } from '../../data/freeSuperiority'
+import { useStudyProgress } from '../../hooks/useStudyProgress'
+import type { Question } from '../../types'
 
 export default function Home() {
+  const [hotQuestions, setHotQuestions] = useState<Question[]>([])
+  const [hotLoading, setHotLoading] = useState(true)
+  const [hotError, setHotError] = useState(false)
+  const { progress, rememberQuestions } = useStudyProgress()
+
+  const fetchHotQuestions = () => {
+    setHotLoading(true)
+    setHotError(false)
+    getHotQuestions(10, { silentGlobalError: true })
+      .then(data => {
+        setHotQuestions(data)
+        rememberQuestions(data)
+        setHotLoading(false)
+      })
+      .catch(() => {
+        setHotError(true)
+        setHotLoading(false)
+      })
+  }
+
+  useEffect(() => {
+    fetchHotQuestions()
+  }, [])
+
   return (
-    <div>
-      <Title level={3}>热门面试题库</Title>
-      <CategoryGrid />
-      <Title level={4} style={{ marginTop: 32 }}>热门题目排行榜</Title>
-      <HotQuestions />
+    <div className="home-page">
+      <FirstRunLaunchpad hotQuestions={hotQuestions} loading={hotLoading} />
+
+      <DailyPlanCompletionPanel progress={progress} />
+
+      <StudyDashboard hotQuestions={hotQuestions} />
+
+      <StudyCommandCenter />
+
+      <DailyMissionPanel />
+
+      <PrepHealthRadarPanel />
+
+      <InterviewReviewPanel progress={progress} />
+
+      <AbilityMapPanel />
+
+      <section className="free-promise-band" aria-label="免费承诺">
+        {freePromiseItems.map(item => (
+          <div key={item.title}>
+            <strong>{item.metric}</strong>
+            <span>{item.title}</span>
+            <p>{item.description}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="home-section">
+        <div className="home-section-header">
+          <div>
+            <h2 className="section-title">题库入口</h2>
+            <p className="section-subtitle">按技术方向进入系统刷题，先建立知识面，再补重点短板。</p>
+          </div>
+          <span>46 个方向</span>
+        </div>
+        <CategoryGrid />
+      </section>
+
+      <section className="home-section home-hot-section">
+        <div className="home-section-header">
+          <div>
+            <h2 className="section-title">热门题目排行</h2>
+            <p className="section-subtitle">优先挑高频题加入今日计划。</p>
+          </div>
+          <span>高频优先</span>
+        </div>
+        {hotError && (
+          <Alert
+            type="warning"
+            showIcon
+            message="热门题目加载失败，题库入口仍可使用。"
+            className="home-alert"
+          />
+        )}
+        <HotQuestions
+          questions={hotQuestions}
+          loading={hotLoading}
+          error={hotError}
+          onRetry={fetchHotQuestions}
+        />
+      </section>
     </div>
   )
 }

@@ -3,6 +3,7 @@ package com.lcbinterview.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lcbinterview.dto.QuestionTagName;
 import com.lcbinterview.model.Question;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -48,6 +49,47 @@ public interface QuestionMapper extends BaseMapper<Question> {
     List<Question> selectByTagId(@Param("tagId") Long tagId);
 
     /**
+     * 根据标签 ID 分页查询关联题目（仅已发布）。
+     */
+    @Select("""
+            <script>
+            SELECT q.id, q.category_id, q.title, q.summary, q.content,
+                   q.principle, q.comparison, q.scenario, q.risk,
+                   q.project_exp, q.code_examples, q.diagrams, q.related_ids,
+                   q.difficulty, q.view_count, q.status, q.source,
+                   q.create_time, q.update_time
+            FROM question q
+            INNER JOIN question_tag qt ON q.id = qt.question_id
+            WHERE qt.tag_id = #{tagId}
+              AND q.status = 'PUBLISHED' AND q.is_deleted = 0
+            ORDER BY
+              <choose>
+                <when test="sort == 'hot'">q.view_count DESC, q.create_time DESC</when>
+                <otherwise>q.create_time DESC</otherwise>
+              </choose>
+            </script>
+            """)
+    IPage<Question> selectPageByTagId(Page<?> page, @Param("tagId") Long tagId, @Param("sort") String sort);
+
+    /**
+     * 批量查询题目关联的标签名，用于组装列表页和详情页 VO。
+     */
+    @Select("""
+            <script>
+            SELECT qt.question_id AS questionId, t.name AS tagName
+            FROM question_tag qt
+            INNER JOIN tag t ON qt.tag_id = t.id
+            WHERE qt.question_id IN
+            <foreach collection="questionIds" item="questionId" open="(" separator="," close=")">
+                #{questionId}
+            </foreach>
+              AND t.is_deleted = 0
+            ORDER BY qt.question_id ASC, t.id ASC
+            </script>
+            """)
+    List<QuestionTagName> selectTagNamesByQuestionIds(@Param("questionIds") List<Long> questionIds);
+
+    /**
      * 全文搜索题目（FULLTEXT + ngram），支持分类+难度组合筛选。
      */
     @Select("""
@@ -68,11 +110,62 @@ public interface QuestionMapper extends BaseMapper<Question> {
               AND difficulty = #{difficulty}
               </if>
             ORDER BY
-              CASE WHEN title LIKE CONCAT('%', #{keyword}, '%') THEN 0 ELSE 1 END,
-              view_count DESC
+              <choose>
+                <when test="sort == 'hot'">view_count DESC, create_time DESC</when>
+                <when test="sort == 'latest'">create_time DESC</when>
+                <otherwise>
+                  CASE WHEN title LIKE CONCAT('%', #{keyword}, '%') THEN 0 ELSE 1 END,
+                  view_count DESC
+                </otherwise>
+              </choose>
             </script>
             """)
     IPage<Question> searchFulltext(Page<?> page, @Param("keyword") String keyword,
                                     @Param("categoryId") Long categoryId,
-                                    @Param("difficulty") String difficulty);
+                                    @Param("difficulty") String difficulty,
+                                    @Param("sort") String sort);
+
+    /**
+     * LIKE 兜底搜索题目（仅已发布）。用于 FULLTEXT 未命中英文短词或中英混合关键词时保证可检索。
+     */
+    @Select("""
+            <script>
+            SELECT id, category_id, title, summary, content, principle,
+                   comparison, scenario, risk, project_exp,
+                   code_examples, diagrams, related_ids,
+                   difficulty, view_count, status, source,
+                   create_time, update_time
+            FROM question
+            WHERE status = 'PUBLISHED' AND is_deleted = 0
+              AND (
+                title LIKE CONCAT('%', #{keyword}, '%')
+                OR summary LIKE CONCAT('%', #{keyword}, '%')
+                OR content LIKE CONCAT('%', #{keyword}, '%')
+                OR principle LIKE CONCAT('%', #{keyword}, '%')
+                OR comparison LIKE CONCAT('%', #{keyword}, '%')
+                OR scenario LIKE CONCAT('%', #{keyword}, '%')
+                OR risk LIKE CONCAT('%', #{keyword}, '%')
+                OR project_exp LIKE CONCAT('%', #{keyword}, '%')
+              )
+              <if test="categoryId != null">
+              AND category_id = #{categoryId}
+              </if>
+              <if test="difficulty != null and difficulty != ''">
+              AND difficulty = #{difficulty}
+              </if>
+            ORDER BY
+              <choose>
+                <when test="sort == 'hot'">view_count DESC, create_time DESC</when>
+                <when test="sort == 'latest'">create_time DESC</when>
+                <otherwise>
+                  CASE WHEN title LIKE CONCAT('%', #{keyword}, '%') THEN 0 ELSE 1 END,
+                  view_count DESC
+                </otherwise>
+              </choose>
+            </script>
+            """)
+    IPage<Question> searchLike(Page<?> page, @Param("keyword") String keyword,
+                               @Param("categoryId") Long categoryId,
+                               @Param("difficulty") String difficulty,
+                               @Param("sort") String sort);
 }

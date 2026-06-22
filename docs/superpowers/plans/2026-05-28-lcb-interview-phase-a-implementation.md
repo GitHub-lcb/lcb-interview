@@ -310,7 +310,7 @@ git commit -m "feat: QuestionVO 扩展 + FULLTEXT 搜索 + status 过滤"
 ```yaml
 # 在末尾追加
 admin:
-  token: lcb-admin-2026
+  token: ${ADMIN_TOKEN:dev-admin-token-change-me}
 ```
 
 - [ ] **Step 2: 创建 AdminTokenFilter**

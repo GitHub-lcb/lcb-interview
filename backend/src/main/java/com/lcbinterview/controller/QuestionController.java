@@ -1,12 +1,9 @@
 package com.lcbinterview.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.lcbinterview.common.ApiResponse;
-import com.lcbinterview.common.BusinessException;
 import com.lcbinterview.dto.PageResult;
 import com.lcbinterview.dto.QuestionQuery;
 import com.lcbinterview.dto.QuestionVO;
-import com.lcbinterview.model.Question;
 import com.lcbinterview.service.QuestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,36 +30,24 @@ public class QuestionController {
     @Operation(summary = "分页查询题目（含搜索、筛选）")
     @GetMapping
     public ResponseEntity<ApiResponse<PageResult<QuestionVO>>> list(@Valid QuestionQuery query) {
-        IPage<Question> page = questionService.search(
+        PageResult<QuestionVO> page = questionService.searchVo(
                 query.category(), query.difficulty(), query.keyword(),
-                query.tag(), query.page(), query.size());
-        List<QuestionVO> list = page.getRecords().stream()
-                .map(q -> QuestionVO.from(q, null, List.of()))
-                .toList();
-        log.info("搜索题目返回 {} 条（共 {} 条）", list.size(), page.getTotal());
-        return ResponseEntity.ok(ApiResponse.success(PageResult.of(page, list)));
+                query.tag(), query.page(), query.size(), query.sort());
+        log.info("搜索题目返回 {} 条（共 {} 条）", page.content().size(), page.total());
+        return ResponseEntity.ok(ApiResponse.success(page));
     }
 
     @Operation(summary = "获取题目详情")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<QuestionVO>> getById(@PathVariable Long id) {
-        Question question = questionService.getById(id);
-        if (!"PUBLISHED".equals(question.getStatus())) {
-            throw new BusinessException(404, "题目不存在");
-        }
-        return ResponseEntity.ok(ApiResponse.success(
-                QuestionVO.from(question, null, List.of())));
+        return ResponseEntity.ok(ApiResponse.success(questionService.getVoById(id)));
     }
 
     @Operation(summary = "获取热门题目排行")
     @GetMapping("/hot")
     public ResponseEntity<ApiResponse<List<QuestionVO>>> getHot(
             @RequestParam(defaultValue = "10") int size) {
-        List<Question> list = questionService.getHot(size);
-        List<QuestionVO> vos = list.stream()
-                .map(q -> QuestionVO.from(q, null, List.of()))
-                .toList();
         log.info("查询热门题目 Top {}", size);
-        return ResponseEntity.ok(ApiResponse.success(vos));
+        return ResponseEntity.ok(ApiResponse.success(questionService.getHotVo(size)));
     }
 }

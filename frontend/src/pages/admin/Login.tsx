@@ -1,35 +1,83 @@
 import { useState } from 'react'
-import { Card, Input, Button, message, Typography } from 'antd'
+import { Input, Button } from 'antd'
+import { emitFeedbackError, emitFeedbackSuccess } from '../../utils/feedbackMessage'
 import { useNavigate } from 'react-router-dom'
-
-const { Title } = Typography
+import axios from 'axios'
 
 export default function AdminLogin() {
   const [token, setToken] = useState('')
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  const handleLogin = () => {
-    if (!token.trim()) {
-      message.error('请输入 Token')
-      return
+  const handleLogin = async () => {
+    if (!token) return
+    setLoading(true)
+    try {
+      const res = await axios.get('/api/admin/verify', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.data.code === 200) {
+        localStorage.setItem('adminToken', token)
+        emitFeedbackSuccess('登录成功')
+        navigate('/admin/dashboard')
+      } else {
+        emitFeedbackError('验证失败')
+      }
+    } catch {
+      emitFeedbackError('验证失败')
+    } finally {
+      setLoading(false)
     }
-    localStorage.setItem('adminToken', token.trim())
-    message.success('已登录')
-    navigate('/admin/dashboard')
   }
 
   return (
-    <Card style={{ maxWidth: 400, margin: '100px auto' }}>
-      <Title level={4} style={{ textAlign: 'center' }}>Admin 登录</Title>
-      <Input.Password
-        placeholder="请输入 Admin Token"
-        value={token}
-        onChange={e => setToken(e.target.value)}
-        onPressEnter={handleLogin}
-      />
-      <Button type="primary" onClick={handleLogin} style={{ marginTop: 16, width: '100%' }}>
-        登录
-      </Button>
-    </Card>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#FAFAF9',
+      padding: 16,
+    }}>
+      <div className="magazine-card" style={{
+        width: 400,
+        maxWidth: '100%',
+        boxSizing: 'border-box',
+        padding: '40px 24px',
+      }}>
+        <h1 style={{
+          fontFamily: "'DM Serif Display', serif",
+          fontSize: 24,
+          fontWeight: 700,
+          color: '#18181B',
+          letterSpacing: '-0.03em',
+          margin: '0 0 8px 0',
+        }}>
+          管理员登录
+        </h1>
+        <p style={{ fontSize: 14, color: '#71717A', margin: '0 0 28px 0' }}>
+          请输入管理员 Token 登录后台
+        </p>
+        <Input.Password
+          placeholder="请输入 Token"
+          value={token}
+          onChange={e => setToken(e.target.value)}
+          onPressEnter={handleLogin}
+          variant="filled"
+          size="large"
+          style={{ marginBottom: 16, borderRadius: 8 }}
+        />
+        <Button
+          type="primary"
+          block
+          size="large"
+          loading={loading}
+          onClick={handleLogin}
+          style={{ borderRadius: 8, height: 44 }}
+        >
+          登录
+        </Button>
+      </div>
+    </div>
   )
 }
