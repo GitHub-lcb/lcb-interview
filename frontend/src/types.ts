@@ -134,9 +134,19 @@ export interface BatchProgress {
 export interface AdminAiConfigStatus {
   available: boolean
   apiKeyConfigured: boolean
+  maskedApiKey?: string
   model: string
+  apiUrl?: string
   endpointHost: string
+  interviewEnabled?: boolean
   message: string
+}
+
+export interface AdminAiConfigUpdateRequest {
+  apiKey?: string
+  model?: string
+  apiUrl?: string
+  interviewEnabled?: boolean
 }
 
 export interface GenerationTask {

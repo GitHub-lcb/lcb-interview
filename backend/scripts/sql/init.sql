@@ -10,6 +10,18 @@ DROP TABLE IF EXISTS question_tag;
 DROP TABLE IF EXISTS question;
 DROP TABLE IF EXISTS tag;
 DROP TABLE IF EXISTS category;
+DROP TABLE IF EXISTS ai_config;
+
+CREATE TABLE IF NOT EXISTS ai_config (
+    id                BIGINT       PRIMARY KEY COMMENT '主键，固定使用 1 作为当前系统配置',
+    api_key           VARCHAR(500) DEFAULT NULL COMMENT 'OpenAI 兼容 API Key，接口层只返回脱敏值',
+    model             VARCHAR(100) DEFAULT NULL COMMENT '模型名称，留空时使用环境变量兜底',
+    api_url           VARCHAR(500) DEFAULT NULL COMMENT 'OpenAI 兼容 chat completions 地址，留空时使用环境变量兜底',
+    interview_enabled TINYINT      DEFAULT NULL COMMENT '是否启用面试训练 AI 评分，留空时使用环境变量兜底',
+    create_time       DATETIME     NOT NULL COMMENT '创建时间',
+    update_time       DATETIME     NOT NULL COMMENT '更新时间',
+    is_deleted        TINYINT      DEFAULT 0 COMMENT '逻辑删除标记'
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = 'AI 运行时配置';
 
 CREATE TABLE IF NOT EXISTS category (
     id          BIGINT       AUTO_INCREMENT PRIMARY KEY COMMENT '主键',

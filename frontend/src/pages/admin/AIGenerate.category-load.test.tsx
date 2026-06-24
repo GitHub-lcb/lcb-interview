@@ -13,6 +13,7 @@ vi.mock('../../api/category', () => ({
 vi.mock('../../api/admin', () => ({
   batchGenerate: vi.fn(),
   getAiConfigStatus: vi.fn(),
+  updateAiConfig: vi.fn(),
   getBatchStatus: vi.fn(),
   streamGenerate: vi.fn(),
   streamFillAnswer: vi.fn(),
@@ -52,6 +53,16 @@ describe('AIGenerate category loading', () => {
     })
     vi.mocked(adminApi.listDrafts).mockResolvedValue({ total: 0 } as never)
     vi.mocked(adminApi.streamRewritePublishedAnswers).mockReturnValue(new AbortController())
+    vi.mocked((adminApi as any).updateAiConfig).mockResolvedValue({
+      available: true,
+      apiKeyConfigured: true,
+      maskedApiKey: 'sk-n****cret',
+      model: 'glm-5.2',
+      apiUrl: 'https://opencode.ai/zen/go/v1/chat/completions',
+      endpointHost: 'opencode.ai',
+      interviewEnabled: true,
+      message: 'AI 生成服务已配置',
+    })
   })
 
   afterEach(() => {
@@ -138,5 +149,45 @@ describe('AIGenerate category loading', () => {
     expect(await screen.findByText('AI 服务未配置')).toBeInTheDocument()
     expect(screen.getByText(/AI_OPENCODE_API_KEY/)).toBeInTheDocument()
     expect(container.querySelector('button[type="submit"]')).toBeDisabled()
+  })
+
+  it('shows masked ai key and saves a new runtime configuration', async () => {
+    const user = userEvent.setup()
+    vi.mocked(getCategories).mockResolvedValue([
+      {
+        id: 1,
+        name: 'Java 鍩虹',
+        icon: 'java',
+        description: 'Java 鍩虹棰樺簱',
+        sortOrder: 1,
+      },
+    ])
+    vi.mocked((adminApi as any).getAiConfigStatus).mockResolvedValue({
+      available: true,
+      apiKeyConfigured: true,
+      maskedApiKey: 'sk-l****3456',
+      model: 'glm-5.2',
+      apiUrl: 'https://opencode.ai/zen/go/v1/chat/completions',
+      endpointHost: 'opencode.ai',
+      interviewEnabled: true,
+      message: 'AI 生成服务已配置',
+    })
+
+    render(<AIGenerate />)
+
+    expect(await screen.findByText('sk-l****3456')).toBeInTheDocument()
+    expect(screen.queryByText('sk-live-abcdef123456')).not.toBeInTheDocument()
+
+    await user.type(screen.getByTestId('ai-config-api-key'), 'sk-new-secret')
+    await user.click(screen.getByTestId('ai-config-submit'))
+
+    await waitFor(() => {
+      expect((adminApi as any).updateAiConfig).toHaveBeenCalledWith(expect.objectContaining({
+        apiKey: 'sk-new-secret',
+        model: 'glm-5.2',
+        apiUrl: 'https://opencode.ai/zen/go/v1/chat/completions',
+        interviewEnabled: true,
+      }))
+    })
   })
 })

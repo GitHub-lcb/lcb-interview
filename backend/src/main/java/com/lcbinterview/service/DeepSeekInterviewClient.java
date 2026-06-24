@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  * DeepSeek/OpenAI 兼容的面试评分客户端。
- * 只读取环境变量中的密钥，调用失败时由上层 Service 自动回退到规则评分。
+ * 通过运行时配置服务读取数据库配置和环境变量兜底配置，调用失败时由上层 Service 自动回退到规则评分。
  */
 @Service
 public class DeepSeekInterviewClient implements AiInterviewClient {
@@ -36,39 +36,27 @@ public class DeepSeekInterviewClient implements AiInterviewClient {
 
     private final ObjectMapper objectMapper;
     private final HttpClient httpClient;
-    private final String apiKey;
-    private final String model;
-    private final String apiUrl;
-    private final boolean enabled;
+    private final AiRuntimeConfigService aiRuntimeConfigService;
     private final int timeoutMs;
 
     /**
      * 创建 AI 面试评分客户端。
      *
-     * @param objectMapper JSON 序列化组件
-     * @param apiKey       模型 API Key，通过环境变量注入
-     * @param model        模型名称
-     * @param apiUrl       OpenAI 兼容 chat completions 地址
-     * @param enabled      是否启用 AI 评分
-     * @param timeoutMs    请求超时时间，毫秒
+     * @param objectMapper           JSON 序列化组件
+     * @param aiRuntimeConfigService AI 运行时配置服务
+     * @param timeoutMs              请求超时时间，毫秒
      */
     @Autowired
     public DeepSeekInterviewClient(
             ObjectMapper objectMapper,
-            @Value("${ai.deepseek.api-key:}") String apiKey,
-            @Value("${ai.deepseek.model:deepseek-v4-flash}") String model,
-            @Value("${ai.deepseek.url:https://opencode.ai/zen/go/v1/chat/completions}") String apiUrl,
-            @Value("${ai.interview.enabled:true}") boolean enabled,
+            AiRuntimeConfigService aiRuntimeConfigService,
             @Value("${ai.interview.timeout-ms:" + DEFAULT_TIMEOUT_MS + "}") int timeoutMs) {
         this(
                 objectMapper,
                 HttpClient.newBuilder()
                         .connectTimeout(Duration.ofMillis(Math.max(1000, timeoutMs)))
                         .build(),
-                apiKey,
-                model,
-                apiUrl,
-                enabled,
+                aiRuntimeConfigService,
                 Math.max(1000, timeoutMs)
         );
     }
@@ -76,17 +64,11 @@ public class DeepSeekInterviewClient implements AiInterviewClient {
     DeepSeekInterviewClient(
             ObjectMapper objectMapper,
             HttpClient httpClient,
-            String apiKey,
-            String model,
-            String apiUrl,
-            boolean enabled,
+            AiRuntimeConfigService aiRuntimeConfigService,
             int timeoutMs) {
         this.objectMapper = objectMapper;
         this.httpClient = httpClient;
-        this.apiKey = apiKey == null ? "" : apiKey.trim();
-        this.model = model == null ? "" : model.trim();
-        this.apiUrl = apiUrl == null ? "" : apiUrl.trim();
-        this.enabled = enabled;
+        this.aiRuntimeConfigService = aiRuntimeConfigService;
         this.timeoutMs = timeoutMs;
     }
 
@@ -97,10 +79,7 @@ public class DeepSeekInterviewClient implements AiInterviewClient {
      */
     @Override
     public boolean isEnabled() {
-        return enabled
-                && StringUtils.hasText(apiKey)
-                && StringUtils.hasText(model)
-                && StringUtils.hasText(apiUrl);
+        return isEnabled(aiRuntimeConfigService.current());
     }
 
     /**
@@ -112,17 +91,19 @@ public class DeepSeekInterviewClient implements AiInterviewClient {
      */
     @Override
     public InterviewFeedbackVO evaluate(InterviewEvaluateRequest request, InterviewFeedbackVO ruleBasedFallback) {
-        if (!isEnabled()) {
+        AiRuntimeConfig runtimeConfig = aiRuntimeConfigService.current();
+        if (!isEnabled(runtimeConfig)) {
             throw new IllegalStateException("AI 面试评分未启用或未配置密钥");
         }
 
         try {
-            String requestBody = objectMapper.writeValueAsString(buildPayload(request, ruleBasedFallback));
-            HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(apiUrl))
+            String requestBody = objectMapper.writeValueAsString(
+                    buildPayload(request, ruleBasedFallback, runtimeConfig.model()));
+            HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(runtimeConfig.apiUrl()))
                     .timeout(Duration.ofMillis(timeoutMs))
                     .header("Content-Type", "application/json")
                     .header("Accept", "application/json")
-                    .header("Authorization", "Bearer " + apiKey)
+                    .header("Authorization", "Bearer " + runtimeConfig.apiKey())
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
                     .build();
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
@@ -140,7 +121,14 @@ public class DeepSeekInterviewClient implements AiInterviewClient {
         }
     }
 
-    private Map<String, Object> buildPayload(InterviewEvaluateRequest request, InterviewFeedbackVO fallback) {
+    private boolean isEnabled(AiRuntimeConfig runtimeConfig) {
+        return runtimeConfig.interviewEnabled()
+                && StringUtils.hasText(runtimeConfig.apiKey())
+                && StringUtils.hasText(runtimeConfig.model())
+                && StringUtils.hasText(runtimeConfig.apiUrl());
+    }
+
+    private Map<String, Object> buildPayload(InterviewEvaluateRequest request, InterviewFeedbackVO fallback, String model) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("model", model);
         payload.put("temperature", 0.2);

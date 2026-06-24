@@ -1,9 +1,12 @@
 package com.lcbinterview.controller.admin;
 
 import com.lcbinterview.dto.AdminAiConfigStatusVO;
+import com.lcbinterview.dto.AdminAiConfigUpdateRequest;
+import com.lcbinterview.dto.AdminAiConfigVO;
 import com.lcbinterview.dto.BatchGenerationRequest;
 import com.lcbinterview.service.AiGenerationRequestPolicy;
 import com.lcbinterview.service.AiQuestionService;
+import com.lcbinterview.service.AiRuntimeConfigService;
 import com.lcbinterview.service.BatchGenerationRunner;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -24,9 +27,10 @@ class AiGenerationControllerTest {
 
     private final AiQuestionService aiQuestionService = mock(AiQuestionService.class);
     private final BatchGenerationRunner batchGenerationRunner = mock(BatchGenerationRunner.class);
+    private final AiRuntimeConfigService aiRuntimeConfigService = mock(AiRuntimeConfigService.class);
     private final AiGenerationRequestPolicy requestPolicy = new AiGenerationRequestPolicy();
     private final AiGenerationController controller = new AiGenerationController(
-            aiQuestionService, batchGenerationRunner, requestPolicy);
+            aiQuestionService, batchGenerationRunner, requestPolicy, aiRuntimeConfigService);
 
     @Test
     void configStatusReturnsAiServiceConfigurationStatus() {
@@ -40,6 +44,54 @@ class AiGenerationControllerTest {
         assertThat(response.getBody().code()).isEqualTo(200);
         assertThat(response.getBody().data()).isSameAs(status);
         verify(aiQuestionService).configStatus();
+    }
+
+    @Test
+    void configReturnsMaskedRuntimeConfiguration() {
+        AdminAiConfigVO config = new AdminAiConfigVO(
+                true,
+                true,
+                "sk-l****3456",
+                "deepseek-chat",
+                "https://api.deepseek.com/v1/chat/completions",
+                "api.deepseek.com",
+                true,
+                "AI 生成服务已配置");
+        when(aiRuntimeConfigService.publicConfig()).thenReturn(config);
+
+        var response = controller.config();
+
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().code()).isEqualTo(200);
+        assertThat(response.getBody().data()).isSameAs(config);
+        assertThat(response.getBody().toString()).doesNotContain("abcdef123456");
+        verify(aiRuntimeConfigService).publicConfig();
+    }
+
+    @Test
+    void updateConfigSavesRuntimeConfiguration() {
+        AdminAiConfigUpdateRequest request = new AdminAiConfigUpdateRequest(
+                "sk-new-secret",
+                "deepseek-chat",
+                "https://api.deepseek.com/v1/chat/completions",
+                true);
+        AdminAiConfigVO saved = new AdminAiConfigVO(
+                true,
+                true,
+                "sk-n****cret",
+                "deepseek-chat",
+                "https://api.deepseek.com/v1/chat/completions",
+                "api.deepseek.com",
+                true,
+                "AI 生成服务已配置");
+        when(aiRuntimeConfigService.save(request)).thenReturn(saved);
+
+        var response = controller.updateConfig(request);
+
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().code()).isEqualTo(200);
+        assertThat(response.getBody().data()).isSameAs(saved);
+        verify(aiRuntimeConfigService).save(request);
     }
 
     @Test

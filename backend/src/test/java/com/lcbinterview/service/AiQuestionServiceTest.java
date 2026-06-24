@@ -1,6 +1,7 @@
 package com.lcbinterview.service;
 
 import com.lcbinterview.dto.GenerationRequest;
+import com.lcbinterview.dto.AdminAiConfigStatusVO;
 import com.lcbinterview.mapper.CategoryMapper;
 import com.lcbinterview.mapper.QuestionMapper;
 import org.junit.jupiter.api.Test;
@@ -81,11 +82,28 @@ class AiQuestionServiceTest {
         AiAnswerQualityPolicy answerQualityPolicy = mock(AiAnswerQualityPolicy.class);
         QuestionTitleDeduplicator titleDeduplicator = mock(QuestionTitleDeduplicator.class);
         AiGenerationRequestPolicy requestPolicy = mock(AiGenerationRequestPolicy.class);
+        AiRuntimeConfigService aiRuntimeConfigService = mock(AiRuntimeConfigService.class);
+        AiRuntimeConfig runtimeConfig = new AiRuntimeConfig(
+                apiKey,
+                "test-model",
+                "http://127.0.0.1:1/v1/chat/completions",
+                true);
+        when(aiRuntimeConfigService.current()).thenReturn(runtimeConfig);
+        when(aiRuntimeConfigService.legacyStatus()).thenReturn(new AdminAiConfigStatusVO(
+                runtimeConfig.generationAvailable(),
+                runtimeConfig.apiKeyConfigured(),
+                runtimeConfig.model(),
+                "127.0.0.1",
+                runtimeConfig.apiKeyConfigured()
+                        ? "AI 生成服务已配置"
+                        : "AI 生成服务未配置密钥，请设置 AI_OPENCODE_API_KEY"));
         AiQuestionService service = new AiQuestionService(
-                questionMapper, categoryMapper, answerQualityPolicy, titleDeduplicator, requestPolicy);
-        ReflectionTestUtils.setField(service, "apiKey", apiKey);
-        ReflectionTestUtils.setField(service, "model", "test-model");
-        ReflectionTestUtils.setField(service, "apiUrl", "http://127.0.0.1:1/v1/chat/completions");
+                questionMapper,
+                categoryMapper,
+                answerQualityPolicy,
+                titleDeduplicator,
+                requestPolicy,
+                aiRuntimeConfigService);
         ReflectionTestUtils.setField(service, "maxTokens", 1000);
         return new TestContext(service, questionMapper, answerQualityPolicy, requestPolicy);
     }

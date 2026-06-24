@@ -2,12 +2,15 @@ package com.lcbinterview.controller.admin;
 
 import com.lcbinterview.common.ApiResponse;
 import com.lcbinterview.dto.AdminAiConfigStatusVO;
+import com.lcbinterview.dto.AdminAiConfigUpdateRequest;
+import com.lcbinterview.dto.AdminAiConfigVO;
 import com.lcbinterview.dto.BatchGenerationRequest;
 import com.lcbinterview.dto.BatchProgressVO;
 import com.lcbinterview.dto.FillAnswersRequest;
 import com.lcbinterview.dto.GenerationRequest;
 import com.lcbinterview.service.AiGenerationRequestPolicy;
 import com.lcbinterview.service.AiQuestionService;
+import com.lcbinterview.service.AiRuntimeConfigService;
 import com.lcbinterview.service.BatchGenerationRunner;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,7 @@ public class AiGenerationController {
     private final AiQuestionService aiQuestionService;
     private final BatchGenerationRunner batchRunner;
     private final AiGenerationRequestPolicy requestPolicy;
+    private final AiRuntimeConfigService aiRuntimeConfigService;
 
     /**
      * 查询 AI 生成服务配置状态，供管理端展示可用性和非敏感诊断信息。
@@ -39,6 +43,28 @@ public class AiGenerationController {
     @GetMapping("/config-status")
     public ResponseEntity<ApiResponse<AdminAiConfigStatusVO>> configStatus() {
         return ResponseEntity.ok(ApiResponse.success(aiQuestionService.configStatus()));
+    }
+
+    /**
+     * 查询 AI 运行时配置，密钥只返回脱敏结果。
+     *
+     * @return AI 运行时配置
+     */
+    @GetMapping("/config")
+    public ResponseEntity<ApiResponse<AdminAiConfigVO>> config() {
+        return ResponseEntity.ok(ApiResponse.success(aiRuntimeConfigService.publicConfig()));
+    }
+
+    /**
+     * 保存 AI 运行时配置，apiKey 为空时保留已有数据库密钥。
+     *
+     * @param request AI 配置更新请求
+     * @return 保存后的 AI 运行时配置
+     */
+    @PutMapping("/config")
+    public ResponseEntity<ApiResponse<AdminAiConfigVO>> updateConfig(
+            @Valid @RequestBody AdminAiConfigUpdateRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(aiRuntimeConfigService.save(request)));
     }
 
     /**

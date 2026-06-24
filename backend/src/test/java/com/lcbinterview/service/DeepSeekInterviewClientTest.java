@@ -17,6 +17,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * DeepSeek 面试评分客户端测试，验证 OpenAI 兼容响应解析、鉴权头和失败处理。
@@ -25,14 +27,12 @@ class DeepSeekInterviewClientTest {
 
     @Test
     void springContextCreatesDeepSeekInterviewClientBean() {
+        AiRuntimeConfigService aiRuntimeConfigService = mock(AiRuntimeConfigService.class);
         new ApplicationContextRunner()
                 .withBean(ObjectMapper.class)
+                .withBean(AiRuntimeConfigService.class, () -> aiRuntimeConfigService)
                 .withBean(DeepSeekInterviewClient.class)
                 .withPropertyValues(
-                        "ai.deepseek.api-key=test-key",
-                        "ai.deepseek.model=test-model",
-                        "ai.deepseek.url=http://localhost/v1/chat/completions",
-                        "ai.interview.enabled=true",
                         "ai.interview.timeout-ms=5000"
                 )
                 .run(context -> assertThat(context).hasSingleBean(DeepSeekInterviewClient.class));
@@ -103,13 +103,16 @@ class DeepSeekInterviewClientTest {
     }
 
     private DeepSeekInterviewClient client(HttpServer server, String apiKey, boolean enabled) {
-        return new DeepSeekInterviewClient(
-                new ObjectMapper(),
-                HttpClient.newHttpClient(),
+        AiRuntimeConfigService aiRuntimeConfigService = mock(AiRuntimeConfigService.class);
+        when(aiRuntimeConfigService.current()).thenReturn(new AiRuntimeConfig(
                 apiKey,
                 "test-model",
                 "http://localhost:" + server.getAddress().getPort() + "/v1/chat/completions",
-                enabled,
+                enabled));
+        return new DeepSeekInterviewClient(
+                new ObjectMapper(),
+                HttpClient.newHttpClient(),
+                aiRuntimeConfigService,
                 5000
         );
     }

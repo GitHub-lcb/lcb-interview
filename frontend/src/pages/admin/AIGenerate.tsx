@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Card, Form, Select, InputNumber, Input, Button, Progress, Alert, Segmented, Tag, Divider, Statistic, Row, Col, Collapse, List, Badge, Space } from 'antd'
+import { Card, Form, Select, InputNumber, Input, Button, Progress, Alert, Segmented, Tag, Divider, Statistic, Row, Col, Collapse, List, Badge, Space, Switch } from 'antd'
 import { emitFeedbackError, emitFeedbackSuccess } from '../../utils/feedbackMessage'
-import { batchGenerate, getAiConfigStatus, getBatchStatus, streamGenerate, streamFillAnswer, streamRewritePublishedAnswers } from '../../api/admin'
+import { batchGenerate, getAiConfigStatus, getBatchStatus, streamGenerate, streamFillAnswer, streamRewritePublishedAnswers, updateAiConfig } from '../../api/admin'
 import { getCategories } from '../../api/category'
 import { listDrafts } from '../../api/admin'
-import type { AdminAiConfigStatus, Category, BatchProgress, StreamEvent } from '../../types'
+import type { AdminAiConfigStatus, AdminAiConfigUpdateRequest, Category, BatchProgress, StreamEvent } from '../../types'
 import { getStreamResultMeta } from './aiGenerateResult'
 
 export default function AIGenerate() {
+  const [aiConfigForm] = Form.useForm<AdminAiConfigUpdateRequest>()
   const [mode, setMode] = useState<'batch' | 'stream' | 'streamFill' | 'rewritePublished'>('stream')
   const [categories, setCategories] = useState<Category[]>([])
   const [categoryLoadError, setCategoryLoadError] = useState(false)
@@ -15,6 +16,7 @@ export default function AIGenerate() {
   const [batchProgress, setBatchProgress] = useState<BatchProgress | null>(null)
   const [aiConfigStatus, setAiConfigStatus] = useState<AdminAiConfigStatus | null>(null)
   const [aiConfigLoadError, setAiConfigLoadError] = useState(false)
+  const [aiConfigSaving, setAiConfigSaving] = useState(false)
   const [draftCount, setDraftCount] = useState(0)
 
   const [streamStatus, setStreamStatus] = useState<'idle' | 'connecting' | 'streaming' | 'done' | 'error'>('idle')
@@ -45,11 +47,21 @@ export default function AIGenerate() {
       })
   }, [])
 
+  const applyAiConfigStatus = useCallback((status: AdminAiConfigStatus) => {
+    setAiConfigStatus(status)
+    aiConfigForm.setFieldsValue({
+      apiKey: '',
+      model: status.model || '',
+      apiUrl: status.apiUrl || '',
+      interviewEnabled: status.interviewEnabled ?? true,
+    })
+  }, [aiConfigForm])
+
   useEffect(() => {
     loadCategories()
     getAiConfigStatus()
       .then(status => {
-        setAiConfigStatus(status)
+        applyAiConfigStatus(status)
         setAiConfigLoadError(false)
       })
       .catch(() => {
@@ -58,13 +70,35 @@ export default function AIGenerate() {
       })
     getBatchStatus().then(p => setBatchProgress(p as any)).catch(() => {})
     listDrafts(0, 1).then((res: any) => setDraftCount(res.total || 0)).catch(() => {})
-  }, [loadCategories])
+  }, [applyAiConfigStatus, loadCategories])
 
   const categoryOptions = categories.map(c => ({ value: c.name, label: c.name }))
   const aiOperationDisabled = aiConfigLoadError || aiConfigStatus?.available !== true
+  const aiKeyDisplay = aiConfigStatus?.apiKeyConfigured
+    ? aiConfigStatus.maskedApiKey || '已配置'
+    : '未配置'
   const aiConfigDescription = aiConfigStatus?.available
-    ? `模型：${aiConfigStatus.model || '-'}；端点：${aiConfigStatus.endpointHost || '-'}`
+    ? `密钥：${aiKeyDisplay}；模型：${aiConfigStatus.model || '-'}；端点：${aiConfigStatus.endpointHost || '-'}`
     : aiConfigStatus?.message || '请设置 AI_OPENCODE_API_KEY 后再使用生成、补答案和重写。'
+
+  const onAiConfigFinish = async (values: AdminAiConfigUpdateRequest) => {
+    setAiConfigSaving(true)
+    try {
+      const saved = await updateAiConfig({
+        apiKey: values.apiKey?.trim() || undefined,
+        model: values.model?.trim() || undefined,
+        apiUrl: values.apiUrl?.trim() || undefined,
+        interviewEnabled: values.interviewEnabled ?? false,
+      })
+      applyAiConfigStatus(saved)
+      setAiConfigLoadError(false)
+      emitFeedbackSuccess('AI 配置已保存')
+    } catch {
+      emitFeedbackError('AI 配置保存失败')
+    } finally {
+      setAiConfigSaving(false)
+    }
+  }
 
   const onBatchFinish = async (values: any) => {
     setBatchLoading(true)
@@ -274,6 +308,61 @@ export default function AIGenerate() {
         ]}
         style={{ marginBottom: 24 }}
       />
+
+      <div style={{ marginBottom: 16, padding: '12px 16px', border: '1px solid #f0f0f0', borderRadius: 8, background: '#fafafa' }}>
+        <Space size={[8, 8]} wrap style={{ marginBottom: 12 }}>
+          <Tag color={aiConfigStatus?.available ? 'success' : 'warning'}>
+            {aiConfigStatus?.available ? 'AI 已就绪' : 'AI 未配置'}
+          </Tag>
+          <span>当前 Key：<code>{aiKeyDisplay}</code></span>
+          <span>模型：<code>{aiConfigStatus?.model || '-'}</code></span>
+          <span>端点：<code>{aiConfigStatus?.endpointHost || '-'}</code></span>
+        </Space>
+        <Form
+          form={aiConfigForm}
+          layout="vertical"
+          onFinish={onAiConfigFinish}
+          initialValues={{ interviewEnabled: true }}
+        >
+          <Row gutter={12} align="bottom">
+            <Col xs={24} md={7}>
+              <Form.Item name="apiKey" label="API Key">
+                <Input.Password
+                  data-testid="ai-config-api-key"
+                  autoComplete="new-password"
+                  placeholder="留空保留当前 Key"
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={5}>
+              <Form.Item name="model" label="模型">
+                <Input data-testid="ai-config-model" placeholder="deepseek-v4-pro" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={7}>
+              <Form.Item name="apiUrl" label="接口地址">
+                <Input data-testid="ai-config-url" placeholder="https://.../chat/completions" />
+              </Form.Item>
+            </Col>
+            <Col xs={12} md={2}>
+              <Form.Item name="interviewEnabled" label="面试评分" valuePropName="checked">
+                <Switch />
+              </Form.Item>
+            </Col>
+            <Col xs={12} md={3}>
+              <Form.Item label=" ">
+                <Button
+                  data-testid="ai-config-submit"
+                  loading={aiConfigSaving}
+                  onClick={() => aiConfigForm.submit()}
+                >
+                  保存 AI 配置
+                </Button>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </div>
 
       {aiConfigLoadError && (
         <Alert

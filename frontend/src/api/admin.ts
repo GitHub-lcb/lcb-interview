@@ -14,7 +14,11 @@ export const getBatchStatus = () =>
     .then(res => res.data.data)
 
 export const getAiConfigStatus = () =>
-  api.get<{ data: import('../types').AdminAiConfigStatus }>('/admin/ai/config-status')
+  api.get<{ data: import('../types').AdminAiConfigStatus }>('/admin/ai/config')
+    .then(res => res.data.data)
+
+export const updateAiConfig = (params: import('../types').AdminAiConfigUpdateRequest) =>
+  api.put<{ data: import('../types').AdminAiConfigStatus }>('/admin/ai/config', params)
     .then(res => res.data.data)
 
 export const getAdminQualitySummary = (options: AxiosRequestConfig = {}) =>

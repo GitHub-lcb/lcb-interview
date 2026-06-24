@@ -40,6 +40,7 @@ public class AiQuestionService {
     private final AiAnswerQualityPolicy answerQualityPolicy;
     private final QuestionTitleDeduplicator titleDeduplicator;
     private final AiGenerationRequestPolicy requestPolicy;
+    private final AiRuntimeConfigService aiRuntimeConfigService;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
     private static final int ANSWER_QUALITY_MAX_ATTEMPTS = 3;
@@ -47,15 +48,6 @@ public class AiQuestionService {
     private static final String STATUS_PUBLISHED = "PUBLISHED";
     private static final String STATUS_DRAFT = "DRAFT";
     private static final String SOURCE_AI_REWRITE = "AI_REWRITE";
-
-    @Value("${ai.deepseek.api-key}")
-    private String apiKey;
-
-    @Value("${ai.deepseek.model:deepseek-v4-flash}")
-    private String model;
-
-    @Value("${ai.deepseek.url:https://opencode.ai/zen/go/v1/chat/completions}")
-    private String apiUrl;
 
     @Value("${ai.deepseek.max-tokens:65536}")
     private int maxTokens;
@@ -66,21 +58,7 @@ public class AiQuestionService {
      * @return AI 配置状态
      */
     public AdminAiConfigStatusVO configStatus() {
-        boolean apiKeyConfigured = isApiKeyConfigured();
-        boolean modelConfigured = model != null && !model.isBlank();
-        boolean endpointConfigured = apiUrl != null && !apiUrl.isBlank();
-        boolean available = apiKeyConfigured && modelConfigured && endpointConfigured;
-        String message;
-        if (!apiKeyConfigured) {
-            message = "AI 生成服务未配置密钥，请设置 AI_OPENCODE_API_KEY";
-        } else if (!modelConfigured) {
-            message = "AI 生成服务未配置模型，请设置 AI_DEEPSEEK_MODEL";
-        } else if (!endpointConfigured) {
-            message = "AI 生成服务未配置接口地址，请设置 AI_DEEPSEEK_URL";
-        } else {
-            message = "AI 生成服务已配置";
-        }
-        return new AdminAiConfigStatusVO(available, apiKeyConfigured, model, endpointHost(), message);
+        return aiRuntimeConfigService.legacyStatus();
     }
 
     // ==================== 同步方法（供 BatchGenerationRunner 使用） ====================
@@ -91,8 +69,9 @@ public class AiQuestionService {
     public List<Long> generateSync(GenerationRequest req, Long categoryId) {
         GenerationRequest safeReq = new GenerationRequest(
                 req.category(), req.difficulty(), requestPolicy.clampCount(req.count()), req.topic());
+        AiRuntimeConfig runtimeConfig = aiRuntimeConfigService.current();
         log.info("同步生成: category='{}', categoryId={}, count={}, topic='{}', 模型={}, maxTokens={}",
-                safeReq.category(), categoryId, safeReq.count(), safeReq.topic(), model, maxTokens);
+                safeReq.category(), categoryId, safeReq.count(), safeReq.topic(), runtimeConfig.model(), maxTokens);
 
         String prompt = answerQualityPolicy.buildQuestionPrompt(safeReq);
         log.info("调用 DeepSeek, prompt长度={}字符", prompt.length());
@@ -142,8 +121,9 @@ public class AiQuestionService {
         GenerationRequest safeReq = new GenerationRequest(
                 req.category(), req.difficulty(), requestPolicy.clampCount(req.count()), req.topic());
         SseStreamSession session = SseStreamSession.open(emitter);
+        AiRuntimeConfig runtimeConfig = aiRuntimeConfigService.current();
         log.info("流式生成启动: category='{}', difficulty={}, topic='{}', count={}, 模型={}, maxTokens={}",
-                safeReq.category(), safeReq.difficulty(), safeReq.topic(), safeReq.count(), model, maxTokens);
+                safeReq.category(), safeReq.difficulty(), safeReq.topic(), safeReq.count(), runtimeConfig.model(), maxTokens);
 
         scheduler.submit(() -> {
             long totalStart = System.currentTimeMillis();
@@ -745,13 +725,13 @@ public class AiQuestionService {
 
     /** 流式调用 DeepSeek，将 thinking/content 实时推送到 emitter。 */
     private StreamResult callDeepSeekStreamInternal(String prompt, SseStreamSession session, StreamPushMode pushMode) {
-        assertApiKeyConfigured();
+        AiRuntimeConfig runtimeConfig = requireGenerationConfig();
         if (pushMode.stopOnClosed && !session.isOpen()) {
             throw new SseStreamClosedException("SSE 连接已关闭");
         }
 
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", model);
+        requestBody.put("model", runtimeConfig.model());
         requestBody.put("messages", List.of(
                 Map.of("role", "system", "content",
                         "你是一位资深技术面试官，擅长出高质量面试题并给出详细解答。"),
@@ -765,10 +745,10 @@ public class AiQuestionService {
         try {
             String json = objectMapper.writeValueAsString(requestBody);
 
-            conn = (HttpURLConnection) URI.create(apiUrl).toURL().openConnection();
+            conn = (HttpURLConnection) URI.create(runtimeConfig.apiUrl()).toURL().openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+            conn.setRequestProperty("Authorization", "Bearer " + runtimeConfig.apiKey());
             conn.setRequestProperty("Accept", "text/event-stream");
             conn.setDoOutput(true);
             conn.setConnectTimeout(15000);
@@ -850,9 +830,9 @@ public class AiQuestionService {
 
     /** 非流式调用 DeepSeek（供 generateSync 使用）。 */
     private String callDeepSeek(String prompt) {
-        assertApiKeyConfigured();
+        AiRuntimeConfig runtimeConfig = requireGenerationConfig();
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", model);
+        requestBody.put("model", runtimeConfig.model());
         requestBody.put("messages", List.of(
                 Map.of("role", "system", "content",
                         "你是一位资深技术面试官，擅长出高质量面试题并给出详细解答。"),
@@ -861,16 +841,16 @@ public class AiQuestionService {
         requestBody.put("temperature", 0.7);
         requestBody.put("max_tokens", maxTokens);
 
-        log.info("非流式请求: model={}, prompt长度={}字符, maxTokens={}", model, prompt.length(), maxTokens);
+        log.info("非流式请求: model={}, prompt长度={}字符, maxTokens={}", runtimeConfig.model(), prompt.length(), maxTokens);
         long t = System.currentTimeMillis();
 
         try {
             String json = objectMapper.writeValueAsString(requestBody);
 
-            HttpURLConnection conn = (HttpURLConnection) URI.create(apiUrl).toURL().openConnection();
+            HttpURLConnection conn = (HttpURLConnection) URI.create(runtimeConfig.apiUrl()).toURL().openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+            conn.setRequestProperty("Authorization", "Bearer " + runtimeConfig.apiKey());
             conn.setDoOutput(true);
             conn.setConnectTimeout(15000);
             conn.setReadTimeout(600000);
@@ -902,26 +882,18 @@ public class AiQuestionService {
         }
     }
 
-    private void assertApiKeyConfigured() {
-        if (!isApiKeyConfigured()) {
+    private AiRuntimeConfig requireGenerationConfig() {
+        AiRuntimeConfig runtimeConfig = aiRuntimeConfigService.current();
+        if (!runtimeConfig.apiKeyConfigured()) {
             throw new IllegalStateException("AI 生成服务未配置密钥，请设置 AI_OPENCODE_API_KEY");
         }
-    }
-
-    private boolean isApiKeyConfigured() {
-        return apiKey != null && !apiKey.isBlank();
-    }
-
-    private String endpointHost() {
-        if (apiUrl == null || apiUrl.isBlank()) {
-            return "";
+        if (!runtimeConfig.modelConfigured()) {
+            throw new IllegalStateException("AI 生成服务未配置模型，请设置 AI_DEEPSEEK_MODEL");
         }
-        try {
-            String host = URI.create(apiUrl).getHost();
-            return host == null ? "" : host;
-        } catch (IllegalArgumentException e) {
-            return "";
+        if (!runtimeConfig.endpointConfigured()) {
+            throw new IllegalStateException("AI 生成服务未配置接口地址，请设置 AI_DEEPSEEK_URL");
         }
+        return runtimeConfig;
     }
 
     private void logResponseUsage(String responseJson) {
