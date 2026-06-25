@@ -10,6 +10,7 @@ import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { summarizeQuestionSetProgress } from '../../utils/studyProgress'
 import { buildScheduledReviewQueue } from '../../utils/reviewSchedule'
 import { buildContinuePracticePath } from '../../utils/practiceRoute'
+import { previewQuestion } from '../../utils/questionPreview'
 import type { Question, Category, StudyQuestionStatus } from '../../types'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
@@ -389,6 +390,12 @@ export default function QuestionList() {
                         {q.title}
                       </Link>
                     </h2>
+                    {(() => {
+                      const preview = previewQuestion(q)
+                      return preview ? (
+                        <p className="question-list-card-preview">{preview}</p>
+                      ) : null
+                    })()}
                     <div className="question-list-card-meta">
                       <span className={`difficulty-tag ${q.difficulty.toLowerCase()}`}>
                         {difficultyLabels[q.difficulty] || q.difficulty}

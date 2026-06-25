@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS question (
     INDEX idx_status (status),
     INDEX idx_view_count (view_count DESC),
     INDEX idx_create_time (create_time DESC),
-    FULLTEXT INDEX ft_question_search (title, summary, principle, content, scenario, project_exp) WITH PARSER ngram
+    FULLTEXT INDEX ft_question_search (title, summary, principle, content, comparison, scenario, risk, project_exp, answer) WITH PARSER ngram
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '面试题目';
 
 CREATE TABLE IF NOT EXISTS question_tag (

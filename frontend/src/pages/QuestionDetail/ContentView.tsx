@@ -1,4 +1,4 @@
-import { useId, useState, type ReactNode } from 'react'
+import { useId, useRef, useState, type ReactNode } from 'react'
 import { DownOutlined } from '@ant-design/icons'
 import Markdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
@@ -36,16 +36,18 @@ function Section({
   label,
   children,
   defaultOpen,
+  sectionRef,
 }: {
   index: number
   label: string
   children: ReactNode
   defaultOpen?: boolean
+  sectionRef: (el: HTMLElement | null) => void
 }) {
   const [open, setOpen] = useState(defaultOpen ?? false)
   const panelId = useId()
   return (
-    <div className="answer-section">
+    <div className="answer-section" ref={sectionRef}>
       <button
         type="button"
         className="answer-section-toggle"
@@ -71,6 +73,8 @@ function Section({
 }
 
 export default function ContentView({ question, defaultOpen = false }: Props) {
+  // 记录每个 section 对应的 DOM 节点，供 TOC 点击跳转使用。
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
   const sections: SectionItem[] = [
     {
       key: 'quick-answer',
@@ -134,14 +138,52 @@ export default function ContentView({ question, defaultOpen = false }: Props) {
     })
   }
 
+  const jumpTo = (key: string) => {
+    const el = sectionRefs.current[key]
+    if (!el) {
+      return
+    }
+    // 若 section 处于折叠态，先模拟点击展开后再滚动，避免定位不到内容。
+    const toggle = el.querySelector<HTMLButtonElement>('.answer-section-toggle')
+    const isOpen = toggle?.getAttribute('aria-expanded') === 'true'
+    if (!isOpen) {
+      toggle?.click()
+    }
+    // 等待展开后下一帧再滚动，避免位置算错。
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
+
+  // TOC 仅在段落数超过 3 时呈现，避免短答案反而出现冗余目录。
+  const showToc = sections.length > 3
+
   return (
     <div>
+      {showToc && (
+        <nav className="answer-toc" aria-label="答案目录">
+          {sections.map((section, index) => (
+            <button
+              key={section.key}
+              type="button"
+              className="answer-toc-item"
+              onClick={() => jumpTo(section.key)}
+            >
+              <span className="answer-toc-index">{String(index + 1).padStart(2, '0')}</span>
+              <span className="answer-toc-label">{section.label}</span>
+            </button>
+          ))}
+        </nav>
+      )}
       {sections.map((section, index) => (
         <Section
           key={section.key}
           index={index}
           label={section.label}
           defaultOpen={defaultOpen || section.defaultOpen || index < 2}
+          sectionRef={(el) => {
+            sectionRefs.current[section.key] = el
+          }}
         >
           {section.content}
         </Section>

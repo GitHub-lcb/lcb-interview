@@ -690,6 +690,7 @@ public class AiQuestionService {
         q.setRisk(nullIfEmpty(item.path("risk").asText()));
         q.setProjectExp(nullIfEmpty(item.path("project_exp").asText()));
         q.setCodeExamples(nullIfEmpty(item.path("code_examples").toString()));
+        q.setDiagrams(nullIfEmpty(item.path("diagrams").toString()));
         q.setDifficulty(item.path("difficulty").asText("MEDIUM"));
         return q;
     }
@@ -706,6 +707,7 @@ public class AiQuestionService {
         update.setRisk(nullIfEmpty(parsed.path("risk").asText()));
         update.setProjectExp(nullIfEmpty(parsed.path("project_exp").asText()));
         update.setCodeExamples(nullIfEmpty(parsed.path("code_examples").toString()));
+        update.setDiagrams(nullIfEmpty(parsed.path("diagrams").toString()));
         if (parsed.has("difficulty") && !parsed.path("difficulty").asText().isBlank()) {
             update.setDifficulty(parsed.path("difficulty").asText());
         }
@@ -725,7 +727,9 @@ public class AiQuestionService {
         draft.setRisk(nullIfEmpty(parsed.path("risk").asText()));
         draft.setProjectExp(nullIfEmpty(parsed.path("project_exp").asText()));
         draft.setCodeExamples(nullIfEmpty(parsed.path("code_examples").toString()));
-        draft.setDiagrams(original.getDiagrams());
+        draft.setDiagrams(nullIfEmpty(parsed.path("diagrams").toString()) == null
+                ? original.getDiagrams()
+                : nullIfEmpty(parsed.path("diagrams").toString()));
         draft.setDifficulty(nullIfEmpty(original.getDifficulty()) == null
                 ? parsed.path("difficulty").asText("MEDIUM")
                 : original.getDifficulty());

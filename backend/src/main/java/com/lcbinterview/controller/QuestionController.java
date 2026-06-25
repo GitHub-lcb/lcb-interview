@@ -50,4 +50,17 @@ public class QuestionController {
         log.info("查询热门题目 Top {}", size);
         return ResponseEntity.ok(ApiResponse.success(questionService.getHotVo(size)));
     }
+
+    /**
+     * 按 ID 列表批量查询已发布题目，用于详情页关联题目渲染。
+     * 仅返回 PUBLISHED 题目，避免通过关联 ID 暴露草稿/驳回题。
+     */
+    @Operation(summary = "按 ID 列表批量查询题目")
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<List<QuestionVO>>> listByIds(
+            @RequestParam("ids") List<Long> ids) {
+        List<QuestionVO> result = questionService.listPublishedVosByIds(ids);
+        log.info("按 ID 批量查询题目，请求 {} 条，命中 {} 条", ids == null ? 0 : ids.size(), result.size());
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
 }

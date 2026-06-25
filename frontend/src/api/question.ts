@@ -52,3 +52,10 @@ export const getQuestionById = (id: number, options: RequestOptions = {}) =>
 export const getHotQuestions = (size = 10, options: RequestOptions = {}) =>
   api.get<{ data: Question[] }>('/questions/hot', { params: { size }, ...options })
     .then(res => res.data.data)
+
+/** 按 ID 列表批量查询已发布题目，用于详情页关联题目渲染。 */
+export const listQuestionsByIds = (ids: number[], options: RequestOptions = {}) =>
+  api.get<{ data: Question[] }>('/questions/list', {
+    params: { ids: ids.join(',') },
+    ...options,
+  }).then(res => res.data.data ?? [])

@@ -164,7 +164,8 @@ public class QuestionService {
         }
         viewCountService.increment(id);
         log.info("查看题目详情，id={}, title={}", id, question.getTitle());
-        return toVos(List.of(question)).getFirst();
+        QuestionVO detail = toVos(List.of(question)).getFirst();
+        return detail.withNavigation(findPreviousQuestionId(question), findNextQuestionId(question));
     }
 
     /**
@@ -186,6 +187,37 @@ public class QuestionService {
     @Cacheable(value = "hotQuestionVos")
     public List<QuestionVO> getHotVo(int size) {
         return toVos(getHot(size));
+    }
+
+    /**
+     * 按 ID 列表批量查询已发布题目，并组装 VO。
+     * 用于详情页关联题目渲染：传入 relatedIds 解析后的 ID 列表，返回同分类或跨分类的相关题。
+     * 仅返回 PUBLISHED 题目，过滤草稿/驳回，避免通过关联 ID 暴露未发布内容。
+     * 上限 20 条，对输入去重并剔除无效/非正 ID。
+     */
+    public List<QuestionVO> listPublishedVosByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        // 解析关联 ID 列表后立即做去重和数值校验，避免脏数据放大查询压力。
+        List<Long> distinctIds = ids.stream()
+                .filter(Objects::nonNull)
+                .filter(id -> id > 0)
+                .distinct()
+                .limit(20)
+                .toList();
+        if (distinctIds.isEmpty()) {
+            return List.of();
+        }
+        List<Question> questions = questionMapper.selectBatchIds(distinctIds);
+        if (questions == null || questions.isEmpty()) {
+            return List.of();
+        }
+        // 仅返回已发布题目；按传入顺序排序，保证关联题目展示稳定。
+        List<Question> published = questions.stream()
+                .filter(q -> "PUBLISHED".equals(q.getStatus()))
+                .toList();
+        return toVos(published);
     }
 
     private int normalizePage(int page) {
@@ -216,6 +248,34 @@ public class QuestionService {
             throw new BusinessException(404, "题目不存在");
         }
         return question;
+    }
+
+    private Long findPreviousQuestionId(Question question) {
+        if (question.getCategoryId() == null || question.getId() == null) {
+            return null;
+        }
+        Question previous = questionMapper.selectOne(new LambdaQueryWrapper<Question>()
+                .select(Question::getId)
+                .eq(Question::getStatus, "PUBLISHED")
+                .eq(Question::getCategoryId, question.getCategoryId())
+                .lt(Question::getId, question.getId())
+                .orderByDesc(Question::getId)
+                .last("LIMIT 1"));
+        return previous == null ? null : previous.getId();
+    }
+
+    private Long findNextQuestionId(Question question) {
+        if (question.getCategoryId() == null || question.getId() == null) {
+            return null;
+        }
+        Question next = questionMapper.selectOne(new LambdaQueryWrapper<Question>()
+                .select(Question::getId)
+                .eq(Question::getStatus, "PUBLISHED")
+                .eq(Question::getCategoryId, question.getCategoryId())
+                .gt(Question::getId, question.getId())
+                .orderByAsc(Question::getId)
+                .last("LIMIT 1"));
+        return next == null ? null : next.getId();
     }
 
     private List<QuestionVO> toVos(List<Question> questions) {

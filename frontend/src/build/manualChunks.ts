@@ -25,6 +25,18 @@ export function manualChunks(id: string): string | undefined {
     return 'http-vendor'
   }
 
+  // mermaid 体积较大（含众多图表渲染依赖），单独分包并配合懒加载避免拖慢首屏。
+  if (normalizedId.includes('/node_modules/mermaid/')
+      || normalizedId.includes('/node_modules/cytoscape/')
+      || normalizedId.includes('/node_modules/d3/')
+      || normalizedId.includes('/node_modules/dagre/')
+      || normalizedId.includes('/node_modules/elkjs/')
+      || normalizedId.includes('/node_modules/khroma/')
+      || normalizedId.includes('/node_modules/lodash-es/')
+      || normalizedId.includes('/node_modules/d3-array/')) {
+    return 'diagram-vendor'
+  }
+
   return 'vendor'
 }
 

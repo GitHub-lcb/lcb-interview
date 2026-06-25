@@ -31,6 +31,8 @@ export interface Question {
   tags: string[]
   viewCount: number
   createTime: string
+  previousId?: number
+  nextId?: number
 }
 
 export interface QuestionAdmin extends Question {

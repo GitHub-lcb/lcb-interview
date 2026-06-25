@@ -8,6 +8,7 @@ import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import { summarizeQuestionSetProgress } from '../../utils/studyProgress'
 import { buildContinuePracticePath } from '../../utils/practiceRoute'
+import { previewQuestion } from '../../utils/questionPreview'
 import type { Question } from '../../types'
 
 const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
@@ -43,14 +44,6 @@ function parsePage(value: string | null): number {
     return 1
   }
   return parsed
-}
-
-function previewQuestion(question: Question): string {
-  return (question.summary || question.content || question.answer || '')
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/[#>*_`~-]/g, '')
-    .trim()
-    .slice(0, 120)
 }
 
 function normalizeRecentKeyword(value: string): string {

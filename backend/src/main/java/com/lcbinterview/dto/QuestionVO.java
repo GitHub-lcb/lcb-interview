@@ -29,7 +29,9 @@ public record QuestionVO(
         @Schema(description = "分类名称") String categoryName,
         @Schema(description = "标签列表") List<String> tags,
         @Schema(description = "浏览次数") Integer viewCount,
-        @Schema(description = "创建时间") LocalDateTime createTime
+        @Schema(description = "创建时间") LocalDateTime createTime,
+        @Schema(description = "同分类上一题 ID") Long previousId,
+        @Schema(description = "同分类下一题 ID") Long nextId
 ) {
     /**
      * 从 Question 实体创建 VO，需要外部传入分类名称和标签列表。
@@ -44,7 +46,23 @@ public record QuestionVO(
                 question.getDiagrams(), question.getRelatedIds(),
                 question.getDifficulty(), question.getCategoryId(),
                 categoryName, tags,
-                question.getViewCount(), question.getCreateTime()
+                question.getViewCount(), question.getCreateTime(),
+                null, null
+        );
+    }
+
+    /**
+     * 返回带同分类上下题导航的副本。
+     *
+     * @param previousId 同分类上一题 ID，可为空
+     * @param nextId 同分类下一题 ID，可为空
+     * @return 带导航信息的题目 VO
+     */
+    public QuestionVO withNavigation(Long previousId, Long nextId) {
+        return new QuestionVO(
+                id, title, summary, content, principle, comparison, scenario, risk,
+                projectExp, codeExamples, diagrams, relatedIds, difficulty, categoryId,
+                categoryName, tags, viewCount, createTime, previousId, nextId
         );
     }
 }

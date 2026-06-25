@@ -101,7 +101,7 @@ public interface QuestionMapper extends BaseMapper<Question> {
                    create_time, update_time
             FROM question
             WHERE status = 'PUBLISHED' AND is_deleted = 0
-              AND MATCH(title, summary, principle, content, scenario, project_exp)
+              AND MATCH(title, summary, principle, content, comparison, scenario, risk, project_exp, answer)
                   AGAINST(#{keyword} IN BOOLEAN MODE)
               <if test="categoryId != null">
               AND category_id = #{categoryId}

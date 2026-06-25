@@ -31,6 +31,7 @@ class AiAnswerQualityPolicyTest {
                 .contains("标签：线程池、并发")
                 .contains("30 秒口述版")
                 .contains("面试官评分点")
+                .contains("diagrams")
                 .contains("质量门槛")
                 .contains("避免空泛表述");
     }
@@ -67,6 +68,7 @@ class AiAnswerQualityPolicyTest {
                 .contains("标准答案")
                 .contains("面试官评分点")
                 .contains("高频追问")
+                .contains("diagrams")
                 .contains("质量门槛");
     }
 
@@ -82,7 +84,8 @@ class AiAnswerQualityPolicyTest {
                   "scenario": null,
                   "risk": null,
                   "project_exp": null,
-                  "code_examples": []
+                  "code_examples": [],
+                  "diagrams": []
                 }
                 """);
 
@@ -115,6 +118,14 @@ class AiAnswerQualityPolicyTest {
                       "code": "new ThreadPoolExecutor(8, 16, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(500), namedFactory, new ThreadPoolExecutor.CallerRunsPolicy());",
                       "description": "使用有界队列和明确拒绝策略，避免任务无限堆积。"
                     }
+                  ],
+                  "diagrams": [
+                    {
+                      "type": "mermaid",
+                      "alt": "线程池执行流程",
+                      "content": "flowchart LR\\nA[提交任务] --> B{核心线程未满?}\\nB -- 是 --> C[创建核心线程]\\nB -- 否 --> D{队列未满?}\\nD -- 是 --> E[进入有界队列]\\nD -- 否 --> F{最大线程未满?}\\nF -- 是 --> G[创建非核心线程]\\nF -- 否 --> H[触发拒绝策略]",
+                      "caption": "展示 ThreadPoolExecutor 从提交任务到拒绝策略的关键分支。"
+                    }
                   ]
                 }
                 """);
@@ -146,6 +157,14 @@ class AiAnswerQualityPolicyTest {
                       "code": "new ThreadPoolExecutor(8, 16, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(500), namedFactory, new ThreadPoolExecutor.CallerRunsPolicy());",
                       "description": "使用有界队列和明确拒绝策略，避免任务无限堆积。"
                     }
+                  ],
+                  "diagrams": [
+                    {
+                      "type": "mermaid",
+                      "alt": "线程池执行流程",
+                      "content": "flowchart LR\\nA[提交任务] --> B{核心线程未满?}\\nB -- 是 --> C[创建核心线程]\\nB -- 否 --> D{队列未满?}\\nD -- 是 --> E[进入有界队列]\\nD -- 否 --> F{最大线程未满?}\\nF -- 是 --> G[创建非核心线程]\\nF -- 否 --> H[触发拒绝策略]",
+                      "caption": "展示 ThreadPoolExecutor 从提交任务到拒绝策略的关键分支。"
+                    }
                   ]
                 }
                 """);
@@ -170,6 +189,7 @@ class AiAnswerQualityPolicyTest {
         generated.setRisk("");
         generated.setProjectExp("");
         generated.setCodeExamples("[]");
+        generated.setDiagrams("[]");
 
         AiAnswerQualityPolicy.QualityReport report =
                 policy.evaluateGeneratedQuestion("Java 并发", generated);

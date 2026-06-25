@@ -2,7 +2,6 @@ package com.lcbinterview.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lcbinterview.dto.GenerationRequest;
 import com.lcbinterview.model.Question;
@@ -55,6 +54,7 @@ public class AiAnswerQualityPolicy {
                 - risk: Markdown，至少 80 字，列出线上风险、边界条件和常见坑
                 - project_exp: Markdown，至少 80 字，给出可以在面试中复述的项目经验表达
                 - code_examples: 数组。涉及代码、SQL、算法、配置、并发、框架用法时必须至少 1 个示例；每项包含 lang、title、code、description
+                - diagrams: 数组，必须至少 1 个图解；每项包含 type、alt、content、caption。type 优先使用 mermaid，content 只放 Mermaid 源码，不要 Markdown 代码围栏
                 - difficulty: EASY/MEDIUM/HARD
 
                 ## 质量门槛
@@ -62,6 +62,7 @@ public class AiAnswerQualityPolicy {
                 - 必须说明为什么这样做，不能只说是什么
                 - 必须有面试官视角的评分点和追问
                 - 必须有项目表达，能让候选人迁移到真实经历
+                - 必须提供一张能帮助快速理解的流程图、时序图或结构图；优先用 Mermaid flowchart/sequenceDiagram/classDiagram
                 - 避免空泛表述，例如「根据业务情况」「非常重要」「需要综合考虑」后不继续展开
                 - 不确定的事实不要编造版本号、源码细节或性能数字
                 """.formatted(question.getTitle(), safeCategoryName, safeDifficulty, tagText);
@@ -104,6 +105,7 @@ public class AiAnswerQualityPolicy {
                 - risk: Markdown，至少 80 字，列出线上风险、边界条件和常见坑
                 - project_exp: Markdown，至少 80 字，给出可以在面试中复述的项目经验表达
                 - code_examples: 数组。涉及代码、SQL、算法、配置、并发、框架用法时必须至少 1 个示例；每项包含 lang、title、code、description
+                - diagrams: 数组，必须至少 1 个图解；每项包含 type、alt、content、caption。type 优先使用 mermaid，content 只放 Mermaid 源码，不要 Markdown 代码围栏
                 - difficulty: EASY/MEDIUM/HARD
 
                 ## 质量门槛
@@ -112,6 +114,7 @@ public class AiAnswerQualityPolicy {
                 - 必须说明为什么这样做，不能只说是什么
                 - 必须有面试官视角的评分点和追问
                 - 必须有项目表达，能让候选人迁移到真实经历
+                - 必须提供一张能帮助快速理解的流程图、时序图或结构图；优先用 Mermaid flowchart/sequenceDiagram/classDiagram
                 - 不确定的事实不要编造版本号、源码细节或性能数字
                 """.formatted(question.getTitle(), safeCategoryName, safeDifficulty, tagText, currentAnswer);
     }
@@ -144,6 +147,7 @@ public class AiAnswerQualityPolicy {
                 - risk: Markdown，至少 80 字，列出线上风险、边界条件和常见坑
                 - project_exp: Markdown，至少 80 字，给出可在面试中复述的项目经验表达
                 - code_examples: 数组。涉及代码、SQL、算法、配置、并发、框架用法时必须至少 1 个示例；每项包含 lang、title、code、description
+                - diagrams: 数组，必须至少 1 个图解；每项包含 type、alt、content、caption。type 优先使用 mermaid，content 只放 Mermaid 源码，不要 Markdown 代码围栏
                 - difficulty: EASY/MEDIUM/HARD
 
                 ## 质量门槛
@@ -152,6 +156,7 @@ public class AiAnswerQualityPolicy {
                 - 必须说明为什么这样做，不能只说是什么
                 - 必须有面试官视角的评分点和追问
                 - 必须有项目表达，能让候选人迁移到真实经历
+                - 必须提供一张能帮助快速理解的流程图、时序图或结构图；优先用 Mermaid flowchart/sequenceDiagram/classDiagram
                 - 不确定的事实不要编造版本号、源码细节或性能数字
                 """.formatted(req.count(), req.category(), safeDifficulty, topic);
     }
@@ -194,6 +199,10 @@ public class AiAnswerQualityPolicy {
             issues.add("code_examples 缺少必要示例");
             score -= 10;
         }
+        if (!hasDiagram(answer.path("diagrams"))) {
+            issues.add("diagrams 缺少图解");
+            score -= 6;
+        }
 
         return new QualityReport(Math.max(0, score), List.copyOf(issues));
     }
@@ -232,19 +241,23 @@ public class AiAnswerQualityPolicy {
         node.put("risk", textOrDefault(question.getRisk(), ""));
         node.put("project_exp", textOrDefault(question.getProjectExp(), ""));
         node.set("code_examples", parseCodeExamples(question.getCodeExamples()));
+        node.set("diagrams", parseJsonArray(question.getDiagrams()));
         return node;
     }
 
     private JsonNode parseCodeExamples(String codeExamples) {
-        if (codeExamples == null || codeExamples.isBlank() || "null".equals(codeExamples)) {
+        return parseJsonArray(codeExamples);
+    }
+
+    private JsonNode parseJsonArray(String value) {
+        if (value == null || value.isBlank() || "null".equals(value)) {
             return objectMapper.createArrayNode();
         }
         try {
-            JsonNode parsed = objectMapper.readTree(codeExamples);
+            JsonNode parsed = objectMapper.readTree(value);
             return parsed.isArray() ? parsed : objectMapper.createArrayNode();
         } catch (Exception e) {
-            ArrayNode fallback = objectMapper.createArrayNode();
-            return fallback;
+            return objectMapper.createArrayNode();
         }
     }
 
@@ -289,6 +302,20 @@ public class AiAnswerQualityPolicy {
         }
         for (JsonNode item : codeExamples) {
             if (!item.path("code").asText("").isBlank()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasDiagram(JsonNode diagrams) {
+        if (!diagrams.isArray() || diagrams.isEmpty()) {
+            return false;
+        }
+        for (JsonNode item : diagrams) {
+            String type = item.path("type").asText("");
+            String content = item.path("content").asText("");
+            if (!type.isBlank() && !content.isBlank()) {
                 return true;
             }
         }

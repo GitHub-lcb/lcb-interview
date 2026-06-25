@@ -9,10 +9,11 @@ import StudyActionButtons from '../../components/StudyActionButtons'
 import StudyStatusBadge from '../../components/StudyStatusBadge'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import ContentView from './ContentView'
+import RelatedQuestions from './RelatedQuestions'
 import Skeleton from './Skeleton'
 import type { InterviewAttempt, InterviewCriterion, Question } from '../../types'
 
-const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
+export const difficultyLabels: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
 
 function parseQuestionRouteId(id?: string): number | null {
   const questionId = Number(id)
@@ -215,6 +216,26 @@ export default function QuestionDetail() {
           <div className="content-card">
             <ContentView question={q} />
           </div>
+
+          <RelatedQuestions question={q} />
+
+          {(q.previousId || q.nextId) && (
+            <nav className="question-neighbor-nav" aria-label="同分类题目导航">
+              <Button
+                disabled={!q.previousId}
+                onClick={() => q.previousId && navigate(`/question/${q.previousId}`)}
+              >
+                上一题
+              </Button>
+              <Button
+                type="primary"
+                disabled={!q.nextId}
+                onClick={() => q.nextId && navigate(`/question/${q.nextId}`)}
+              >
+                下一题
+              </Button>
+            </nav>
+          )}
         </main>
 
         <AnswerQualityPanel question={q} />
