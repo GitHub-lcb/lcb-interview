@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -19,6 +20,23 @@ public class AiAnswerQualityPolicy {
 
     private static final int PASS_SCORE = 85;
     private static final Set<String> VALID_DIFFICULTIES = Set.of("EASY", "MEDIUM", "HARD");
+    private static final Set<String> SUPPORTED_DIAGRAM_TYPES = Set.of("mermaid", "svg", "url");
+    private static final Set<String> SUPPORTED_MERMAID_STARTERS = Set.of(
+            "flowchart", "graph", "sequencediagram", "classdiagram", "statediagram-v2",
+            "erdiagram", "gantt", "journey", "pie", "mindmap", "timeline", "gitgraph"
+    );
+    private static final String MERMAID_SYNTAX_GUARDRAILS = """
+
+            ## Mermaid 图解语法约束
+            - diagrams[].content 必须是合法 Mermaid 源码，content 不要包含 ```mermaid 代码围栏。
+            - flowchart 节点必须使用 A[\"文本\"] 或 B{\"判断文本\"} 格式，节点 ID 只能使用英文字母、数字和下划线。
+            - 节点文本包含中文、括号、冒号、斜杠、逗号时，必须放在双引号里。
+            - Mermaid 示例：
+              flowchart TD
+                A[\"开始排序查询\"] --> B{\"是否命中索引排序？\"}
+                B -->|是| C[\"按索引顺序扫描\"]
+                B -->|否| D[\"执行 filesort\"]
+            """;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -65,7 +83,8 @@ public class AiAnswerQualityPolicy {
                 - 必须提供一张能帮助快速理解的流程图、时序图或结构图；优先用 Mermaid flowchart/sequenceDiagram/classDiagram
                 - 避免空泛表述，例如「根据业务情况」「非常重要」「需要综合考虑」后不继续展开
                 - 不确定的事实不要编造版本号、源码细节或性能数字
-                """.formatted(question.getTitle(), safeCategoryName, safeDifficulty, tagText);
+                """.formatted(question.getTitle(), safeCategoryName, safeDifficulty, tagText)
+                + MERMAID_SYNTAX_GUARDRAILS;
     }
 
     /**
@@ -116,7 +135,8 @@ public class AiAnswerQualityPolicy {
                 - 必须有项目表达，能让候选人迁移到真实经历
                 - 必须提供一张能帮助快速理解的流程图、时序图或结构图；优先用 Mermaid flowchart/sequenceDiagram/classDiagram
                 - 不确定的事实不要编造版本号、源码细节或性能数字
-                """.formatted(question.getTitle(), safeCategoryName, safeDifficulty, tagText, currentAnswer);
+                """.formatted(question.getTitle(), safeCategoryName, safeDifficulty, tagText, currentAnswer)
+                + MERMAID_SYNTAX_GUARDRAILS;
     }
 
     /**
@@ -158,7 +178,8 @@ public class AiAnswerQualityPolicy {
                 - 必须有项目表达，能让候选人迁移到真实经历
                 - 必须提供一张能帮助快速理解的流程图、时序图或结构图；优先用 Mermaid flowchart/sequenceDiagram/classDiagram
                 - 不确定的事实不要编造版本号、源码细节或性能数字
-                """.formatted(req.count(), req.category(), safeDifficulty, topic);
+                """.formatted(req.count(), req.category(), safeDifficulty, topic)
+                + MERMAID_SYNTAX_GUARDRAILS;
     }
 
     /**
@@ -199,10 +220,7 @@ public class AiAnswerQualityPolicy {
             issues.add("code_examples 缺少必要示例");
             score -= 10;
         }
-        if (!hasDiagram(answer.path("diagrams"))) {
-            issues.add("diagrams 缺少图解");
-            score -= 6;
-        }
+        score -= requireValidDiagram(issues, answer.path("diagrams"));
 
         return new QualityReport(Math.max(0, score), List.copyOf(issues));
     }
@@ -308,18 +326,187 @@ public class AiAnswerQualityPolicy {
         return false;
     }
 
-    private boolean hasDiagram(JsonNode diagrams) {
+    private int requireValidDiagram(List<String> issues, JsonNode diagrams) {
         if (!diagrams.isArray() || diagrams.isEmpty()) {
-            return false;
+            issues.add("diagrams 缺少图解");
+            return 6;
         }
+
+        int before = issues.size();
+        boolean hasValidDiagram = false;
         for (JsonNode item : diagrams) {
-            String type = item.path("type").asText("");
-            String content = item.path("content").asText("");
-            if (!type.isBlank() && !content.isBlank()) {
-                return true;
+            String issue = validateDiagramItem(item);
+            if (issue == null) {
+                hasValidDiagram = true;
+            } else {
+                issues.add(issue);
             }
         }
-        return false;
+        if (!hasValidDiagram) {
+            issues.add("diagrams 缺少可渲染图解");
+        }
+        return issues.size() > before ? 10 : 0;
+    }
+
+    private String validateDiagramItem(JsonNode item) {
+        String type = item.path("type").asText("").trim();
+        String content = item.path("content").asText("").trim();
+        if (type.isBlank() || content.isBlank()) {
+            return "diagrams 图解类型或内容为空";
+        }
+
+        String normalizedType = type.toLowerCase(Locale.ROOT);
+        if (!type.equals(normalizedType) && SUPPORTED_DIAGRAM_TYPES.contains(normalizedType)) {
+            return "diagrams 图解类型必须使用小写：" + type;
+        }
+        if (!SUPPORTED_DIAGRAM_TYPES.contains(type)) {
+            return "diagrams 图解类型不支持：" + type;
+        }
+        if ("mermaid".equals(type)) {
+            return validateMermaidContent(content);
+        }
+        return null;
+    }
+
+    private String validateMermaidContent(String content) {
+        if (content.contains("```")) {
+            return "diagrams Mermaid 源码不能包含 Markdown 代码围栏";
+        }
+
+        String firstLine = firstMermaidContentLine(content);
+        if (firstLine == null || !isSupportedMermaidStarter(firstLine)) {
+            return "diagrams Mermaid 图解必须以合法图表类型开头";
+        }
+        if (isFlowchart(firstLine)) {
+            return validateFlowchartLabels(content);
+        }
+        return null;
+    }
+
+    private String firstMermaidContentLine(String content) {
+        for (String line : content.split("\\R")) {
+            String trimmed = line.trim();
+            if (trimmed.isBlank() || trimmed.startsWith("%%")) {
+                continue;
+            }
+            if (!trimmed.isBlank()) {
+                return trimmed;
+            }
+        }
+        return null;
+    }
+
+    private boolean isSupportedMermaidStarter(String firstLine) {
+        String normalized = firstLine.toLowerCase(Locale.ROOT);
+        return SUPPORTED_MERMAID_STARTERS.stream()
+                .anyMatch(starter -> normalized.equals(starter) || normalized.startsWith(starter + " "));
+    }
+
+    private boolean isFlowchart(String firstLine) {
+        String normalized = firstLine.toLowerCase(Locale.ROOT);
+        return normalized.equals("flowchart")
+                || normalized.startsWith("flowchart ")
+                || normalized.equals("graph")
+                || normalized.startsWith("graph ");
+    }
+
+    private String validateFlowchartLabels(String content) {
+        for (String line : content.split("\\R")) {
+            String trimmed = line.trim();
+            if (trimmed.isBlank() || trimmed.startsWith("%%")) {
+                continue;
+            }
+            String issue = validateFlowchartLabelsInLine(line);
+            if (issue != null) {
+                return issue;
+            }
+        }
+        return null;
+    }
+
+    private String validateFlowchartLabelsInLine(String line) {
+        for (int i = 0; i < line.length(); i++) {
+            char current = line.charAt(i);
+            if (current != '[' && current != '{' && current != '(' && current != '>') {
+                continue;
+            }
+            if (!isNodeLabelStart(line, i)) {
+                continue;
+            }
+
+            int closeIndex = findFlowchartLabelClose(line, i, current);
+            if (closeIndex < 0) {
+                return "diagrams Mermaid flowchart 节点括号未闭合";
+            }
+            int labelStart = current == '(' && i + 1 < line.length() && line.charAt(i + 1) == '('
+                    ? i + 2
+                    : i + 1;
+            String label = line.substring(labelStart, closeIndex).trim();
+            if (!isQuotedLabel(label)) {
+                return "diagrams Mermaid flowchart 节点文本必须使用双引号";
+            }
+            i = current == '(' && closeIndex + 1 < line.length() && line.charAt(closeIndex + 1) == ')'
+                    ? closeIndex + 1
+                    : closeIndex;
+        }
+        return null;
+    }
+
+    private int findFlowchartLabelClose(String line, int openIndex, char open) {
+        if (open == '(' && openIndex + 1 < line.length() && line.charAt(openIndex + 1) == '(') {
+            return findDoubleRoundClose(line, openIndex + 2);
+        }
+        char close = switch (open) {
+            case '[' -> ']';
+            case '{' -> '}';
+            case '>' -> ']';
+            default -> ')';
+        };
+        return findCloseOutsideQuotes(line, openIndex + 1, close);
+    }
+
+    private int findDoubleRoundClose(String line, int startIndex) {
+        boolean inQuotes = false;
+        for (int i = startIndex; i < line.length() - 1; i++) {
+            char current = line.charAt(i);
+            if (current == '"' && (i == 0 || line.charAt(i - 1) != '\\')) {
+                inQuotes = !inQuotes;
+            }
+            if (!inQuotes && current == ')' && line.charAt(i + 1) == ')') {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int findCloseOutsideQuotes(String line, int startIndex, char close) {
+        boolean inQuotes = false;
+        for (int i = startIndex; i < line.length(); i++) {
+            char current = line.charAt(i);
+            if (current == '"' && (i == 0 || line.charAt(i - 1) != '\\')) {
+                inQuotes = !inQuotes;
+            }
+            if (!inQuotes && current == close) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private boolean isNodeLabelStart(String line, int openIndex) {
+        int cursor = openIndex - 1;
+        while (cursor >= 0 && Character.isWhitespace(line.charAt(cursor))) {
+            cursor--;
+        }
+        if (cursor < 0) {
+            return false;
+        }
+        char previous = line.charAt(cursor);
+        return Character.isLetterOrDigit(previous) || previous == '_';
+    }
+
+    private boolean isQuotedLabel(String label) {
+        return label.length() >= 2 && label.startsWith("\"") && label.endsWith("\"");
     }
 
     private String textOrDefault(String value, String fallback) {

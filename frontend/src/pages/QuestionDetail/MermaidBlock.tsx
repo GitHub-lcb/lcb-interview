@@ -93,7 +93,14 @@ export default function MermaidBlock({ code }: Props) {
         <Alert
           type="warning"
           message="图表渲染失败"
-          description={error}
+          description={(
+            <div style={{ textAlign: 'left' }}>
+              <div>
+                AI 生成的 Mermaid 图解语法不合法，已保留源码。可以在后台重新生成答案，或审核时把节点文本改成 A[&quot;文本&quot;] 格式。
+              </div>
+              <div style={{ marginTop: 8 }}>错误详情：{error}</div>
+            </div>
+          )}
           showIcon
           style={{ marginBottom: 12 }}
         />
@@ -115,7 +122,8 @@ export default function MermaidBlock({ code }: Props) {
     <div ref={containerRef}>
       {loading ? (
         <div style={{ textAlign: 'center', padding: 24 }}>
-          <Spin size="small" tip="渲染图表中..." />
+          <Spin size="small" />
+          <div style={{ marginTop: 8, fontSize: 13, color: '#71717A' }}>渲染图表中...</div>
         </div>
       ) : (
         rendered
