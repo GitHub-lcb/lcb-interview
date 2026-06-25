@@ -21,10 +21,6 @@ lcb-interview/
 ├── backend/
 │   ├── pom.xml
 │   ├── scripts/
-│   │   ├── fetch-questions.js          # 从 mianshiya.com 抓取题目
-│   │   ├── ai-generate-answers.js      # AI 生成答案 SQL
-│   │   ├── ai-answer-guide.md          # AI 答案生成说明
-│   │   ├── data/                       # 各分类抓取结果
 │   │   └── sql/init.sql                # 建表 + 初始题库数据
 │   └── src/
 │       ├── main/java/com/lcbinterview/
@@ -233,43 +229,18 @@ if (tag != null) { ... }
 
 ## 题目数据工作流
 
-### 1. 从 mianshiya.com 抓取题目
-
-```bash
-cd backend/scripts
-node fetch-questions.js
-```
-
-输出：
-
-- `data/{slug}.json`：每分类的题目数据（标题、难度、标签、来源 URL）。
-- `sql/insert-draft.sql`：抓取过程的临时 DRAFT SQL 片段；正式初始化只保留并执行 `sql/init.sql`。
-
-### 2. 初始化数据库（一站式）
+### 1. 初始化数据库（一站式）
 
 ```bash
 # init.sql 包含: 建表 + 46个分类 + 71个标签 + 6386道DRAFT题目
 mysql -u root -p lcb_interview < backend/scripts/sql/init.sql
 ```
 
-### 3. AI 填充答案（中后台）
+### 2. AI 填充答案（中后台）
 
-通过管理后台 `/admin/ai-generate` 使用 AI 补答案功能，或手动运行 `node ai-generate-answers.js` 生成 UPDATE SQL。
+通过管理后台 `/admin/ai-generate` 使用 AI 补答案功能（`/api/admin/ai/fill-answer-stream`、`/api/admin/ai/batch`）。早期依赖 `backend/scripts` 下 Node 脚本的离线生成方式已移除，统一走后端 AI 服务。
 
-```bash
-# 列出所有可用分类
-node ai-generate-answers.js
-
-# 处理单个分类
-node ai-generate-answers.js java-basics
-
-# 处理所有分类
-node ai-generate-answers.js --all
-```
-
-输出文件：`backend/scripts/sql/ai-update-answers.sql`
-
-### 4. 发布（可选）
+### 3. 发布（可选）
 
 ```sql
 UPDATE question SET status = 'PUBLISHED' WHERE status = 'DRAFT' AND source = 'AI_GENERATED';

@@ -31,10 +31,6 @@ lcb-interview/
 ├── backend/
 │   ├── pom.xml
 │   ├── scripts/
-│   │   ├── fetch-questions.js          # 从 mianshiya.com 抓取题目
-│   │   ├── ai-generate-answers.js      # AI 生成答案 SQL
-│   │   ├── ai-answer-guide.md          # AI 答案生成说明
-│   │   ├── data/                       # 各分类抓取结果
 │   │   └── sql/init.sql                # 建表 + 初始题库数据
 │   └── src/
 │       ├── main/java/com/lcbinterview/
@@ -203,38 +199,17 @@ npm run dev
 
 ## 题目数据工作流
 
-### 抓取题目
+### 初始化数据库
 
 ```bash
-cd backend/scripts
-node fetch-questions.js
+mysql -u root -p lcb_interview < backend/scripts/sql/init.sql
 ```
 
-输出：
-
-- `data/{slug}.json`：每个分类的抓取数据。
-- `sql/insert-draft.sql`：抓取过程生成的临时 DRAFT SQL 片段。
-
-正式初始化请执行 `backend/scripts/sql/init.sql`。
+`init.sql` 包含建表 + 46 个分类 + 71 个标签 + 6386 道 DRAFT 题目。
 
 ### AI 填充答案
 
-```bash
-cd backend/scripts
-
-# 列出所有可用分类
-node ai-generate-answers.js
-
-# 处理单个分类
-node ai-generate-answers.js java-basics
-
-# 处理所有分类
-node ai-generate-answers.js --all
-```
-
-输出文件：`backend/scripts/sql/ai-update-answers.sql`。
-
-也可以通过管理后台 `/admin/ai-generate` 使用 SSE 实时进度生成答案。
+通过管理后台 `/admin/ai-generate` 使用 SSE 实时进度补齐答案字段（`/api/admin/ai/fill-answer-stream`、`/api/admin/ai/batch`）。早期依赖 `backend/scripts` 下 Node 脚本的离线生成方式已移除，统一走后端 AI 服务。
 
 ### 发布题目
 
