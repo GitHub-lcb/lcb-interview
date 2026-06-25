@@ -120,7 +120,7 @@ export interface Diagram {
 }
 
 export interface BatchProgress {
-  status: 'RUNNING' | 'IDLE'
+  status: 'RUNNING' | 'IDLE' | 'COMPLETED' | 'FAILED'
   totalCategories: number
   completedCategories: number
   totalQuestions: number

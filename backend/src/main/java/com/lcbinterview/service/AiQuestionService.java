@@ -112,6 +112,37 @@ public class AiQuestionService {
         return ids;
     }
 
+    /**
+     * 同步补全单道草稿题答案，供后台批量任务复用。
+     *
+     * @param question 待补答案的草稿题
+     * @return 补答案结果
+     */
+    public FillAnswerResult fillAnswerSync(Question question) {
+        requireGenerationConfig();
+        return fillAnswer(question, null, StreamPushMode.SILENT, "同步补答案");
+    }
+
+    /**
+     * 单题补答案结果。
+     *
+     * @param success 是否补全成功
+     * @param questionId 题目 ID
+     * @param qualityScore 质量分
+     * @param reasoningLength 推理内容长度
+     * @param error 失败原因
+     * @param qualityIssues 质量问题列表
+     */
+    public record FillAnswerResult(
+            boolean success,
+            Long questionId,
+            Integer qualityScore,
+            int reasoningLength,
+            String error,
+            List<String> qualityIssues
+    ) {
+    }
+
     // ==================== SSE 流式方法 ====================
 
     /**
@@ -304,55 +335,10 @@ public class AiQuestionService {
 
                     log.info("流式补答案 [{}/{}]: id={}, title='{}'", i + 1, total, q.getId(), truncate(q.getTitle(), 50));
 
-                    FillContext context = loadFillContext(q);
-                    Question update = null;
-                    int reasoningLength = 0;
-                    AiAnswerQualityPolicy.QualityReport qualityReport = null;
-                    String lastError = null;
+                    FillAnswerResult result = fillAnswer(
+                            q, session, StreamPushMode.HEARTBEAT_ONLY, "流式补答案 [" + (i + 1) + "/" + total + "]");
 
-                    for (int attempt = 1; attempt <= ANSWER_QUALITY_MAX_ATTEMPTS; attempt++) {
-                        String prompt = answerQualityPolicy.buildFillPrompt(q, context.categoryName(), context.tags());
-                        if (qualityReport != null) {
-                            prompt = prompt + buildQualityRetryInstruction(qualityReport);
-                        }
-                        log.info("流式补答案 [{}/{}]: 第 {} 次生成, prompt={}字符",
-                                i + 1, total, attempt, prompt.length());
-
-                        try {
-                            StreamResult sr = callDeepSeekStreamInternal(prompt, session, StreamPushMode.HEARTBEAT_ONLY);
-                            reasoningLength = sr.reasoningLength();
-                            log.info("流式补答案 [{}/{}]: 第 {} 次收到响应, content={}字符, reasoning={}字符",
-                                    i + 1, total, attempt, sr.content().length(), sr.reasoningLength());
-
-                            JsonNode parsed = parseAnswerObject(sr.content());
-                            if (parsed == null) {
-                                lastError = "响应中无有效答案对象";
-                                log.warn("流式补答案 [{}/{}]: 第 {} 次解析失败, id={}",
-                                        i + 1, total, attempt, q.getId());
-                                continue;
-                            }
-
-                            qualityReport = answerQualityPolicy.evaluate(q, context.categoryName(), context.tags(), parsed);
-                            if (!qualityReport.passed()) {
-                                lastError = formatQualityIssues(qualityReport);
-                                log.warn("流式补答案 [{}/{}]: 第 {} 次质量未达标, id={}, {}",
-                                        i + 1, total, attempt, q.getId(), lastError);
-                                continue;
-                            }
-
-                            update = toQuestionUpdate(q.getId(), parsed);
-                            break;
-                        } catch (SseStreamClosedException e) {
-                            throw e;
-                        } catch (Exception e) {
-                            lastError = e.getMessage();
-                            log.warn("流式补答案 [{}/{}]: 第 {} 次生成异常, id={}, error={}",
-                                    i + 1, total, attempt, q.getId(), e.getMessage());
-                        }
-                    }
-
-                    if (update != null) {
-                        questionMapper.updateById(update);
+                    if (result.success()) {
                         success++;
 
                         long iterTime = System.currentTimeMillis() - iterStart;
@@ -362,20 +348,20 @@ public class AiQuestionService {
                         Map<String, Object> qResult = new HashMap<>(progressData);
                         qResult.put("status", "completed");
                         qResult.put("questionId", q.getId());
-                        qResult.put("qualityScore", qualityReport == null ? null : qualityReport.score());
-                        qResult.put("reasoningLength", reasoningLength);
+                        qResult.put("qualityScore", result.qualityScore());
+                        qResult.put("reasoningLength", result.reasoningLength());
                         sendJsonBestEffort(session, "question_result", qResult);
                         resultCount++;
                     } else {
                         fail++;
                         log.warn("流式补答案 [{}/{}]: 多次生成后仍未达标, id={}, error={}",
-                                i + 1, total, q.getId(), lastError);
+                                i + 1, total, q.getId(), result.error());
                         Map<String, Object> errData = new HashMap<>(progressData);
                         errData.put("status", "failed");
-                        errData.put("error", lastError == null ? "答案质量未达标" : lastError);
-                        if (qualityReport != null) {
-                            errData.put("qualityScore", qualityReport.score());
-                            errData.put("qualityIssues", qualityReport.issues());
+                        errData.put("error", result.error() == null ? "答案质量未达标" : result.error());
+                        if (result.qualityScore() != null) {
+                            errData.put("qualityScore", result.qualityScore());
+                            errData.put("qualityIssues", result.qualityIssues());
                         }
                         sendJsonBestEffort(session, "question_result", errData);
                         resultCount++;
@@ -561,7 +547,8 @@ public class AiQuestionService {
 
     private enum StreamPushMode {
         FULL(true, true),
-        HEARTBEAT_ONLY(false, false);
+        HEARTBEAT_ONLY(false, false),
+        SILENT(false, false);
 
         private final boolean stopOnClosed;
         private final boolean captureReasoning;
@@ -570,6 +557,78 @@ public class AiQuestionService {
             this.stopOnClosed = stopOnClosed;
             this.captureReasoning = captureReasoning;
         }
+    }
+
+    private FillAnswerResult fillAnswer(
+            Question question, SseStreamSession session, StreamPushMode pushMode, String logPrefix) {
+        if (question == null || question.getId() == null) {
+            throw new IllegalArgumentException("待补答案题目不能为空");
+        }
+
+        FillContext context = loadFillContext(question);
+        Question update = null;
+        int reasoningLength = 0;
+        AiAnswerQualityPolicy.QualityReport qualityReport = null;
+        String lastError = null;
+
+        for (int attempt = 1; attempt <= ANSWER_QUALITY_MAX_ATTEMPTS; attempt++) {
+            String prompt = answerQualityPolicy.buildFillPrompt(question, context.categoryName(), context.tags());
+            if (qualityReport != null) {
+                prompt = prompt + buildQualityRetryInstruction(qualityReport);
+            }
+            log.info("{}: 第 {} 次生成, id={}, prompt={}字符",
+                    logPrefix, attempt, question.getId(), prompt.length());
+
+            try {
+                StreamResult sr = callDeepSeekStreamInternal(prompt, session, pushMode);
+                reasoningLength = sr.reasoningLength();
+                log.info("{}: 第 {} 次收到响应, id={}, content={}字符, reasoning={}字符",
+                        logPrefix, attempt, question.getId(), sr.content().length(), sr.reasoningLength());
+
+                JsonNode parsed = parseAnswerObject(sr.content());
+                if (parsed == null) {
+                    lastError = "响应中无有效答案对象";
+                    log.warn("{}: 第 {} 次解析失败, id={}", logPrefix, attempt, question.getId());
+                    continue;
+                }
+
+                qualityReport = answerQualityPolicy.evaluate(question, context.categoryName(), context.tags(), parsed);
+                if (!qualityReport.passed()) {
+                    lastError = formatQualityIssues(qualityReport);
+                    log.warn("{}: 第 {} 次质量未达标, id={}, {}",
+                            logPrefix, attempt, question.getId(), lastError);
+                    continue;
+                }
+
+                update = toQuestionUpdate(question.getId(), parsed);
+                break;
+            } catch (SseStreamClosedException e) {
+                throw e;
+            } catch (Exception e) {
+                lastError = e.getMessage();
+                log.warn("{}: 第 {} 次生成异常, id={}, error={}",
+                        logPrefix, attempt, question.getId(), e.getMessage());
+            }
+        }
+
+        if (update != null) {
+            questionMapper.updateById(update);
+            return new FillAnswerResult(
+                    true,
+                    question.getId(),
+                    qualityReport == null ? null : qualityReport.score(),
+                    reasoningLength,
+                    null,
+                    List.of());
+        }
+
+        return new FillAnswerResult(
+                false,
+                question.getId(),
+                qualityReport == null ? null : qualityReport.score(),
+                reasoningLength,
+                lastError == null ? "答案质量未达标" : lastError,
+                qualityReport == null ? List.of() : List.copyOf(qualityReport.issues()));
     }
 
     private static class SseStreamClosedException extends RuntimeException {
@@ -714,11 +773,14 @@ public class AiQuestionService {
 
     private void pushStreamDelta(SseStreamSession session, StreamPushMode pushMode,
                                  String name, String data, int chunkCount) {
+        if (pushMode == StreamPushMode.SILENT) {
+            return;
+        }
         if (pushMode == StreamPushMode.FULL) {
             sendEventOrStop(session, name, data);
             return;
         }
-        if (chunkCount % STREAM_HEARTBEAT_CHUNK_INTERVAL == 0) {
+        if (session != null && chunkCount % STREAM_HEARTBEAT_CHUNK_INTERVAL == 0) {
             sendEventBestEffort(session, "info", "AI 正在生成，已接收 " + chunkCount + " 个片段");
         }
     }
@@ -726,7 +788,7 @@ public class AiQuestionService {
     /** 流式调用 DeepSeek，将 thinking/content 实时推送到 emitter。 */
     private StreamResult callDeepSeekStreamInternal(String prompt, SseStreamSession session, StreamPushMode pushMode) {
         AiRuntimeConfig runtimeConfig = requireGenerationConfig();
-        if (pushMode.stopOnClosed && !session.isOpen()) {
+        if (pushMode.stopOnClosed && (session == null || !session.isOpen())) {
             throw new SseStreamClosedException("SSE 连接已关闭");
         }
 
@@ -763,7 +825,9 @@ public class AiQuestionService {
                 String errorBody = new String(
                         conn.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
                 log.error("DeepSeek 流式 API 错误: status={}, body={}", status, truncate(errorBody, 500));
-                sendEventOrStop(session, "error", "API 错误: " + status);
+                if (pushMode != StreamPushMode.SILENT && session != null) {
+                    sendEventOrStop(session, "error", "API 错误: " + status);
+                }
                 throw new RuntimeException("DeepSeek API 错误: " + status);
             }
 

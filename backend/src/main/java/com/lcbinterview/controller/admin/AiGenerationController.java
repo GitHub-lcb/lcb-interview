@@ -4,13 +4,14 @@ import com.lcbinterview.common.ApiResponse;
 import com.lcbinterview.dto.AdminAiConfigStatusVO;
 import com.lcbinterview.dto.AdminAiConfigUpdateRequest;
 import com.lcbinterview.dto.AdminAiConfigVO;
+import com.lcbinterview.dto.BatchFillAnswerRequest;
 import com.lcbinterview.dto.BatchGenerationRequest;
 import com.lcbinterview.dto.BatchProgressVO;
-import com.lcbinterview.dto.FillAnswersRequest;
 import com.lcbinterview.dto.GenerationRequest;
 import com.lcbinterview.service.AiGenerationRequestPolicy;
 import com.lcbinterview.service.AiQuestionService;
 import com.lcbinterview.service.AiRuntimeConfigService;
+import com.lcbinterview.service.BatchFillAnswerRunner;
 import com.lcbinterview.service.BatchGenerationRunner;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class AiGenerationController {
 
     private final AiQuestionService aiQuestionService;
     private final BatchGenerationRunner batchRunner;
+    private final BatchFillAnswerRunner batchFillAnswerRunner;
     private final AiGenerationRequestPolicy requestPolicy;
     private final AiRuntimeConfigService aiRuntimeConfigService;
 
@@ -148,6 +150,35 @@ public class AiGenerationController {
     @GetMapping("/batch/status")
     public ResponseEntity<ApiResponse<BatchProgressVO>> batchStatus() {
         return ResponseEntity.ok(ApiResponse.success(batchRunner.getProgress()));
+    }
+
+    /**
+     * 后台批量补答案。异步处理待补草稿，通过 /fill-answer-batch/status 查看进度。
+     *
+     * @param req 批量补答案请求
+     * @return 启动结果
+     */
+    @PostMapping("/fill-answer-batch")
+    public ResponseEntity<ApiResponse<String>> batchFillAnswers(@Valid @RequestBody BatchFillAnswerRequest req) {
+        AdminAiConfigStatusVO configStatus = aiQuestionService.configStatus();
+        if (!configStatus.available()) {
+            return ResponseEntity.ok(ApiResponse.error(503, configStatus.message()));
+        }
+        boolean started = batchFillAnswerRunner.start(req.categoryId(), req.maxQuestions(), req.delaySeconds());
+        if (!started) {
+            return ResponseEntity.ok(ApiResponse.error(409, "批量补答案任务已在运行中"));
+        }
+        return ResponseEntity.ok(ApiResponse.success("批量补答案任务已启动"));
+    }
+
+    /**
+     * 查询后台批量补答案任务进度。
+     *
+     * @return 当前任务进度
+     */
+    @GetMapping("/fill-answer-batch/status")
+    public ResponseEntity<ApiResponse<BatchProgressVO>> batchFillAnswerStatus() {
+        return ResponseEntity.ok(ApiResponse.success(batchFillAnswerRunner.getProgress()));
     }
 
     private SseEmitter unavailableStream(AdminAiConfigStatusVO configStatus) {

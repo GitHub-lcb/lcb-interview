@@ -13,6 +13,18 @@ export const getBatchStatus = () =>
   api.get<{ data: import('../types').BatchProgress }>('/admin/ai/batch/status')
     .then(res => res.data.data)
 
+export const batchFillAnswers = (params: {
+  categoryId?: number
+  maxQuestions?: number
+  delaySeconds?: number
+}) =>
+  api.post<{ data: string }>('/admin/ai/fill-answer-batch', params)
+    .then(res => res.data.data)
+
+export const getBatchFillAnswerStatus = () =>
+  api.get<{ data: import('../types').BatchProgress }>('/admin/ai/fill-answer-batch/status')
+    .then(res => res.data.data)
+
 export const getAiConfigStatus = () =>
   api.get<{ data: import('../types').AdminAiConfigStatus }>('/admin/ai/config')
     .then(res => res.data.data)

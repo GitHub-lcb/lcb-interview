@@ -4,6 +4,7 @@ import com.lcbinterview.dto.GenerationRequest;
 import com.lcbinterview.dto.AdminAiConfigStatusVO;
 import com.lcbinterview.mapper.CategoryMapper;
 import com.lcbinterview.mapper.QuestionMapper;
+import com.lcbinterview.model.Question;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -54,6 +55,22 @@ class AiQuestionServiceTest {
 
         assertThatThrownBy(() -> context.service.generateSync(
                 new GenerationRequest("Java", "MEDIUM", 1, "集合"), 1L))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("AI 生成服务未配置密钥")
+                .hasMessageContaining("AI_OPENCODE_API_KEY");
+
+        verifyNoInteractions(context.questionMapper);
+    }
+
+    @Test
+    void fillAnswerSyncFailsFastWhenApiKeyIsBlank() {
+        TestContext context = createService(" ");
+        Question question = new Question();
+        question.setId(10L);
+        question.setCategoryId(1L);
+        question.setTitle("HashMap 为什么线程不安全？");
+
+        assertThatThrownBy(() -> context.service.fillAnswerSync(question))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("AI 生成服务未配置密钥")
                 .hasMessageContaining("AI_OPENCODE_API_KEY");

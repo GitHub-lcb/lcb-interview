@@ -1,0 +1,4 @@
+interface:
+  display_name: "LCB Interview Deploy"
+  short_description: "打包并发布 LCB Interview 到已配置服务器。"
+  default_prompt: "使用 lcb-interview-deploy 将当前仓库构建、上传并部署到线上。"

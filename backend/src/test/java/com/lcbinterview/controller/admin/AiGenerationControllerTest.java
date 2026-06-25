@@ -3,10 +3,12 @@ package com.lcbinterview.controller.admin;
 import com.lcbinterview.dto.AdminAiConfigStatusVO;
 import com.lcbinterview.dto.AdminAiConfigUpdateRequest;
 import com.lcbinterview.dto.AdminAiConfigVO;
+import com.lcbinterview.dto.BatchFillAnswerRequest;
 import com.lcbinterview.dto.BatchGenerationRequest;
 import com.lcbinterview.service.AiGenerationRequestPolicy;
 import com.lcbinterview.service.AiQuestionService;
 import com.lcbinterview.service.AiRuntimeConfigService;
+import com.lcbinterview.service.BatchFillAnswerRunner;
 import com.lcbinterview.service.BatchGenerationRunner;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -27,10 +29,11 @@ class AiGenerationControllerTest {
 
     private final AiQuestionService aiQuestionService = mock(AiQuestionService.class);
     private final BatchGenerationRunner batchGenerationRunner = mock(BatchGenerationRunner.class);
+    private final BatchFillAnswerRunner batchFillAnswerRunner = mock(BatchFillAnswerRunner.class);
     private final AiRuntimeConfigService aiRuntimeConfigService = mock(AiRuntimeConfigService.class);
     private final AiGenerationRequestPolicy requestPolicy = new AiGenerationRequestPolicy();
     private final AiGenerationController controller = new AiGenerationController(
-            aiQuestionService, batchGenerationRunner, requestPolicy, aiRuntimeConfigService);
+            aiQuestionService, batchGenerationRunner, batchFillAnswerRunner, requestPolicy, aiRuntimeConfigService);
 
     @Test
     void configStatusReturnsAiServiceConfigurationStatus() {
@@ -107,6 +110,44 @@ class AiGenerationControllerTest {
         assertThat(response.getBody().message()).contains("AI_OPENCODE_API_KEY");
         verify(aiQuestionService).configStatus();
         verifyNoInteractions(batchGenerationRunner);
+    }
+
+    @Test
+    void batchFillAnswersStartsDefaultAllCategoryTask() {
+        when(aiQuestionService.configStatus()).thenReturn(availableAiStatus());
+        when(batchFillAnswerRunner.start(null, null, 3)).thenReturn(true);
+
+        var response = controller.batchFillAnswers(new BatchFillAnswerRequest(null, null, null));
+
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().code()).isEqualTo(200);
+        assertThat(response.getBody().data()).isEqualTo("批量补答案任务已启动");
+        verify(batchFillAnswerRunner).start(null, null, 3);
+    }
+
+    @Test
+    void batchFillAnswersRejectsWhenAiServiceIsUnavailable() {
+        when(aiQuestionService.configStatus()).thenReturn(unavailableAiStatus());
+
+        var response = controller.batchFillAnswers(new BatchFillAnswerRequest(null, null, 3));
+
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().code()).isEqualTo(503);
+        assertThat(response.getBody().message()).contains("AI_OPENCODE_API_KEY");
+        verifyNoInteractions(batchFillAnswerRunner);
+    }
+
+    @Test
+    void batchFillAnswersRejectsWhenTaskAlreadyRunning() {
+        when(aiQuestionService.configStatus()).thenReturn(availableAiStatus());
+        when(batchFillAnswerRunner.start(3L, 100, 2)).thenReturn(false);
+
+        var response = controller.batchFillAnswers(new BatchFillAnswerRequest(3L, 100, 2));
+
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().code()).isEqualTo(409);
+        assertThat(response.getBody().message()).isEqualTo("批量补答案任务已在运行中");
+        verify(batchFillAnswerRunner).start(3L, 100, 2);
     }
 
     @Test

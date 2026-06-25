@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Card, Form, Select, InputNumber, Input, Button, Progress, Alert, Segmented, Tag, Divider, Statistic, Row, Col, Collapse, List, Badge, Space, Switch } from 'antd'
 import { emitFeedbackError, emitFeedbackSuccess } from '../../utils/feedbackMessage'
-import { batchGenerate, getAiConfigStatus, getBatchStatus, streamGenerate, streamFillAnswer, streamRewritePublishedAnswers, updateAiConfig } from '../../api/admin'
+import { batchFillAnswers, batchGenerate, getAiConfigStatus, getBatchFillAnswerStatus, getBatchStatus, streamGenerate, streamFillAnswer, streamRewritePublishedAnswers, updateAiConfig } from '../../api/admin'
 import { getCategories } from '../../api/category'
 import { listDrafts } from '../../api/admin'
 import type { AdminAiConfigStatus, AdminAiConfigUpdateRequest, Category, BatchProgress, StreamEvent } from '../../types'
@@ -29,6 +29,8 @@ export default function AIGenerate() {
   const streamAbortRef = useRef<AbortController | null>(null)
 
   const [batchLoading, setBatchLoading] = useState(false)
+  const [batchFillProgress, setBatchFillProgress] = useState<BatchProgress | null>(null)
+  const [batchFillLoading, setBatchFillLoading] = useState(false)
 
   const loadCategories = useCallback(() => {
     setCategoryLoading(true)
@@ -69,6 +71,15 @@ export default function AIGenerate() {
         setAiConfigLoadError(true)
       })
     getBatchStatus().then(p => setBatchProgress(p as any)).catch(() => {})
+    getBatchFillAnswerStatus()
+      .then(p => {
+        setBatchFillProgress(p)
+        setBatchFillLoading(p.status === 'RUNNING')
+        if (p.status === 'RUNNING') {
+          pollBatchFillAnswerStatus()
+        }
+      })
+      .catch(() => {})
     listDrafts(0, 1).then((res: any) => setDraftCount(res.total || 0)).catch(() => {})
   }, [applyAiConfigStatus, loadCategories])
 
@@ -116,6 +127,41 @@ export default function AIGenerate() {
         setBatchProgress(p)
         if (p.status === 'IDLE') { clearInterval(timer); setBatchLoading(false); emitFeedbackSuccess('批量任务完成') }
       } catch { clearInterval(timer); setBatchLoading(false) }
+    }, 3000)
+  }
+
+  const onBatchFillAnswerFinish = async (values: any) => {
+    setBatchFillLoading(true)
+    try {
+      await batchFillAnswers({
+        categoryId: values.categoryId,
+        maxQuestions: values.maxQuestions,
+        delaySeconds: values.delaySeconds ?? 3,
+      })
+      emitFeedbackSuccess('批量补答案任务已启动')
+      pollBatchFillAnswerStatus()
+    } catch {
+      emitFeedbackError('启动失败')
+      setBatchFillLoading(false)
+    }
+  }
+
+  const pollBatchFillAnswerStatus = () => {
+    const timer = setInterval(async () => {
+      try {
+        const p = await getBatchFillAnswerStatus()
+        setBatchFillProgress(p)
+        if (p.status !== 'RUNNING') {
+          clearInterval(timer)
+          setBatchFillLoading(false)
+          if (p.status === 'COMPLETED') {
+            emitFeedbackSuccess('批量补答案任务完成')
+          }
+        }
+      } catch {
+        clearInterval(timer)
+        setBatchFillLoading(false)
+      }
     }, 3000)
   }
 
@@ -295,6 +341,39 @@ export default function AIGenerate() {
     </Card>
   )
 
+  const renderBatchFillProgress = () => {
+    if (!batchFillProgress || batchFillProgress.status === 'IDLE') return null
+
+    const completed = batchFillProgress.completedCategories
+    const total = batchFillProgress.totalQuestions
+    const percent = total > 0 ? Math.round(completed / total * 100) : 0
+    const tagColor = batchFillProgress.status === 'RUNNING'
+      ? 'processing'
+      : batchFillProgress.status === 'COMPLETED'
+        ? 'success'
+        : 'error'
+
+    return (
+      <Card size="small" style={{ marginTop: 16 }}>
+        <Space style={{ marginBottom: 12 }}>
+          <span>后台批量状态：</span>
+          <Tag color={tagColor}>{batchFillProgress.status === 'RUNNING' ? '运行中' : batchFillProgress.status === 'COMPLETED' ? '已完成' : '失败'}</Tag>
+        </Space>
+        <Progress percent={percent} />
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px', fontSize: 14, color: '#52525B' }}>
+          <span>题目: {completed}/{total}</span>
+          <span>成功: {batchFillProgress.generatedQuestions}</span>
+          <span>失败: {batchFillProgress.failedCategories}</span>
+        </div>
+        {batchFillProgress.currentMessage && <p><Tag color={tagColor}>{batchFillProgress.currentMessage}</Tag></p>}
+        {batchFillProgress.currentCategory && <p>当前分类: <Tag color="blue">{batchFillProgress.currentCategory}</Tag></p>}
+        {batchFillProgress.errors?.length > 0 && (
+          <Alert type="warning" message={batchFillProgress.errors.join('; ')} showIcon style={{ marginTop: 12 }} />
+        )}
+      </Card>
+    )
+  }
+
   return (
     <Card title="AI 题目生成 — 质量门禁 + 草稿审核">
       <Segmented
@@ -434,17 +513,17 @@ export default function AIGenerate() {
       {/* 流式补答案 */}
       {mode === 'streamFill' && (
         <>
-          <Alert type="info" showIcon message="逐题补答案" description="每道题独立发送 AI 请求，实时展示思考过程和补全内容，可随时取消。" style={{ marginBottom: 16 }} />
+          <Alert type="info" showIcon message="逐题补答案" description="逐题流式适合小批量观察；后台批量适合补齐全部待补草稿。" style={{ marginBottom: 16 }} />
           <Row gutter={16} style={{ marginBottom: 16 }}>
             <Col>
               <Statistic title="待补草稿" value={draftCount} suffix="题" />
             </Col>
           </Row>
           <Form layout="vertical" onFinish={onStreamFillFinish} style={{ maxWidth: 500 }}>
-            <Form.Item name="categoryId" label="分类（留空则补所有分类）">
+            <Form.Item name="categoryId" label="分类（留空则从所有分类选取）">
               <Select allowClear options={categories.map(c => ({ value: c.id, label: c.name }))} showSearch placeholder="选择分类" />
             </Form.Item>
-            <Form.Item name="count" label="补全数量" initialValue={5} tooltip="一次最多补 20 道">
+            <Form.Item name="count" label="小批量补全数量" initialValue={5} tooltip="一次最多补 20 道">
               <InputNumber min={1} max={20} />
             </Form.Item>
             <Space>
@@ -461,6 +540,31 @@ export default function AIGenerate() {
           </Form>
 
           {streamStatus !== 'idle' && renderStreamResult()}
+
+          <Divider />
+
+          <Form layout="vertical" onFinish={onBatchFillAnswerFinish} style={{ maxWidth: 500 }}>
+            <Form.Item name="categoryId" label="后台分类（留空则补所有分类）">
+              <Select allowClear options={categories.map(c => ({ value: c.id, label: c.name }))} showSearch placeholder="选择分类" />
+            </Form.Item>
+            <Form.Item name="maxQuestions" label="本次最大处理数量" tooltip="留空则补到当前待补草稿清零">
+              <InputNumber min={1} />
+            </Form.Item>
+            <Form.Item name="delaySeconds" label="API 调用间隔（秒）" initialValue={3}>
+              <InputNumber min={0} max={300} />
+            </Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={batchFillLoading}
+              disabled={aiOperationDisabled || batchFillLoading || batchFillProgress?.status === 'RUNNING'}
+              danger
+            >
+              启动后台批量补答案
+            </Button>
+          </Form>
+
+          {renderBatchFillProgress()}
         </>
       )}
 
