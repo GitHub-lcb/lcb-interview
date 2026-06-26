@@ -47,7 +47,7 @@ function Section({
   const [open, setOpen] = useState(defaultOpen ?? false)
   const panelId = useId()
   return (
-    <div className="answer-section" ref={sectionRef}>
+    <div className={open ? 'answer-section open' : 'answer-section'} ref={sectionRef}>
       <button
         type="button"
         className="answer-section-toggle"
@@ -167,6 +167,7 @@ export default function ContentView({ question, defaultOpen = false }: Props) {
               key={section.key}
               type="button"
               className="answer-toc-item"
+              aria-label={`跳转到第 ${index + 1} 个答案段落`}
               onClick={() => jumpTo(section.key)}
             >
               <span className="answer-toc-index">{String(index + 1).padStart(2, '0')}</span>
