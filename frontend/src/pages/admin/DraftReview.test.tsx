@@ -169,4 +169,53 @@ describe('DraftReview', () => {
     expect(await screen.findByText('恢复后的草稿')).toBeInTheDocument()
     await waitFor(() => expect(screen.queryByText('草稿列表加载失败')).not.toBeInTheDocument())
   })
+
+  it('can reject a draft and clear content so it returns to the refill queue', async () => {
+    const user = userEvent.setup()
+    vi.mocked(adminApi.listDrafts).mockResolvedValue({
+      records: [draft(61, '需要重新补答案')],
+      total: 1,
+      current: 1,
+      pages: 1,
+    })
+    vi.mocked(adminApi.rejectDraft).mockResolvedValue({} as never)
+
+    renderDraftReview()
+
+    const row = (await screen.findByText('需要重新补答案')).closest('tr')
+    expect(row).not.toBeNull()
+    await user.click(within(row as HTMLElement).getByRole('button', { name: /驳\s*回/ }))
+    await user.click(await screen.findByRole('checkbox', { name: /清空答案.*重新补/ }))
+    await user.click(screen.getByRole('button', { name: '确认驳回' }))
+
+    await waitFor(() => expect(adminApi.rejectDraft).toHaveBeenCalledWith(61, { clearContent: true }))
+  })
+
+  it('can batch reject and clear content so selected drafts return to the refill queue', async () => {
+    const user = userEvent.setup()
+    vi.mocked(adminApi.listDrafts).mockResolvedValue({
+      records: [draft(71, '批量重补一'), draft(72, '批量重补二')],
+      total: 2,
+      current: 1,
+      pages: 1,
+    })
+    vi.mocked(adminApi.batchRejectDrafts).mockResolvedValue({} as never)
+
+    renderDraftReview()
+
+    const firstRow = (await screen.findByText('批量重补一')).closest('tr')
+    const secondRow = (await screen.findByText('批量重补二')).closest('tr')
+    expect(firstRow).not.toBeNull()
+    expect(secondRow).not.toBeNull()
+    await user.click(within(firstRow as HTMLElement).getByRole('checkbox'))
+    await user.click(within(secondRow as HTMLElement).getByRole('checkbox'))
+    await user.click(screen.getByRole('button', { name: /批量驳回/ }))
+    await user.click(await screen.findByRole('checkbox', { name: /清空答案.*重新补/ }))
+    await user.click(screen.getByRole('button', { name: '确认驳回' }))
+
+    await waitFor(() => expect(adminApi.batchRejectDrafts).toHaveBeenCalledWith(
+      [71, 72],
+      { clearContent: true },
+    ))
+  })
 })

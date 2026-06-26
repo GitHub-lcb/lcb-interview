@@ -67,14 +67,14 @@ export const updateDraft = (id: number, data: Partial<import('../types').Questio
 export const approveDraft = (id: number) =>
   api.post(`/admin/questions/draft/${id}/approve`)
 
-export const rejectDraft = (id: number) =>
-  api.post(`/admin/questions/draft/${id}/reject`)
+export const rejectDraft = (id: number, options: import('../types').DraftRejectOptions = {}) =>
+  api.post(`/admin/questions/draft/${id}/reject`, options)
 
 export const batchApproveDrafts = (ids: number[]) =>
   api.post('/admin/questions/draft/batch-approve', ids)
 
-export const batchRejectDrafts = (ids: number[]) =>
-  api.post('/admin/questions/draft/batch-reject', ids)
+export const batchRejectDrafts = (ids: number[], options: import('../types').DraftRejectOptions = {}) =>
+  api.post('/admin/questions/draft/batch-reject', options.clearContent ? { ids, ...options } : ids)
 
 /**
  * SSE 流式生成单道题。

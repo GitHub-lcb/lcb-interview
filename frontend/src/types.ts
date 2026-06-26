@@ -63,6 +63,10 @@ export interface DraftReviewFilters {
   contentStatus?: DraftContentStatus
 }
 
+export interface DraftRejectOptions {
+  clearContent?: boolean
+}
+
 export interface AdminCategoryQuality {
   categoryId: number | null
   categoryName: string

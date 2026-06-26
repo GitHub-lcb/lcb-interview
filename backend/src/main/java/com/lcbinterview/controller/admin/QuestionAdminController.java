@@ -2,9 +2,9 @@ package com.lcbinterview.controller.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.lcbinterview.common.ApiResponse;
 import com.lcbinterview.dto.QuestionAdminVO;
 import com.lcbinterview.mapper.QuestionMapper;
@@ -31,6 +31,8 @@ public class QuestionAdminController {
     private static final int PRINCIPLE_MIN_CHARS = 120;
     private static final int DETAIL_MIN_CHARS = 80;
     private static final String SOURCE_AI_REWRITE = "AI_REWRITE";
+    private static final String STATUS_DRAFT = "DRAFT";
+    private static final String STATUS_REJECTED = "REJECTED";
 
     private final QuestionMapper questionMapper;
     private final AiAnswerQualityPolicy aiAnswerQualityPolicy;
@@ -203,14 +205,23 @@ public class QuestionAdminController {
     }
 
     /**
-     * 审核驳回。
+     * 审核驳回；可选择清空答案字段并保留为草稿，便于重新进入 AI 补答案队列。
+     *
+     * @param id 题目 ID
+     * @param request 可选请求体，clearContent=true 时清空答案并保持 DRAFT
+     * @return 操作结果
      */
     @PostMapping("/draft/{id}/reject")
-    public ResponseEntity<ApiResponse<Void>> reject(@PathVariable Long id) {
-        Question q = new Question();
-        q.setId(id);
-        q.setStatus("REJECTED");
-        questionMapper.updateById(q);
+    public ResponseEntity<ApiResponse<Void>> reject(@PathVariable Long id,
+                                                    @RequestBody(required = false) JsonNode request) {
+        if (shouldClearContent(request)) {
+            questionMapper.update(null, buildClearContentRejectWrapper(List.of(id)));
+        } else {
+            Question q = new Question();
+            q.setId(id);
+            q.setStatus(STATUS_REJECTED);
+            questionMapper.updateById(q);
+        }
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
@@ -265,18 +276,75 @@ public class QuestionAdminController {
     }
 
     /**
-     * 批量审核驳回。
+     * 批量审核驳回；兼容旧版 ID 数组请求，也支持 clearContent=true 的对象请求。
+     *
+     * @param request ID 数组，或包含 ids/clearContent 的对象
+     * @return 操作结果
      */
     @PostMapping("/draft/batch-reject")
-    public ResponseEntity<ApiResponse<Void>> batchReject(@RequestBody List<Long> ids) {
-        if (ids == null || ids.isEmpty()) {
+    public ResponseEntity<ApiResponse<Void>> batchReject(@RequestBody JsonNode request) {
+        BatchRejectRequest rejectRequest = parseBatchRejectRequest(request);
+        if (rejectRequest.ids().isEmpty()) {
             return ResponseEntity.ok(ApiResponse.error(400, "ID 列表不能为空"));
         }
-        questionMapper.update(null, new LambdaUpdateWrapper<Question>()
-                .set(Question::getStatus, "REJECTED")
-                .in(Question::getId, ids)
-                .eq(Question::getStatus, "DRAFT"));
+        if (rejectRequest.clearContent()) {
+            questionMapper.update(null, buildClearContentRejectWrapper(rejectRequest.ids()));
+        } else {
+            questionMapper.update(null, new UpdateWrapper<Question>()
+                    .set("status", STATUS_REJECTED)
+                    .in("id", rejectRequest.ids())
+                    .eq("status", STATUS_DRAFT));
+        }
         return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    private boolean shouldClearContent(JsonNode request) {
+        return request != null && request.path("clearContent").asBoolean(false);
+    }
+
+    private BatchRejectRequest parseBatchRejectRequest(JsonNode request) {
+        if (request == null) {
+            return new BatchRejectRequest(List.of(), false);
+        }
+        if (request.isArray()) {
+            return new BatchRejectRequest(parseIds(request), false);
+        }
+        JsonNode idsNode = request.path("ids");
+        return new BatchRejectRequest(parseIds(idsNode), shouldClearContent(request));
+    }
+
+    private List<Long> parseIds(JsonNode idsNode) {
+        if (idsNode == null || !idsNode.isArray()) {
+            return List.of();
+        }
+        List<Long> ids = new ArrayList<>();
+        idsNode.forEach(node -> {
+            if (node.canConvertToLong()) {
+                ids.add(node.asLong());
+            }
+        });
+        return ids;
+    }
+
+    private UpdateWrapper<Question> buildClearContentRejectWrapper(List<Long> ids) {
+        return new UpdateWrapper<Question>()
+                .set("status", STATUS_DRAFT)
+                // 清空结构化答案字段后仍保留题干、分类、难度和来源，使补答案任务可以复用原题目。
+                .set("summary", null)
+                .set("content", "")
+                .set("answer", "")
+                .set("principle", null)
+                .set("comparison", null)
+                .set("scenario", null)
+                .set("risk", null)
+                .set("project_exp", null)
+                .set("code_examples", null)
+                .set("diagrams", null)
+                .in("id", ids)
+                .in("status", List.of(STATUS_DRAFT, STATUS_REJECTED));
+    }
+
+    private record BatchRejectRequest(List<Long> ids, boolean clearContent) {
     }
 
     private boolean isContentBlank(Question question) {

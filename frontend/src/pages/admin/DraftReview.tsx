@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Table, Button, Modal, Tag, Space, Alert, Select, Input } from 'antd'
+import { Table, Button, Modal, Tag, Space, Alert, Select, Input, Checkbox } from 'antd'
 import { emitFeedbackError, emitFeedbackSuccess, emitFeedbackWarning } from '../../utils/feedbackMessage'
 import { useSearchParams } from 'react-router-dom'
 import { listDrafts, getDraft, approveDraft, rejectDraft, batchApproveDrafts, batchRejectDrafts } from '../../api/admin'
@@ -7,6 +7,10 @@ import ContentView from '../QuestionDetail/ContentView'
 import { getDraftQualityWarnings } from './draftQuality'
 import type { DraftContentStatus, DraftReviewFilters, DraftRiskType, QuestionAdmin } from '../../types'
 import type { ColumnsType } from 'antd/es/table'
+
+type RejectTarget =
+  | { kind: 'single'; id: number; title: string }
+  | { kind: 'batch'; ids: number[] }
 
 const riskOptions: { label: string; value: DraftRiskType }[] = [
   { label: '空答案', value: 'EMPTY_ANSWER' },
@@ -37,6 +41,9 @@ export default function DraftReview() {
   const [preview, setPreview] = useState<QuestionAdmin | null>(null)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
+  const [rejectTarget, setRejectTarget] = useState<RejectTarget | null>(null)
+  const [rejectClearContent, setRejectClearContent] = useState(false)
+  const [rejectSubmitting, setRejectSubmitting] = useState(false)
   const [riskType, setRiskType] = useState<DraftRiskType | undefined>(() =>
     normalizeRiskType(searchParams.get('risk'))
   )
@@ -120,9 +127,14 @@ export default function DraftReview() {
     catch (error) { showActionFailure(error, '操作失败') }
   }
 
-  const handleReject = async (id: number) => {
-    try { await rejectDraft(id); emitFeedbackSuccess('已驳回'); load(current - 1) }
-    catch (error) { showActionFailure(error, '操作失败') }
+  const openSingleReject = (question: QuestionAdmin) => {
+    setRejectTarget({ kind: 'single', id: question.id, title: question.title })
+    setRejectClearContent(false)
+  }
+
+  const closeRejectModal = () => {
+    setRejectTarget(null)
+    setRejectClearContent(false)
   }
 
   const handlePreview = async (id: number) => {
@@ -141,11 +153,31 @@ export default function DraftReview() {
 
   const handleBatchReject = async () => {
     if (selectedIds.length === 0) { emitFeedbackWarning('请先选择题目'); return }
+    setRejectTarget({ kind: 'batch', ids: selectedIds })
+    setRejectClearContent(false)
+  }
+
+  const handleConfirmReject = async () => {
+    if (!rejectTarget) { return }
+    setRejectSubmitting(true)
     try {
-      await batchRejectDrafts(selectedIds)
-      emitFeedbackSuccess(`已驳回 ${selectedIds.length} 道题`)
-      setSelectedIds([]); load(current - 1)
-    } catch (error) { showActionFailure(error, '批量操作失败') }
+      if (rejectTarget.kind === 'single') {
+        await rejectDraft(rejectTarget.id, { clearContent: rejectClearContent })
+        emitFeedbackSuccess(rejectClearContent ? '已清空答案，等待重新补答案' : '已驳回')
+      } else {
+        await batchRejectDrafts(rejectTarget.ids, { clearContent: rejectClearContent })
+        emitFeedbackSuccess(rejectClearContent
+          ? `已清空 ${rejectTarget.ids.length} 道题答案`
+          : `已驳回 ${rejectTarget.ids.length} 道题`)
+        setSelectedIds([])
+      }
+      closeRejectModal()
+      load(current - 1)
+    } catch (error) {
+      showActionFailure(error, rejectTarget.kind === 'batch' ? '批量操作失败' : '操作失败')
+    } finally {
+      setRejectSubmitting(false)
+    }
   }
 
   const handlePageChange = (p: number) => {
@@ -180,7 +212,7 @@ export default function DraftReview() {
         <Space wrap>
           <Button size="small" onClick={() => handlePreview(r.id)}>预览</Button>
           <Button size="small" type="primary" onClick={() => handleApprove(r.id)}>通过</Button>
-          <Button size="small" danger onClick={() => handleReject(r.id)}>驳回</Button>
+          <Button size="small" danger onClick={() => openSingleReject(r)}>驳回</Button>
         </Space>
       ),
     },
@@ -256,6 +288,32 @@ export default function DraftReview() {
              width={800} footer={null}
              styles={{ body: { overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' } }}>
         {preview && <ContentView question={preview} defaultOpen />}
+      </Modal>
+      <Modal
+        title={rejectTarget?.kind === 'batch' ? `驳回 ${rejectTarget.ids.length} 道草稿` : '驳回草稿'}
+        open={!!rejectTarget}
+        okText="确认驳回"
+        okButtonProps={{ danger: true }}
+        confirmLoading={rejectSubmitting}
+        onOk={handleConfirmReject}
+        onCancel={closeRejectModal}
+      >
+        <Space direction="vertical" size={12}>
+          {rejectTarget?.kind === 'single' && <span>{rejectTarget.title}</span>}
+          <Checkbox
+            checked={rejectClearContent}
+            onChange={event => setRejectClearContent(event.target.checked)}
+          >
+            清空答案并重新补
+          </Checkbox>
+          {rejectClearContent && (
+            <Alert
+              type="info"
+              showIcon
+              message="清空后保留题目，状态保持草稿，可被流式补答案重新生成内容。"
+            />
+          )}
+        </Space>
       </Modal>
     </>
   )

@@ -2,6 +2,7 @@ package com.lcbinterview.controller.admin;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lcbinterview.config.AdminTokenFilter;
 import com.lcbinterview.mapper.QuestionMapper;
@@ -21,6 +22,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -224,6 +226,32 @@ class QuestionAdminControllerTest {
     }
 
     @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    void rejectCanClearAnswerAndKeepDraftForRegeneration() throws Exception {
+        mockMvc.perform(post("/api/admin/questions/draft/31/reject")
+                        .header("Authorization", "Bearer test-token")
+                        .contentType("application/json")
+                        .content("{\"clearContent\":true}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code", is(200)));
+
+        ArgumentCaptor<Wrapper<Question>> wrapperCaptor = ArgumentCaptor.forClass((Class) Wrapper.class);
+        verify(questionMapper).update(isNull(), wrapperCaptor.capture());
+        UpdateWrapper<Question> updateWrapper = (UpdateWrapper<Question>) wrapperCaptor.getValue();
+        assertThat(updateWrapper.getSqlSet())
+                .contains("status")
+                .contains("summary")
+                .contains("content")
+                .contains("answer")
+                .contains("principle")
+                .contains("code_examples");
+        assertThat(updateWrapper.getCustomSqlSegment()).contains("id IN");
+        assertThat(updateWrapper.getParamNameValuePairs())
+                .containsValue("DRAFT")
+                .containsValue("");
+    }
+
+    @Test
     void batchApproveRejectsWhenAnyDraftHasNoContent() throws Exception {
         Question emptyDraft = new Question();
         emptyDraft.setId(10L);
@@ -291,6 +319,33 @@ class QuestionAdminControllerTest {
         assertThat(questionCaptor.getValue().getContent()).isEqualTo("批量新答案");
         verify(questionMapper).deleteById(21L);
         verify(questionMapper, never()).update(any(), any());
+    }
+
+    @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    void batchRejectCanClearAnswersAndKeepDraftsForRegeneration() throws Exception {
+        mockMvc.perform(post("/api/admin/questions/draft/batch-reject")
+                        .header("Authorization", "Bearer test-token")
+                        .contentType("application/json")
+                        .content("{\"ids\":[41,42],\"clearContent\":true}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code", is(200)));
+
+        ArgumentCaptor<Wrapper<Question>> wrapperCaptor = ArgumentCaptor.forClass((Class) Wrapper.class);
+        verify(questionMapper).update(isNull(), wrapperCaptor.capture());
+        UpdateWrapper<Question> updateWrapper = (UpdateWrapper<Question>) wrapperCaptor.getValue();
+        String sqlSegment = updateWrapper.getCustomSqlSegment();
+        assertThat(sqlSegment)
+                .contains("id IN")
+                .contains("status IN");
+        assertThat(updateWrapper.getSqlSet())
+                .contains("status")
+                .contains("content")
+                .contains("answer")
+                .contains("code_examples");
+        assertThat(updateWrapper.getParamNameValuePairs())
+                .containsValue("DRAFT")
+                .containsValue("");
     }
 
     private Question qualityDraft(Long id) {
