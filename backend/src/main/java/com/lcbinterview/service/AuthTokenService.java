@@ -1,6 +1,7 @@
 package com.lcbinterview.service;
 
 import com.lcbinterview.common.BusinessException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -30,6 +31,7 @@ public class AuthTokenService {
      * @param secret 令牌签名密钥
      * @param ttlHours 令牌有效小时数
      */
+    @Autowired
     public AuthTokenService(
             @Value("${app.auth.secret}") String secret,
             @Value("${app.auth.token-ttl-hours:168}") long ttlHours) {
