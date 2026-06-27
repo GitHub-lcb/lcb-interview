@@ -84,7 +84,7 @@ LCB Interview 当前核心是面试题库、学习计划、模拟训练和材料
 | --- | --- | --- |
 | `id` | bigint | 主键 |
 | `username` | varchar(64) | 登录用户名，唯一 |
-| `password_hash` | varchar(120) | BCrypt 密码哈希 |
+| `password_hash` | varchar(220) | PBKDF2 密码哈希 |
 | `display_name` | varchar(64) | 展示昵称 |
 | `status` | varchar(16) | `ACTIVE` 或 `DISABLED` |
 | `create_time` | datetime | 创建时间 |
@@ -412,7 +412,7 @@ Prompt 要求：
 - 普通用户 API 需要普通用户令牌。
 - 用户只能访问自己的书摘和推荐历史。
 - 开奖历史是公共数据，登录用户可查看。
-- 密码使用 BCrypt 哈希，不存明文。
+- 密码使用 PBKDF2 带盐哈希，不存明文。
 - 令牌有过期时间，解析失败返回 401。
 - 管理员 Token 不可访问普通用户个人数据 API。
 - 普通用户令牌不可访问 `/api/admin/**`。

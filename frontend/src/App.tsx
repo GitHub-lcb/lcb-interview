@@ -12,6 +12,9 @@ const StudyPlan = lazy(() => import('./pages/StudyPlan'))
 const Practice = lazy(() => import('./pages/Practice'))
 const PrepRoutes = lazy(() => import('./pages/PrepRoutes'))
 const Experiences = lazy(() => import('./pages/Experiences'))
+const Tools = lazy(() => import('./pages/Tools'))
+const Login = lazy(() => import('./pages/Auth/Login'))
+const Register = lazy(() => import('./pages/Auth/Register'))
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'))
 const AdminLogin = lazy(() => import('./pages/admin/Login'))
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'))
@@ -38,9 +41,12 @@ export default function App() {
           <Route path="/search" element={<SearchResult />} />
           <Route path="/routes" element={<PrepRoutes />} />
           <Route path="/experiences" element={<Experiences />} />
+          <Route path="/tools" element={<Tools />} />
           <Route path="/study" element={<StudyPlan />} />
           <Route path="/practice" element={<Practice />} />
         </Route>
+        <Route path="/auth/login" element={<Login />} />
+        <Route path="/auth/register" element={<Register />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Navigate to="/admin/dashboard" replace />} />

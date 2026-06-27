@@ -180,6 +180,97 @@ export interface PageResult<T> {
   totalPages: number
 }
 
+export interface AuthUser {
+  id: number
+  username: string
+  displayName: string
+}
+
+export interface AuthTokenResponse {
+  token: string
+  user: AuthUser
+}
+
+export interface LoginRequest {
+  username: string
+  password: string
+}
+
+export interface RegisterRequest {
+  username: string
+  password: string
+  displayName?: string
+}
+
+export interface ReadingExcerpt {
+  id: number
+  bookTitle: string
+  author: string
+  content: string
+  note: string
+  tags: string[]
+  chapter: string
+  pageNo: string
+  createTime: string
+  updateTime: string
+}
+
+export interface ReadingExcerptPayload {
+  bookTitle: string
+  author?: string
+  content: string
+  note?: string
+  tags?: string[]
+  chapter?: string
+  pageNo?: string
+}
+
+export interface MarkdownExport {
+  fileName: string
+  markdown: string
+}
+
+export interface LotteryKl8Draw {
+  issueNo: string
+  drawDate: string
+  numbers: number[]
+  sourceName: string
+}
+
+export interface LotteryKl8SyncStatus {
+  latestIssueNo: string
+  latestDrawDate?: string
+  drawCount: number
+  lastSyncAt?: string
+  stale: boolean
+  message: string
+}
+
+export interface LotteryKl8SyncResult {
+  success: boolean
+  sourceName: string
+  fetchedCount: number
+  insertedCount: number
+  latestIssueNo: string
+  message: string
+}
+
+export interface LotteryKl8RecommendationGroup {
+  numbers: number[]
+  reason: string
+}
+
+export interface LotteryKl8Recommendation {
+  id: number
+  source: 'AI' | 'RULE_BASED'
+  baseIssueCount: number
+  latestIssueNo: string
+  groups: LotteryKl8RecommendationGroup[]
+  featureSummary: string
+  disclaimer: string
+  createdAt: string
+}
+
 export type StudyQuestionStatus = 'new' | 'learning' | 'mastered' | 'weak'
 
 export interface QuestionStudyState {

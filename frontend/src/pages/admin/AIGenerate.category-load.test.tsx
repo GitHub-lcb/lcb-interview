@@ -11,8 +11,10 @@ vi.mock('../../api/category', () => ({
 }))
 
 vi.mock('../../api/admin', () => ({
+  batchFillAnswers: vi.fn(),
   batchGenerate: vi.fn(),
   getAiConfigStatus: vi.fn(),
+  getBatchFillAnswerStatus: vi.fn(),
   updateAiConfig: vi.fn(),
   getBatchStatus: vi.fn(),
   streamGenerate: vi.fn(),
@@ -44,6 +46,7 @@ describe('AIGenerate category loading', () => {
     })
 
     vi.mocked(adminApi.getBatchStatus).mockResolvedValue({ status: 'IDLE' } as never)
+    vi.mocked(adminApi.getBatchFillAnswerStatus).mockResolvedValue({ status: 'IDLE' } as never)
     vi.mocked((adminApi as any).getAiConfigStatus).mockResolvedValue({
       available: true,
       apiKeyConfigured: true,

@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { emitFeedbackError } from '../utils/feedbackMessage'
+import { clearUserToken, readUserToken } from '../utils/authToken'
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -17,6 +18,10 @@ api.interceptors.request.use(config => {
   if (token && config.url?.startsWith('/admin/')) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  const userToken = readUserToken()
+  if (userToken && (config.url?.startsWith('/tools/') || config.url === '/auth/me')) {
+    config.headers.Authorization = `Bearer ${userToken}`
+  }
   return config
 })
 
@@ -31,6 +36,9 @@ api.interceptors.response.use(
     return res
   },
   (err) => {
+    if (err.response?.status === 401) {
+      clearUserToken()
+    }
     if (!err.config?.silentGlobalError) {
       emitFeedbackError('网络错误，请稍后重试')
     }

@@ -39,6 +39,11 @@ logging:
 admin:
   token: ${ADMIN_TOKEN:dev-admin-token-change-me}
 
+app:
+  auth:
+    secret: ${APP_AUTH_SECRET:dev-user-auth-secret-change-me}
+    token-ttl-hours: ${APP_AUTH_TOKEN_TTL_HOURS:168}
+
 ai:
   interview:
     enabled: ${AI_INTERVIEW_ENABLED:true}

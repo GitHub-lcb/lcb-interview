@@ -1,6 +1,6 @@
 # LCB Interview - Java 面试题库网站
 
-LCB Interview 是一个前后端分离的面试题库与备考训练系统。项目以 Java 后端面试为核心，同时覆盖前端、运维、AI 大模型等方向，提供题库浏览、搜索筛选、Markdown 答案展示、学习计划、模拟问答、后台质检和 AI 批量补答案能力。
+LCB Interview 是一个前后端分离的面试题库与备考训练系统。项目以 Java 后端面试为核心，同时覆盖前端、运维、AI 大模型等方向，提供题库浏览、搜索筛选、Markdown 答案展示、学习计划、模拟问答、后台质检、AI 批量补答案和个人工具能力。
 
 ## 核心能力
 
@@ -8,6 +8,7 @@ LCB Interview 是一个前后端分离的面试题库与备考训练系统。项
 - **题目详情**：支持摘要、原理、对比、场景、风险、项目经验、代码示例和图示等结构化答案字段。
 - **学习计划**：提供备考路线、每日任务、复习进度、能力地图、健康雷达和下一步训练队列。
 - **模拟训练**：支持按题目进行回答练习、面试评分、追问训练、反馈闭环和复盘材料沉淀。
+- **个人工具**：支持普通用户注册登录、读书摘录管理与 Markdown 导出、福彩快乐8选5历史开奖同步和 AI 推荐参考。
 - **管理后台**：支持管理员 Token 校验、题库质量总览、草稿审核、批量发布/拒绝和 AI 生成答案。
 - **工程化支持**：Spring Boot 3 + JDK 21 后端、React 18 + Vite 前端、Vitest/JUnit 测试、Nginx SPA 部署配置。
 
@@ -38,10 +39,11 @@ lcb-interview/
 │       │   ├── config/                 # CORS、缓存、MyBatis-Plus、Swagger
 │       │   ├── controller/             # 公开 API 与面试训练接口
 │       │   ├── controller/admin/       # 管理后台接口
+│       │   ├── controller/tools/       # 个人工具接口
 │       │   ├── dto/                    # Query/VO/PageResult records
 │       │   ├── mapper/                 # MyBatis-Plus Mapper
 │       │   ├── model/                  # Entity
-│       │   └── service/                # 业务逻辑、缓存、AI、质检、浏览量批量写入
+│       │   └── service/                # 业务逻辑、缓存、AI、质检、个人工具、浏览量批量写入
 │       └── test/java/com/lcbinterview/ # 后端单元测试
 ├── frontend/
 │   ├── package.json
@@ -51,7 +53,7 @@ lcb-interview/
 │       ├── api/                        # Axios 实例与 API 封装
 │       ├── build/manualChunks.ts       # 前端构建分包策略
 │       ├── components/                 # 学习、练习、复盘、后台通用组件
-│       ├── pages/                      # 首页、题库、练习、路线、后台等页面
+│       ├── pages/                      # 首页、题库、练习、路线、工具、后台等页面
 │       ├── styles/                     # 全局样式与 Ant Design 主题
 │       ├── types.ts                    # 前端领域类型
 │       └── utils/                      # 学习进度、评分、导出、训练策略算法
@@ -80,13 +82,15 @@ lcb-interview/
 | `REDIS_HOST` | `localhost` | Redis 主机 |
 | `REDIS_PORT` | `6379` | Redis 端口 |
 | `ADMIN_TOKEN` | `dev-admin-token-change-me` | 管理后台访问 Token |
+| `APP_AUTH_SECRET` | `dev-user-auth-secret-change-me` | 普通用户登录令牌签名密钥 |
+| `APP_AUTH_TOKEN_TTL_HOURS` | `168` | 普通用户登录令牌有效期，单位小时 |
 | `AI_INTERVIEW_ENABLED` | `true` | 是否启用远程 AI 面试评分 |
 | `AI_INTERVIEW_TIMEOUT_MS` | `8000` | AI 面试评分超时时间 |
 | `AI_OPENCODE_API_KEY` | 空 | AI 服务 API Key；不配置时远程 AI 能力不可用 |
 | `AI_DEEPSEEK_MODEL` | `glm-5.2` | AI 模型名 |
 | `AI_DEEPSEEK_URL` | OpenAI 兼容接口地址 | AI 服务地址 |
 
-生产环境必须通过环境变量覆盖 `ADMIN_TOKEN` 和 `AI_OPENCODE_API_KEY`；AI Key 不提供源码默认值。
+生产环境必须通过环境变量覆盖 `ADMIN_TOKEN`、`APP_AUTH_SECRET` 和 `AI_OPENCODE_API_KEY`；AI Key 不提供源码默认值。
 
 ## 快速启动
 
@@ -97,7 +101,7 @@ mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS lcb_interview DEFAULT CHARSET
 mysql -u root -p lcb_interview < backend/scripts/sql/init.sql
 ```
 
-`init.sql` 会重建 `category`、`tag`、`question`、`question_tag` 等核心表，并导入 46 个分类、71 个标签和 6386 道 DRAFT 题目。
+`init.sql` 会重建 `category`、`tag`、`question`、`question_tag`、`app_user`、`reading_excerpt`、`lottery_kl8_draw`、`lottery_kl8_recommendation` 等核心表，并导入 46 个分类、71 个标签和 6386 道 DRAFT 题目。
 
 ### 2. 启动 Redis
 
@@ -154,6 +158,9 @@ npm run dev
 | `/study` | 学习计划与进度中心 |
 | `/practice` | 模拟问答与反馈闭环 |
 | `/experiences` | 面试经验与材料沉淀 |
+| `/tools` | 个人工具，包含读书摘录和快乐8选5推荐 |
+| `/auth/login` | 普通用户登录 |
+| `/auth/register` | 普通用户注册 |
 | `/admin/login` | 管理后台登录 |
 | `/admin/dashboard` | 题库质量总览 |
 | `/admin/ai-generate` | AI 批量生成答案 |
@@ -178,6 +185,26 @@ npm run dev
 | `GET` | `/api/questions/{id}` | 获取题目详情并记录浏览量 |
 | `GET` | `/api/questions/hot` | 获取热门题目排行 |
 | `POST` | `/api/interview/evaluate` | 生成面试训练评分 |
+
+### 普通用户与工具接口
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| `POST` | `/api/auth/register` | 注册普通用户 |
+| `POST` | `/api/auth/login` | 普通用户登录 |
+| `GET` | `/api/auth/me` | 查询当前普通用户 |
+| `GET` | `/api/tools/reading/excerpts` | 分页查询当前用户书摘，支持书名、作者、标签和关键词筛选 |
+| `POST` | `/api/tools/reading/excerpts` | 新增书摘 |
+| `PUT` | `/api/tools/reading/excerpts/{id}` | 更新书摘 |
+| `DELETE` | `/api/tools/reading/excerpts/{id}` | 删除书摘 |
+| `GET` | `/api/tools/reading/excerpts/export` | 导出当前筛选结果为 Markdown |
+| `POST` | `/api/tools/lottery/kl8/sync` | 手动同步福彩快乐8开奖数据 |
+| `GET` | `/api/tools/lottery/kl8/sync-status` | 查询开奖同步状态 |
+| `GET` | `/api/tools/lottery/kl8/draws` | 分页查询近期开奖 |
+| `POST` | `/api/tools/lottery/kl8/recommendations` | 生成快乐8选5推荐，每次返回 5 组、每组 5 个号码 |
+| `GET` | `/api/tools/lottery/kl8/recommendations` | 查询当前用户推荐历史 |
+
+快乐8推荐复用现有 OpenAI 兼容 AI 配置分析历史开奖数据；当远程 AI 不可用时会降级为规则推荐。推荐内容仅作为娱乐和统计参考，不承诺命中率，也不构成投注建议。
 
 ### 管理后台接口
 
@@ -261,6 +288,7 @@ DB_USERNAME="lcb" \
 DB_PASSWORD="change-me" \
 REDIS_HOST="redis" \
 ADMIN_TOKEN="change-me" \
+APP_AUTH_SECRET="change-me-with-at-least-32-random-chars" \
 AI_OPENCODE_API_KEY="change-me" \
 java -jar target/lcb-interview-0.0.1-SNAPSHOT.jar
 ```
@@ -319,6 +347,14 @@ location /assets/ {
 
 访问 `/admin/login`，输入与后端 `ADMIN_TOKEN` 一致的 Token。生产环境请务必使用强 Token。
 
+### 个人工具无法进入
+
+访问 `/auth/register` 注册普通用户，或访问 `/auth/login` 登录。生产环境请务必使用强 `APP_AUTH_SECRET`，避免普通用户令牌可被伪造。
+
 ### AI 评分或生成失败
 
 检查 `AI_INTERVIEW_ENABLED`、`AI_OPENCODE_API_KEY`、`AI_DEEPSEEK_MODEL`、`AI_DEEPSEEK_URL` 和网络连通性。远程 AI 不可用时，面试评分逻辑会尽量回退到本地规则评分。
+
+### 快乐8推荐无法生成
+
+先在 `/tools` 中点击同步开奖数据；历史数据不足或公开开奖源不可访问时，推荐接口会提示先同步更多数据。AI 配置缺失时会使用规则推荐降级。

@@ -6,6 +6,10 @@ SET NAMES utf8mb4;
 -- 包含: 建表 + 46个分类 + 71个标签 + 6386道DRAFT题目
 -- =============================================
 
+DROP TABLE IF EXISTS lottery_kl8_recommendation;
+DROP TABLE IF EXISTS lottery_kl8_draw;
+DROP TABLE IF EXISTS reading_excerpt;
+DROP TABLE IF EXISTS app_user;
 DROP TABLE IF EXISTS question_tag;
 DROP TABLE IF EXISTS question;
 DROP TABLE IF EXISTS tag;
@@ -22,6 +26,64 @@ CREATE TABLE IF NOT EXISTS ai_config (
     update_time       DATETIME     NOT NULL COMMENT '更新时间',
     is_deleted        TINYINT      DEFAULT 0 COMMENT '逻辑删除标记'
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = 'AI 运行时配置';
+
+CREATE TABLE IF NOT EXISTS app_user (
+    id            BIGINT       AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    username      VARCHAR(64)  NOT NULL COMMENT '登录用户名',
+    password_hash VARCHAR(220) NOT NULL COMMENT 'PBKDF2 密码哈希',
+    display_name  VARCHAR(64)  NOT NULL COMMENT '展示昵称',
+    status        VARCHAR(16)  NOT NULL DEFAULT 'ACTIVE' COMMENT '用户状态：ACTIVE/DISABLED',
+    create_time   DATETIME     NOT NULL COMMENT '创建时间',
+    update_time   DATETIME     NOT NULL COMMENT '更新时间',
+    is_deleted    TINYINT      DEFAULT 0 COMMENT '逻辑删除标记',
+    UNIQUE KEY uk_app_user_username (username),
+    INDEX idx_app_user_status (status)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '普通用户';
+
+CREATE TABLE IF NOT EXISTS reading_excerpt (
+    id          BIGINT       AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    user_id     BIGINT       NOT NULL COMMENT '所属普通用户 ID',
+    book_title  VARCHAR(160) NOT NULL COMMENT '书名',
+    author      VARCHAR(120) DEFAULT '' COMMENT '作者',
+    content     TEXT         NOT NULL COMMENT '摘录正文',
+    note        TEXT COMMENT '个人评论',
+    tags        VARCHAR(300) DEFAULT '' COMMENT '标签，逗号分隔',
+    chapter     VARCHAR(120) DEFAULT '' COMMENT '章节',
+    page_no     VARCHAR(40)  DEFAULT '' COMMENT '页码',
+    create_time DATETIME     NOT NULL COMMENT '创建时间',
+    update_time DATETIME     NOT NULL COMMENT '更新时间',
+    is_deleted  TINYINT      DEFAULT 0 COMMENT '逻辑删除标记',
+    INDEX idx_reading_excerpt_user_time (user_id, create_time),
+    INDEX idx_reading_excerpt_user_book (user_id, book_title)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '读书摘录';
+
+CREATE TABLE IF NOT EXISTS lottery_kl8_draw (
+    id          BIGINT       AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    issue_no    VARCHAR(32)  NOT NULL COMMENT '开奖期号',
+    draw_date   DATE         NOT NULL COMMENT '开奖日期',
+    numbers     VARCHAR(260) NOT NULL COMMENT '20 个开奖号码，逗号分隔',
+    source_url  VARCHAR(500) DEFAULT '' COMMENT '来源页面',
+    source_name VARCHAR(80)  DEFAULT '' COMMENT '来源名称',
+    create_time DATETIME     NOT NULL COMMENT '创建时间',
+    update_time DATETIME     NOT NULL COMMENT '更新时间',
+    UNIQUE KEY uk_lottery_kl8_issue (issue_no),
+    INDEX idx_lottery_kl8_draw_date (draw_date)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '快乐8开奖记录';
+
+CREATE TABLE IF NOT EXISTS lottery_kl8_recommendation (
+    id                   BIGINT      AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    user_id              BIGINT      NOT NULL COMMENT '所属普通用户 ID',
+    source               VARCHAR(20) NOT NULL COMMENT '推荐来源：AI/RULE_BASED',
+    base_issue_count     INT         NOT NULL COMMENT '使用的历史期数',
+    latest_issue_no      VARCHAR(32) DEFAULT '' COMMENT '生成时最新期号',
+    recommendations_json TEXT        NOT NULL COMMENT '5 组推荐号码和理由 JSON',
+    feature_summary      TEXT COMMENT '本次历史特征摘要',
+    disclaimer           VARCHAR(300) NOT NULL COMMENT '风险提示',
+    create_time          DATETIME    NOT NULL COMMENT '创建时间',
+    is_deleted           TINYINT     DEFAULT 0 COMMENT '逻辑删除标记',
+    INDEX idx_kl8_recommend_user_time (user_id, create_time),
+    INDEX idx_kl8_recommend_latest_issue (latest_issue_no)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '快乐8选5推荐历史';
 
 CREATE TABLE IF NOT EXISTS category (
     id          BIGINT       AUTO_INCREMENT PRIMARY KEY COMMENT '主键',

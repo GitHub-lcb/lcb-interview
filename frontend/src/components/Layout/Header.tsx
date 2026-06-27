@@ -9,6 +9,7 @@ import {
   ReadOutlined,
   SearchOutlined,
   SolutionOutlined,
+  ToolOutlined,
 } from '@ant-design/icons'
 
 const { Header } = Layout
@@ -19,6 +20,7 @@ const navItems = [
   { path: '/banks', label: '题库', icon: <BookOutlined /> },
   { path: '/routes', label: '路线', icon: <ReadOutlined /> },
   { path: '/experiences', label: '面经', icon: <SolutionOutlined /> },
+  { path: '/tools', label: '工具', icon: <ToolOutlined /> },
   { path: '/study', label: '计划', icon: <CalendarOutlined /> },
   { path: '/practice', label: '训练', icon: <PlayCircleOutlined /> },
 ]

@@ -6,7 +6,7 @@
 
 **Architecture:** Add a minimal ordinary-user auth layer separate from the existing admin token, then add focused Spring services for reading excerpts, lottery draw sync, feature extraction, AI recommendations, rule validation, and fallback. The React app gets login/register routes, a `/tools` entry, typed API wrappers, and Ant Design panels that use the backend as the source of truth.
 
-**Tech Stack:** Spring Boot 3.2, MyBatis-Plus, JDK 21, spring-security-crypto BCrypt, Java HttpClient, React 18, Vite, TypeScript, Ant Design 5, Vitest, JUnit 5.
+**Tech Stack:** Spring Boot 3.2, MyBatis-Plus, JDK 21, JDK PBKDF2 password hashing, Java HttpClient, React 18, Vite, TypeScript, Ant Design 5, Vitest, JUnit 5.
 
 ---
 
@@ -14,7 +14,7 @@
 
 ### Backend
 
-- Modify `backend/pom.xml`: add `spring-security-crypto` for BCrypt password hashing.
+- Modify `backend/pom.xml`: keep dependencies unchanged and use JDK PBKDF2 for password hashing.
 - Modify `backend/src/main/resources/application.yml`: add `app.auth.secret` and `app.auth.token-ttl-hours`.
 - Modify `backend/scripts/sql/init.sql`: create `app_user`, `reading_excerpt`, `lottery_kl8_draw`, `lottery_kl8_recommendation`.
 - Create `backend/src/main/java/com/lcbinterview/model/AppUser.java`: ordinary user entity.
@@ -65,14 +65,7 @@
 - Modify: `backend/src/main/resources/application.yml`
 - Modify: `backend/scripts/sql/init.sql`
 
-- [ ] Add `spring-security-crypto` to `backend/pom.xml` so `BCryptPasswordEncoder` is available without enabling a Spring Security filter chain.
-
-```xml
-<dependency>
-    <groupId>org.springframework.security</groupId>
-    <artifactId>spring-security-crypto</artifactId>
-</dependency>
-```
+- [ ] Keep `backend/pom.xml` free of new security dependencies; implement password hashing with JDK `PBKDF2WithHmacSHA256`.
 
 - [ ] Add ordinary-user auth configuration to `application.yml`.
 
@@ -100,7 +93,7 @@ app:
 - [ ] Write `AuthTokenServiceTest` first for token round trip, bad signature, and expired token.
 - [ ] Implement `AuthTokenService` using `HmacSHA256`, Base64 URL encoding, `userId:expiresAt:signature` payload, and `BusinessException(401, "登录状态已失效")` for invalid tokens.
 - [ ] Write `AppUserServiceTest` for registration, duplicate username, login success, login password failure, and disabled user rejection.
-- [ ] Implement `AppUserService` with username pattern `^[A-Za-z0-9_]{3,32}$`, minimum password length 8, and BCrypt.
+- [ ] Implement `AppUserService` with username pattern `^[A-Za-z0-9_]{3,32}$`, minimum password length 8, and PBKDF2 password hashing.
 - [ ] Implement `AuthController` returning `ResponseEntity<ApiResponse<AuthTokenVO>>` for register/login and `AuthUserVO` for `/api/auth/me`.
 - [ ] Implement `UserAuthInterceptor` to read `Authorization: Bearer <token>`, resolve user id, set `AuthUserContext`, and clear it in `afterCompletion`.
 - [ ] Register the interceptor only for `/api/tools/**` and `/api/auth/me`, leaving public question APIs and `/api/admin/**` untouched.
