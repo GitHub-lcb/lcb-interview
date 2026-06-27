@@ -2,6 +2,7 @@ package com.lcbinterview.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -32,6 +33,7 @@ public class LotteryKl8AiRecommendationService {
      * @param objectMapper           JSON 组件
      * @param aiRuntimeConfigService AI 运行时配置服务
      */
+    @Autowired
     public LotteryKl8AiRecommendationService(ObjectMapper objectMapper, AiRuntimeConfigService aiRuntimeConfigService) {
         this(objectMapper, aiRuntimeConfigService, HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(8)).build());
     }
