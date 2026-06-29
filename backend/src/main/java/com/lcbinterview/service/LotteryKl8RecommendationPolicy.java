@@ -2,10 +2,13 @@ package com.lcbinterview.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lcbinterview.dto.tools.LotteryKl8RecommendationGroupVO;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -20,6 +23,7 @@ public class LotteryKl8RecommendationPolicy {
 
     private static final int GROUP_COUNT = 5;
     private static final int GROUP_SIZE = 5;
+    private static final Set<String> CONFIDENCE_LABELS = Set.of("低", "中低", "中");
 
     private final ObjectMapper objectMapper;
 
@@ -39,6 +43,16 @@ public class LotteryKl8RecommendationPolicy {
      * @return 通过校验的推荐组
      */
     public List<LotteryKl8RecommendationGroupVO> validateAiContent(String content) {
+        return validateAiResult(content).groups();
+    }
+
+    /**
+     * 从 AI 文本中解析并校验深度推荐结果。
+     *
+     * @param content AI 输出文本
+     * @return 通过校验的深度推荐结果
+     */
+    public ValidatedRecommendation validateAiResult(String content) {
         try {
             JsonNode root = objectMapper.readTree(extractJson(content));
             JsonNode groupsNode = root.isArray() ? root : root.path("groups");
@@ -58,9 +72,43 @@ public class LotteryKl8RecommendationPolicy {
                 String reason = item.path("reason").asText("");
                 groups.add(validateGroup(numbers, reason));
             }
-            return validateGroups(groups);
+            List<LotteryKl8RecommendationGroupVO> validatedGroups = validateGroups(groups);
+            String confidenceLabel = root.isObject() && CONFIDENCE_LABELS.contains(root.path("confidenceLabel").asText())
+                    ? root.path("confidenceLabel").asText()
+                    : "中低";
+            ObjectNode analysis = normalizeAnalysis(root, confidenceLabel);
+            List<String> warnings = readWarnings(analysis.path("analysis").path("riskWarnings"));
+            return new ValidatedRecommendation(validatedGroups, objectMapper.writeValueAsString(analysis), confidenceLabel, warnings);
         } catch (Exception e) {
             throw new IllegalArgumentException("AI 推荐输出不合规", e);
+        }
+    }
+
+    /**
+     * 根据历史特征生成带分析 JSON 的规则降级推荐。
+     *
+     * @param report 历史特征报告
+     * @return 规则降级推荐结果
+     */
+    public ValidatedRecommendation fallbackResult(LotteryKl8FeatureReport report) {
+        List<LotteryKl8RecommendationGroupVO> groups = fallbackGroups(report);
+        try {
+            ObjectNode root = objectMapper.createObjectNode();
+            root.put("confidenceLabel", "低");
+            ObjectNode analysis = root.putObject("analysis");
+            analysis.put("overview", "AI 推荐不可用，已使用后端深度候选池按规则生成 5 组号码。");
+            ArrayNode featureSignals = analysis.putArray("featureSignals");
+            report.analysisSections().forEach(featureSignals::add);
+            ArrayNode combinationLogic = analysis.putArray("combinationLogic");
+            combinationLogic.add("每组从热号、冷号、高遗漏和趋势候选中分散抽取，避免完全依赖单一信号。");
+            combinationLogic.add("组内号码按升序展示，并控制重复组合。");
+            ArrayNode warnings = analysis.putArray("riskWarnings");
+            warnings.add("彩票开奖结果具有独立随机性，历史统计不能保证命中。");
+            warnings.add("规则推荐仅在 AI 不可用时作为娱乐参考。");
+            return new ValidatedRecommendation(groups, objectMapper.writeValueAsString(root), "低",
+                    List.of("彩票开奖结果具有独立随机性，历史统计不能保证命中。", "规则推荐仅在 AI 不可用时作为娱乐参考。"));
+        } catch (Exception e) {
+            throw new IllegalStateException("快乐8规则分析结果序列化失败", e);
         }
     }
 
@@ -75,11 +123,13 @@ public class LotteryKl8RecommendationPolicy {
         List<LotteryKl8RecommendationGroupVO> groups = new ArrayList<>();
         Set<String> used = new HashSet<>();
         int cursor = 0;
+        List<Integer> candidateNumbers = candidateNumbers(report);
         while (groups.size() < GROUP_COUNT) {
             LinkedHashSet<Integer> numbers = new LinkedHashSet<>();
-            push(numbers, report.hotNumbers(), cursor, 2);
-            push(numbers, report.coldNumbers(), cursor + 3, 1);
+            push(numbers, candidateNumbers, cursor, 2);
+            push(numbers, report.hotNumbers(), cursor + 3, 1);
             push(numbers, missingCandidates(report), cursor + 5, 1);
+            push(numbers, report.coldNumbers(), cursor + 7, 1);
             while (numbers.size() < GROUP_SIZE) {
                 numbers.add(random.nextInt(80) + 1);
             }
@@ -88,7 +138,7 @@ public class LotteryKl8RecommendationPolicy {
             if (used.add(key)) {
                 groups.add(new LotteryKl8RecommendationGroupVO(
                         sorted,
-                        "规则降级推荐：结合热号、冷号、遗漏和随机扰动生成，仅作娱乐参考。"));
+                        "规则降级推荐：结合深度候选池、热号、冷号、遗漏和随机扰动生成，仅作娱乐参考。"));
             }
             cursor += 1;
         }
@@ -146,6 +196,74 @@ public class LotteryKl8RecommendationPolicy {
                 .toList();
     }
 
+    private List<Integer> candidateNumbers(LotteryKl8FeatureReport report) {
+        if (!report.candidatePool().isEmpty()) {
+            return report.candidatePool().stream()
+                    .sorted(Comparator.comparingDouble(LotteryKl8CandidateNumber::score).reversed()
+                            .thenComparing(LotteryKl8CandidateNumber::number))
+                    .map(LotteryKl8CandidateNumber::number)
+                    .toList();
+        }
+        return report.hotNumbers();
+    }
+
+    private ObjectNode normalizeAnalysis(JsonNode root, String confidenceLabel) {
+        ObjectNode normalized = objectMapper.createObjectNode();
+        normalized.put("confidenceLabel", confidenceLabel);
+        ObjectNode analysis = normalized.putObject("analysis");
+        JsonNode source = root.path("analysis");
+        if (source.isObject()) {
+            copyText(source, analysis, "overview", "AI 基于历史特征和候选池生成推荐。");
+            copyArray(source, analysis, "featureSignals");
+            copyArray(source, analysis, "combinationLogic");
+            copyArray(source, analysis, "riskWarnings");
+        } else {
+            analysis.put("overview", "AI 基于历史特征和候选池生成推荐。");
+            analysis.putArray("featureSignals");
+            analysis.putArray("combinationLogic");
+            analysis.putArray("riskWarnings").add("彩票开奖结果具有独立随机性，历史统计不能保证命中。");
+        }
+        if (analysis.path("riskWarnings").isEmpty()) {
+            ((ArrayNode) analysis.path("riskWarnings")).add("彩票开奖结果具有独立随机性，历史统计不能保证命中。");
+        }
+        return normalized;
+    }
+
+    private void copyText(JsonNode source, ObjectNode target, String fieldName, String fallback) {
+        String value = source.path(fieldName).asText("");
+        target.put(fieldName, value.isBlank() ? fallback : value);
+    }
+
+    private void copyArray(JsonNode source, ObjectNode target, String fieldName) {
+        ArrayNode targetArray = target.putArray(fieldName);
+        JsonNode sourceArray = source.path(fieldName);
+        if (sourceArray.isArray()) {
+            for (JsonNode item : sourceArray) {
+                String value = item.asText("");
+                if (!value.isBlank()) {
+                    targetArray.add(value);
+                }
+            }
+        }
+    }
+
+    private List<String> readWarnings(JsonNode warningsNode) {
+        if (!warningsNode.isArray()) {
+            return List.of("彩票开奖结果具有独立随机性，历史统计不能保证命中。");
+        }
+        List<String> warnings = new ArrayList<>();
+        for (JsonNode item : warningsNode) {
+            String value = item.asText("");
+            if (!value.isBlank()) {
+                warnings.add(value);
+            }
+        }
+        if (warnings.isEmpty()) {
+            return List.of("彩票开奖结果具有独立随机性，历史统计不能保证命中。");
+        }
+        return warnings;
+    }
+
     private String extractJson(String content) {
         String clean = content == null ? "" : content.trim()
                 .replaceAll("(?s)^```json\\s*", "")
@@ -167,5 +285,21 @@ public class LotteryKl8RecommendationPolicy {
             throw new IllegalArgumentException("AI 响应中没有 JSON");
         }
         return clean.substring(start, end + 1);
+    }
+
+    /**
+     * 已校验的快乐8推荐结果。
+     *
+     * @param groups          5 组推荐号码
+     * @param analysisJson    深度分析 JSON
+     * @param confidenceLabel 置信标签，仅表达统计参考强弱
+     * @param riskWarnings    风险提示列表
+     */
+    public record ValidatedRecommendation(
+            List<LotteryKl8RecommendationGroupVO> groups,
+            String analysisJson,
+            String confidenceLabel,
+            List<String> riskWarnings
+    ) {
     }
 }

@@ -28,6 +28,7 @@ public class LotteryKl8SyncService {
 
     private final LotteryKl8DrawMapper drawMapper;
     private final LotteryKl8DrawFetcher drawFetcher;
+    private final LotteryKl8RecommendationEvaluationService evaluationService;
 
     private volatile LocalDateTime lastSyncAt;
 
@@ -62,6 +63,10 @@ public class LotteryKl8SyncService {
             inserted += 1;
         }
         lastSyncAt = LocalDateTime.now();
+        int evaluated = evaluationService.evaluatePendingRecommendations();
+        if (evaluated > 0) {
+            log.info("快乐8同步后完成推荐命中结算 {} 条", evaluated);
+        }
         String latestIssue = latestDraw() == null ? "" : latestDraw().getIssueNo();
         return new LotteryKl8SyncResultVO(true, sourceName(fetched), fetched.size(), inserted, latestIssue, "同步完成");
     }

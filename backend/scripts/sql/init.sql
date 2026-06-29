@@ -78,11 +78,23 @@ CREATE TABLE IF NOT EXISTS lottery_kl8_recommendation (
     latest_issue_no      VARCHAR(32) DEFAULT '' COMMENT '生成时最新期号',
     recommendations_json TEXT        NOT NULL COMMENT '5 组推荐号码和理由 JSON',
     feature_summary      TEXT COMMENT '本次历史特征摘要',
+    analysis_json        MEDIUMTEXT COMMENT '本次深度分析 JSON',
+    candidate_pool_json  MEDIUMTEXT COMMENT '本次候选池 JSON',
+    calibration_snapshot_json MEDIUMTEXT COMMENT '策略校准快照 JSON',
+    strategy_version     VARCHAR(40) DEFAULT '' COMMENT '推荐策略版本',
+    evaluated_issue_no   VARCHAR(32) DEFAULT '' COMMENT '结算开奖期号',
+    evaluated_draw_date  DATE DEFAULT NULL COMMENT '结算开奖日期',
+    hit_summary_json     MEDIUMTEXT COMMENT '命中结果 JSON',
+    total_hit_count      INT DEFAULT NULL COMMENT '5 组累计命中数量',
+    max_hit_count        INT DEFAULT NULL COMMENT '单组最高命中数量',
+    evaluated_at         DATETIME DEFAULT NULL COMMENT '命中结算时间',
     disclaimer           VARCHAR(300) NOT NULL COMMENT '风险提示',
     create_time          DATETIME    NOT NULL COMMENT '创建时间',
     is_deleted           TINYINT     DEFAULT 0 COMMENT '逻辑删除标记',
     INDEX idx_kl8_recommend_user_time (user_id, create_time),
-    INDEX idx_kl8_recommend_latest_issue (latest_issue_no)
+    INDEX idx_kl8_recommend_latest_issue (latest_issue_no),
+    INDEX idx_kl8_recommend_eval_issue (evaluated_issue_no),
+    INDEX idx_kl8_recommend_evaluated_at (evaluated_at)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '快乐8选5推荐历史';
 
 CREATE TABLE IF NOT EXISTS category (

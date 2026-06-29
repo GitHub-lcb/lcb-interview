@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -43,6 +44,46 @@ public class LotteryKl8Recommendation {
     /** 历史特征摘要 */
     @TableField("feature_summary")
     private String featureSummary;
+
+    /** 深度分析 JSON */
+    @TableField("analysis_json")
+    private String analysisJson;
+
+    /** 候选池 JSON */
+    @TableField("candidate_pool_json")
+    private String candidatePoolJson;
+
+    /** 策略校准快照 JSON */
+    @TableField("calibration_snapshot_json")
+    private String calibrationSnapshotJson;
+
+    /** 推荐策略版本 */
+    @TableField("strategy_version")
+    private String strategyVersion;
+
+    /** 结算开奖期号 */
+    @TableField("evaluated_issue_no")
+    private String evaluatedIssueNo;
+
+    /** 结算开奖日期 */
+    @TableField("evaluated_draw_date")
+    private LocalDate evaluatedDrawDate;
+
+    /** 命中结果 JSON */
+    @TableField("hit_summary_json")
+    private String hitSummaryJson;
+
+    /** 5 组累计命中数量 */
+    @TableField("total_hit_count")
+    private Integer totalHitCount;
+
+    /** 单组最高命中数量 */
+    @TableField("max_hit_count")
+    private Integer maxHitCount;
+
+    /** 命中结算时间 */
+    @TableField("evaluated_at")
+    private LocalDateTime evaluatedAt;
 
     /** 风险提示 */
     private String disclaimer;

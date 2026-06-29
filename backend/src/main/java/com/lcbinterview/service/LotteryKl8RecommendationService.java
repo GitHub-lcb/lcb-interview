@@ -26,11 +26,14 @@ import java.util.List;
 public class LotteryKl8RecommendationService {
 
     private static final int DEFAULT_BASE_ISSUE_COUNT = 100;
+    private static final String STRATEGY_VERSION = "KL8_DEEP_FEEDBACK_V2";
     private static final String DISCLAIMER = "彩票结果具有随机性，本推荐仅为娱乐统计参考，不保证命中，不构成投注建议。";
 
     private final LotteryKl8FeatureService featureService;
     private final LotteryKl8AiRecommendationService aiRecommendationService;
     private final LotteryKl8RecommendationPolicy recommendationPolicy;
+    private final LotteryKl8RecommendationEvaluationService evaluationService;
+    private final LotteryKl8StrategyCalibrationService calibrationService;
     private final LotteryKl8RecommendationMapper recommendationMapper;
     private final ObjectMapper objectMapper;
 
@@ -44,23 +47,29 @@ public class LotteryKl8RecommendationService {
     @Transactional
     public LotteryKl8RecommendationVO recommend(Long userId, LotteryKl8RecommendationRequest request) {
         int baseIssueCount = request.baseIssueCount() == null ? DEFAULT_BASE_ISSUE_COUNT : request.baseIssueCount();
-        LotteryKl8FeatureReport report = featureService.buildReport(baseIssueCount);
+        evaluationService.evaluatePendingRecommendations();
+        LotteryKl8StrategyCalibration calibration = calibrationService.currentCalibration();
+        LotteryKl8FeatureReport report = featureService.buildReport(baseIssueCount, calibration);
         String source = "AI";
-        List<LotteryKl8RecommendationGroupVO> groups;
+        LotteryKl8RecommendationPolicy.ValidatedRecommendation result;
         try {
-            groups = recommendationPolicy.validateAiContent(aiRecommendationService.recommend(report));
+            result = recommendationPolicy.validateAiResult(aiRecommendationService.recommend(report));
         } catch (Exception e) {
             log.warn("快乐8 AI 推荐不可用，回退规则推荐: {}", e.getMessage());
             source = "RULE_BASED";
-            groups = recommendationPolicy.fallbackGroups(report);
+            result = recommendationPolicy.fallbackResult(report);
         }
         LotteryKl8Recommendation recommendation = new LotteryKl8Recommendation();
         recommendation.setUserId(userId);
         recommendation.setSource(source);
         recommendation.setBaseIssueCount(report.baseIssueCount());
         recommendation.setLatestIssueNo(report.latestIssueNo());
-        recommendation.setRecommendationsJson(writeGroups(groups));
-        recommendation.setFeatureSummary(report.summary());
+        recommendation.setRecommendationsJson(writeGroups(result.groups()));
+        recommendation.setFeatureSummary(report.deepSummary());
+        recommendation.setAnalysisJson(result.analysisJson());
+        recommendation.setCandidatePoolJson(writeCandidatePool(report));
+        recommendation.setCalibrationSnapshotJson(writeCalibrationSnapshot(calibration));
+        recommendation.setStrategyVersion(STRATEGY_VERSION);
         recommendation.setDisclaimer(DISCLAIMER);
         recommendationMapper.insert(recommendation);
         return LotteryKl8RecommendationVO.from(recommendation, objectMapper);
@@ -91,6 +100,22 @@ public class LotteryKl8RecommendationService {
             return objectMapper.writeValueAsString(groups);
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("快乐8推荐结果序列化失败", e);
+        }
+    }
+
+    private String writeCandidatePool(LotteryKl8FeatureReport report) {
+        try {
+            return objectMapper.writeValueAsString(report.candidatePool());
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("快乐8候选池序列化失败", e);
+        }
+    }
+
+    private String writeCalibrationSnapshot(LotteryKl8StrategyCalibration calibration) {
+        try {
+            return objectMapper.writeValueAsString(calibration);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("快乐8策略校准快照序列化失败", e);
         }
     }
 }

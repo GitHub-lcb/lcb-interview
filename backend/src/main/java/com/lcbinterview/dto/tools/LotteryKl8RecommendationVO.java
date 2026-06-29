@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lcbinterview.model.LotteryKl8Recommendation;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,6 +17,16 @@ import java.util.List;
  * @param latestIssueNo  最新期号
  * @param groups         5 组推荐号码
  * @param featureSummary 特征摘要
+ * @param analysisJson   深度分析 JSON
+ * @param candidatePoolJson 候选池 JSON
+ * @param calibrationSnapshotJson 策略校准快照 JSON
+ * @param strategyVersion 策略版本
+ * @param evaluatedIssueNo 结算开奖期号
+ * @param evaluatedDrawDate 结算开奖日期
+ * @param hitSummaryJson 命中结果 JSON
+ * @param totalHitCount 5 组累计命中数量
+ * @param maxHitCount 单组最高命中数量
+ * @param evaluatedAt 命中结算时间
  * @param disclaimer     风险提示
  * @param createdAt      创建时间
  */
@@ -26,6 +37,16 @@ public record LotteryKl8RecommendationVO(
         String latestIssueNo,
         List<LotteryKl8RecommendationGroupVO> groups,
         String featureSummary,
+        String analysisJson,
+        String candidatePoolJson,
+        String calibrationSnapshotJson,
+        String strategyVersion,
+        String evaluatedIssueNo,
+        LocalDate evaluatedDrawDate,
+        String hitSummaryJson,
+        Integer totalHitCount,
+        Integer maxHitCount,
+        LocalDateTime evaluatedAt,
         String disclaimer,
         LocalDateTime createdAt
 ) {
@@ -47,6 +68,16 @@ public record LotteryKl8RecommendationVO(
                 recommendation.getLatestIssueNo(),
                 parseGroups(recommendation.getRecommendationsJson(), objectMapper),
                 recommendation.getFeatureSummary(),
+                recommendation.getAnalysisJson(),
+                recommendation.getCandidatePoolJson(),
+                recommendation.getCalibrationSnapshotJson(),
+                recommendation.getStrategyVersion(),
+                recommendation.getEvaluatedIssueNo(),
+                recommendation.getEvaluatedDrawDate(),
+                recommendation.getHitSummaryJson(),
+                recommendation.getTotalHitCount(),
+                recommendation.getMaxHitCount(),
+                recommendation.getEvaluatedAt(),
                 recommendation.getDisclaimer(),
                 recommendation.getCreateTime());
     }

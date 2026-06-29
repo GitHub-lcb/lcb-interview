@@ -267,6 +267,16 @@ export interface LotteryKl8Recommendation {
   latestIssueNo: string
   groups: LotteryKl8RecommendationGroup[]
   featureSummary: string
+  analysisJson?: string
+  candidatePoolJson?: string
+  calibrationSnapshotJson?: string
+  strategyVersion?: string
+  evaluatedIssueNo?: string
+  evaluatedDrawDate?: string
+  hitSummaryJson?: string
+  totalHitCount?: number
+  maxHitCount?: number
+  evaluatedAt?: string
   disclaimer: string
   createdAt: string
 }
