@@ -34,6 +34,8 @@ public class ZhcwKl8DrawFetcher implements LotteryKl8DrawFetcher {
     private static final Pattern ISSUE_PATTERN = Pattern.compile("(20\\d{5,}|\\d{7,})");
     private static final Pattern NUMBER_PATTERN = Pattern.compile("(?<!\\d)(0?[1-9]|[1-7]\\d|80)(?!\\d)");
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final int PAGE_SIZE = 500;
+    private static final int MAX_PAGES = 12;
 
     private final HttpClient httpClient;
 
@@ -55,8 +57,31 @@ public class ZhcwKl8DrawFetcher implements LotteryKl8DrawFetcher {
      */
     @Override
     public List<LotteryKl8FetchedDraw> fetchRecentDraws() {
+        List<LotteryKl8FetchedDraw> allDraws = new ArrayList<>();
+        LinkedHashSet<String> seenIssueNos = new LinkedHashSet<>();
+        for (int pageNum = 1; pageNum <= MAX_PAGES; pageNum += 1) {
+            List<LotteryKl8FetchedDraw> pageDraws = fetchPage(pageNum);
+            if (pageDraws.isEmpty()) {
+                break;
+            }
+            int beforeSize = seenIssueNos.size();
+            for (LotteryKl8FetchedDraw draw : pageDraws) {
+                if (seenIssueNos.add(draw.issueNo())) {
+                    allDraws.add(draw);
+                }
+            }
+            // 中彩网尾页之后可能重复返回最后一页，用期号去重后的增量判断停止，避免继续空转请求。
+            if (seenIssueNos.size() == beforeSize) {
+                break;
+            }
+        }
+        log.info("Fetched KL8 draw data: {} unique records", allDraws.size());
+        return allDraws;
+    }
+
+    private List<LotteryKl8FetchedDraw> fetchPage(int pageNum) {
         try {
-            HttpRequest request = HttpRequest.newBuilder(URI.create(dataApiUrl()))
+            HttpRequest request = HttpRequest.newBuilder(URI.create(dataApiUrl(pageNum)))
                     .timeout(Duration.ofSeconds(10))
                     .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36")
                     .header("Referer", PAGE_URL)
@@ -105,14 +130,14 @@ public class ZhcwKl8DrawFetcher implements LotteryKl8DrawFetcher {
         return draws;
     }
 
-    private String dataApiUrl() {
+    private String dataApiUrl(int pageNum) {
         return SOURCE_URL
                 + "?transactionType=10001001"
                 + "&lotteryId=6"
-                + "&issueCount=30"
+                + "&issueCount=" + PAGE_SIZE * MAX_PAGES
                 + "&type=0"
-                + "&pageNum=1"
-                + "&pageSize=30"
+                + "&pageNum=" + pageNum
+                + "&pageSize=" + PAGE_SIZE
                 + "&callback=callback"
                 + "&tt=" + System.currentTimeMillis();
     }

@@ -11,7 +11,7 @@ vi.mock('./index', () => ({
 }))
 
 import api from './index'
-import { createKl8Recommendation } from './tools'
+import { createKl8Recommendation, syncKl8Draws } from './tools'
 
 const recommendation: LotteryKl8Recommendation = {
   id: 1,
@@ -42,6 +42,18 @@ describe('tools api', () => {
     expect(api.post).toHaveBeenCalledWith(
       '/tools/lottery/kl8/recommendations',
       { baseIssueCount: 120 },
+      { timeout: 120000 },
+    )
+  })
+
+  it('uses an extended timeout for lottery draw sync', async () => {
+    vi.mocked(api.post).mockResolvedValue({ data: { data: { success: true } } })
+
+    await syncKl8Draws()
+
+    expect(api.post).toHaveBeenCalledWith(
+      '/tools/lottery/kl8/sync',
+      undefined,
       { timeout: 120000 },
     )
   })

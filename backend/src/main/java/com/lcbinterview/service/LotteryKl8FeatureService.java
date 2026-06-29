@@ -28,6 +28,7 @@ public class LotteryKl8FeatureService {
 
     private static final int NUMBER_MIN = 1;
     private static final int NUMBER_MAX = 80;
+    private static final int MAX_BASE_ISSUE_COUNT = 2000;
     private static final int CANDIDATE_POOL_SIZE = 32;
     private static final int PAIR_HIGHLIGHT_SIZE = 20;
 
@@ -56,7 +57,7 @@ public class LotteryKl8FeatureService {
         LotteryKl8StrategyCalibration calibrationToUse = calibration == null
                 ? LotteryKl8StrategyCalibration.neutral()
                 : calibration;
-        int limit = Math.max(20, Math.min(500, baseIssueCount));
+        int limit = Math.max(20, Math.min(MAX_BASE_ISSUE_COUNT, baseIssueCount));
         List<LotteryKl8Draw> draws = drawMapper.selectList(Wrappers.<LotteryKl8Draw>lambdaQuery()
                 .orderByDesc(LotteryKl8Draw::getDrawDate)
                 .orderByDesc(LotteryKl8Draw::getIssueNo)
@@ -210,6 +211,8 @@ public class LotteryKl8FeatureService {
         int total = drawSets.size();
         int recent30Window = Math.min(30, total);
         int recent60Window = Math.min(60, total);
+        int recent120Window = Math.min(120, total);
+        int recent365Window = Math.min(365, total);
         int previousStart = recent30Window;
         int previousEnd = Math.min(60, total);
         int maxFrequency = frequency.values().stream().max(Integer::compareTo).orElse(1);
@@ -222,35 +225,46 @@ public class LotteryKl8FeatureService {
             int currentFrequency = frequency.getOrDefault(number, 0);
             int recent30 = countInWindow(drawSets, number, 0, recent30Window);
             int recent60 = countInWindow(drawSets, number, 0, recent60Window);
+            int recent120 = countInWindow(drawSets, number, 0, recent120Window);
+            int recent365 = countInWindow(drawSets, number, 0, recent365Window);
             int previous30 = countInWindow(drawSets, number, previousStart, previousEnd);
             double trendScore = trendScore(recent30, recent30Window, previous30, previousEnd - previousStart);
             double volatility = volatility(drawSets, number, 10);
             OmissionStats omissionStats = omissionStats(drawSets, number);
+            double decayedFrequencyScore = decayedFrequencyScore(drawSets, number);
+            double omissionPressureScore = omissionPressureScore(missing.getOrDefault(number, total), omissionStats);
             double frequencyScore = maxFrequency == 0 ? 0 : (double) currentFrequency / maxFrequency;
             double missingScore = maxMissing == 0 ? 0 : (double) missing.getOrDefault(number, total) / maxMissing;
             double recentScore = recent30Window == 0 ? 0 : (double) recent30 / recent30Window;
+            double midTermScore = recent120Window == 0 ? recentScore : (double) recent120 / recent120Window;
             double trendPositive = Math.max(0, trendScore) * 3;
             double stabilityScore = Math.max(0, 1 - volatility / 4);
             double coldRecoveryScore = coldSet.contains(number)
                     ? Math.min(1, missingScore + Math.max(0, trendScore) * 2)
                     : 0;
-            double compositeScore = round((frequencyScore * 35 + recentScore * 25) * calibration.hotMultiplier()
-                    + missingScore * 18 * calibration.missingMultiplier()
-                    + Math.min(1, trendPositive) * 15 * calibration.trendMultiplier()
-                    + stabilityScore * 7 * calibration.balanceMultiplier()
+            double compositeScore = round((frequencyScore * 24 + recentScore * 20 + midTermScore * 10 + decayedFrequencyScore * 16)
+                    * calibration.hotMultiplier()
+                    + Math.max(missingScore, Math.min(1, omissionPressureScore / 2)) * 18 * calibration.missingMultiplier()
+                    + Math.min(1, trendPositive) * 12 * calibration.trendMultiplier()
+                    + stabilityScore * 8 * calibration.balanceMultiplier()
                     + coldRecoveryScore * 8 * (calibration.coldMultiplier() - 1));
-            List<String> tags = tags(number, hotSet, coldSet, missing, trendScore, volatility, recent30);
+            List<String> tags = tags(number, hotSet, coldSet, missing, trendScore, volatility,
+                    recent30, recent120, decayedFrequencyScore, omissionPressureScore);
             profiles.add(new LotteryKl8NumberProfile(
                     number,
                     currentFrequency,
                     round((double) currentFrequency / total),
                     recent30,
                     recent60,
+                    recent120,
+                    recent365,
                     missing.getOrDefault(number, total),
                     omissionStats.averageMissing(),
                     omissionStats.maxMissing(),
                     round(trendScore),
                     round(volatility),
+                    decayedFrequencyScore,
+                    omissionPressureScore,
                     rangeLabel(number),
                     number % 2 == 0 ? "偶" : "奇",
                     Math.floorMod(number, 10),
@@ -268,7 +282,10 @@ public class LotteryKl8FeatureService {
             Map<Integer, Integer> missing,
             double trendScore,
             double volatility,
-            int recent30) {
+            int recent30,
+            int recent120,
+            double decayedFrequencyScore,
+            double omissionPressureScore) {
         List<String> tags = new ArrayList<>();
         if (hotSet.contains(number)) {
             tags.add("热号");
@@ -287,6 +304,15 @@ public class LotteryKl8FeatureService {
         }
         if (recent30 == 0) {
             tags.add("近30未出");
+        }
+        if (recent120 == 0) {
+            tags.add("百期断档");
+        }
+        if (decayedFrequencyScore >= 0.35) {
+            tags.add("衰减热度高");
+        }
+        if (omissionPressureScore >= 1.5) {
+            tags.add("遗漏压力高");
         }
         if (volatility >= 2.5) {
             tags.add("波动大");
@@ -314,6 +340,24 @@ public class LotteryKl8FeatureService {
         double recentRate = (double) recentCount / recentWindow;
         double previousRate = previousWindow == 0 ? recentRate : (double) previousCount / previousWindow;
         return recentRate - previousRate;
+    }
+
+    private double decayedFrequencyScore(List<Set<Integer>> drawSets, int number) {
+        double weightedHits = 0;
+        double totalWeight = 0;
+        for (int index = 0; index < drawSets.size(); index += 1) {
+            double weight = Math.pow(0.985, index);
+            totalWeight += weight;
+            if (drawSets.get(index).contains(number)) {
+                weightedHits += weight;
+            }
+        }
+        return totalWeight == 0 ? 0 : round(weightedHits / totalWeight);
+    }
+
+    private double omissionPressureScore(int currentMissing, OmissionStats omissionStats) {
+        double baseline = Math.max(1, omissionStats.averageMissing());
+        return round(Math.min(2, currentMissing / baseline));
     }
 
     private double volatility(List<Set<Integer>> drawSets, int number, int blockSize) {

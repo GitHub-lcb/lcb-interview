@@ -15,6 +15,9 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -60,9 +63,14 @@ class ZhcwKl8DrawFetcherTest {
 
     @Test
     void fetchesFromZhcwJsonpDataApi() {
-        CapturingHttpClient httpClient = new CapturingHttpClient("""
-                callback({"resCode":"000000","data":[{"issue":"2026168","openTime":"2026-06-27","frontWinningNum":"02 06 08 09 20 21 24 25 31 33 42 44 46 48 55 61 64 66 72 77"}]});
-                """);
+        CapturingHttpClient httpClient = new CapturingHttpClient(List.of(
+                """
+                        callback({"resCode":"000000","data":[{"issue":"2026168","openTime":"2026-06-27","frontWinningNum":"02 06 08 09 20 21 24 25 31 33 42 44 46 48 55 61 64 66 72 77"}]});
+                        """,
+                """
+                        callback({"resCode":"000000","data":[]});
+                        """
+        ));
         ZhcwKl8DrawFetcher fetcher = new ZhcwKl8DrawFetcher(httpClient);
 
         List<LotteryKl8FetchedDraw> draws = fetcher.fetchRecentDraws();
@@ -77,13 +85,48 @@ class ZhcwKl8DrawFetcherTest {
         assertEquals("2026168", draws.get(0).issueNo());
     }
 
+    @Test
+    void fetchesPagedZhcwJsonpDataApiUntilNoMoreDraws() {
+        CapturingHttpClient httpClient = new CapturingHttpClient(List.of(
+                """
+                        callback({"resCode":"000000","data":[
+                        {"issue":"2026168","openTime":"2026-06-27","frontWinningNum":"02 06 08 09 20 21 24 25 31 33 42 44 46 48 55 61 64 66 72 77"},
+                        {"issue":"2026167","openTime":"2026-06-26","frontWinningNum":"01 03 05 07 09 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39"}]});
+                        """,
+                """
+                        callback({"resCode":"000000","data":[
+                        {"issue":"2026166","openTime":"2026-06-25","frontWinningNum":"04 08 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80"}]});
+                        """,
+                """
+                        callback({"resCode":"000000","data":[]});
+                        """
+        ));
+        ZhcwKl8DrawFetcher fetcher = new ZhcwKl8DrawFetcher(httpClient);
+
+        List<LotteryKl8FetchedDraw> draws = fetcher.fetchRecentDraws();
+
+        assertEquals(3, httpClient.requests.size());
+        assertTrue(httpClient.requests.get(0).uri().getQuery().contains("pageNum=1"));
+        assertTrue(httpClient.requests.get(1).uri().getQuery().contains("pageNum=2"));
+        assertTrue(httpClient.requests.get(2).uri().getQuery().contains("pageNum=3"));
+        assertTrue(httpClient.requests.get(0).uri().getQuery().contains("pageSize=500"));
+        assertEquals(3, draws.size());
+        assertEquals(List.of("2026168", "2026167", "2026166"),
+                draws.stream().map(LotteryKl8FetchedDraw::issueNo).toList());
+    }
+
     private static class CapturingHttpClient extends HttpClient {
 
-        private final String body;
+        private final Deque<String> bodies;
         private HttpRequest request;
+        private final List<HttpRequest> requests = new ArrayList<>();
 
         private CapturingHttpClient(String body) {
-            this.body = body;
+            this(List.of(body));
+        }
+
+        private CapturingHttpClient(List<String> bodies) {
+            this.bodies = new ArrayDeque<>(bodies);
         }
 
         @Override
@@ -135,8 +178,9 @@ class ZhcwKl8DrawFetcherTest {
         public <T> HttpResponse<T> send(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler)
                 throws IOException, InterruptedException {
             this.request = request;
+            this.requests.add(request);
             @SuppressWarnings("unchecked")
-            T typedBody = (T) body;
+            T typedBody = (T) bodies.removeFirst();
             return new SimpleHttpResponse<>(request, typedBody);
         }
 

@@ -25,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LotteryKl8RecommendationService {
 
-    private static final int DEFAULT_BASE_ISSUE_COUNT = 100;
+    private static final int DEFAULT_BASE_ISSUE_COUNT = 1000;
     private static final String STRATEGY_VERSION = "KL8_DEEP_FEEDBACK_V2";
     private static final String DISCLAIMER = "彩票结果具有随机性，本推荐仅为娱乐统计参考，不保证命中，不构成投注建议。";
 

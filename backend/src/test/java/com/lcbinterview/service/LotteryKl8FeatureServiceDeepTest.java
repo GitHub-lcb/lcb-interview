@@ -2,8 +2,11 @@ package com.lcbinterview.service;
 
 import com.lcbinterview.mapper.LotteryKl8DrawMapper;
 import com.lcbinterview.model.LotteryKl8Draw;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class LotteryKl8FeatureServiceDeepTest {
@@ -41,6 +45,10 @@ class LotteryKl8FeatureServiceDeepTest {
                 .orElseThrow();
 
         assertTrue(hotProfile.frequency() > missingProfile.frequency());
+        assertTrue(hotProfile.recent120Frequency() >= hotProfile.recent60Frequency());
+        assertTrue(hotProfile.recent365Frequency() >= hotProfile.recent120Frequency());
+        assertTrue(hotProfile.decayedFrequencyScore() > 0);
+        assertTrue(hotProfile.omissionPressureScore() >= 0);
         assertTrue(hotProfile.compositeScore() > 0);
         assertTrue(hotProfile.tags().contains("热号"));
         assertTrue(missingProfile.currentMissing() >= 20);
@@ -72,6 +80,20 @@ class LotteryKl8FeatureServiceDeepTest {
         assertTrue(weighted.deepSummary().contains("测试提高高遗漏权重"));
     }
 
+    @Test
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    void requestsDeeperHistoryWhenBaseIssueCountAboveFormerCap() {
+        LotteryKl8DrawMapper mapper = mock(LotteryKl8DrawMapper.class);
+        when(mapper.selectList(any())).thenReturn(sampleDraws(1200));
+        LotteryKl8FeatureService service = new LotteryKl8FeatureService(mapper);
+
+        service.buildReport(1200);
+
+        ArgumentCaptor<Wrapper> captor = ArgumentCaptor.forClass(Wrapper.class);
+        verify(mapper).selectList(captor.capture());
+        assertTrue(lastSql(captor.getValue()).contains("LIMIT 1200"));
+    }
+
     private LotteryKl8NumberProfile profile(LotteryKl8FeatureReport report, int number) {
         return report.numberProfiles().stream()
                 .filter(item -> item.number() == number)
@@ -79,9 +101,32 @@ class LotteryKl8FeatureServiceDeepTest {
                 .orElseThrow();
     }
 
+    private String lastSql(Wrapper<?> wrapper) {
+        try {
+            Class<?> type = wrapper.getClass();
+            while (type != null) {
+                try {
+                    Field field = type.getDeclaredField("lastSql");
+                    field.setAccessible(true);
+                    Object sharedString = field.get(wrapper);
+                    return String.valueOf(sharedString.getClass().getMethod("getStringValue").invoke(sharedString));
+                } catch (NoSuchFieldException e) {
+                    type = type.getSuperclass();
+                }
+            }
+            throw new AssertionError("Wrapper last SQL field not found");
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError("Wrapper last SQL field can not be read", e);
+        }
+    }
+
     private List<LotteryKl8Draw> sampleDraws() {
+        return sampleDraws(60);
+    }
+
+    private List<LotteryKl8Draw> sampleDraws(int count) {
         List<LotteryKl8Draw> draws = new ArrayList<>();
-        for (int index = 0; index < 60; index += 1) {
+        for (int index = 0; index < count; index += 1) {
             LotteryKl8Draw draw = new LotteryKl8Draw();
             draw.setIssueNo("2026%03d".formatted(200 - index));
             draw.setDrawDate(LocalDate.of(2026, 6, 29).minusDays(index));

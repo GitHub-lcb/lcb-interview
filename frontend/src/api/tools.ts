@@ -11,6 +11,7 @@ import type {
 } from '../types'
 
 const KL8_RECOMMENDATION_TIMEOUT_MS = 120000
+const KL8_SYNC_TIMEOUT_MS = 120000
 
 export interface ReadingExcerptListParams {
   page?: number
@@ -45,7 +46,7 @@ export async function exportReadingExcerpts(params: ReadingExcerptListParams): P
 }
 
 export async function syncKl8Draws(): Promise<LotteryKl8SyncResult> {
-  const res = await api.post('/tools/lottery/kl8/sync')
+  const res = await api.post('/tools/lottery/kl8/sync', undefined, { timeout: KL8_SYNC_TIMEOUT_MS })
   return res.data.data
 }
 
@@ -59,7 +60,7 @@ export async function listKl8Draws(page = 0, size = 30): Promise<PageResult<Lott
   return res.data.data
 }
 
-export async function createKl8Recommendation(baseIssueCount = 100): Promise<LotteryKl8Recommendation> {
+export async function createKl8Recommendation(baseIssueCount = 1000): Promise<LotteryKl8Recommendation> {
   const res = await api.post('/tools/lottery/kl8/recommendations', { baseIssueCount }, {
     timeout: KL8_RECOMMENDATION_TIMEOUT_MS,
   })

@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Min;
  */
 public record LotteryKl8RecommendationRequest(
         @Min(value = 20, message = "至少需要使用 20 期历史数据")
-        @Max(value = 500, message = "最多使用 500 期历史数据")
+        @Max(value = 2000, message = "最多使用 2000 期历史数据")
         Integer baseIssueCount
 ) {
 }

@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 快乐8开奖同步服务，负责手动和定时抓取公开开奖数据。
@@ -52,14 +54,14 @@ public class LotteryKl8SyncService {
     @Transactional
     public LotteryKl8SyncResultVO sync() {
         List<LotteryKl8FetchedDraw> fetched = drawFetcher.fetchRecentDraws();
+        Set<String> existingIssueNos = existingIssueNos(fetched);
         int inserted = 0;
         for (LotteryKl8FetchedDraw draw : fetched) {
-            Long exists = drawMapper.selectCount(Wrappers.<LotteryKl8Draw>lambdaQuery()
-                    .eq(LotteryKl8Draw::getIssueNo, draw.issueNo()));
-            if (exists != null && exists > 0) {
+            if (existingIssueNos.contains(draw.issueNo())) {
                 continue;
             }
             drawMapper.insert(toEntity(draw));
+            existingIssueNos.add(draw.issueNo());
             inserted += 1;
         }
         lastSyncAt = LocalDateTime.now();
@@ -67,7 +69,8 @@ public class LotteryKl8SyncService {
         if (evaluated > 0) {
             log.info("快乐8同步后完成推荐命中结算 {} 条", evaluated);
         }
-        String latestIssue = latestDraw() == null ? "" : latestDraw().getIssueNo();
+        LotteryKl8Draw latest = latestDraw();
+        String latestIssue = latest == null ? "" : latest.getIssueNo();
         return new LotteryKl8SyncResultVO(true, sourceName(fetched), fetched.size(), inserted, latestIssue, "同步完成");
     }
 
@@ -104,6 +107,22 @@ public class LotteryKl8SyncService {
                 .orderByDesc(LotteryKl8Draw::getDrawDate)
                 .orderByDesc(LotteryKl8Draw::getIssueNo));
         return PageResult.of(result, result.getRecords().stream().map(LotteryKl8DrawVO::from).toList());
+    }
+
+    private Set<String> existingIssueNos(List<LotteryKl8FetchedDraw> fetched) {
+        if (fetched.isEmpty()) {
+            return new java.util.HashSet<>();
+        }
+        List<String> issueNos = fetched.stream()
+                .map(LotteryKl8FetchedDraw::issueNo)
+                .distinct()
+                .toList();
+        // 全量历史同步可能一次返回上千期，先批量查重，避免逐期 selectCount 导致接口超时。
+        return drawMapper.selectList(Wrappers.<LotteryKl8Draw>lambdaQuery()
+                        .in(LotteryKl8Draw::getIssueNo, issueNos))
+                .stream()
+                .map(LotteryKl8Draw::getIssueNo)
+                .collect(Collectors.toSet());
     }
 
     private LotteryKl8Draw latestDraw() {
