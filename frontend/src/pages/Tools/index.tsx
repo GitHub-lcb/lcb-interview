@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Button, Tabs } from 'antd'
+import { Button, Spin, Tabs } from 'antd'
 import { LogoutOutlined, ReadOutlined, ThunderboltOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import ReadingExcerptPanel from '../../components/ReadingExcerptPanel'
@@ -11,20 +11,51 @@ import type { AuthUser } from '../../types'
 export default function Tools() {
   const navigate = useNavigate()
   const [user, setUser] = useState<AuthUser | null>(null)
+  const [checkingUser, setCheckingUser] = useState(true)
 
   useEffect(() => {
+    let cancelled = false
+
     if (!readUserToken()) {
       navigate('/auth/login?from=/tools', { replace: true })
-      return
+      return () => {
+        cancelled = true
+      }
     }
+    setCheckingUser(true)
     getCurrentUser()
-      .then(setUser)
-      .catch(() => navigate('/auth/login?from=/tools', { replace: true }))
+      .then(nextUser => {
+        if (!cancelled) {
+          setUser(nextUser)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          navigate('/auth/login?from=/tools', { replace: true })
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setCheckingUser(false)
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
   }, [navigate])
 
   const handleLogout = () => {
     clearUserToken()
     navigate('/auth/login', { replace: true })
+  }
+
+  if (checkingUser || !user) {
+    return (
+      <div className="tools-page">
+        <div className="tool-empty-panel"><Spin /></div>
+      </div>
+    )
   }
 
   return (

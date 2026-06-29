@@ -86,6 +86,8 @@ export default function LotteryKl8Panel() {
       setStatus(nextStatus)
       setDraws(drawPage.content)
       setHistory(recommendationPage.content)
+    } catch {
+      // 全局 Axios 拦截器已经负责错误提示，这里兜住 Promise，避免 React 事件外产生未捕获异常。
     } finally {
       setLoading(false)
     }
@@ -101,6 +103,8 @@ export default function LotteryKl8Panel() {
       const result = await syncKl8Draws()
       emitFeedbackSuccess(`同步完成，新增 ${result.insertedCount} 期`)
       await load()
+    } catch {
+      // 同步失败时保留按钮状态恢复，错误反馈交给全局请求拦截器。
     } finally {
       setSyncing(false)
     }
@@ -117,6 +121,10 @@ export default function LotteryKl8Panel() {
       setCurrent(result)
       await load()
       emitFeedbackSuccess(result.source === 'AI' ? 'AI 推荐已生成' : 'AI 不可用，已生成规则推荐')
+    } catch (error) {
+      if (isTimeoutError(error)) {
+        emitFeedbackWarning('AI 推荐生成耗时较长，请稍后刷新推荐历史查看结果')
+      }
     } finally {
       setRecommending(false)
     }
@@ -356,4 +364,8 @@ function formatDateTime(value?: string): string {
     return '暂无时间'
   }
   return date.toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+}
+
+function isTimeoutError(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && 'code' in error && error.code === 'ECONNABORTED'
 }
