@@ -53,6 +53,15 @@ class LotteryKl8FeatureServiceDeepTest {
         assertTrue(hotProfile.tags().contains("热号"));
         assertTrue(missingProfile.currentMissing() >= 20);
         assertTrue(missingProfile.tags().contains("高遗漏"));
+        assertNotNull(report.backtestSummary());
+        assertTrue(report.backtestSummary().evaluatedIssueCount() > 0);
+        assertTrue(report.backtestSummary().averageHitCount() > 0);
+        assertTrue(report.backtestSummary().hitDistribution().values().stream().mapToInt(Integer::intValue).sum() > 0);
+        assertTrue(report.backtestSummary().factorWeights().decayWeight() >= report.backtestSummary().factorWeights().missingWeight());
+        assertNotNull(report.optimizedPortfolio());
+        assertEquals(5, report.optimizedPortfolio().groups().size());
+        assertTrue(report.optimizedPortfolio().groups().stream().allMatch(group -> group.numbers().size() == 5));
+        assertTrue(report.optimizedPortfolio().summary().contains("组合"));
         assertNotNull(report.deepSummary());
         assertTrue(report.deepSummary().contains("候选池"));
     }

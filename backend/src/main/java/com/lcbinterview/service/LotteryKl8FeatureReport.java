@@ -41,6 +41,8 @@ public record LotteryKl8FeatureReport(
         List<LotteryKl8NumberProfile> numberProfiles,
         List<LotteryKl8CandidateNumber> candidatePool,
         List<LotteryKl8PairProfile> pairHighlights,
+        LotteryKl8BacktestSummary backtestSummary,
+        LotteryKl8OptimizedPortfolio optimizedPortfolio,
         List<String> analysisSections,
         String summary,
         String deepSummary
@@ -72,7 +74,8 @@ public record LotteryKl8FeatureReport(
             List<LotteryKl8Draw> draws,
             String summary) {
         this(baseIssueCount, latestIssueNo, hotNumbers, coldNumbers, missingNumbers, rangeCounts,
-                Map.of(), Map.of(), oddCount, evenCount, draws, List.of(), List.of(), List.of(), List.of(),
+                Map.of(), Map.of(), oddCount, evenCount, draws, List.of(), List.of(), List.of(),
+                LotteryKl8BacktestSummary.empty(), LotteryKl8OptimizedPortfolio.empty(), List.of(),
                 summary, summary);
     }
 }

@@ -21,6 +21,41 @@ interface LotteryAnalysisPayload {
     combinationLogic?: string[]
     riskWarnings?: string[]
   }
+  backtestSummary?: LotteryBacktestSummary
+  optimizedPortfolio?: LotteryOptimizedPortfolio
+  analysisSections?: string[]
+}
+
+interface LotteryBacktestFactorWeights {
+  hotWeight: number
+  missingWeight: number
+  trendWeight: number
+  decayWeight: number
+  pairWeight: number
+  balanceWeight: number
+}
+
+interface LotteryBacktestSummary {
+  evaluatedIssueCount: number
+  averageHitCount: number
+  maxHitCount: number
+  hitDistribution: Record<string, number>
+  factorWeights: LotteryBacktestFactorWeights
+  topFactorNames: string[]
+  summary: string
+}
+
+interface LotteryOptimizedGroup {
+  numbers: number[]
+  score: number
+  reason: string
+  evidence: string[]
+}
+
+interface LotteryOptimizedPortfolio {
+  groups: LotteryOptimizedGroup[]
+  summary: string
+  diagnostics: Record<string, string>
 }
 
 interface LotteryCandidateNumber {
@@ -68,6 +103,10 @@ export default function LotteryKl8Panel() {
 
   const latest = useMemo(() => current ?? history[0] ?? null, [current, history])
   const analysis = useMemo(() => parseJson<LotteryAnalysisPayload>(latest?.analysisJson), [latest])
+  const backtestSummary = analysis?.backtestSummary
+  const backtestWeights = backtestSummary?.factorWeights
+  const optimizedPortfolio = analysis?.optimizedPortfolio
+  const optimizedGroups = optimizedPortfolio?.groups ?? []
   const candidates = useMemo(() => parseJson<LotteryCandidateNumber[]>(latest?.candidatePoolJson) ?? [], [latest])
   const calibration = useMemo(
     () => parseJson<LotteryCalibrationSnapshot>(latest?.calibrationSnapshotJson),
@@ -219,6 +258,45 @@ export default function LotteryKl8Panel() {
                           <h4>组合逻辑</h4>
                           <ul>{(analysis.analysis.combinationLogic ?? []).map(item => <li key={item}>{item}</li>)}</ul>
                         </section>
+                        {backtestSummary && (
+                          <section className="lottery-backtest-card">
+                            <h4>滚动回测</h4>
+                            <p>{backtestSummary.summary}</p>
+                            <div className="lottery-metric-row">
+                              <span>样本 {backtestSummary.evaluatedIssueCount}</span>
+                              <span>均值 {backtestSummary.averageHitCount.toFixed(2)}</span>
+                              <span>最高 {backtestSummary.maxHitCount}/5</span>
+                            </div>
+                            {backtestWeights && (
+                              <div className="lottery-weight-row">
+                                <span>热 {backtestWeights.hotWeight.toFixed(2)}</span>
+                                <span>漏 {backtestWeights.missingWeight.toFixed(2)}</span>
+                                <span>势 {backtestWeights.trendWeight.toFixed(2)}</span>
+                                <span>衰 {backtestWeights.decayWeight.toFixed(2)}</span>
+                                <span>共 {backtestWeights.pairWeight.toFixed(2)}</span>
+                                <span>衡 {backtestWeights.balanceWeight.toFixed(2)}</span>
+                              </div>
+                            )}
+                            <p>命中分布 {formatHitDistribution(backtestSummary.hitDistribution)}</p>
+                          </section>
+                        )}
+                        {optimizedPortfolio && optimizedGroups.length > 0 && (
+                          <section className="lottery-portfolio-card">
+                            <h4>组合优化</h4>
+                            <p>{optimizedPortfolio.summary}</p>
+                            <div className="lottery-portfolio-list">
+                              {optimizedGroups.map((group, index) => (
+                                <article key={`${group.numbers.join('-')}-${index}`}>
+                                  <div>
+                                    <strong>第 {index + 1} 组 · {group.score.toFixed(2)}</strong>
+                                    <span>{group.numbers.join(' ')}</span>
+                                  </div>
+                                  <p>{group.evidence.slice(0, 2).join('；')}</p>
+                                </article>
+                              ))}
+                            </div>
+                          </section>
+                        )}
                         <section>
                           <h4><WarningOutlined /> 风险提示</h4>
                           <ul>{(analysis.analysis.riskWarnings ?? [DISCLAIMER]).map(item => <li key={item}>{item}</li>)}</ul>
@@ -353,6 +431,16 @@ function parseJson<T>(value?: string): T | null {
   } catch {
     return null
   }
+}
+
+function formatHitDistribution(distribution?: Record<string, number>): string {
+  if (!distribution) {
+    return '暂无'
+  }
+  return Object.entries(distribution)
+    .sort(([left], [right]) => Number(left) - Number(right))
+    .map(([hit, count]) => `${hit}中:${count}`)
+    .join(' / ')
 }
 
 function formatDateTime(value?: string): string {

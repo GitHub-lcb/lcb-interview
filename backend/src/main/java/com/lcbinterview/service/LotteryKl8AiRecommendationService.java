@@ -130,7 +130,8 @@ public class LotteryKl8AiRecommendationService {
                 %s
 
                 要求：
-                - 优先从 candidatePool 中取号，但允许少量使用 numberProfiles 中的均衡补位号码。
+                - 优先以 optimizedPortfolio 的 5 组为硬参考，除非有明确结构性理由才微调。
+                - candidatePool、backtestSummary、numberProfiles 是选号证据，不能脱离这些输入自由编造。
                 - 5 组之间不要完全重复同一套信号，每组都要说明用到了哪些历史特征。
                 - 不要输出投注建议，不要暗示稳赚或必出。
                 """.formatted(
@@ -158,6 +159,8 @@ public class LotteryKl8AiRecommendationService {
             input.put("analysisSections", report.analysisSections());
             input.put("candidatePool", report.candidatePool());
             input.put("pairHighlights", report.pairHighlights());
+            input.put("backtestSummary", report.backtestSummary());
+            input.put("optimizedPortfolio", report.optimizedPortfolio());
             input.put("numberProfiles", report.numberProfiles());
             return objectMapper.writeValueAsString(input);
         } catch (IOException e) {

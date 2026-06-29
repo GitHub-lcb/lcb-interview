@@ -99,6 +99,43 @@ class LotteryKl8RecommendationPolicyTest {
         groups.forEach(group -> assertEquals(5, group.numbers().size()));
     }
 
+    @Test
+    void fallbackGroupsPreferOptimizedPortfolio() {
+        LotteryKl8FeatureReport report = new LotteryKl8FeatureReport(
+                20,
+                "2026150",
+                List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15),
+                List.of(16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30),
+                missingMap(),
+                Map.of("1-20", 100, "21-40", 100, "41-60", 100, "61-80", 100),
+                Map.of(),
+                Map.of(),
+                200,
+                200,
+                List.of(new LotteryKl8Draw()),
+                List.of(),
+                List.of(),
+                List.of(),
+                LotteryKl8BacktestSummary.empty(),
+                new LotteryKl8OptimizedPortfolio(
+                        List.of(
+                                new LotteryKl8OptimizedGroup(List.of(1, 2, 3, 4, 5), 90, "组合优化第一组", List.of("测试证据")),
+                                new LotteryKl8OptimizedGroup(List.of(6, 7, 8, 9, 10), 89, "组合优化第二组", List.of("测试证据")),
+                                new LotteryKl8OptimizedGroup(List.of(11, 12, 13, 14, 15), 88, "组合优化第三组", List.of("测试证据")),
+                                new LotteryKl8OptimizedGroup(List.of(16, 17, 18, 19, 20), 87, "组合优化第四组", List.of("测试证据")),
+                                new LotteryKl8OptimizedGroup(List.of(21, 22, 23, 24, 25), 86, "组合优化第五组", List.of("测试证据"))),
+                        "组合优化测试",
+                        Map.of("maxNumberReuse", "1")),
+                List.of("组合层：测试"),
+                "测试特征",
+                "测试深度");
+
+        List<LotteryKl8RecommendationGroupVO> groups = policy.fallbackGroups(report);
+
+        assertEquals(List.of(1, 2, 3, 4, 5), groups.get(0).numbers());
+        assertTrue(groups.get(0).reason().contains("组合优化"));
+    }
+
     private Map<Integer, Integer> missingMap() {
         Map<Integer, Integer> values = new LinkedHashMap<>();
         for (int i = 1; i <= 80; i += 1) {

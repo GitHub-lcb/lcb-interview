@@ -69,7 +69,7 @@ describe('LotteryKl8Panel', () => {
     await userEvent.click(screen.getByRole('button', { name: /AI 推荐 5 组/ }))
 
     await waitFor(() => {
-      expect(createKl8Recommendation).toHaveBeenCalledWith(100)
+      expect(createKl8Recommendation).toHaveBeenCalledWith(1000)
     })
     expect(emitFeedbackWarning).toHaveBeenCalledWith('AI 推荐生成耗时较长，请稍后刷新推荐历史查看结果')
     expect(emitFeedbackSuccess).not.toHaveBeenCalled()

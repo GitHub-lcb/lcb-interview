@@ -448,6 +448,62 @@ p {
   padding-left: 16px;
 }
 
+.lottery-backtest-card,
+.lottery-portfolio-card {
+  grid-column: span 2;
+}
+
+.lottery-metric-row,
+.lottery-weight-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lottery-metric-row span,
+.lottery-weight-row span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #F1F5F9;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.lottery-portfolio-list {
+  display: grid;
+  gap: 6px;
+}
+
+.lottery-portfolio-list article {
+  display: grid;
+  gap: 5px;
+  padding: 8px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  background: #FFFFFF;
+}
+
+.lottery-portfolio-list article > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.lottery-portfolio-list strong,
+.lottery-portfolio-list span {
+  color: #18181B;
+  font-size: 12px;
+}
+
+.lottery-portfolio-list p {
+  margin: 0;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .lottery-candidate-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -15484,6 +15540,11 @@ p {
   .lottery-hit-grid,
   .lottery-columns {
     grid-template-columns: 1fr;
+  }
+
+  .lottery-backtest-card,
+  .lottery-portfolio-card {
+    grid-column: span 1;
   }
 
   .free-promise-band {

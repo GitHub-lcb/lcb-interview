@@ -3,7 +3,9 @@ package com.lcbinterview.service;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lcbinterview.dto.PageResult;
 import com.lcbinterview.dto.tools.LotteryKl8RecommendationGroupVO;
 import com.lcbinterview.dto.tools.LotteryKl8RecommendationRequest;
@@ -26,7 +28,7 @@ import java.util.List;
 public class LotteryKl8RecommendationService {
 
     private static final int DEFAULT_BASE_ISSUE_COUNT = 1000;
-    private static final String STRATEGY_VERSION = "KL8_DEEP_FEEDBACK_V2";
+    private static final String STRATEGY_VERSION = "KL8_BACKTEST_PORTFOLIO_V3";
     private static final String DISCLAIMER = "彩票结果具有随机性，本推荐仅为娱乐统计参考，不保证命中，不构成投注建议。";
 
     private final LotteryKl8FeatureService featureService;
@@ -66,7 +68,7 @@ public class LotteryKl8RecommendationService {
         recommendation.setLatestIssueNo(report.latestIssueNo());
         recommendation.setRecommendationsJson(writeGroups(result.groups()));
         recommendation.setFeatureSummary(report.deepSummary());
-        recommendation.setAnalysisJson(result.analysisJson());
+        recommendation.setAnalysisJson(writeAnalysis(result, report));
         recommendation.setCandidatePoolJson(writeCandidatePool(report));
         recommendation.setCalibrationSnapshotJson(writeCalibrationSnapshot(calibration));
         recommendation.setStrategyVersion(STRATEGY_VERSION);
@@ -108,6 +110,23 @@ public class LotteryKl8RecommendationService {
             return objectMapper.writeValueAsString(report.candidatePool());
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("快乐8候选池序列化失败", e);
+        }
+    }
+
+    private String writeAnalysis(
+            LotteryKl8RecommendationPolicy.ValidatedRecommendation result,
+            LotteryKl8FeatureReport report) {
+        try {
+            JsonNode parsed = result.analysisJson() == null || result.analysisJson().isBlank()
+                    ? objectMapper.createObjectNode()
+                    : objectMapper.readTree(result.analysisJson());
+            ObjectNode root = parsed.isObject() ? (ObjectNode) parsed.deepCopy() : objectMapper.createObjectNode();
+            root.set("backtestSummary", objectMapper.valueToTree(report.backtestSummary()));
+            root.set("optimizedPortfolio", objectMapper.valueToTree(report.optimizedPortfolio()));
+            root.set("analysisSections", objectMapper.valueToTree(report.analysisSections()));
+            return objectMapper.writeValueAsString(root);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("快乐8深度分析序列化失败", e);
         }
     }
 

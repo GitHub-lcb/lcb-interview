@@ -119,6 +119,11 @@ public class LotteryKl8RecommendationPolicy {
      * @return 5 组规则推荐
      */
     public List<LotteryKl8RecommendationGroupVO> fallbackGroups(LotteryKl8FeatureReport report) {
+        if (!report.optimizedPortfolio().groups().isEmpty()) {
+            return validateGroups(report.optimizedPortfolio().groups().stream()
+                    .map(group -> new LotteryKl8RecommendationGroupVO(group.numbers(), group.reason()))
+                    .toList());
+        }
         Random random = new Random(System.nanoTime());
         List<LotteryKl8RecommendationGroupVO> groups = new ArrayList<>();
         Set<String> used = new HashSet<>();
