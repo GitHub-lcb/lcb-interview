@@ -164,7 +164,8 @@ public class AiGenerationController {
         if (!configStatus.available()) {
             return ResponseEntity.ok(ApiResponse.error(503, configStatus.message()));
         }
-        boolean started = batchFillAnswerRunner.start(req.categoryId(), req.maxQuestions(), req.delaySeconds());
+        boolean started = batchFillAnswerRunner.start(
+                req.categoryId(), req.maxQuestions(), req.delaySeconds(), req.concurrency());
         if (!started) {
             return ResponseEntity.ok(ApiResponse.error(409, "批量补答案任务已在运行中"));
         }

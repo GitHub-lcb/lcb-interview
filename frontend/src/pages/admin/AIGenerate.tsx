@@ -137,6 +137,7 @@ export default function AIGenerate() {
         categoryId: values.categoryId,
         maxQuestions: values.maxQuestions,
         delaySeconds: values.delaySeconds ?? 3,
+        concurrency: values.concurrency ?? 3,
       })
       emitFeedbackSuccess('批量补答案任务已启动')
       pollBatchFillAnswerStatus()
@@ -552,6 +553,9 @@ export default function AIGenerate() {
             </Form.Item>
             <Form.Item name="delaySeconds" label="API 调用间隔（秒）" initialValue={3}>
               <InputNumber min={0} max={300} />
+            </Form.Item>
+            <Form.Item name="concurrency" label="并发数" tooltip="同时调用 AI 补答案的题目数，最高 10" initialValue={3}>
+              <InputNumber min={1} max={10} />
             </Form.Item>
             <Button
               type="primary"

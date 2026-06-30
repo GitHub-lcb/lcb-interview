@@ -98,6 +98,31 @@ class BatchFillAnswerRunnerTest {
         assertThat(wrapper.getParamNameValuePairs()).containsValue(5L);
     }
 
+    @Test
+    void batchFillAnswersRunsQuestionsConcurrentlyWhenConcurrencyIsGreaterThanOne() throws Exception {
+        Question first = question(1L, 3L, "HashMap 为什么线程不安全？");
+        Question second = question(2L, 4L, "Redis 缓存击穿怎么处理？");
+        CountDownLatch bothStarted = new CountDownLatch(2);
+        CountDownLatch releaseRequests = new CountDownLatch(1);
+        when(questionMapper.selectCount(any())).thenReturn(2L);
+        when(questionMapper.selectList(any())).thenReturn(List.of(first, second));
+        when(aiQuestionService.fillAnswerSync(any())).thenAnswer(invocation -> {
+            Question question = invocation.getArgument(0);
+            bothStarted.countDown();
+            releaseRequests.await(1, TimeUnit.SECONDS);
+            return success(question);
+        });
+
+        assertThat(runner.start(null, null, 0, 2)).isTrue();
+        assertThat(bothStarted.await(1, TimeUnit.SECONDS)).isTrue();
+        releaseRequests.countDown();
+        waitUntilFinished(runner);
+
+        var progress = runner.getProgress();
+        assertThat(progress.status()).isEqualTo("COMPLETED");
+        assertThat(progress.generatedQuestions()).isEqualTo(2);
+    }
+
     private Question question(Long id, Long categoryId, String title) {
         Question question = new Question();
         question.setId(id);

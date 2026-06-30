@@ -17,6 +17,7 @@ export const batchFillAnswers = (params: {
   categoryId?: number
   maxQuestions?: number
   delaySeconds?: number
+  concurrency?: number
 }) =>
   api.post<{ data: string }>('/admin/ai/fill-answer-batch', params)
     .then(res => res.data.data)
