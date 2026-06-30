@@ -57,9 +57,11 @@ public class LotteryKl8RecommendationService {
         try {
             result = recommendationPolicy.validateAiResult(aiRecommendationService.recommend(report));
         } catch (Exception e) {
-            log.warn("快乐8 AI 推荐不可用，回退规则推荐: {}", e.getMessage());
+            LotteryKl8AiFailureDetail failureDetail = LotteryKl8AiFailureDetail.from(e);
+            log.warn("快乐8 AI 推荐不可用，回退规则推荐: code={}, message={}, detail={}",
+                    failureDetail.code(), failureDetail.message(), failureDetail.detail());
             source = "RULE_BASED";
-            result = recommendationPolicy.fallbackResult(report);
+            result = recommendationPolicy.fallbackResult(report, failureDetail);
         }
         LotteryKl8Recommendation recommendation = new LotteryKl8Recommendation();
         recommendation.setUserId(userId);

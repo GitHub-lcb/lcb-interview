@@ -304,6 +304,10 @@ p {
   border-radius: 8px;
 }
 
+.lottery-ai-fallback {
+  border-radius: 8px;
+}
+
 .lottery-status-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

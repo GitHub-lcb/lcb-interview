@@ -11,7 +11,7 @@ import {
   syncKl8Draws,
 } from '../api/tools'
 import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
-import type { PageResult } from '../types'
+import type { LotteryKl8Recommendation, PageResult } from '../types'
 
 vi.mock('../api/tools', () => ({
   createKl8Recommendation: vi.fn(),
@@ -83,5 +83,44 @@ describe('LotteryKl8Panel', () => {
     await waitFor(() => {
       expect(screen.getByText('暂无开奖数据，先点击同步开奖。')).toBeInTheDocument()
     })
+  })
+
+  it('shows AI fallback diagnostic detail from recommendation analysis', async () => {
+    const recommendation: LotteryKl8Recommendation = {
+      id: 1,
+      source: 'RULE_BASED',
+      baseIssueCount: 1000,
+      latestIssueNo: '20260629001',
+      groups: [
+        { numbers: [1, 2, 3, 4, 5], reason: '规则推荐' },
+        { numbers: [6, 7, 8, 9, 10], reason: '规则推荐' },
+        { numbers: [11, 12, 13, 14, 15], reason: '规则推荐' },
+        { numbers: [16, 17, 18, 19, 20], reason: '规则推荐' },
+        { numbers: [21, 22, 23, 24, 25], reason: '规则推荐' },
+      ],
+      featureSummary: '测试摘要',
+      analysisJson: JSON.stringify({
+        confidenceLabel: '低',
+        aiFallback: {
+          code: 'HTTP_STATUS',
+          message: 'AI 推荐接口返回 HTTP 401',
+          detail: '上游鉴权失败，请检查 AI API Key 或接口地址。',
+        },
+        analysis: {
+          overview: '规则降级',
+          featureSignals: [],
+          combinationLogic: [],
+          riskWarnings: [],
+        },
+      }),
+      disclaimer: '测试免责声明',
+      createdAt: '2026-06-29T10:00:00',
+    }
+    vi.mocked(listKl8Recommendations).mockResolvedValue(pageOf([recommendation], 8))
+
+    render(<LotteryKl8Panel />)
+
+    expect(await screen.findByText('AI 降级原因')).toBeInTheDocument()
+    expect(screen.getByText(/HTTP 401/)).toBeInTheDocument()
   })
 })

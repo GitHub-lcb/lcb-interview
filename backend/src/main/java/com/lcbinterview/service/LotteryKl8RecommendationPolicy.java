@@ -91,22 +91,51 @@ public class LotteryKl8RecommendationPolicy {
      * @return 规则降级推荐结果
      */
     public ValidatedRecommendation fallbackResult(LotteryKl8FeatureReport report) {
+        return fallbackResult(report, null);
+    }
+
+    /**
+     * 根据历史特征生成带分析 JSON 的规则降级推荐，并附带 AI 失败诊断。
+     *
+     * @param report        历史特征报告
+     * @param failureDetail AI 失败诊断，可为空
+     * @return 规则降级推荐结果
+     */
+    public ValidatedRecommendation fallbackResult(LotteryKl8FeatureReport report, LotteryKl8AiFailureDetail failureDetail) {
         List<LotteryKl8RecommendationGroupVO> groups = fallbackGroups(report);
         try {
             ObjectNode root = objectMapper.createObjectNode();
             root.put("confidenceLabel", "低");
+            if (failureDetail != null) {
+                ObjectNode aiFallback = root.putObject("aiFallback");
+                aiFallback.put("code", failureDetail.code());
+                aiFallback.put("message", failureDetail.message());
+                aiFallback.put("detail", failureDetail.detail());
+            }
             ObjectNode analysis = root.putObject("analysis");
-            analysis.put("overview", "AI 推荐不可用，已使用后端深度候选池按规则生成 5 组号码。");
+            String overview = failureDetail == null
+                    ? "AI 推荐不可用，已使用后端深度候选池按规则生成 5 组号码。"
+                    : "AI 推荐不可用（%s），已使用后端深度候选池按规则生成 5 组号码。".formatted(failureDetail.message());
+            analysis.put("overview", overview);
             ArrayNode featureSignals = analysis.putArray("featureSignals");
             report.analysisSections().forEach(featureSignals::add);
             ArrayNode combinationLogic = analysis.putArray("combinationLogic");
             combinationLogic.add("每组从热号、冷号、高遗漏和趋势候选中分散抽取，避免完全依赖单一信号。");
             combinationLogic.add("组内号码按升序展示，并控制重复组合。");
             ArrayNode warnings = analysis.putArray("riskWarnings");
+            if (failureDetail != null) {
+                warnings.add("AI 降级原因：" + failureDetail.message());
+            }
             warnings.add("彩票开奖结果具有独立随机性，历史统计不能保证命中。");
             warnings.add("规则推荐仅在 AI 不可用时作为娱乐参考。");
+            List<String> warningList = new ArrayList<>();
+            if (failureDetail != null) {
+                warningList.add("AI 降级原因：" + failureDetail.message());
+            }
+            warningList.add("彩票开奖结果具有独立随机性，历史统计不能保证命中。");
+            warningList.add("规则推荐仅在 AI 不可用时作为娱乐参考。");
             return new ValidatedRecommendation(groups, objectMapper.writeValueAsString(root), "低",
-                    List.of("彩票开奖结果具有独立随机性，历史统计不能保证命中。", "规则推荐仅在 AI 不可用时作为娱乐参考。"));
+                    List.copyOf(warningList));
         } catch (Exception e) {
             throw new IllegalStateException("快乐8规则分析结果序列化失败", e);
         }

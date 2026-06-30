@@ -1,5 +1,6 @@
 package com.lcbinterview.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lcbinterview.dto.tools.LotteryKl8RecommendationGroupVO;
 import com.lcbinterview.model.LotteryKl8Draw;
@@ -97,6 +98,43 @@ class LotteryKl8RecommendationPolicyTest {
 
         assertEquals(5, groups.size());
         groups.forEach(group -> assertEquals(5, group.numbers().size()));
+    }
+
+    @Test
+    void fallbackResultIncludesAiFailureDetail() throws Exception {
+        LotteryKl8FeatureReport report = new LotteryKl8FeatureReport(
+                20,
+                "2026150",
+                List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15),
+                List.of(16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30),
+                missingMap(),
+                Map.of("1-20", 100, "21-40", 100, "41-60", 100, "61-80", 100),
+                200,
+                200,
+                List.of(new LotteryKl8Draw()),
+                "测试特征");
+        LotteryKl8AiFailureDetail detail = new LotteryKl8AiFailureDetail(
+                "HTTP_STATUS",
+                "AI 推荐接口返回 HTTP 401",
+                "上游鉴权失败，请检查 AI API Key 或接口地址。");
+
+        LotteryKl8RecommendationPolicy.ValidatedRecommendation result = policy.fallbackResult(report, detail);
+
+        JsonNode root = new ObjectMapper().readTree(result.analysisJson());
+        assertEquals("HTTP_STATUS", root.path("aiFallback").path("code").asText());
+        assertTrue(root.path("aiFallback").path("message").asText().contains("HTTP 401"));
+        assertTrue(root.path("analysis").path("overview").asText().contains("HTTP 401"));
+    }
+
+    @Test
+    void diagnosesHttpFailureWithoutSecretLeak() {
+        LotteryKl8AiFailureDetail detail = LotteryKl8AiFailureDetail.from(
+                new IllegalStateException("AI 推荐接口返回 HTTP 401 authorization: sk-test-secret"));
+
+        assertEquals("HTTP_STATUS", detail.code());
+        assertTrue(detail.message().contains("HTTP 401"));
+        assertTrue(detail.detail().contains("鉴权失败"));
+        assertTrue(!detail.message().contains("sk-test-secret"));
     }
 
     @Test

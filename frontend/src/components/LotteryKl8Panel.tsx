@@ -15,6 +15,7 @@ const DISCLAIMER = '彩票结果具有随机性，本推荐仅为娱乐统计参
 
 interface LotteryAnalysisPayload {
   confidenceLabel?: string
+  aiFallback?: LotteryAiFallback
   analysis?: {
     overview?: string
     featureSignals?: string[]
@@ -24,6 +25,12 @@ interface LotteryAnalysisPayload {
   backtestSummary?: LotteryBacktestSummary
   optimizedPortfolio?: LotteryOptimizedPortfolio
   analysisSections?: string[]
+}
+
+interface LotteryAiFallback {
+  code?: string
+  message?: string
+  detail?: string
 }
 
 interface LotteryBacktestFactorWeights {
@@ -103,6 +110,7 @@ export default function LotteryKl8Panel() {
 
   const latest = useMemo(() => current ?? history[0] ?? null, [current, history])
   const analysis = useMemo(() => parseJson<LotteryAnalysisPayload>(latest?.analysisJson), [latest])
+  const aiFallback = analysis?.aiFallback
   const backtestSummary = analysis?.backtestSummary
   const backtestWeights = backtestSummary?.factorWeights
   const optimizedPortfolio = analysis?.optimizedPortfolio
@@ -159,7 +167,13 @@ export default function LotteryKl8Panel() {
       const result = await createKl8Recommendation(baseIssueCount)
       setCurrent(result)
       await load()
-      emitFeedbackSuccess(result.source === 'AI' ? 'AI 推荐已生成' : 'AI 不可用，已生成规则推荐')
+      const resultAnalysis = parseJson<LotteryAnalysisPayload>(result.analysisJson)
+      const resultFallback = resultAnalysis?.aiFallback
+      if (result.source === 'AI') {
+        emitFeedbackSuccess('AI 推荐已生成')
+      } else {
+        emitFeedbackWarning(resultFallback ? `AI 不可用，已生成规则推荐：${aiFallbackMessage(resultFallback)}` : 'AI 不可用，已生成规则推荐')
+      }
     } catch (error) {
       if (isTimeoutError(error)) {
         emitFeedbackWarning('AI 推荐生成耗时较长，请稍后刷新推荐历史查看结果')
@@ -226,6 +240,15 @@ export default function LotteryKl8Panel() {
                 <small>{formatDateTime(latest.createdAt)}</small>
               </div>
               <p>{latest.featureSummary}</p>
+              {aiFallback && (
+                <Alert
+                  className="lottery-ai-fallback"
+                  type="info"
+                  showIcon
+                  message="AI 降级原因"
+                  description={aiFallbackDescription(aiFallback)}
+                />
+              )}
               <div className="lottery-group-grid">
                 {latest.groups.map((group, index) => (
                   <article key={`${latest.id}-${index}`} className="lottery-group-card">
@@ -456,4 +479,13 @@ function formatDateTime(value?: string): string {
 
 function isTimeoutError(error: unknown): boolean {
   return typeof error === 'object' && error !== null && 'code' in error && error.code === 'ECONNABORTED'
+}
+
+function aiFallbackMessage(value: LotteryAiFallback): string {
+  return value.message || value.code || 'AI 推荐失败'
+}
+
+function aiFallbackDescription(value: LotteryAiFallback): string {
+  const message = aiFallbackMessage(value)
+  return value.detail ? `${message}：${value.detail}` : message
 }
