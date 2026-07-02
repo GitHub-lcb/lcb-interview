@@ -167,16 +167,10 @@ export default function LotteryKl8Panel() {
       const result = await createKl8Recommendation(baseIssueCount)
       setCurrent(result)
       await load()
-      const resultAnalysis = parseJson<LotteryAnalysisPayload>(result.analysisJson)
-      const resultFallback = resultAnalysis?.aiFallback
-      if (result.source === 'AI') {
-        emitFeedbackSuccess('AI 推荐已生成')
-      } else {
-        emitFeedbackWarning(resultFallback ? `AI 不可用，已生成规则推荐：${aiFallbackMessage(resultFallback)}` : 'AI 不可用，已生成规则推荐')
-      }
+      emitFeedbackSuccess('Java 推荐已生成')
     } catch (error) {
       if (isTimeoutError(error)) {
-        emitFeedbackWarning('AI 推荐生成耗时较长，请稍后刷新推荐历史查看结果')
+        emitFeedbackWarning('Java 推荐生成耗时较长，请稍后刷新推荐历史查看结果')
       }
     } finally {
       setRecommending(false)
@@ -188,15 +182,15 @@ export default function LotteryKl8Panel() {
       <div className="tool-section-head">
         <div>
           <div className="dashboard-kicker">快乐8选5</div>
-          <h2>AI 历史数据分析推荐</h2>
-          <p>后端同步公开开奖数据，提取冷热、遗漏、区间和奇偶特征，再由 AI 生成 5 组号码。</p>
+          <h2>Java 历史数据回测推荐</h2>
+          <p>后端同步公开开奖数据，使用纯 Java 提取冷热、遗漏、区间、共现和回测特征，生成 1 组精选号码。</p>
         </div>
         <div className="tool-actions">
           <Button icon={<ReloadOutlined />} loading={syncing} onClick={handleSync}>
             同步开奖
           </Button>
           <Button type="primary" icon={<ThunderboltOutlined />} loading={recommending} onClick={handleRecommend}>
-            AI 推荐 5 组
+            Java 推荐 1 组
           </Button>
         </div>
       </div>
@@ -207,237 +201,241 @@ export default function LotteryKl8Panel() {
         <div className="tool-empty-panel"><Spin /></div>
       ) : (
         <>
-          <div className="lottery-status-grid">
-            <article>
-              <span>最新期号</span>
-              <strong>{status?.latestIssueNo || '暂无'}</strong>
-              <small>{status?.latestDrawDate || '等待同步'}</small>
-            </article>
-            <article>
-              <span>历史期数</span>
-              <strong>{status?.drawCount ?? 0}</strong>
-              <small>{status?.message || '暂无状态'}</small>
-            </article>
-            <article>
-              <span>推荐基准</span>
-              <InputNumber min={20} max={2000} value={baseIssueCount} onChange={value => setBaseIssueCount(value ?? 1000)} />
-              <small>历史期数</small>
-            </article>
-          </div>
+          <div className="lottery-dashboard-grid">
+            <div className="lottery-main-column">
+              <div className="lottery-status-grid">
+                <article>
+                  <span>最新期号</span>
+                  <strong>{status?.latestIssueNo || '暂无'}</strong>
+                  <small>{status?.latestDrawDate || '等待同步'}</small>
+                </article>
+                <article>
+                  <span>历史期数</span>
+                  <strong>{status?.drawCount ?? 0}</strong>
+                  <small>{status?.message || '暂无状态'}</small>
+                </article>
+                <article>
+                  <span>推荐基准</span>
+                  <InputNumber min={20} max={2000} value={baseIssueCount} onChange={value => setBaseIssueCount(value ?? 1000)} />
+                  <small>历史期数</small>
+                </article>
+              </div>
 
-          {latest ? (
-            <div className="lottery-recommendation">
-              <div className="lottery-recommendation-head">
-                <div>
-                  <Tag color={latest.source === 'AI' ? 'blue' : 'orange'}>{latest.source === 'AI' ? 'AI 推荐' : '规则推荐'}</Tag>
-                  {analysis?.confidenceLabel && <Tag color="geekblue">参考强度 {analysis.confidenceLabel}</Tag>}
-                  {latest.strategyVersion && <Tag>{latest.strategyVersion}</Tag>}
-                  {latest.evaluatedIssueNo && <Tag color="cyan">已结算 {latest.evaluatedIssueNo}</Tag>}
-                  {typeof latest.maxHitCount === 'number' && <Tag color="green">最高命中 {latest.maxHitCount}/5</Tag>}
-                  {calibration && calibration.evaluatedCount > 0 && <Tag color="purple">反馈校准 {calibration.evaluatedCount} 条</Tag>}
-                  <strong>基于近 {latest.baseIssueCount} 期，最新期号 {latest.latestIssueNo}</strong>
-                </div>
-                <small>{formatDateTime(latest.createdAt)}</small>
-              </div>
-              <p>{latest.featureSummary}</p>
-              {aiFallback && (
-                <Alert
-                  className="lottery-ai-fallback"
-                  type="info"
-                  showIcon
-                  message="AI 降级原因"
-                  description={aiFallbackDescription(aiFallback)}
-                />
-              )}
-              <div className="lottery-group-grid">
-                {latest.groups.map((group, index) => (
-                  <article key={`${latest.id}-${index}`} className="lottery-group-card">
-                    <span>第 {index + 1} 组</span>
-                    <div className="lottery-number-row">
-                      {group.numbers.map(number => <em key={number}>{number}</em>)}
-                    </div>
-                    <p>{group.reason}</p>
-                  </article>
-                ))}
-              </div>
-              <Tabs
-                className="lottery-detail-tabs"
-                size="small"
-                items={[
-                  {
-                    key: 'analysis',
-                    label: <span><BulbOutlined /> 深度分析</span>,
-                    children: analysis?.analysis ? (
-                      <div className="lottery-analysis-panel">
-                        <section>
-                          <h4>整体判断</h4>
-                          <p>{analysis.analysis.overview || latest.featureSummary}</p>
-                        </section>
-                        <section>
-                          <h4>特征信号</h4>
-                          <ul>{(analysis.analysis.featureSignals ?? []).map(item => <li key={item}>{item}</li>)}</ul>
-                        </section>
-                        <section>
-                          <h4>组合逻辑</h4>
-                          <ul>{(analysis.analysis.combinationLogic ?? []).map(item => <li key={item}>{item}</li>)}</ul>
-                        </section>
-                        {backtestSummary && (
-                          <section className="lottery-backtest-card">
-                            <h4>滚动回测</h4>
-                            <p>{backtestSummary.summary}</p>
-                            <div className="lottery-metric-row">
-                              <span>样本 {backtestSummary.evaluatedIssueCount}</span>
-                              <span>均值 {backtestSummary.averageHitCount.toFixed(2)}</span>
-                              <span>最高 {backtestSummary.maxHitCount}/5</span>
-                            </div>
-                            {backtestWeights && (
-                              <div className="lottery-weight-row">
-                                <span>热 {backtestWeights.hotWeight.toFixed(2)}</span>
-                                <span>漏 {backtestWeights.missingWeight.toFixed(2)}</span>
-                                <span>势 {backtestWeights.trendWeight.toFixed(2)}</span>
-                                <span>衰 {backtestWeights.decayWeight.toFixed(2)}</span>
-                                <span>共 {backtestWeights.pairWeight.toFixed(2)}</span>
-                                <span>衡 {backtestWeights.balanceWeight.toFixed(2)}</span>
-                              </div>
-                            )}
-                            <p>命中分布 {formatHitDistribution(backtestSummary.hitDistribution)}</p>
-                          </section>
-                        )}
-                        {optimizedPortfolio && optimizedGroups.length > 0 && (
-                          <section className="lottery-portfolio-card">
-                            <h4>组合优化</h4>
-                            <p>{optimizedPortfolio.summary}</p>
-                            <div className="lottery-portfolio-list">
-                              {optimizedGroups.map((group, index) => (
-                                <article key={`${group.numbers.join('-')}-${index}`}>
-                                  <div>
-                                    <strong>第 {index + 1} 组 · {group.score.toFixed(2)}</strong>
-                                    <span>{group.numbers.join(' ')}</span>
-                                  </div>
-                                  <p>{group.evidence.slice(0, 2).join('；')}</p>
-                                </article>
-                              ))}
-                            </div>
-                          </section>
-                        )}
-                        <section>
-                          <h4><WarningOutlined /> 风险提示</h4>
-                          <ul>{(analysis.analysis.riskWarnings ?? [DISCLAIMER]).map(item => <li key={item}>{item}</li>)}</ul>
-                        </section>
-                      </div>
-                    ) : (
-                      <p className="lottery-legacy-summary">{latest.featureSummary}</p>
-                    ),
-                  },
-                  {
-                    key: 'candidates',
-                    label: '候选池',
-                    children: candidates.length > 0 ? (
-                      <div className="lottery-candidate-grid">
-                        {candidates.slice(0, 16).map(candidate => (
-                          <article key={candidate.number}>
-                            <div>
-                              <em>{candidate.number}</em>
-                              <strong>{candidate.score.toFixed(2)}</strong>
-                            </div>
-                            <p>{candidate.evidence}</p>
-                            <span>{candidate.roles.join(' / ')}</span>
-                          </article>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="lottery-legacy-summary">旧推荐记录暂无候选池明细。</p>
-                    ),
-                  },
-                  {
-                    key: 'feedback',
-                    label: '命中反馈',
-                    children: (
-                      <div className="lottery-feedback-panel">
-                        {calibration ? (
-                          <section className="lottery-calibration-panel">
-                            <h4>策略校准</h4>
-                            <p>{calibration.summary}</p>
-                            <div>
-                              <span>热号 {calibration.hotMultiplier.toFixed(2)}</span>
-                              <span>冷号 {calibration.coldMultiplier.toFixed(2)}</span>
-                              <span>高遗漏 {calibration.missingMultiplier.toFixed(2)}</span>
-                              <span>趋势 {calibration.trendMultiplier.toFixed(2)}</span>
-                              <span>均衡 {calibration.balanceMultiplier.toFixed(2)}</span>
-                            </div>
-                          </section>
-                        ) : (
-                          <p className="lottery-legacy-summary">暂无策略校准快照，新推荐会在命中反馈足够后自动记录。</p>
-                        )}
-                        {hitSummary ? (
-                          <section className="lottery-hit-panel">
-                            <div>
-                              <h4>结算期号 {hitSummary.issueNo}</h4>
-                              <small>{hitSummary.drawDate}</small>
-                            </div>
-                            <p>5 组累计命中 {hitSummary.totalHitCount} 个，单组最高命中 {hitSummary.maxHitCount} 个。随机基线约为单号 25%，反馈只用于调整权重，不代表下次必然命中。</p>
-                            <div className="lottery-hit-grid">
-                              {hitSummary.groups.map(group => (
-                                <article key={group.groupIndex}>
-                                  <strong>第 {group.groupIndex} 组 · 命中 {group.hitCount}/5</strong>
-                                  <div>
-                                    {group.numbers.map(number => (
-                                      <em key={number} className={group.hitNumbers.includes(number) ? 'is-hit' : undefined}>
-                                        {number}
-                                      </em>
-                                    ))}
-                                  </div>
-                                </article>
-                              ))}
-                            </div>
-                          </section>
-                        ) : (
-                          <p className="lottery-legacy-summary">等待下一期开奖同步后，系统会自动回填本次推荐的命中结果。</p>
-                        )}
-                      </div>
-                    ),
-                  },
-                ]}
-              />
-            </div>
-          ) : (
-            <div className="tool-empty-panel">
-              <Empty description="还没有推荐记录">
-                <Button type="primary" ghost icon={<ThunderboltOutlined />} onClick={handleRecommend}>
-                  生成第一组推荐
-                </Button>
-              </Empty>
-            </div>
-          )}
-
-          <div className="lottery-columns">
-            <section>
-              <h3><HistoryOutlined /> 推荐历史</h3>
-              <div className="lottery-history-list">
-                {history.map(item => (
-                  <button key={item.id} type="button" onClick={() => setCurrent(item)}>
-                    <strong>{item.source === 'AI' ? 'AI 推荐' : '规则推荐'} · {item.latestIssueNo}</strong>
-                    <small>{formatDateTime(item.createdAt)}</small>
-                  </button>
-                ))}
-                {history.length === 0 && <p>暂无推荐历史。</p>}
-              </div>
-            </section>
-            <section>
-              <h3>近期开奖</h3>
-              <div className="lottery-draw-list">
-                {draws.slice(0, 10).map(draw => (
-                  <article key={draw.issueNo}>
+              {latest ? (
+                <div className="lottery-recommendation">
+                  <div className="lottery-recommendation-head">
                     <div>
-                      <strong>{draw.issueNo}</strong>
-                      <small>{draw.drawDate}</small>
+                      <Tag color={latest.source === 'AI' ? 'blue' : 'orange'}>{latest.source === 'AI' ? '历史 AI 推荐' : 'Java 推荐'}</Tag>
+                      {analysis?.confidenceLabel && <Tag color="geekblue">参考强度 {analysis.confidenceLabel}</Tag>}
+                      {latest.strategyVersion && <Tag>{latest.strategyVersion}</Tag>}
+                      {latest.evaluatedIssueNo && <Tag color="cyan">已结算 {latest.evaluatedIssueNo}</Tag>}
+                      {typeof latest.maxHitCount === 'number' && <Tag color="green">最高命中 {latest.maxHitCount}/5</Tag>}
+                      {calibration && calibration.evaluatedCount > 0 && <Tag color="purple">反馈校准 {calibration.evaluatedCount} 条</Tag>}
+                      <strong>基于近 {latest.baseIssueCount} 期，最新期号 {latest.latestIssueNo}</strong>
                     </div>
-                    <p>{draw.numbers.join(' ')}</p>
-                  </article>
-                ))}
-                {draws.length === 0 && <p>暂无开奖数据，先点击同步开奖。</p>}
-              </div>
-            </section>
+                    <small>{formatDateTime(latest.createdAt)}</small>
+                  </div>
+                  <p>{latest.featureSummary}</p>
+                  {aiFallback && (
+                    <Alert
+                      className="lottery-ai-fallback"
+                      type="info"
+                      showIcon
+                      message="历史 AI 降级原因"
+                      description={aiFallbackDescription(aiFallback)}
+                    />
+                  )}
+                  <div className={`lottery-group-grid${latest.groups.length === 1 ? ' is-single' : ''}`}>
+                    {latest.groups.map((group, index) => (
+                      <article key={`${latest.id}-${index}`} className="lottery-group-card">
+                        <span>{latest.groups.length === 1 ? '精选号码' : `第 ${index + 1} 组`}</span>
+                        <div className="lottery-number-row">
+                          {group.numbers.map(number => <em key={number}>{number}</em>)}
+                        </div>
+                        <p>{group.reason}</p>
+                      </article>
+                    ))}
+                  </div>
+                  <Tabs
+                    className="lottery-detail-tabs"
+                    size="small"
+                    items={[
+                      {
+                        key: 'analysis',
+                        label: <span><BulbOutlined /> 深度分析</span>,
+                        children: analysis?.analysis ? (
+                          <div className="lottery-analysis-panel">
+                            <section>
+                              <h4>整体判断</h4>
+                              <p>{analysis.analysis.overview || latest.featureSummary}</p>
+                            </section>
+                            <section>
+                              <h4>特征信号</h4>
+                              <ul>{(analysis.analysis.featureSignals ?? []).map(item => <li key={item}>{item}</li>)}</ul>
+                            </section>
+                            <section>
+                              <h4>组合逻辑</h4>
+                              <ul>{(analysis.analysis.combinationLogic ?? []).map(item => <li key={item}>{item}</li>)}</ul>
+                            </section>
+                            {backtestSummary && (
+                              <section className="lottery-backtest-card">
+                                <h4>滚动回测</h4>
+                                <p>{backtestSummary.summary}</p>
+                                <div className="lottery-metric-row">
+                                  <span>样本 {backtestSummary.evaluatedIssueCount}</span>
+                                  <span>均值 {backtestSummary.averageHitCount.toFixed(2)}</span>
+                                  <span>最高 {backtestSummary.maxHitCount}/5</span>
+                                </div>
+                                {backtestWeights && (
+                                  <div className="lottery-weight-row">
+                                    <span>热 {backtestWeights.hotWeight.toFixed(2)}</span>
+                                    <span>漏 {backtestWeights.missingWeight.toFixed(2)}</span>
+                                    <span>势 {backtestWeights.trendWeight.toFixed(2)}</span>
+                                    <span>衰 {backtestWeights.decayWeight.toFixed(2)}</span>
+                                    <span>共 {backtestWeights.pairWeight.toFixed(2)}</span>
+                                    <span>衡 {backtestWeights.balanceWeight.toFixed(2)}</span>
+                                  </div>
+                                )}
+                                <p>命中分布 {formatHitDistribution(backtestSummary.hitDistribution)}</p>
+                              </section>
+                            )}
+                            {optimizedPortfolio && optimizedGroups.length > 0 && (
+                              <section className="lottery-portfolio-card">
+                                <h4>组合优化</h4>
+                                <p>{optimizedPortfolio.summary}</p>
+                                <div className="lottery-portfolio-list">
+                                  {optimizedGroups.map((group, index) => (
+                                    <article key={`${group.numbers.join('-')}-${index}`}>
+                                      <div>
+                                        <strong>第 {index + 1} 组 · {group.score.toFixed(2)}</strong>
+                                        <span>{group.numbers.join(' ')}</span>
+                                      </div>
+                                      <p>{group.evidence.slice(0, 2).join('；')}</p>
+                                    </article>
+                                  ))}
+                                </div>
+                              </section>
+                            )}
+                            <section>
+                              <h4><WarningOutlined /> 风险提示</h4>
+                              <ul>{(analysis.analysis.riskWarnings ?? [DISCLAIMER]).map(item => <li key={item}>{item}</li>)}</ul>
+                            </section>
+                          </div>
+                        ) : (
+                          <p className="lottery-legacy-summary">{latest.featureSummary}</p>
+                        ),
+                      },
+                      {
+                        key: 'candidates',
+                        label: '候选池',
+                        children: candidates.length > 0 ? (
+                          <div className="lottery-candidate-grid">
+                            {candidates.slice(0, 16).map(candidate => (
+                              <article key={candidate.number}>
+                                <div>
+                                  <em>{candidate.number}</em>
+                                  <strong>{candidate.score.toFixed(2)}</strong>
+                                </div>
+                                <p>{candidate.evidence}</p>
+                                <span>{candidate.roles.join(' / ')}</span>
+                              </article>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="lottery-legacy-summary">旧推荐记录暂无候选池明细。</p>
+                        ),
+                      },
+                      {
+                        key: 'feedback',
+                        label: '命中反馈',
+                        children: (
+                          <div className="lottery-feedback-panel">
+                            {calibration ? (
+                              <section className="lottery-calibration-panel">
+                                <h4>策略校准</h4>
+                                <p>{calibration.summary}</p>
+                                <div>
+                                  <span>热号 {calibration.hotMultiplier.toFixed(2)}</span>
+                                  <span>冷号 {calibration.coldMultiplier.toFixed(2)}</span>
+                                  <span>高遗漏 {calibration.missingMultiplier.toFixed(2)}</span>
+                                  <span>趋势 {calibration.trendMultiplier.toFixed(2)}</span>
+                                  <span>均衡 {calibration.balanceMultiplier.toFixed(2)}</span>
+                                </div>
+                              </section>
+                            ) : (
+                              <p className="lottery-legacy-summary">暂无策略校准快照，新推荐会在命中反馈足够后自动记录。</p>
+                            )}
+                            {hitSummary ? (
+                              <section className="lottery-hit-panel">
+                                <div>
+                                  <h4>结算期号 {hitSummary.issueNo}</h4>
+                                  <small>{hitSummary.drawDate}</small>
+                                </div>
+                                <p>推荐累计命中 {hitSummary.totalHitCount} 个，单组最高命中 {hitSummary.maxHitCount} 个。随机基线约为单号 25%，反馈只用于调整权重，不代表下次必然命中。</p>
+                                <div className="lottery-hit-grid">
+                                  {hitSummary.groups.map(group => (
+                                    <article key={group.groupIndex}>
+                                      <strong>第 {group.groupIndex} 组 · 命中 {group.hitCount}/5</strong>
+                                      <div>
+                                        {group.numbers.map(number => (
+                                          <em key={number} className={group.hitNumbers.includes(number) ? 'is-hit' : undefined}>
+                                            {number}
+                                          </em>
+                                        ))}
+                                      </div>
+                                    </article>
+                                  ))}
+                                </div>
+                              </section>
+                            ) : (
+                              <p className="lottery-legacy-summary">等待下一期开奖同步后，系统会自动回填本次推荐的命中结果。</p>
+                            )}
+                          </div>
+                        ),
+                      },
+                    ]}
+                  />
+                </div>
+              ) : (
+                <div className="tool-empty-panel lottery-empty-panel">
+                  <Empty description="还没有推荐记录">
+                    <Button type="primary" ghost icon={<ThunderboltOutlined />} onClick={handleRecommend}>
+                      生成第一组推荐
+                    </Button>
+                  </Empty>
+                </div>
+              )}
+            </div>
+
+            <aside className="lottery-side-column">
+              <section>
+                <h3><HistoryOutlined /> 推荐历史</h3>
+                <div className="lottery-history-list">
+                  {history.map(item => (
+                    <button key={item.id} type="button" onClick={() => setCurrent(item)}>
+                      <strong>{item.source === 'AI' ? '历史 AI 推荐' : 'Java 推荐'} · {item.latestIssueNo}</strong>
+                      <small>{formatDateTime(item.createdAt)}</small>
+                    </button>
+                  ))}
+                  {history.length === 0 && <p>暂无推荐历史。</p>}
+                </div>
+              </section>
+              <section>
+                <h3>近期开奖</h3>
+                <div className="lottery-draw-list">
+                  {draws.slice(0, 10).map(draw => (
+                    <article key={draw.issueNo}>
+                      <div>
+                        <strong>{draw.issueNo}</strong>
+                        <small>{draw.drawDate}</small>
+                      </div>
+                      <p>{draw.numbers.join(' ')}</p>
+                    </article>
+                  ))}
+                  {draws.length === 0 && <p>暂无开奖数据，先点击同步开奖。</p>}
+                </div>
+              </section>
+            </aside>
           </div>
         </>
       )}

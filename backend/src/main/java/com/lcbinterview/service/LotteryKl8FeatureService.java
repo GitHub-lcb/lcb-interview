@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * 快乐8历史特征服务，为 AI 推荐提供结构化统计输入。
+ * 快乐8历史特征服务，为 Java 推荐策略提供结构化统计输入。
  */
 @Service
 @RequiredArgsConstructor
@@ -33,6 +33,7 @@ public class LotteryKl8FeatureService {
     private static final int MAX_BASE_ISSUE_COUNT = 2000;
     private static final int CANDIDATE_POOL_SIZE = 32;
     private static final int PAIR_HIGHLIGHT_SIZE = 20;
+    private static final int OPTIMIZED_GROUP_COUNT = 1;
     private static final List<String> BACKTEST_FACTORS = List.of(
             "hot", "missing", "trend", "decay", "pair", "balance");
 
@@ -717,7 +718,7 @@ public class LotteryKl8FeatureService {
         List<LotteryKl8OptimizedGroup> groups = new ArrayList<>();
         Set<String> usedKeys = new HashSet<>();
 
-        for (int groupIndex = 0; groupIndex < 5; groupIndex += 1) {
+        for (int groupIndex = 0; groupIndex < OPTIMIZED_GROUP_COUNT; groupIndex += 1) {
             List<Integer> selected = selectOptimizedNumbers(
                     groupIndex,
                     candidates,
@@ -733,7 +734,7 @@ public class LotteryKl8FeatureService {
             groups.add(new LotteryKl8OptimizedGroup(
                     unique,
                     groupScore,
-                    "组合优化：结合滚动回测权重、候选池强度、组内共现和区间/奇偶/尾数分散生成，作为 AI 推荐的优先参考。",
+                    "组合优化：结合滚动回测权重、候选池强度、组内共现和区间/奇偶/尾数分散生成，作为 Java 规则推荐结果。",
                     optimizedEvidence(unique, groupScore, pairScores, reuseCounts, backtestSummary)));
         }
 
@@ -741,14 +742,15 @@ public class LotteryKl8FeatureService {
         int maxReuse = reuseCounts.values().stream().max(Integer::compareTo).orElse(0);
         Map<String, String> diagnostics = new LinkedHashMap<>();
         diagnostics.put("averageGroupScore", "%.2f".formatted(averageScore));
+        diagnostics.put("groupCount", String.valueOf(groups.size()));
         diagnostics.put("maxNumberReuse", String.valueOf(maxReuse));
         diagnostics.put("backtestAverageHit", "%.2f".formatted(backtestSummary.averageHitCount()));
         diagnostics.put("topFactors", String.join("、", backtestSummary.topFactorNames()));
         diagnostics.put("pairWeight", "%.2f".formatted(backtestSummary.factorWeights().pairWeight()));
         return new LotteryKl8OptimizedPortfolio(
                 groups,
-                "组合优化完成：基于 %d 个候选号码生成 5 组，最大单号复用 %d 次，平均组合分 %.2f，回测平均命中 %.2f。"
-                        .formatted(candidates.size(), maxReuse, averageScore, backtestSummary.averageHitCount()),
+                "组合优化完成：基于 %d 个候选号码生成 1 组精选号码，平均组合分 %.2f，回测平均命中 %.2f。"
+                        .formatted(candidates.size(), averageScore, backtestSummary.averageHitCount()),
                 diagnostics);
     }
 

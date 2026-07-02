@@ -13,26 +13,23 @@ import com.lcbinterview.dto.tools.LotteryKl8RecommendationVO;
 import com.lcbinterview.mapper.LotteryKl8RecommendationMapper;
 import com.lcbinterview.model.LotteryKl8Recommendation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
- * 快乐8推荐编排服务，串联历史特征、AI 推荐、规则校验和历史保存。
+ * 快乐8推荐编排服务，串联历史特征、Java 规则推荐、规则校验和历史保存。
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LotteryKl8RecommendationService {
 
     private static final int DEFAULT_BASE_ISSUE_COUNT = 1000;
-    private static final String STRATEGY_VERSION = "KL8_BACKTEST_PORTFOLIO_V3";
+    private static final String STRATEGY_VERSION = "KL8_JAVA_BACKTEST_SINGLE_V4";
     private static final String DISCLAIMER = "彩票结果具有随机性，本推荐仅为娱乐统计参考，不保证命中，不构成投注建议。";
 
     private final LotteryKl8FeatureService featureService;
-    private final LotteryKl8AiRecommendationService aiRecommendationService;
     private final LotteryKl8RecommendationPolicy recommendationPolicy;
     private final LotteryKl8RecommendationEvaluationService evaluationService;
     private final LotteryKl8StrategyCalibrationService calibrationService;
@@ -40,7 +37,7 @@ public class LotteryKl8RecommendationService {
     private final ObjectMapper objectMapper;
 
     /**
-     * 为当前用户生成 5 组快乐8选5推荐。
+     * 为当前用户生成 1 组快乐8选5推荐。
      *
      * @param userId  用户 ID
      * @param request 推荐请求
@@ -52,17 +49,8 @@ public class LotteryKl8RecommendationService {
         evaluationService.evaluatePendingRecommendations();
         LotteryKl8StrategyCalibration calibration = calibrationService.currentCalibration();
         LotteryKl8FeatureReport report = featureService.buildReport(baseIssueCount, calibration);
-        String source = "AI";
-        LotteryKl8RecommendationPolicy.ValidatedRecommendation result;
-        try {
-            result = recommendationPolicy.validateAiResult(aiRecommendationService.recommend(report));
-        } catch (Exception e) {
-            LotteryKl8AiFailureDetail failureDetail = LotteryKl8AiFailureDetail.from(e);
-            log.warn("快乐8 AI 推荐不可用，回退规则推荐: code={}, message={}, detail={}",
-                    failureDetail.code(), failureDetail.message(), failureDetail.detail());
-            source = "RULE_BASED";
-            result = recommendationPolicy.fallbackResult(report, failureDetail);
-        }
+        String source = "RULE_BASED";
+        LotteryKl8RecommendationPolicy.ValidatedRecommendation result = recommendationPolicy.fallbackResult(report);
         LotteryKl8Recommendation recommendation = new LotteryKl8Recommendation();
         recommendation.setUserId(userId);
         recommendation.setSource(source);

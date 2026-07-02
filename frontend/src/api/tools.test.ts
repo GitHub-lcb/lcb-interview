@@ -15,7 +15,7 @@ import { createKl8Recommendation, syncKl8Draws } from './tools'
 
 const recommendation: LotteryKl8Recommendation = {
   id: 1,
-  source: 'AI',
+  source: 'RULE_BASED',
   baseIssueCount: 120,
   latestIssueNo: '20260629001',
   groups: [
@@ -34,7 +34,7 @@ describe('tools api', () => {
     vi.clearAllMocks()
   })
 
-  it('uses an extended timeout for AI lottery recommendations', async () => {
+  it('uses an extended timeout for Java lottery recommendations', async () => {
     vi.mocked(api.post).mockResolvedValue({ data: { data: recommendation } })
 
     await createKl8Recommendation(120)

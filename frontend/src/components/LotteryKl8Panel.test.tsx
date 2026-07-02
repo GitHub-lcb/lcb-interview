@@ -58,7 +58,7 @@ describe('LotteryKl8Panel', () => {
     })
   })
 
-  it('handles AI recommendation timeout with controlled feedback', async () => {
+  it('handles Java recommendation timeout with controlled feedback', async () => {
     vi.mocked(createKl8Recommendation).mockRejectedValue(
       Object.assign(new Error('timeout'), { code: 'ECONNABORTED' }),
     )
@@ -66,12 +66,12 @@ describe('LotteryKl8Panel', () => {
     render(<LotteryKl8Panel />)
 
     await screen.findByText('20260629001')
-    await userEvent.click(screen.getByRole('button', { name: /AI 推荐 5 组/ }))
+    await userEvent.click(screen.getByRole('button', { name: /Java 推荐 1 组/ }))
 
     await waitFor(() => {
       expect(createKl8Recommendation).toHaveBeenCalledWith(1000)
     })
-    expect(emitFeedbackWarning).toHaveBeenCalledWith('AI 推荐生成耗时较长，请稍后刷新推荐历史查看结果')
+    expect(emitFeedbackWarning).toHaveBeenCalledWith('Java 推荐生成耗时较长，请稍后刷新推荐历史查看结果')
     expect(emitFeedbackSuccess).not.toHaveBeenCalled()
   })
 
@@ -93,10 +93,6 @@ describe('LotteryKl8Panel', () => {
       latestIssueNo: '20260629001',
       groups: [
         { numbers: [1, 2, 3, 4, 5], reason: '规则推荐' },
-        { numbers: [6, 7, 8, 9, 10], reason: '规则推荐' },
-        { numbers: [11, 12, 13, 14, 15], reason: '规则推荐' },
-        { numbers: [16, 17, 18, 19, 20], reason: '规则推荐' },
-        { numbers: [21, 22, 23, 24, 25], reason: '规则推荐' },
       ],
       featureSummary: '测试摘要',
       analysisJson: JSON.stringify({
@@ -120,7 +116,7 @@ describe('LotteryKl8Panel', () => {
 
     render(<LotteryKl8Panel />)
 
-    expect(await screen.findByText('AI 降级原因')).toBeInTheDocument()
+    expect(await screen.findByText('历史 AI 降级原因')).toBeInTheDocument()
     expect(screen.getByText(/HTTP 401/)).toBeInTheDocument()
   })
 })

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * 快乐8选5推荐历史实体，保存当前用户每次生成的 5 组号码。
+ * 快乐8选5推荐历史实体，保存当前用户每次生成的推荐号码。
  */
 @Data
 @TableName("lottery_kl8_recommendation")
@@ -26,7 +26,7 @@ public class LotteryKl8Recommendation {
     @TableField("user_id")
     private Long userId;
 
-    /** 推荐来源：AI / RULE_BASED */
+    /** 推荐来源：RULE_BASED，旧记录可能为 AI */
     private String source;
 
     /** 使用的历史期数 */
@@ -73,7 +73,7 @@ public class LotteryKl8Recommendation {
     @TableField("hit_summary_json")
     private String hitSummaryJson;
 
-    /** 5 组累计命中数量 */
+    /** 推荐组累计命中数量 */
     @TableField("total_hit_count")
     private Integer totalHitCount;
 

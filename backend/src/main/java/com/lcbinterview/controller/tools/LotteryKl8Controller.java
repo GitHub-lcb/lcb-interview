@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 快乐8选5工具接口，提供开奖同步、历史开奖和 AI 推荐能力。
+ * 快乐8选5工具接口，提供开奖同步、历史开奖和 Java 规则推荐能力。
  */
 @Tag(name = "快乐8选5工具")
 @RestController

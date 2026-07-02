@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 快乐8组合优化结果，包含 5 组号码和组合层诊断信息。
+ * 快乐8组合优化结果，包含 Java 精选号码组和组合层诊断信息。
  *
- * @param groups 5 组优化号码
+ * @param groups 优化号码组，当前只生成 1 组
  * @param summary 组合优化摘要
  * @param diagnostics 组合层诊断信息
  */

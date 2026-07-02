@@ -16,12 +16,12 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * 快乐8推荐策略。负责校验 AI 输出，并在 AI 不可用时生成规则降级推荐。
+ * 快乐8推荐策略。负责校验推荐输出，并生成纯 Java 规则推荐。
  */
 @Service
 public class LotteryKl8RecommendationPolicy {
 
-    private static final int GROUP_COUNT = 5;
+    private static final int GROUP_COUNT = 1;
     private static final int GROUP_SIZE = 5;
     private static final Set<String> CONFIDENCE_LABELS = Set.of("低", "中低", "中");
 
@@ -37,7 +37,7 @@ public class LotteryKl8RecommendationPolicy {
     }
 
     /**
-     * 从 AI 文本中解析并校验 5 组推荐。
+     * 从 AI 文本中解析并校验 1 组推荐。
      *
      * @param content AI 输出文本
      * @return 通过校验的推荐组
@@ -85,21 +85,21 @@ public class LotteryKl8RecommendationPolicy {
     }
 
     /**
-     * 根据历史特征生成带分析 JSON 的规则降级推荐。
+     * 根据历史特征生成带分析 JSON 的 Java 规则推荐。
      *
      * @param report 历史特征报告
-     * @return 规则降级推荐结果
+     * @return Java 规则推荐结果
      */
     public ValidatedRecommendation fallbackResult(LotteryKl8FeatureReport report) {
         return fallbackResult(report, null);
     }
 
     /**
-     * 根据历史特征生成带分析 JSON 的规则降级推荐，并附带 AI 失败诊断。
+     * 根据历史特征生成带分析 JSON 的 Java 规则推荐，并兼容旧 AI 失败诊断。
      *
      * @param report        历史特征报告
      * @param failureDetail AI 失败诊断，可为空
-     * @return 规则降级推荐结果
+     * @return Java 规则推荐结果
      */
     public ValidatedRecommendation fallbackResult(LotteryKl8FeatureReport report, LotteryKl8AiFailureDetail failureDetail) {
         List<LotteryKl8RecommendationGroupVO> groups = fallbackGroups(report);
@@ -114,26 +114,26 @@ public class LotteryKl8RecommendationPolicy {
             }
             ObjectNode analysis = root.putObject("analysis");
             String overview = failureDetail == null
-                    ? "AI 推荐不可用，已使用后端深度候选池按规则生成 5 组号码。"
-                    : "AI 推荐不可用（%s），已使用后端深度候选池按规则生成 5 组号码。".formatted(failureDetail.message());
+                    ? "已使用后端 Java 回测策略生成 1 组号码。"
+                    : "AI 推荐不可用（%s），已使用后端 Java 回测策略生成 1 组号码。".formatted(failureDetail.message());
             analysis.put("overview", overview);
             ArrayNode featureSignals = analysis.putArray("featureSignals");
             report.analysisSections().forEach(featureSignals::add);
             ArrayNode combinationLogic = analysis.putArray("combinationLogic");
-            combinationLogic.add("每组从热号、冷号、高遗漏和趋势候选中分散抽取，避免完全依赖单一信号。");
-            combinationLogic.add("组内号码按升序展示，并控制重复组合。");
+            combinationLogic.add("从热号、高遗漏、趋势和结构均衡候选中选出单组号码，避免完全依赖单一信号。");
+            combinationLogic.add("组内号码按升序展示，并控制区间、奇偶和尾数不要过度集中。");
             ArrayNode warnings = analysis.putArray("riskWarnings");
             if (failureDetail != null) {
-                warnings.add("AI 降级原因：" + failureDetail.message());
+                warnings.add("历史 AI 降级原因：" + failureDetail.message());
             }
             warnings.add("彩票开奖结果具有独立随机性，历史统计不能保证命中。");
-            warnings.add("规则推荐仅在 AI 不可用时作为娱乐参考。");
+            warnings.add("Java 规则推荐仅作为娱乐参考。");
             List<String> warningList = new ArrayList<>();
             if (failureDetail != null) {
-                warningList.add("AI 降级原因：" + failureDetail.message());
+                warningList.add("历史 AI 降级原因：" + failureDetail.message());
             }
             warningList.add("彩票开奖结果具有独立随机性，历史统计不能保证命中。");
-            warningList.add("规则推荐仅在 AI 不可用时作为娱乐参考。");
+            warningList.add("Java 规则推荐仅作为娱乐参考。");
             return new ValidatedRecommendation(groups, objectMapper.writeValueAsString(root), "低",
                     List.copyOf(warningList));
         } catch (Exception e) {
@@ -142,14 +142,15 @@ public class LotteryKl8RecommendationPolicy {
     }
 
     /**
-     * 根据历史特征生成规则降级推荐。
+     * 根据历史特征生成 Java 规则推荐。
      *
      * @param report 历史特征报告
-     * @return 5 组规则推荐
+     * @return 1 组规则推荐
      */
     public List<LotteryKl8RecommendationGroupVO> fallbackGroups(LotteryKl8FeatureReport report) {
         if (!report.optimizedPortfolio().groups().isEmpty()) {
             return validateGroups(report.optimizedPortfolio().groups().stream()
+                    .limit(GROUP_COUNT)
                     .map(group -> new LotteryKl8RecommendationGroupVO(group.numbers(), group.reason()))
                     .toList());
         }
@@ -172,7 +173,7 @@ public class LotteryKl8RecommendationPolicy {
             if (used.add(key)) {
                 groups.add(new LotteryKl8RecommendationGroupVO(
                         sorted,
-                        "规则降级推荐：结合深度候选池、热号、冷号、遗漏和随机扰动生成，仅作娱乐参考。"));
+                        "Java 规则推荐：结合深度候选池、热号、冷号、遗漏和随机扰动生成，仅作娱乐参考。"));
             }
             cursor += 1;
         }
@@ -181,7 +182,7 @@ public class LotteryKl8RecommendationPolicy {
 
     private List<LotteryKl8RecommendationGroupVO> validateGroups(List<LotteryKl8RecommendationGroupVO> groups) {
         if (groups.size() != GROUP_COUNT) {
-            throw new IllegalArgumentException("必须返回 5 组推荐");
+            throw new IllegalArgumentException("必须返回 1 组推荐");
         }
         Set<String> used = new HashSet<>();
         List<LotteryKl8RecommendationGroupVO> result = new ArrayList<>();
@@ -324,7 +325,7 @@ public class LotteryKl8RecommendationPolicy {
     /**
      * 已校验的快乐8推荐结果。
      *
-     * @param groups          5 组推荐号码
+     * @param groups          1 组推荐号码
      * @param analysisJson    深度分析 JSON
      * @param confidenceLabel 置信标签，仅表达统计参考强弱
      * @param riskWarnings    风险提示列表

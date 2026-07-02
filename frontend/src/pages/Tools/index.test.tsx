@@ -75,7 +75,7 @@ describe('Tools page auth gate', () => {
     expect(panelRenderSpies.lottery).not.toHaveBeenCalled()
   })
 
-  it('mounts the active protected tool panel after current user is verified', async () => {
+  it('mounts lottery prediction as the default protected tool panel after current user is verified', async () => {
     window.localStorage.setItem(USER_TOKEN_STORAGE_KEY, 'valid-token')
     vi.mocked(getCurrentUser).mockResolvedValue({
       id: 1,
@@ -86,8 +86,8 @@ describe('Tools page auth gate', () => {
     renderTools()
 
     await waitFor(() => {
-      expect(screen.getByTestId('reading-panel')).toBeInTheDocument()
+      expect(screen.getByTestId('lottery-panel')).toBeInTheDocument()
     })
-    expect(panelRenderSpies.reading).toHaveBeenCalled()
+    expect(panelRenderSpies.lottery).toHaveBeenCalled()
   })
 })

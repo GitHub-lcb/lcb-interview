@@ -59,7 +59,7 @@ class LotteryKl8FeatureServiceDeepTest {
         assertTrue(report.backtestSummary().hitDistribution().values().stream().mapToInt(Integer::intValue).sum() > 0);
         assertTrue(report.backtestSummary().factorWeights().decayWeight() >= report.backtestSummary().factorWeights().missingWeight());
         assertNotNull(report.optimizedPortfolio());
-        assertEquals(5, report.optimizedPortfolio().groups().size());
+        assertEquals(1, report.optimizedPortfolio().groups().size());
         assertTrue(report.optimizedPortfolio().groups().stream().allMatch(group -> group.numbers().size() == 5));
         assertTrue(report.optimizedPortfolio().summary().contains("组合"));
         assertNotNull(report.deepSummary());
@@ -101,6 +101,23 @@ class LotteryKl8FeatureServiceDeepTest {
         ArgumentCaptor<Wrapper> captor = ArgumentCaptor.forClass(Wrapper.class);
         verify(mapper).selectList(captor.capture());
         assertTrue(lastSql(captor.getValue()).contains("LIMIT 1200"));
+    }
+
+    @Test
+    void prioritizesDominantBacktestedNumbersInSingleGroup() {
+        LotteryKl8DrawMapper mapper = mock(LotteryKl8DrawMapper.class);
+        when(mapper.selectList(any())).thenReturn(dominantSignalDraws());
+        LotteryKl8FeatureService service = new LotteryKl8FeatureService(mapper);
+
+        LotteryKl8FeatureReport report = service.buildReport(90);
+
+        List<Integer> dominantNumbers = List.of(1, 2, 3, 4, 5);
+        List<Integer> selected = report.optimizedPortfolio().groups().get(0).numbers();
+        long selectedDominantNumbers = selected.stream()
+                .filter(dominantNumbers::contains)
+                .count();
+
+        assertTrue(selectedDominantNumbers >= 3, "单组推荐应优先吸收强回测号码，而不是过度分散到弱信号");
     }
 
     private LotteryKl8NumberProfile profile(LotteryKl8FeatureReport report, int number) {
@@ -154,6 +171,25 @@ class LotteryKl8FeatureServiceDeepTest {
             }
             if (index >= 30 && !numbers.contains(80)) {
                 numbers.set(numbers.size() - 1, 80);
+            }
+            draw.setNumbers(numbers.stream().sorted().map(String::valueOf).reduce((left, right) -> left + "," + right).orElse(""));
+            draws.add(draw);
+        }
+        return draws;
+    }
+
+    private List<LotteryKl8Draw> dominantSignalDraws() {
+        List<LotteryKl8Draw> draws = new ArrayList<>();
+        for (int index = 0; index < 90; index += 1) {
+            LotteryKl8Draw draw = new LotteryKl8Draw();
+            draw.setIssueNo("2026%03d".formatted(300 - index));
+            draw.setDrawDate(LocalDate.of(2026, 7, 1).minusDays(index));
+            List<Integer> numbers = new ArrayList<>(List.of(1, 2, 3, 4, 5));
+            for (int extra = 0; extra < 15; extra += 1) {
+                int value = 6 + Math.floorMod(index * 11 + extra * 7, 75);
+                if (!numbers.contains(value)) {
+                    numbers.add(value);
+                }
             }
             draw.setNumbers(numbers.stream().sorted().map(String::valueOf).reduce((left, right) -> left + "," + right).orElse(""));
             draws.add(draw);

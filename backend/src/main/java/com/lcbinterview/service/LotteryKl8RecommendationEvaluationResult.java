@@ -9,7 +9,7 @@ import java.util.List;
  * @param issueNo       用于结算的开奖期号
  * @param drawDate      开奖日期
  * @param drawNumbers   开奖号码
- * @param totalHitCount 5 组累计命中数量
+ * @param totalHitCount 推荐组累计命中数量
  * @param maxHitCount   单组最高命中数量
  * @param groups        分组命中结果
  */

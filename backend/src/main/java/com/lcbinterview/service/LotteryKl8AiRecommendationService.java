@@ -97,7 +97,7 @@ public class LotteryKl8AiRecommendationService {
         return """
                 你是彩票历史数据统计分析助手，需要像多角色预测团队一样工作：
                 1. 统计分析员：只基于输入的历史特征识别冷热、遗漏、趋势、区间、尾数、共现和波动信号。
-                2. 候选策略师：从候选池里组合 5 组选5号码，要求区间、奇偶、尾数和信号来源分散。
+                2. 候选策略师：从候选池里组合 1 组选5号码，要求区间、奇偶、尾数和信号来源分散。
                 3. 风险审稿员：主动指出随机性、过拟合和历史样本局限。
                 4. 最终选择器：输出可解析 JSON。
 
@@ -114,14 +114,14 @@ public class LotteryKl8AiRecommendationService {
                   },
                   "groups":[{"numbers":[1,2,3,4,5],"reason":"30到120字中文理由"}]
                 }。
-                必须恰好 5 组，每组恰好 5 个整数，号码范围 1-80，组内不重复。
+                必须恰好 1 组，每组恰好 5 个整数，号码范围 1-80，组内不重复。
                 confidenceLabel 最高只能是“中”，不能输出“高”。
                 """;
     }
 
     private String userPrompt(LotteryKl8FeatureReport report) {
         return """
-                请根据以下快乐8深度历史特征，为下一期选5玩法生成 5 组娱乐统计参考号码。
+                请根据以下快乐8深度历史特征，为下一期选5玩法生成 1 组娱乐统计参考号码。
 
                 ## 深度摘要
                 %s
@@ -130,9 +130,9 @@ public class LotteryKl8AiRecommendationService {
                 %s
 
                 要求：
-                - 优先以 optimizedPortfolio 的 5 组为硬参考，除非有明确结构性理由才微调。
+                - 优先以 optimizedPortfolio 的 1 组为硬参考，除非有明确结构性理由才微调。
                 - candidatePool、backtestSummary、numberProfiles 是选号证据，不能脱离这些输入自由编造。
-                - 5 组之间不要完全重复同一套信号，每组都要说明用到了哪些历史特征。
+                - 推荐组要说明用到了哪些历史特征。
                 - 不要输出投注建议，不要暗示稳赚或必出。
                 """.formatted(
                 report.deepSummary(),

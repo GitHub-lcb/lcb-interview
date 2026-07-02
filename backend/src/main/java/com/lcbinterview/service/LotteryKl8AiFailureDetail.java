@@ -56,7 +56,7 @@ public record LotteryKl8AiFailureDetail(String code, String message, String deta
             return new LotteryKl8AiFailureDetail(
                     "OUTPUT_INVALID",
                     "AI 推荐输出不符合 JSON 规范",
-                    fallback(rootMessage, "模型没有返回 5 组合法号码 JSON。"));
+                    fallback(rootMessage, "模型没有返回合法号码 JSON。"));
         }
         return new LotteryKl8AiFailureDetail(
                 "UNKNOWN",

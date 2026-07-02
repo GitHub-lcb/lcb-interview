@@ -15,7 +15,7 @@ import java.util.List;
  * @param source         推荐来源
  * @param baseIssueCount 使用历史期数
  * @param latestIssueNo  最新期号
- * @param groups         5 组推荐号码
+ * @param groups         推荐号码组，当前 Java 策略返回 1 组
  * @param featureSummary 特征摘要
  * @param analysisJson   深度分析 JSON
  * @param candidatePoolJson 候选池 JSON
@@ -24,7 +24,7 @@ import java.util.List;
  * @param evaluatedIssueNo 结算开奖期号
  * @param evaluatedDrawDate 结算开奖日期
  * @param hitSummaryJson 命中结果 JSON
- * @param totalHitCount 5 组累计命中数量
+ * @param totalHitCount 推荐组累计命中数量
  * @param maxHitCount 单组最高命中数量
  * @param evaluatedAt 命中结算时间
  * @param disclaimer     风险提示
