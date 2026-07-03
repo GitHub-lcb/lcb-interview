@@ -154,4 +154,18 @@ describe('AppLayout global recovery dock', () => {
 
     expect(navigate).toHaveBeenCalledWith('/search')
   })
+
+  it('shows the frontend version in the global layout footer', () => {
+    render(
+      <MemoryRouter initialEntries={['/banks']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route path="/banks" element={<div>题库页面内容</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByLabelText('前端版本号')).toHaveTextContent('v0.0.1')
+  })
 })
