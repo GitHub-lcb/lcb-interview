@@ -29,7 +29,9 @@ class LotteryKl8StrategyCalibrationServiceTest {
         assertTrue(calibration.hotMultiplier() > 1.0);
         assertTrue(calibration.missingMultiplier() > 1.0);
         assertTrue(calibration.trendMultiplier() > 1.0);
+        assertTrue(calibration.pairMultiplier() > 1.0);
         assertTrue(calibration.summary().contains("历史命中反馈"));
+        assertTrue(calibration.summary().contains("对子"));
     }
 
     private LotteryKl8Recommendation evaluatedRecommendation() {
@@ -59,6 +61,10 @@ class LotteryKl8StrategyCalibrationServiceTest {
                   "drawDate":"2026-06-28",
                   "totalHitCount":15,
                   "maxHitCount":3,
+                  "pairs":[
+                    {"pairIndex":1,"numbers":[1,80],"hitNumbers":[1,80],"hitCount":2,"fullHit":true},
+                    {"pairIndex":2,"numbers":[34,50],"hitNumbers":[34],"hitCount":1,"fullHit":false}
+                  ],
                   "groups":[
                     {"groupIndex":1,"numbers":[1,80,34,50,60],"hitNumbers":[1,80,34],"hitCount":3},
                     {"groupIndex":2,"numbers":[1,80,34,51,61],"hitNumbers":[1,80,34],"hitCount":3},

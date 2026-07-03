@@ -120,6 +120,29 @@ class LotteryKl8FeatureServiceDeepTest {
         assertTrue(selectedDominantNumbers >= 3, "单组推荐应优先吸收强回测号码，而不是过度分散到弱信号");
     }
 
+    @Test
+    void buildsSingleGroupFromAtLeastTwoSelectedPairs() {
+        LotteryKl8DrawMapper mapper = mock(LotteryKl8DrawMapper.class);
+        when(mapper.selectList(any())).thenReturn(sampleDraws());
+        LotteryKl8FeatureService service = new LotteryKl8FeatureService(mapper);
+
+        LotteryKl8FeatureReport report = service.buildReport(60);
+
+        List<LotteryKl8PairRecommendation> selectedPairs = report.optimizedPortfolio().pairRecommendations().stream()
+                .filter(LotteryKl8PairRecommendation::selected)
+                .toList();
+        List<Integer> selected = report.optimizedPortfolio().groups().get(0).numbers();
+        List<Integer> pairNumbers = selectedPairs.stream()
+                .flatMap(pair -> List.of(pair.leftNumber(), pair.rightNumber()).stream())
+                .distinct()
+                .toList();
+
+        assertTrue(selectedPairs.size() >= 2, "每次推荐至少需要 2 组核心对子");
+        assertEquals(4, pairNumbers.size(), "核心对子默认不应互相重叠");
+        assertTrue(selected.containsAll(pairNumbers), "最终 5 码必须包含核心对子里的 4 个号码");
+        assertTrue(report.optimizedPortfolio().summary().contains("2 组核心对子"));
+    }
+
     private LotteryKl8NumberProfile profile(LotteryKl8FeatureReport report, int number) {
         return report.numberProfiles().stream()
                 .filter(item -> item.number() == number)

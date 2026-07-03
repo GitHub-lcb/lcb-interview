@@ -45,6 +45,9 @@ class LotteryKl8RecommendationEvaluationServiceTest {
         assertEquals(3, recommendation.getMaxHitCount());
         assertNotNull(recommendation.getEvaluatedAt());
         assertTrue(recommendation.getHitSummaryJson().contains("\"maxHitCount\":3"));
+        assertTrue(recommendation.getHitSummaryJson().contains("\"pairs\""));
+        assertTrue(recommendation.getHitSummaryJson().contains("\"fullHit\":true"));
+        assertTrue(recommendation.getHitSummaryJson().contains("\"fullHit\":false"));
         verify(recommendationMapper).updateById(recommendation);
     }
 
@@ -60,6 +63,17 @@ class LotteryKl8RecommendationEvaluationServiceTest {
                   {"numbers":[5,22,39,48,64],"reason":"D"},
                   {"numbers":[7,27,43,60,75],"reason":"E"}
                 ]
+                """);
+        recommendation.setAnalysisJson("""
+                {
+                  "optimizedPortfolio": {
+                    "pairRecommendations": [
+                      {"leftNumber":1,"rightNumber":23,"count":20,"lift":1.2,"score":98,"selected":true,"reason":"核心对子","evidence":["测试"]},
+                      {"leftNumber":45,"rightNumber":67,"count":18,"lift":1.1,"score":88,"selected":true,"reason":"核心对子","evidence":["测试"]},
+                      {"leftNumber":2,"rightNumber":16,"count":18,"lift":1.1,"score":80,"selected":false,"reason":"备选对子","evidence":["测试"]}
+                    ]
+                  }
+                }
                 """);
         return recommendation;
     }

@@ -9,12 +9,28 @@ import java.util.Map;
  * @param groups 优化号码组，当前只生成 1 组
  * @param summary 组合优化摘要
  * @param diagnostics 组合层诊断信息
+ * @param pairRecommendations 对子推荐和入选结果
  */
 public record LotteryKl8OptimizedPortfolio(
         List<LotteryKl8OptimizedGroup> groups,
         String summary,
-        Map<String, String> diagnostics
+        Map<String, String> diagnostics,
+        List<LotteryKl8PairRecommendation> pairRecommendations
 ) {
+
+    /**
+     * 兼容旧调用方的构造器，未提供对子推荐时使用空列表。
+     *
+     * @param groups 优化号码组
+     * @param summary 组合优化摘要
+     * @param diagnostics 组合层诊断信息
+     */
+    public LotteryKl8OptimizedPortfolio(
+            List<LotteryKl8OptimizedGroup> groups,
+            String summary,
+            Map<String, String> diagnostics) {
+        this(groups, summary, diagnostics, List.of());
+    }
 
     /**
      * 创建空组合优化结果，供候选池不足或兼容旧调用时使用。
@@ -22,6 +38,6 @@ public record LotteryKl8OptimizedPortfolio(
      * @return 空组合优化结果
      */
     public static LotteryKl8OptimizedPortfolio empty() {
-        return new LotteryKl8OptimizedPortfolio(List.of(), "候选池不足，暂未生成组合优化结果。", Map.of());
+        return new LotteryKl8OptimizedPortfolio(List.of(), "候选池不足，暂未生成组合优化结果。", Map.of(), List.of());
     }
 }

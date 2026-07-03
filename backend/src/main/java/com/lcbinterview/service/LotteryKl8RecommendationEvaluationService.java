@@ -2,6 +2,7 @@ package com.lcbinterview.service;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -81,6 +82,8 @@ public class LotteryKl8RecommendationEvaluationService {
         Set<Integer> drawSet = new LinkedHashSet<>(drawNumbers);
         List<LotteryKl8RecommendationGroupVO> groups = parseGroups(recommendation.getRecommendationsJson());
         List<LotteryKl8RecommendationEvaluationGroupResult> groupResults = new ArrayList<>();
+        List<PairEvaluationResult> pairResults = evaluatePairs(
+                parseSelectedPairs(recommendation.getAnalysisJson()), drawSet);
         int totalHitCount = 0;
         int maxHitCount = 0;
         for (int index = 0; index < groups.size(); index += 1) {
@@ -103,7 +106,7 @@ public class LotteryKl8RecommendationEvaluationService {
                 groupResults);
         recommendation.setEvaluatedIssueNo(draw.getIssueNo());
         recommendation.setEvaluatedDrawDate(draw.getDrawDate());
-        recommendation.setHitSummaryJson(writeResult(result));
+        recommendation.setHitSummaryJson(writeResult(result, pairResults));
         recommendation.setTotalHitCount(totalHitCount);
         recommendation.setMaxHitCount(maxHitCount);
         recommendation.setEvaluatedAt(LocalDateTime.now());
@@ -131,7 +134,49 @@ public class LotteryKl8RecommendationEvaluationService {
         }
     }
 
-    private String writeResult(LotteryKl8RecommendationEvaluationResult result) {
+    private List<RecommendedPair> parseSelectedPairs(String analysisJson) {
+        if (analysisJson == null || analysisJson.isBlank()) {
+            return List.of();
+        }
+        try {
+            JsonNode pairs = objectMapper.readTree(analysisJson)
+                    .path("optimizedPortfolio")
+                    .path("pairRecommendations");
+            if (!pairs.isArray()) {
+                return List.of();
+            }
+            List<RecommendedPair> result = new ArrayList<>();
+            for (JsonNode pair : pairs) {
+                if (!pair.path("selected").asBoolean(false)) {
+                    continue;
+                }
+                int left = pair.path("leftNumber").asInt(0);
+                int right = pair.path("rightNumber").asInt(0);
+                if (left > 0 && right > 0 && left != right) {
+                    result.add(new RecommendedPair(Math.min(left, right), Math.max(left, right)));
+                }
+            }
+            return result;
+        } catch (Exception e) {
+            log.warn("快乐8推荐对子 JSON 解析失败: error={}", e.getMessage());
+            return List.of();
+        }
+    }
+
+    private List<PairEvaluationResult> evaluatePairs(List<RecommendedPair> pairs, Set<Integer> drawSet) {
+        List<PairEvaluationResult> result = new ArrayList<>();
+        for (int index = 0; index < pairs.size(); index += 1) {
+            RecommendedPair pair = pairs.get(index);
+            List<Integer> numbers = List.of(pair.leftNumber(), pair.rightNumber());
+            List<Integer> hitNumbers = numbers.stream()
+                    .filter(drawSet::contains)
+                    .toList();
+            result.add(new PairEvaluationResult(index + 1, numbers, hitNumbers, hitNumbers.size(), hitNumbers.size() == 2));
+        }
+        return result;
+    }
+
+    private String writeResult(LotteryKl8RecommendationEvaluationResult result, List<PairEvaluationResult> pairResults) {
         ObjectNode root = objectMapper.createObjectNode();
         root.put("issueNo", result.issueNo());
         root.put("drawDate", result.drawDate() == null ? "" : result.drawDate().toString());
@@ -139,6 +184,17 @@ public class LotteryKl8RecommendationEvaluationService {
         result.drawNumbers().forEach(drawNumbers::add);
         root.put("totalHitCount", result.totalHitCount());
         root.put("maxHitCount", result.maxHitCount());
+        ArrayNode pairs = root.putArray("pairs");
+        for (PairEvaluationResult pair : pairResults) {
+            ObjectNode pairNode = pairs.addObject();
+            pairNode.put("pairIndex", pair.pairIndex());
+            ArrayNode numbers = pairNode.putArray("numbers");
+            pair.numbers().forEach(numbers::add);
+            ArrayNode hitNumbers = pairNode.putArray("hitNumbers");
+            pair.hitNumbers().forEach(hitNumbers::add);
+            pairNode.put("hitCount", pair.hitCount());
+            pairNode.put("fullHit", pair.fullHit());
+        }
         ArrayNode groups = root.putArray("groups");
         for (LotteryKl8RecommendationEvaluationGroupResult group : result.groups()) {
             ObjectNode groupNode = groups.addObject();
@@ -150,6 +206,18 @@ public class LotteryKl8RecommendationEvaluationService {
             groupNode.put("hitCount", group.hitCount());
         }
         return root.toString();
+    }
+
+    private record RecommendedPair(int leftNumber, int rightNumber) {
+    }
+
+    private record PairEvaluationResult(
+            int pairIndex,
+            List<Integer> numbers,
+            List<Integer> hitNumbers,
+            int hitCount,
+            boolean fullHit
+    ) {
     }
 
     private List<Integer> parseNumbers(String numbers) {

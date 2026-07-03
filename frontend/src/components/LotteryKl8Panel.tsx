@@ -63,6 +63,18 @@ interface LotteryOptimizedPortfolio {
   groups: LotteryOptimizedGroup[]
   summary: string
   diagnostics: Record<string, string>
+  pairRecommendations?: LotteryPairRecommendation[]
+}
+
+interface LotteryPairRecommendation {
+  leftNumber: number
+  rightNumber: number
+  count: number
+  lift: number
+  score: number
+  selected: boolean
+  reason: string
+  evidence: string[]
 }
 
 interface LotteryCandidateNumber {
@@ -89,12 +101,21 @@ interface LotteryHitGroup {
   hitCount: number
 }
 
+interface LotteryHitPair {
+  pairIndex: number
+  numbers: number[]
+  hitNumbers: number[]
+  hitCount: number
+  fullHit: boolean
+}
+
 interface LotteryHitSummary {
   issueNo: string
   drawDate: string
   drawNumbers: number[]
   totalHitCount: number
   maxHitCount: number
+  pairs?: LotteryHitPair[]
   groups: LotteryHitGroup[]
 }
 
@@ -103,7 +124,7 @@ export default function LotteryKl8Panel() {
   const [draws, setDraws] = useState<LotteryKl8Draw[]>([])
   const [history, setHistory] = useState<LotteryKl8Recommendation[]>([])
   const [current, setCurrent] = useState<LotteryKl8Recommendation | null>(null)
-  const [baseIssueCount, setBaseIssueCount] = useState(1000)
+  const [baseIssueCount, setBaseIssueCount] = useState(2000)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [recommending, setRecommending] = useState(false)
@@ -115,6 +136,8 @@ export default function LotteryKl8Panel() {
   const backtestWeights = backtestSummary?.factorWeights
   const optimizedPortfolio = analysis?.optimizedPortfolio
   const optimizedGroups = optimizedPortfolio?.groups ?? []
+  const pairRecommendations = optimizedPortfolio?.pairRecommendations ?? []
+  const selectedPairs = pairRecommendations.filter(pair => pair.selected).slice(0, 4)
   const candidates = useMemo(() => parseJson<LotteryCandidateNumber[]>(latest?.candidatePoolJson) ?? [], [latest])
   const calibration = useMemo(
     () => parseJson<LotteryCalibrationSnapshot>(latest?.calibrationSnapshotJson),
@@ -183,7 +206,7 @@ export default function LotteryKl8Panel() {
         <div>
           <div className="dashboard-kicker">快乐8选5</div>
           <h2>Java 历史数据回测推荐</h2>
-          <p>后端同步公开开奖数据，使用纯 Java 提取冷热、遗漏、区间、共现和回测特征，生成 1 组精选号码。</p>
+          <p>后端同步公开开奖数据，使用纯 Java 提取冷热、遗漏、区间、对子共现和回测特征，先选至少 2 组对子再生成 1 组精选号码。</p>
         </div>
         <div className="tool-actions">
           <Button icon={<ReloadOutlined />} loading={syncing} onClick={handleSync}>
@@ -216,8 +239,8 @@ export default function LotteryKl8Panel() {
                 </article>
                 <article>
                   <span>推荐基准</span>
-                  <InputNumber min={20} max={2000} value={baseIssueCount} onChange={value => setBaseIssueCount(value ?? 1000)} />
-                  <small>历史期数</small>
+                  <InputNumber min={20} max={2000} value={baseIssueCount} onChange={value => setBaseIssueCount(value ?? 2000)} />
+                  <small>历史期数，默认尽量取满</small>
                 </article>
               </div>
 
@@ -256,6 +279,23 @@ export default function LotteryKl8Panel() {
                       </article>
                     ))}
                   </div>
+                  {selectedPairs.length > 0 && (
+                    <section className="lottery-pair-card">
+                      <div>
+                        <h4>核心对子</h4>
+                        <span>至少 2 组对子参与生成本次 5 码</span>
+                      </div>
+                      <div className="lottery-pair-list">
+                        {selectedPairs.map(pair => (
+                          <article key={`${pair.leftNumber}-${pair.rightNumber}`}>
+                            <strong>{formatPair(pair.leftNumber, pair.rightNumber)}</strong>
+                            <span>分 {pair.score.toFixed(2)} · 共现 {pair.count} 次 · lift {pair.lift.toFixed(2)}</span>
+                            <p>{pair.evidence?.[0] || pair.reason}</p>
+                          </article>
+                        ))}
+                      </div>
+                    </section>
+                  )}
                   <Tabs
                     className="lottery-detail-tabs"
                     size="small"
@@ -311,6 +351,22 @@ export default function LotteryKl8Panel() {
                                         <span>{group.numbers.join(' ')}</span>
                                       </div>
                                       <p>{group.evidence.slice(0, 2).join('；')}</p>
+                                    </article>
+                                  ))}
+                                </div>
+                              </section>
+                            )}
+                            {pairRecommendations.length > 0 && (
+                              <section className="lottery-portfolio-card">
+                                <h4>对子策略</h4>
+                                <div className="lottery-portfolio-list">
+                                  {pairRecommendations.slice(0, 6).map(pair => (
+                                    <article key={`strategy-${pair.leftNumber}-${pair.rightNumber}`}>
+                                      <div>
+                                        <strong>{pair.selected ? '核心' : '备选'} · {formatPair(pair.leftNumber, pair.rightNumber)}</strong>
+                                        <span>{pair.score.toFixed(2)}</span>
+                                      </div>
+                                      <p>{pair.evidence?.[0] || pair.reason}</p>
                                     </article>
                                   ))}
                                 </div>
@@ -386,6 +442,25 @@ export default function LotteryKl8Panel() {
                                     </article>
                                   ))}
                                 </div>
+                                {(hitSummary.pairs?.length ?? 0) > 0 && (
+                                  <>
+                                    <h4>对子命中反馈</h4>
+                                    <div className="lottery-hit-grid is-pairs">
+                                      {hitSummary.pairs?.map(pair => (
+                                        <article key={pair.pairIndex}>
+                                          <strong>第 {pair.pairIndex} 对 · {pair.fullHit ? '双中' : `命中 ${pair.hitCount}/2`}</strong>
+                                          <div>
+                                            {pair.numbers.map(number => (
+                                              <em key={number} className={pair.hitNumbers.includes(number) ? 'is-hit' : undefined}>
+                                                {number}
+                                              </em>
+                                            ))}
+                                          </div>
+                                        </article>
+                                      ))}
+                                    </div>
+                                  </>
+                                )}
                               </section>
                             ) : (
                               <p className="lottery-legacy-summary">等待下一期开奖同步后，系统会自动回填本次推荐的命中结果。</p>
@@ -462,6 +537,10 @@ function formatHitDistribution(distribution?: Record<string, number>): string {
     .sort(([left], [right]) => Number(left) - Number(right))
     .map(([hit, count]) => `${hit}中:${count}`)
     .join(' / ')
+}
+
+function formatPair(left: number, right: number): string {
+  return `${Math.min(left, right)}-${Math.max(left, right)}`
 }
 
 function formatDateTime(value?: string): string {

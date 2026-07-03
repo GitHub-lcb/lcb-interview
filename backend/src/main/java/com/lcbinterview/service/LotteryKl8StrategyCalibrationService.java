@@ -26,6 +26,7 @@ public class LotteryKl8StrategyCalibrationService {
 
     private static final int MAX_EVALUATED_RECOMMENDATIONS = 100;
     private static final double RANDOM_BASELINE = 0.25;
+    private static final double PAIR_RANDOM_BASELINE = (20.0 / 80.0) * (19.0 / 79.0);
     private static final double MIN_MULTIPLIER = 0.75;
     private static final double MAX_MULTIPLIER = 1.25;
 
@@ -74,9 +75,10 @@ public class LotteryKl8StrategyCalibrationService {
         double missing = multiplier(stats.get(RoleBucket.MISSING));
         double trend = multiplier(stats.get(RoleBucket.TREND));
         double balance = multiplier(stats.get(RoleBucket.BALANCE));
-        String summary = "历史命中反馈校准：使用最近 %d 条已结算推荐，热号 %.2f、冷号 %.2f、高遗漏 %.2f、趋势 %.2f、均衡 %.2f；随机基线按单号 25%% 计算，倍率仅用于下一次统计参考。"
-                .formatted(evaluatedCount, hot, cold, missing, trend, balance);
-        return new LotteryKl8StrategyCalibration(hot, cold, missing, trend, balance, evaluatedCount, summary);
+        double pair = multiplier(stats.get(RoleBucket.PAIR), PAIR_RANDOM_BASELINE);
+        String summary = "历史命中反馈校准：使用最近 %d 条已结算推荐，热号 %.2f、冷号 %.2f、高遗漏 %.2f、趋势 %.2f、均衡 %.2f、对子 %.2f；随机基线按单号 25%%、对子双中 %.2f%% 计算，倍率仅用于下一次统计参考。"
+                .formatted(evaluatedCount, hot, cold, missing, trend, balance, pair, PAIR_RANDOM_BASELINE * 100);
+        return new LotteryKl8StrategyCalibration(hot, cold, missing, trend, balance, pair, evaluatedCount, summary);
     }
 
     private boolean applyRecommendation(
@@ -105,7 +107,20 @@ public class LotteryKl8StrategyCalibrationService {
                 }
             }
         }
+        applyPairResults(root.path("pairs"), stats.get(RoleBucket.PAIR));
         return true;
+    }
+
+    private void applyPairResults(JsonNode pairs, RoleStats pairStats) {
+        if (!pairs.isArray()) {
+            return;
+        }
+        for (JsonNode pair : pairs) {
+            pairStats.appearance += 1;
+            if (pair.path("fullHit").asBoolean(false) || pair.path("hitCount").asInt(0) >= 2) {
+                pairStats.hit += 1;
+            }
+        }
     }
 
     private Map<Integer, List<RoleBucket>> roleMap(String candidatePoolJson) throws Exception {
@@ -168,11 +183,15 @@ public class LotteryKl8StrategyCalibrationService {
     }
 
     private double multiplier(RoleStats stats) {
+        return multiplier(stats, RANDOM_BASELINE);
+    }
+
+    private double multiplier(RoleStats stats, double baseline) {
         if (stats.appearance == 0) {
             return 1.0;
         }
         double hitRate = (double) stats.hit / stats.appearance;
-        return round(Math.max(MIN_MULTIPLIER, Math.min(MAX_MULTIPLIER, 1 + hitRate - RANDOM_BASELINE)));
+        return round(Math.max(MIN_MULTIPLIER, Math.min(MAX_MULTIPLIER, 1 + hitRate - baseline)));
     }
 
     private double round(double value) {
@@ -184,7 +203,8 @@ public class LotteryKl8StrategyCalibrationService {
         COLD,
         MISSING,
         TREND,
-        BALANCE
+        BALANCE,
+        PAIR
     }
 
     private static class RoleStats {
