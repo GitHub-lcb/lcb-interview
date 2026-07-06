@@ -9,17 +9,19 @@ import java.util.Map;
  * @param groups 优化号码组，当前只生成 1 组
  * @param summary 组合优化摘要
  * @param diagnostics 组合层诊断信息
- * @param pairRecommendations 对子推荐和入选结果
+ * @param pairRecommendations 共现参考结果，兼容旧推荐记录
+ * @param neighborRecommendations 上一期邻位候选和入选结果
  */
 public record LotteryKl8OptimizedPortfolio(
         List<LotteryKl8OptimizedGroup> groups,
         String summary,
         Map<String, String> diagnostics,
-        List<LotteryKl8PairRecommendation> pairRecommendations
+        List<LotteryKl8PairRecommendation> pairRecommendations,
+        List<LotteryKl8NeighborRecommendation> neighborRecommendations
 ) {
 
     /**
-     * 兼容旧调用方的构造器，未提供对子推荐时使用空列表。
+     * 兼容旧调用方的构造器，未提供共现参考时使用空列表。
      *
      * @param groups 优化号码组
      * @param summary 组合优化摘要
@@ -29,7 +31,23 @@ public record LotteryKl8OptimizedPortfolio(
             List<LotteryKl8OptimizedGroup> groups,
             String summary,
             Map<String, String> diagnostics) {
-        this(groups, summary, diagnostics, List.of());
+        this(groups, summary, diagnostics, List.of(), List.of());
+    }
+
+    /**
+     * 兼容旧调用方的构造器，未提供邻位候选时使用空列表。
+     *
+     * @param groups 优化号码组
+     * @param summary 组合优化摘要
+     * @param diagnostics 组合层诊断信息
+     * @param pairRecommendations 共现参考结果
+     */
+    public LotteryKl8OptimizedPortfolio(
+            List<LotteryKl8OptimizedGroup> groups,
+            String summary,
+            Map<String, String> diagnostics,
+            List<LotteryKl8PairRecommendation> pairRecommendations) {
+        this(groups, summary, diagnostics, pairRecommendations, List.of());
     }
 
     /**
@@ -38,6 +56,6 @@ public record LotteryKl8OptimizedPortfolio(
      * @return 空组合优化结果
      */
     public static LotteryKl8OptimizedPortfolio empty() {
-        return new LotteryKl8OptimizedPortfolio(List.of(), "候选池不足，暂未生成组合优化结果。", Map.of(), List.of());
+        return new LotteryKl8OptimizedPortfolio(List.of(), "候选池不足，暂未生成组合优化结果。", Map.of(), List.of(), List.of());
     }
 }

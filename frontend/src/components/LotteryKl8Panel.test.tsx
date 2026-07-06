@@ -120,14 +120,14 @@ describe('LotteryKl8Panel', () => {
     expect(screen.getByText(/HTTP 401/)).toBeInTheDocument()
   })
 
-  it('shows selected pairs and pair hit feedback', async () => {
+  it('shows latest-neighbor candidates instead of required pair strategy', async () => {
     const recommendation: LotteryKl8Recommendation = {
       id: 2,
       source: 'RULE_BASED',
       baseIssueCount: 2000,
       latestIssueNo: '20260629001',
       groups: [
-        { numbers: [1, 23, 45, 67, 70], reason: '对子生成 5 码' },
+        { numbers: [9, 10, 11, 33, 35], reason: '邻位连号生成 5 码' },
       ],
       featureSummary: '测试摘要',
       analysisJson: JSON.stringify({
@@ -139,24 +139,30 @@ describe('LotteryKl8Panel', () => {
           riskWarnings: [],
         },
         optimizedPortfolio: {
+          summary: '基于上一期左右邻位候选和连号结构生成 1 组精选号码。',
+          groups: [
+            { numbers: [9, 10, 11, 33, 35], score: 91.5, reason: '邻位连号', evidence: ['来自上一期 10、34 的左右邻位', '形成 9、10、11 三连号'] },
+          ],
+          diagnostics: { selectedNeighborCount: '5' },
+          neighborRecommendations: [
+            { number: 9, anchorNumbers: [10], directions: ['左邻'], score: 93, selected: true, reason: '上一期 10 左邻', evidence: ['来自上一期 10、34 的左右邻位'] },
+            { number: 10, anchorNumbers: [11], directions: ['左邻'], score: 92, selected: true, reason: '上一期 11 左邻', evidence: ['连号补位'] },
+            { number: 11, anchorNumbers: [10, 12], directions: ['右邻', '左邻'], score: 91, selected: true, reason: '上一期 10/12 邻位', evidence: ['三连号结构'] },
+          ],
           pairRecommendations: [
-            { leftNumber: 1, rightNumber: 23, count: 20, lift: 1.2, score: 98, selected: true, reason: '核心对子', evidence: ['共现 20 次'] },
-            { leftNumber: 45, rightNumber: 67, count: 18, lift: 1.1, score: 88, selected: true, reason: '核心对子', evidence: ['共现 18 次'] },
+            { leftNumber: 1, rightNumber: 23, count: 20, lift: 1.2, score: 98, selected: false, reason: '共现参考', evidence: ['共现 20 次'] },
           ],
         },
       }),
       hitSummaryJson: JSON.stringify({
         issueNo: '20260629002',
         drawDate: '2026-06-30',
-        drawNumbers: [1, 2, 23, 45, 60],
+        drawNumbers: [9, 10, 23, 45, 60],
         totalHitCount: 3,
         maxHitCount: 3,
-        pairs: [
-          { pairIndex: 1, numbers: [1, 23], hitNumbers: [1, 23], hitCount: 2, fullHit: true },
-          { pairIndex: 2, numbers: [45, 67], hitNumbers: [45], hitCount: 1, fullHit: false },
-        ],
+        pairs: [],
         groups: [
-          { groupIndex: 1, numbers: [1, 23, 45, 67, 70], hitNumbers: [1, 23, 45], hitCount: 3 },
+          { groupIndex: 1, numbers: [9, 10, 11, 33, 35], hitNumbers: [9, 10, 35], hitCount: 3 },
         ],
       }),
       disclaimer: '测试免责声明',
@@ -166,13 +172,11 @@ describe('LotteryKl8Panel', () => {
 
     render(<LotteryKl8Panel />)
 
-    expect(await screen.findByText('核心对子')).toBeInTheDocument()
-    expect(screen.getByText('1-23')).toBeInTheDocument()
-    expect(screen.getByText('45-67')).toBeInTheDocument()
+    expect(await screen.findByText('邻位候选')).toBeInTheDocument()
+    expect(screen.getAllByText('来自上一期 10、34 的左右邻位').length).toBeGreaterThan(0)
+    expect(screen.queryByText('核心对子')).not.toBeInTheDocument()
     const feedbackTabs = screen.getAllByRole('tab', { name: /命中反馈/ })
     await userEvent.click(feedbackTabs[feedbackTabs.length - 1])
-    expect(screen.getByText('对子命中反馈')).toBeInTheDocument()
-    expect(screen.getByText(/第 1 对 · 双中/)).toBeInTheDocument()
-    expect(screen.getByText(/第 2 对 · 命中 1\/2/)).toBeInTheDocument()
+    expect(screen.queryByText('对子命中反馈')).not.toBeInTheDocument()
   })
 })

@@ -9,7 +9,9 @@ import org.mockito.ArgumentCaptor;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -121,9 +123,9 @@ class LotteryKl8FeatureServiceDeepTest {
     }
 
     @Test
-    void buildsSingleGroupFromAtLeastTwoSelectedPairs() {
+    void buildsSingleGroupFromLatestNeighborsAndConsecutiveRunWithoutSelectedPairs() {
         LotteryKl8DrawMapper mapper = mock(LotteryKl8DrawMapper.class);
-        when(mapper.selectList(any())).thenReturn(sampleDraws());
+        when(mapper.selectList(any())).thenReturn(latestNeighborTrendDraws());
         LotteryKl8FeatureService service = new LotteryKl8FeatureService(mapper);
 
         LotteryKl8FeatureReport report = service.buildReport(60);
@@ -132,15 +134,14 @@ class LotteryKl8FeatureServiceDeepTest {
                 .filter(LotteryKl8PairRecommendation::selected)
                 .toList();
         List<Integer> selected = report.optimizedPortfolio().groups().get(0).numbers();
-        List<Integer> pairNumbers = selectedPairs.stream()
-                .flatMap(pair -> List.of(pair.leftNumber(), pair.rightNumber()).stream())
-                .distinct()
-                .toList();
+        Set<Integer> latestNeighbors = latestNeighborNumbers(report.draws().get(0));
 
-        assertTrue(selectedPairs.size() >= 2, "每次推荐至少需要 2 组核心对子");
-        assertEquals(4, pairNumbers.size(), "核心对子默认不应互相重叠");
-        assertTrue(selected.containsAll(pairNumbers), "最终 5 码必须包含核心对子里的 4 个号码");
-        assertTrue(report.optimizedPortfolio().summary().contains("2 组核心对子"));
+        assertEquals(0, selectedPairs.size(), "新策略不再强制选择核心对子");
+        assertEquals(5, selected.size());
+        assertTrue(latestNeighbors.containsAll(selected), "最终 5 码应优先来自上一期号码左右邻位");
+        assertTrue(hasConsecutiveRun(selected, 3), "邻位策略应优先形成 10、11、12 这类三连号");
+        assertTrue(report.optimizedPortfolio().summary().contains("邻位"));
+        assertFalse(report.optimizedPortfolio().summary().contains("核心对子"));
     }
 
     private LotteryKl8NumberProfile profile(LotteryKl8FeatureReport report, int number) {
@@ -218,5 +219,57 @@ class LotteryKl8FeatureServiceDeepTest {
             draws.add(draw);
         }
         return draws;
+    }
+
+    private List<LotteryKl8Draw> latestNeighborTrendDraws() {
+        List<LotteryKl8Draw> draws = new ArrayList<>();
+        for (int index = 0; index < 90; index += 1) {
+            LotteryKl8Draw draw = new LotteryKl8Draw();
+            draw.setIssueNo("2026%03d".formatted(400 - index));
+            draw.setDrawDate(LocalDate.of(2026, 7, 5).minusDays(index));
+            LinkedHashSet<Integer> numbers = new LinkedHashSet<>();
+            if (index == 0) {
+                numbers.addAll(List.of(10, 11, 12, 34, 35));
+            } else {
+                numbers.addAll(List.of(9, 10, 11, 12, 13, 33, 34, 36));
+            }
+            for (int extra = 0; numbers.size() < 20; extra += 1) {
+                int value = 1 + Math.floorMod(index * 13 + extra * 7, 80);
+                numbers.add(value);
+            }
+            draw.setNumbers(numbers.stream().sorted().map(String::valueOf).reduce((left, right) -> left + "," + right).orElse(""));
+            draws.add(draw);
+        }
+        return draws;
+    }
+
+    private Set<Integer> latestNeighborNumbers(LotteryKl8Draw latestDraw) {
+        Set<Integer> neighbors = new LinkedHashSet<>();
+        for (String part : latestDraw.getNumbers().split(",")) {
+            int number = Integer.parseInt(part.trim());
+            if (number > 1) {
+                neighbors.add(number - 1);
+            }
+            if (number < 80) {
+                neighbors.add(number + 1);
+            }
+        }
+        return neighbors;
+    }
+
+    private boolean hasConsecutiveRun(List<Integer> numbers, int minRunLength) {
+        Set<Integer> numberSet = new LinkedHashSet<>(numbers);
+        for (Integer number : numbers) {
+            int runLength = 1;
+            int next = number + 1;
+            while (numberSet.contains(next)) {
+                runLength += 1;
+                next += 1;
+            }
+            if (runLength >= minRunLength) {
+                return true;
+            }
+        }
+        return false;
     }
 }

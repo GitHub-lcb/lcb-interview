@@ -96,8 +96,8 @@ public class LotteryKl8AiRecommendationService {
     private String systemPrompt() {
         return """
                 你是彩票历史数据统计分析助手，需要像多角色预测团队一样工作：
-                1. 统计分析员：只基于输入的历史特征识别冷热、遗漏、趋势、区间、尾数、共现和波动信号。
-                2. 候选策略师：从候选池里组合 1 组选5号码，要求区间、奇偶、尾数和信号来源分散。
+                1. 统计分析员：只基于输入的历史特征识别冷热、遗漏、趋势、区间、尾数、上一期邻位、连号和波动信号。
+                2. 候选策略师：优先从上一期号码的左右邻位候选中组合 1 组选5号码，并尽量形成 10、11、12 这类连号结构。
                 3. 风险审稿员：主动指出随机性、过拟合和历史样本局限。
                 4. 最终选择器：输出可解析 JSON。
 
@@ -130,7 +130,8 @@ public class LotteryKl8AiRecommendationService {
                 %s
 
                 要求：
-                - 优先以 optimizedPortfolio 的 1 组为硬参考，除非有明确结构性理由才微调。
+                - 优先以 optimizedPortfolio 的 1 组和 neighborRecommendations 为硬参考，除非有明确结构性理由才微调。
+                - 不要把 pairRecommendations 当成必须入选的对子；它只表示历史共现参考。
                 - candidatePool、backtestSummary、numberProfiles 是选号证据，不能脱离这些输入自由编造。
                 - 推荐组要说明用到了哪些历史特征。
                 - 不要输出投注建议，不要暗示稳赚或必出。

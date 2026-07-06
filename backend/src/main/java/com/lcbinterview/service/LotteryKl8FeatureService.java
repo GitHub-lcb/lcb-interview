@@ -35,7 +35,7 @@ public class LotteryKl8FeatureService {
     private static final int CANDIDATE_POOL_SIZE = 32;
     private static final int PAIR_HIGHLIGHT_SIZE = 20;
     private static final int PAIR_RECOMMENDATION_SIZE = 12;
-    private static final int SELECTED_PAIR_COUNT = 2;
+    private static final int NEIGHBOR_RECOMMENDATION_SIZE = 20;
     private static final int OPTIMIZED_GROUP_COUNT = 1;
     private static final List<String> BACKTEST_FACTORS = List.of(
             "hot", "missing", "trend", "decay", "pair", "balance");
@@ -118,7 +118,13 @@ public class LotteryKl8FeatureService {
         Map<String, Integer> pairCounts = buildPairCounts(drawSets);
         List<LotteryKl8PairProfile> pairHighlights = buildPairHighlights(pairCounts, drawSets.size(), frequency);
         LotteryKl8OptimizedPortfolio optimizedPortfolio = buildOptimizedPortfolio(
-                candidatePool, profiles, pairHighlights, pairCounts, drawSets.size(), calibrationToUse, backtestSummary);
+                candidatePool,
+                profiles,
+                pairCounts,
+                parseNumbers(draws.get(0).getNumbers()),
+                drawSets.size(),
+                calibrationToUse,
+                backtestSummary);
         List<String> analysisSections = buildAnalysisSections(
                 draws.size(),
                 hot,
@@ -701,8 +707,8 @@ public class LotteryKl8FeatureService {
     private LotteryKl8OptimizedPortfolio buildOptimizedPortfolio(
             List<LotteryKl8CandidateNumber> candidatePool,
             List<LotteryKl8NumberProfile> profiles,
-            List<LotteryKl8PairProfile> pairHighlights,
             Map<String, Integer> pairCounts,
+            List<Integer> latestNumbers,
             int total,
             LotteryKl8StrategyCalibration calibration,
             LotteryKl8BacktestSummary backtestSummary) {
@@ -713,20 +719,23 @@ public class LotteryKl8FeatureService {
                 .collect(Collectors.toMap(LotteryKl8NumberProfile::number, profile -> profile));
         List<LotteryKl8PairRecommendation> pairRecommendations = buildPairRecommendations(
                 candidatePool, profileByNumber, pairCounts, total, calibration, backtestSummary);
-        Map<String, Double> pairScores = pairHighlights.stream()
-                .collect(Collectors.toMap(
-                        pair -> pairKey(pair.leftNumber(), pair.rightNumber()),
-                        LotteryKl8PairProfile::score,
-                        (left, right) -> Math.max(left, right),
-                        LinkedHashMap::new));
+        List<LotteryKl8NeighborRecommendation> neighborDrafts = buildNeighborRecommendations(
+                latestNumbers, candidatePool, profileByNumber);
         List<Integer> candidates = candidatePool.stream()
                 .map(LotteryKl8CandidateNumber::number)
                 .distinct()
                 .toList();
-        Map<Integer, Integer> candidateRanks = new LinkedHashMap<>();
-        for (int index = 0; index < candidates.size(); index += 1) {
-            candidateRanks.put(candidates.get(index), index);
+        List<Integer> selectionPool = selectionPool(candidates, neighborDrafts);
+        Map<Integer, Integer> selectionRanks = new LinkedHashMap<>();
+        for (int index = 0; index < selectionPool.size(); index += 1) {
+            selectionRanks.put(selectionPool.get(index), index);
         }
+        Map<Integer, Double> neighborScores = neighborDrafts.stream()
+                .collect(Collectors.toMap(
+                        LotteryKl8NeighborRecommendation::number,
+                        LotteryKl8NeighborRecommendation::score,
+                        Math::max,
+                        LinkedHashMap::new));
         Map<Integer, Integer> reuseCounts = initNumberMap(0);
         List<LotteryKl8OptimizedGroup> groups = new ArrayList<>();
         Set<String> usedKeys = new HashSet<>();
@@ -734,42 +743,47 @@ public class LotteryKl8FeatureService {
         for (int groupIndex = 0; groupIndex < OPTIMIZED_GROUP_COUNT; groupIndex += 1) {
             List<Integer> selected = selectOptimizedNumbers(
                     groupIndex,
-                    candidates,
-                    candidateRanks,
+                    selectionPool,
+                    selectionRanks,
                     reuseCounts,
                     profileByNumber,
-                    pairScores,
-                    pairRecommendations,
+                    neighborScores,
                     backtestSummary.factorWeights());
-            List<Integer> unique = ensureUniqueGroup(selected, usedKeys, candidates, reuseCounts);
+            List<Integer> unique = ensureUniqueGroup(selected, usedKeys, selectionPool, reuseCounts);
             usedKeys.add(unique.toString());
             unique.forEach(number -> reuseCounts.put(number, reuseCounts.getOrDefault(number, 0) + 1));
-            double groupScore = optimizedGroupScore(unique, profileByNumber, pairScores, backtestSummary.factorWeights());
+            double groupScore = optimizedGroupScore(unique, profileByNumber, neighborScores, backtestSummary.factorWeights());
             groups.add(new LotteryKl8OptimizedGroup(
                     unique,
                     groupScore,
-                    "组合优化：结合滚动回测权重、候选池强度、组内共现和区间/奇偶/尾数分散生成，作为 Java 规则推荐结果。",
-                    optimizedEvidence(unique, groupScore, pairScores, reuseCounts, backtestSummary)));
+                    "组合优化：优先从上一期左右邻位中筛选，结合历史趋势、候选池强度和连号结构生成，作为 Java 规则推荐结果。",
+                    optimizedEvidence(unique, groupScore, neighborScores, reuseCounts, backtestSummary)));
         }
 
         double averageScore = groups.stream().mapToDouble(LotteryKl8OptimizedGroup::score).average().orElse(0);
         int maxReuse = reuseCounts.values().stream().max(Integer::compareTo).orElse(0);
+        Set<Integer> selectedNumbers = groups.stream()
+                .flatMap(group -> group.numbers().stream())
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        List<LotteryKl8NeighborRecommendation> neighborRecommendations = markSelectedNeighbors(neighborDrafts, selectedNumbers);
         Map<String, String> diagnostics = new LinkedHashMap<>();
         diagnostics.put("averageGroupScore", "%.2f".formatted(averageScore));
         diagnostics.put("groupCount", String.valueOf(groups.size()));
         diagnostics.put("maxNumberReuse", String.valueOf(maxReuse));
         diagnostics.put("backtestAverageHit", "%.2f".formatted(backtestSummary.averageHitCount()));
         diagnostics.put("topFactors", String.join("、", backtestSummary.topFactorNames()));
-        diagnostics.put("pairWeight", "%.2f".formatted(backtestSummary.factorWeights().pairWeight()));
-        diagnostics.put("selectedPairCount", String.valueOf(pairRecommendations.stream()
-                .filter(LotteryKl8PairRecommendation::selected)
+        diagnostics.put("neighborCandidateCount", String.valueOf(neighborDrafts.size()));
+        diagnostics.put("selectedNeighborCount", String.valueOf(neighborRecommendations.stream()
+                .filter(LotteryKl8NeighborRecommendation::selected)
                 .count()));
+        diagnostics.put("longestConsecutiveRun", String.valueOf(longestConsecutiveRun(groups.get(0).numbers())));
         return new LotteryKl8OptimizedPortfolio(
                 groups,
-                "组合优化完成：基于 %d 个候选号码和至少 2 组核心对子生成 1 组精选号码，平均组合分 %.2f，回测平均命中 %.2f。"
+                "组合优化完成：基于 %d 个候选号码和上一期左右邻位候选生成 1 组精选号码，优先保留连号结构，平均组合分 %.2f，回测平均命中 %.2f。"
                         .formatted(candidates.size(), averageScore, backtestSummary.averageHitCount()),
                 diagnostics,
-                pairRecommendations);
+                pairRecommendations,
+                neighborRecommendations);
     }
 
     private List<LotteryKl8PairRecommendation> buildPairRecommendations(
@@ -813,51 +827,17 @@ public class LotteryKl8FeatureService {
                         .thenComparing(PairDraft::leftNumber)
                         .thenComparing(PairDraft::rightNumber))
                 .toList();
-        Set<String> selectedKeys = selectCorePairKeys(ranked);
         return ranked.stream()
-                .filter(draft -> selectedKeys.contains(draft.key()))
-                .limit(SELECTED_PAIR_COUNT)
-                .map(draft -> pairRecommendation(draft, true))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), selected -> {
-                    List<LotteryKl8PairRecommendation> result = new ArrayList<>(selected);
-                    ranked.stream()
-                            .filter(draft -> !selectedKeys.contains(draft.key()))
-                            .limit(Math.max(0, PAIR_RECOMMENDATION_SIZE - result.size()))
-                            .map(draft -> pairRecommendation(draft, false))
-                            .forEach(result::add);
-                    return result;
-                }));
-    }
-
-    private Set<String> selectCorePairKeys(List<PairDraft> ranked) {
-        Set<String> keys = new HashSet<>();
-        Set<Integer> usedNumbers = new HashSet<>();
-        for (PairDraft draft : ranked) {
-            if (usedNumbers.contains(draft.leftNumber()) || usedNumbers.contains(draft.rightNumber())) {
-                continue;
-            }
-            keys.add(draft.key());
-            usedNumbers.add(draft.leftNumber());
-            usedNumbers.add(draft.rightNumber());
-            if (keys.size() >= SELECTED_PAIR_COUNT) {
-                return keys;
-            }
-        }
-        for (PairDraft draft : ranked) {
-            if (keys.add(draft.key()) && keys.size() >= SELECTED_PAIR_COUNT) {
-                return keys;
-            }
-        }
-        return keys;
+                .limit(PAIR_RECOMMENDATION_SIZE)
+                .map(draft -> pairRecommendation(draft, false))
+                .toList();
     }
 
     private LotteryKl8PairRecommendation pairRecommendation(PairDraft draft, boolean selected) {
-        String reason = selected
-                ? "核心对子：进入本次 5 码组合，后续按双中结果参与权重校准。"
-                : "备选对子：保留为共现参考，未进入本次最终组合。";
+        String reason = "共现参考：仅用于观察历史同期开出关系，不再强制进入本次最终 5 码。";
         List<String> evidence = List.of(
                 "样本内共现 %d 次，lift %.2f".formatted(draft.count(), draft.lift()),
-                "对子综合分 %.2f，已纳入历史命中反馈和回测共现权重。".formatted(draft.score()));
+                "共现综合分 %.2f，仅作为辅助解释，不作为硬性入选条件。".formatted(draft.score()));
         return new LotteryKl8PairRecommendation(
                 draft.leftNumber(),
                 draft.rightNumber(),
@@ -869,23 +849,134 @@ public class LotteryKl8FeatureService {
                 evidence);
     }
 
+    private List<LotteryKl8NeighborRecommendation> buildNeighborRecommendations(
+            List<Integer> latestNumbers,
+            List<LotteryKl8CandidateNumber> candidatePool,
+            Map<Integer, LotteryKl8NumberProfile> profileByNumber) {
+        if (latestNumbers == null || latestNumbers.isEmpty()) {
+            return List.of();
+        }
+        Set<Integer> candidateNumbers = candidatePool.stream()
+                .map(LotteryKl8CandidateNumber::number)
+                .collect(Collectors.toSet());
+        Map<Integer, LinkedHashSet<Integer>> anchorsByNumber = new LinkedHashMap<>();
+        Map<Integer, LinkedHashSet<String>> directionsByNumber = new LinkedHashMap<>();
+        for (Integer anchor : latestNumbers) {
+            if (anchor == null) {
+                continue;
+            }
+            registerNeighborCandidate(anchor - 1, anchor, "左邻", anchorsByNumber, directionsByNumber);
+            registerNeighborCandidate(anchor + 1, anchor, "右邻", anchorsByNumber, directionsByNumber);
+        }
+        return anchorsByNumber.entrySet().stream()
+                .map(entry -> {
+                    int number = entry.getKey();
+                    LotteryKl8NumberProfile profile = profileByNumber.get(number);
+                    double score = neighborScore(number, entry.getValue(), candidateNumbers, profile);
+                    List<Integer> anchors = List.copyOf(entry.getValue());
+                    List<String> directions = List.copyOf(directionsByNumber.getOrDefault(number, new LinkedHashSet<>()));
+                    List<String> evidence = neighborEvidence(profile, candidateNumbers.contains(number), anchors, directions);
+                    return new LotteryKl8NeighborRecommendation(
+                            number,
+                            anchors,
+                            directions,
+                            score,
+                            false,
+                            "上一期 %s 的%s候选，结合历史走势筛选。"
+                                    .formatted(anchors, String.join("/", directions)),
+                            evidence);
+                })
+                .sorted(Comparator.comparingDouble(LotteryKl8NeighborRecommendation::score).reversed()
+                        .thenComparing(LotteryKl8NeighborRecommendation::number))
+                .limit(NEIGHBOR_RECOMMENDATION_SIZE)
+                .toList();
+    }
+
+    private void registerNeighborCandidate(
+            int candidate,
+            int anchor,
+            String direction,
+            Map<Integer, LinkedHashSet<Integer>> anchorsByNumber,
+            Map<Integer, LinkedHashSet<String>> directionsByNumber) {
+        if (candidate < NUMBER_MIN || candidate > NUMBER_MAX) {
+            return;
+        }
+        anchorsByNumber.computeIfAbsent(candidate, ignored -> new LinkedHashSet<>()).add(anchor);
+        directionsByNumber.computeIfAbsent(candidate, ignored -> new LinkedHashSet<>()).add(direction);
+    }
+
+    private double neighborScore(
+            int number,
+            Set<Integer> anchors,
+            Set<Integer> candidateNumbers,
+            LotteryKl8NumberProfile profile) {
+        double profileScore = profile == null ? 0 : profile.compositeScore();
+        double trendBonus = profile == null ? 0 : Math.max(0, profile.trendScore()) * 60;
+        double decayBonus = profile == null ? 0 : profile.decayedFrequencyScore() * 18;
+        double omissionBonus = profile == null ? 0 : profile.omissionPressureScore() * 6;
+        double candidateBonus = candidateNumbers.contains(number) ? 14 : 0;
+        double anchorBonus = anchors.size() * 5;
+        return round(profileScore + trendBonus + decayBonus + omissionBonus + candidateBonus + anchorBonus);
+    }
+
+    private List<String> neighborEvidence(
+            LotteryKl8NumberProfile profile,
+            boolean inCandidatePool,
+            List<Integer> anchors,
+            List<String> directions) {
+        List<String> evidence = new ArrayList<>();
+        evidence.add("上一期邻位来源 " + anchors + "，方向 " + directions);
+        if (profile != null) {
+            evidence.add("综合分 %.2f，近30期出现 %d 次，趋势 %.2f。"
+                    .formatted(profile.compositeScore(), profile.recent30Frequency(), profile.trendScore()));
+            evidence.add("当前遗漏 %d，遗漏压力 %.2f，标签 %s。"
+                    .formatted(profile.currentMissing(), profile.omissionPressureScore(), profile.tags()));
+        }
+        if (inCandidatePool) {
+            evidence.add("该号码仍在本次综合候选池内，邻位信号和历史画像方向一致。");
+        }
+        return evidence;
+    }
+
+    private List<Integer> selectionPool(
+            List<Integer> candidates,
+            List<LotteryKl8NeighborRecommendation> neighborRecommendations) {
+        LinkedHashSet<Integer> pool = new LinkedHashSet<>();
+        neighborRecommendations.stream()
+                .map(LotteryKl8NeighborRecommendation::number)
+                .forEach(pool::add);
+        if (pool.size() < 5) {
+            candidates.forEach(pool::add);
+        }
+        return List.copyOf(pool);
+    }
+
+    private List<LotteryKl8NeighborRecommendation> markSelectedNeighbors(
+            List<LotteryKl8NeighborRecommendation> neighborRecommendations,
+            Set<Integer> selectedNumbers) {
+        return neighborRecommendations.stream()
+                .map(candidate -> new LotteryKl8NeighborRecommendation(
+                        candidate.number(),
+                        candidate.anchorNumbers(),
+                        candidate.directions(),
+                        candidate.score(),
+                        selectedNumbers.contains(candidate.number()),
+                        selectedNumbers.contains(candidate.number())
+                                ? "入选最终 5 码：" + candidate.reason()
+                                : candidate.reason(),
+                        candidate.evidence()))
+                .toList();
+    }
+
     private List<Integer> selectOptimizedNumbers(
             int groupIndex,
             List<Integer> candidates,
             Map<Integer, Integer> candidateRanks,
             Map<Integer, Integer> reuseCounts,
             Map<Integer, LotteryKl8NumberProfile> profileByNumber,
-            Map<String, Double> pairScores,
-            List<LotteryKl8PairRecommendation> pairRecommendations,
+            Map<Integer, Double> neighborScores,
             LotteryKl8BacktestFactorWeights factorWeights) {
-        LinkedHashSet<Integer> selectedNumbers = new LinkedHashSet<>();
-        pairRecommendations.stream()
-                .filter(LotteryKl8PairRecommendation::selected)
-                .limit(SELECTED_PAIR_COUNT)
-                .forEach(pair -> {
-                    selectedNumbers.add(pair.leftNumber());
-                    selectedNumbers.add(pair.rightNumber());
-                });
+        LinkedHashSet<Integer> selectedNumbers = new LinkedHashSet<>(bestConsecutiveSeed(candidates, neighborScores, profileByNumber));
         List<Integer> selected = new ArrayList<>(selectedNumbers);
         while (selected.size() < 5) {
             Integer next = candidates.stream()
@@ -897,7 +988,7 @@ public class LotteryKl8FeatureService {
                             candidateRanks,
                             reuseCounts,
                             profileByNumber,
-                            pairScores,
+                            neighborScores,
                             factorWeights)))
                     .orElse(null);
             if (next == null) {
@@ -915,7 +1006,7 @@ public class LotteryKl8FeatureService {
             Map<Integer, Integer> candidateRanks,
             Map<Integer, Integer> reuseCounts,
             Map<Integer, LotteryKl8NumberProfile> profileByNumber,
-            Map<String, Double> pairScores,
+            Map<Integer, Double> neighborScores,
             LotteryKl8BacktestFactorWeights factorWeights) {
         LotteryKl8NumberProfile profile = profileByNumber.get(number);
         double baseScore = profile == null ? 0 : profile.compositeScore();
@@ -924,13 +1015,54 @@ public class LotteryKl8FeatureService {
         long sameRangeCount = selected.stream().filter(existing -> rangeLabel(existing).equals(rangeLabel(number))).count();
         long sameParityCount = selected.stream().filter(existing -> existing % 2 == number % 2).count();
         long sameTailCount = selected.stream().filter(existing -> Math.floorMod(existing, 10) == Math.floorMod(number, 10)).count();
-        double structurePenalty = Math.max(0, sameRangeCount - 1) * 14
-                + Math.max(0, sameParityCount - 2) * 10
-                + sameTailCount * 6;
-        double pairBonus = Math.min(22, pairBonus(number, selected, pairScores) * factorWeights.pairWeight());
+        double structurePenalty = Math.max(0, sameRangeCount - 2) * 8
+                + Math.max(0, sameParityCount - 3) * 6
+                + sameTailCount * 4;
+        double neighborBonus = Math.min(45, neighborScores.getOrDefault(number, 0.0) * 0.35);
+        double consecutiveBonus = consecutiveBonus(number, selected) * factorWeights.trendWeight();
         int shiftedRank = Math.floorMod(candidateRanks.getOrDefault(number, 0) - groupIndex * 5, Math.max(1, candidatesSize(candidateRanks)));
         double rotationPenalty = shiftedRank * 0.12;
-        return baseScore + pairBonus - reusePenalty - structurePenalty - rotationPenalty;
+        return baseScore + neighborBonus + consecutiveBonus - reusePenalty - structurePenalty - rotationPenalty;
+    }
+
+    private List<Integer> bestConsecutiveSeed(
+            List<Integer> candidates,
+            Map<Integer, Double> neighborScores,
+            Map<Integer, LotteryKl8NumberProfile> profileByNumber) {
+        Set<Integer> candidateSet = new HashSet<>(candidates);
+        List<Integer> best = List.of();
+        double bestScore = 0;
+        for (int number = NUMBER_MIN; number <= NUMBER_MAX - 2; number += 1) {
+            if (!candidateSet.contains(number) || !candidateSet.contains(number + 1) || !candidateSet.contains(number + 2)) {
+                continue;
+            }
+            List<Integer> run = List.of(number, number + 1, number + 2);
+            double score = run.stream()
+                    .mapToDouble(item -> neighborScores.getOrDefault(item, 0.0)
+                            + (profileByNumber.get(item) == null ? 0 : profileByNumber.get(item).compositeScore()))
+                    .sum();
+            if (score > bestScore) {
+                best = run;
+                bestScore = score;
+            }
+        }
+        return best;
+    }
+
+    private double consecutiveBonus(int number, List<Integer> selected) {
+        if (selected.isEmpty()) {
+            return 0;
+        }
+        List<Integer> simulated = new ArrayList<>(selected);
+        simulated.add(number);
+        int longestRun = longestConsecutiveRun(simulated);
+        if (longestRun >= 3) {
+            return 34;
+        }
+        if (selected.contains(number - 1) || selected.contains(number + 1)) {
+            return 20;
+        }
+        return 0;
     }
 
     private int candidatesSize(Map<Integer, Integer> candidateRanks) {
@@ -965,7 +1097,7 @@ public class LotteryKl8FeatureService {
     private double optimizedGroupScore(
             List<Integer> numbers,
             Map<Integer, LotteryKl8NumberProfile> profileByNumber,
-            Map<String, Double> pairScores,
+            Map<Integer, Double> neighborScores,
             LotteryKl8BacktestFactorWeights factorWeights) {
         double base = numbers.stream()
                 .map(profileByNumber::get)
@@ -973,13 +1105,13 @@ public class LotteryKl8FeatureService {
                 .mapToDouble(LotteryKl8NumberProfile::compositeScore)
                 .average()
                 .orElse(0);
-        double pairBonus = 0;
-        for (int leftIndex = 0; leftIndex < numbers.size(); leftIndex += 1) {
-            for (int rightIndex = leftIndex + 1; rightIndex < numbers.size(); rightIndex += 1) {
-                pairBonus += pairScores.getOrDefault(pairKey(numbers.get(leftIndex), numbers.get(rightIndex)), 0.0);
-            }
-        }
-        return round(base + Math.min(20, pairBonus * factorWeights.pairWeight() / 4)
+        double neighborBonus = numbers.stream()
+                .mapToDouble(number -> neighborScores.getOrDefault(number, 0.0))
+                .average()
+                .orElse(0);
+        double runBonus = longestConsecutiveRun(numbers) >= 3 ? 18 : 0;
+        return round(base + Math.min(25, neighborBonus * 0.25)
+                + runBonus * factorWeights.trendWeight()
                 - structurePenalty(numbers));
     }
 
@@ -1001,27 +1133,38 @@ public class LotteryKl8FeatureService {
     private List<String> optimizedEvidence(
             List<Integer> numbers,
             double groupScore,
-            Map<String, Double> pairScores,
+            Map<Integer, Double> neighborScores,
             Map<Integer, Integer> reuseCounts,
             LotteryKl8BacktestSummary backtestSummary) {
-        double pairBonus = 0;
-        for (int leftIndex = 0; leftIndex < numbers.size(); leftIndex += 1) {
-            for (int rightIndex = leftIndex + 1; rightIndex < numbers.size(); rightIndex += 1) {
-                pairBonus += pairScores.getOrDefault(pairKey(numbers.get(leftIndex), numbers.get(rightIndex)), 0.0);
-            }
-        }
+        long neighborCount = numbers.stream().filter(neighborScores::containsKey).count();
         int maxReuse = numbers.stream().mapToInt(number -> reuseCounts.getOrDefault(number, 0)).max().orElse(0);
         return List.of(
                 "组合分 %.2f，回测平均命中 %.2f".formatted(groupScore, backtestSummary.averageHitCount()),
+                "上一期左右邻位入选 %d 个，最长连号 %d 个。".formatted(neighborCount, longestConsecutiveRun(numbers)),
                 "区间分布 " + rangeDistribution(numbers) + "，奇偶分布 " + parityDistribution(numbers),
-                "尾数分布 " + tailDistribution(numbers) + "，组内共现加成 %.2f".formatted(pairBonus),
+                "尾数分布 " + tailDistribution(numbers) + "，优先保留邻位趋势和连号结构。",
                 "本组号码最大复用次数 " + maxReuse + "，优先因子 " + backtestSummary.topFactorNames());
     }
 
-    private double pairBonus(int number, List<Integer> selected, Map<String, Double> pairScores) {
-        return selected.stream()
-                .mapToDouble(existing -> pairScores.getOrDefault(pairKey(number, existing), 0.0))
-                .sum();
+    private int longestConsecutiveRun(List<Integer> numbers) {
+        if (numbers.isEmpty()) {
+            return 0;
+        }
+        Set<Integer> numberSet = new HashSet<>(numbers);
+        int longest = 1;
+        for (Integer number : numberSet) {
+            if (numberSet.contains(number - 1)) {
+                continue;
+            }
+            int length = 1;
+            int next = number + 1;
+            while (numberSet.contains(next)) {
+                length += 1;
+                next += 1;
+            }
+            longest = Math.max(longest, length);
+        }
+        return longest;
     }
 
     private Map<String, Long> rangeDistribution(List<Integer> numbers) {
@@ -1087,11 +1230,11 @@ public class LotteryKl8FeatureService {
         sections.add("样本层：本次使用近 %d 期开奖记录，按 30/60/全量窗口同时观察，避免只看单一时间段。".formatted(count));
         sections.add("号码层：热号前列 %s，冷号前列 %s，候选池优先保留热号、趋势上行和高遗漏回补信号。"
                 .formatted(hot.subList(0, Math.min(8, hot.size())), cold.subList(0, Math.min(8, cold.size()))));
-        sections.add("结构层：区间分布 %s，尾数分布高位 %s，组合时会约束区间、奇偶和尾数不要过度集中。"
+        sections.add("结构层：区间分布 %s，尾数分布高位 %s，组合时优先观察上一期左右邻位和连号结构，再约束区间、奇偶和尾数不过度集中。"
                 .formatted(ranges, topEntries(tailCounts, 4)));
         if (!pairHighlights.isEmpty()) {
             LotteryKl8PairProfile pair = pairHighlights.get(0);
-            sections.add("共现层：%d-%d 在样本内共现 %d 次，lift %.2f，只作为组合参考，不直接视为因果。"
+            sections.add("共现参考：%d-%d 在样本内共现 %d 次，lift %.2f，仅用于观察历史关系，不再强制进入最终 5 码。"
                     .formatted(pair.leftNumber(), pair.rightNumber(), pair.count(), pair.lift()));
         }
         sections.add("候选池：当前保留 %d 个候选号码，前列候选 %s。"
