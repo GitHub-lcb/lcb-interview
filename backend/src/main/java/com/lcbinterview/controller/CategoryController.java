@@ -1,7 +1,7 @@
 package com.lcbinterview.controller;
 
 import com.lcbinterview.common.ApiResponse;
-import com.lcbinterview.model.Category;
+import com.lcbinterview.dto.CategoryVO;
 import com.lcbinterview.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,16 +26,15 @@ public class CategoryController {
 
     @Operation(summary = "获取全部分类")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Category>>> getAll() {
-        List<Category> list = categoryService.getAll();
+    public ResponseEntity<ApiResponse<List<CategoryVO>>> getAll() {
+        List<CategoryVO> list = categoryService.getAllVos();
         log.info("查询全部分类，共 {} 条", list.size());
         return ResponseEntity.ok(ApiResponse.success(list));
     }
 
     @Operation(summary = "获取分类详情")
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Category>> getById(@PathVariable Long id) {
-        Category category = categoryService.getById(id);
-        return ResponseEntity.ok(ApiResponse.success(category));
+    public ResponseEntity<ApiResponse<CategoryVO>> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success(categoryService.getVoById(id)));
     }
 }

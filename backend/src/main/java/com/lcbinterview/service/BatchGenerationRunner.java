@@ -7,6 +7,7 @@ import com.lcbinterview.mapper.QuestionMapper;
 import com.lcbinterview.model.Category;
 import com.lcbinterview.mapper.CategoryMapper;
 import com.lcbinterview.model.Question;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -101,6 +102,14 @@ public class BatchGenerationRunner {
      */
     public BatchProgressVO getProgress() {
         return progress.get();
+    }
+
+    /**
+     * 应用关闭时停止批量生成后台线程，避免任务线程阻塞 JVM 退出。
+     */
+    @PreDestroy
+    void shutdownExecutor() {
+        executor.shutdownNow();
     }
 
     private void runBatch(int countPerCategory, String categoryName, int delaySeconds) {

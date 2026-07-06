@@ -10,6 +10,7 @@ import com.lcbinterview.mapper.CategoryMapper;
 import com.lcbinterview.mapper.QuestionMapper;
 import com.lcbinterview.model.Category;
 import com.lcbinterview.model.Question;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,6 +60,14 @@ public class AiQuestionService {
      */
     public AdminAiConfigStatusVO configStatus() {
         return aiRuntimeConfigService.legacyStatus();
+    }
+
+    /**
+     * 应用关闭时停止 SSE 后台调度线程，避免容器退出后仍残留非托管线程。
+     */
+    @PreDestroy
+    void shutdownScheduler() {
+        scheduler.shutdownNow();
     }
 
     // ==================== 同步方法（供 BatchGenerationRunner 使用） ====================

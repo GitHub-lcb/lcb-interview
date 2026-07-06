@@ -13,6 +13,8 @@ import com.lcbinterview.service.AiQuestionService;
 import com.lcbinterview.service.AiRuntimeConfigService;
 import com.lcbinterview.service.BatchFillAnswerRunner;
 import com.lcbinterview.service.BatchGenerationRunner;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -24,6 +26,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  * AI 题目生成接口。所有 AI 操作均通过 SSE 流式推送进度和思考过程。
  * @author chongan
  */
+@Tag(name = "管理端 AI 生成")
 @RestController
 @RequestMapping("/api/admin/ai")
 @RequiredArgsConstructor
@@ -42,6 +45,7 @@ public class AiGenerationController {
      *
      * @return AI 配置状态
      */
+    @Operation(summary = "查询 AI 配置状态")
     @GetMapping("/config-status")
     public ResponseEntity<ApiResponse<AdminAiConfigStatusVO>> configStatus() {
         return ResponseEntity.ok(ApiResponse.success(aiQuestionService.configStatus()));
@@ -52,6 +56,7 @@ public class AiGenerationController {
      *
      * @return AI 运行时配置
      */
+    @Operation(summary = "查询 AI 运行时配置")
     @GetMapping("/config")
     public ResponseEntity<ApiResponse<AdminAiConfigVO>> config() {
         return ResponseEntity.ok(ApiResponse.success(aiRuntimeConfigService.publicConfig()));
@@ -63,6 +68,7 @@ public class AiGenerationController {
      * @param request AI 配置更新请求
      * @return 保存后的 AI 运行时配置
      */
+    @Operation(summary = "更新 AI 运行时配置")
     @PutMapping("/config")
     public ResponseEntity<ApiResponse<AdminAiConfigVO>> updateConfig(
             @Valid @RequestBody AdminAiConfigUpdateRequest request) {
@@ -78,6 +84,7 @@ public class AiGenerationController {
      *   es.addEventListener('question_result', e => { JSON.parse(e.data) })
      *   es.addEventListener('done', e => { es.close() })
      */
+    @Operation(summary = "SSE 方式生成题目答案")
     @GetMapping(value = "/generate-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter generateStream(
             @RequestParam String category,
@@ -97,6 +104,7 @@ public class AiGenerationController {
     /**
      * SSE 流式补答案。逐题发送，实时推送 AI 思考过程和补全内容。
      */
+    @Operation(summary = "SSE 方式补齐答案字段")
     @GetMapping(value = "/fill-answer-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter fillAnswerStream(
             @RequestParam(required = false) Long categoryId,
@@ -113,6 +121,7 @@ public class AiGenerationController {
     /**
      * SSE 流式重写已发布题目答案。生成结果进入草稿审核，不直接覆盖线上答案。
      */
+    @Operation(summary = "SSE 方式重写已发布题目答案")
     @GetMapping(value = "/rewrite-published-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter rewritePublishedStream(
             @RequestParam(required = false) Long categoryId,
@@ -130,6 +139,7 @@ public class AiGenerationController {
     /**
      * 批量生成所有分类的题目。异步执行，通过日志和 /batch/status 查看进度。
      */
+    @Operation(summary = "启动批量生成任务")
     @PostMapping("/batch")
     public ResponseEntity<ApiResponse<String>> batchGenerate(@Valid @RequestBody BatchGenerationRequest req) {
         AdminAiConfigStatusVO configStatus = aiQuestionService.configStatus();
@@ -147,6 +157,7 @@ public class AiGenerationController {
     /**
      * 查询批量任务进度。
      */
+    @Operation(summary = "查询批量生成进度")
     @GetMapping("/batch/status")
     public ResponseEntity<ApiResponse<BatchProgressVO>> batchStatus() {
         return ResponseEntity.ok(ApiResponse.success(batchRunner.getProgress()));
@@ -158,6 +169,7 @@ public class AiGenerationController {
      * @param req 批量补答案请求
      * @return 启动结果
      */
+    @Operation(summary = "启动批量补答案任务")
     @PostMapping("/fill-answer-batch")
     public ResponseEntity<ApiResponse<String>> batchFillAnswers(@Valid @RequestBody BatchFillAnswerRequest req) {
         AdminAiConfigStatusVO configStatus = aiQuestionService.configStatus();
@@ -177,6 +189,7 @@ public class AiGenerationController {
      *
      * @return 当前任务进度
      */
+    @Operation(summary = "查询批量补答案进度")
     @GetMapping("/fill-answer-batch/status")
     public ResponseEntity<ApiResponse<BatchProgressVO>> batchFillAnswerStatus() {
         return ResponseEntity.ok(ApiResponse.success(batchFillAnswerRunner.getProgress()));

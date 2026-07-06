@@ -8,6 +8,7 @@ import com.lcbinterview.config.AdminTokenFilter;
 import com.lcbinterview.mapper.QuestionMapper;
 import com.lcbinterview.model.Question;
 import com.lcbinterview.service.AiAnswerQualityPolicy;
+import com.lcbinterview.service.QuestionAdminService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * 管理端草稿审核接口测试，确保空答案草稿不会被发布到公开题库。
  */
 @WebMvcTest(QuestionAdminController.class)
-@Import(AdminTokenFilter.class)
+@Import({AdminTokenFilter.class, QuestionAdminService.class})
 @TestPropertySource(properties = "admin.token=test-token")
 class QuestionAdminControllerTest {
 

@@ -2,6 +2,7 @@ package com.lcbinterview.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lcbinterview.common.BusinessException;
+import com.lcbinterview.dto.CategoryVO;
 import com.lcbinterview.mapper.CategoryMapper;
 import com.lcbinterview.model.Category;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +37,19 @@ public class CategoryService {
     }
 
     /**
+     * 获取全部分类展示对象。
+     *
+     * @return 分类展示对象列表
+     */
+    public List<CategoryVO> getAllVos() {
+        return getAll().stream().map(CategoryVO::from).toList();
+    }
+
+    /**
      * 根据 ID 获取分类详情。
      *
+     * @param id 分类 ID
+     * @return 分类实体
      * @throws BusinessException 分类不存在时抛 404
      */
     public Category getById(Long id) {
@@ -47,5 +59,15 @@ public class CategoryService {
             throw new BusinessException(404, "分类不存在");
         }
         return category;
+    }
+
+    /**
+     * 根据 ID 获取分类展示对象。
+     *
+     * @param id 分类 ID
+     * @return 分类展示对象
+     */
+    public CategoryVO getVoById(Long id) {
+        return CategoryVO.from(getById(id));
     }
 }

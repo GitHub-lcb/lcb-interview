@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lcbinterview.dto.BatchProgressVO;
 import com.lcbinterview.mapper.QuestionMapper;
 import com.lcbinterview.model.Question;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -96,6 +97,14 @@ public class BatchFillAnswerRunner {
      */
     public BatchProgressVO getProgress() {
         return progress.get();
+    }
+
+    /**
+     * 应用关闭时停止批量补答案调度线程，避免异步任务线程脱离 Spring 生命周期。
+     */
+    @PreDestroy
+    void shutdownExecutor() {
+        executor.shutdownNow();
     }
 
     private void runBatch(Long categoryId, Integer maxQuestions, int delaySeconds, int concurrency) {
