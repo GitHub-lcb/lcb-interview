@@ -252,7 +252,7 @@ UPDATE question SET status = 'PUBLISHED' WHERE status = 'DRAFT' AND source = 'AI
 
 | 分类 | Slug | 抓取题目数 | 包含子题库 |
 |------|------|-----------|-----------|
-| Java 基础 | java-basics | 237 | Java面试题/面试鸭Java后端/手写代码 |
+| Java 基础 | java-basics | 237 | Java面试题/Java后端题库/手写代码 |
 | Java 集合 | java-collections | 26 | |
 | Java 并发 | java-concurrency | 63 | |
 | JVM | jvm | 46 | |

@@ -2,11 +2,11 @@
 
 ## Background
 
-The product goal is no longer "a local clone of mianshiya.com". The site must become a free interview preparation system that is clearly stronger in the areas a job seeker feels every day: no paywall, structured answers, study routing, simulated interview practice, review queues, and practical interview scenarios.
+The product goal is no longer a generic local question-bank clone. The site must become a free interview preparation system that is clearly stronger in the areas a job seeker feels every day: no paywall, structured answers, study routing, simulated interview practice, review queues, and practical interview scenarios.
 
-Current public competitor signals checked on 2026-06-17:
+Current public question-bank product signals checked on 2026-06-17:
 
-- mianshiya.com advertises 1w+ interview questions, question banks, study routes, an AI interview entry, spring recruitment hot topics, real interview experiences, a community, mini program access, and membership.
+- Public question-bank products commonly advertise large interview-question collections, question banks, study routes, AI interview entries, spring recruitment hot topics, real interview experiences, communities, mini program access, and membership.
 - Some public question/tag pages show VIP labels on questions.
 - The about page positions the product around broad coverage, original explanations, continuous updates, and mobile learning.
 

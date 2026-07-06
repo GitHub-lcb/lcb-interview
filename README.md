@@ -232,7 +232,7 @@ npm run dev
 mysql -u root -p lcb_interview < backend/scripts/sql/init.sql
 ```
 
-`init.sql` 包含建表 + 46 个分类 + 71 个标签 + 6386 道 DRAFT 题目。
+`init.sql` 包含建表 + 46 个分类 + 71 个标签 + 6386 道 DRAFT 题目。初始数据仅整理题目标题、分类和标签，答案字段通过站内自研流程补齐。
 
 ### AI 填充答案
 

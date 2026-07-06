@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS question_tag (
 -- 分类 & 标签数据
 -- =============================================
 
--- 分类（46 个，对齐 mianshiya.com /category/hot）
+-- 分类（46 个，按公开面试题方向整理）
 
 -- =============================================
 INSERT INTO category (name, icon, description, sort_order, create_time, update_time) VALUES
@@ -287,7 +287,7 @@ INSERT INTO tag (id, name, create_time, update_time, is_deleted) VALUES
 
 -- =============================================
 -- 6386 道 DRAFT 题目（含题目-标签关联）
--- 由 fetch-questions.js 从 mianshiya.com 抓取生成
+-- 题目标题由 fetch-questions.js 从公开资料整理生成，答案内容后续由站内自研流程补齐
 -- =============================================
 SET NAMES utf8mb4;
 
