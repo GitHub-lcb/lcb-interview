@@ -720,6 +720,295 @@ p {
   font-weight: 700;
 }
 
+.lottery-trend-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.lottery-trend-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  background: #FAFAF9;
+}
+
+.lottery-trend-head h4 {
+  margin: 0 0 4px;
+  color: #18181B;
+  font-size: 14px;
+}
+
+.lottery-trend-head p {
+  max-width: 640px;
+  margin: 0;
+  color: #52525B;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.lottery-trend-summary,
+.lottery-trend-legend,
+.lottery-trend-runs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lottery-trend-summary {
+  justify-content: flex-end;
+  min-width: 260px;
+}
+
+.lottery-trend-summary span,
+.lottery-trend-runs span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: #334155;
+  border: 1px solid #E2E8F0;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.lottery-trend-legend span {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  color: #52525B;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.lottery-trend-legend i {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  border: 1px solid #CBD5E1;
+  background: #F8FAFC;
+}
+
+.lottery-trend-legend i.is-hit {
+  background: #DBEAFE;
+  border-color: #60A5FA;
+}
+
+.lottery-trend-legend i.is-anchor {
+  background: #FDE68A;
+  border-color: #F59E0B;
+}
+
+.lottery-trend-legend i.is-neighbor {
+  background: #DCFCE7;
+  border-color: #22C55E;
+}
+
+.lottery-trend-legend i.is-recommended {
+  background: #FED7AA;
+  border-color: #F97316;
+}
+
+.lottery-trend-legend i.is-consecutive {
+  background: #EDE9FE;
+  border-color: #8B5CF6;
+}
+
+.lottery-trend-runs span {
+  background: #F5F3FF;
+  color: #5B21B6;
+  border-color: #DDD6FE;
+}
+
+.lottery-number-insight {
+  display: grid;
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid #BFDBFE;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 100%);
+}
+
+.lottery-number-insight-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.lottery-number-insight-head h4 {
+  margin: 0 0 4px;
+  color: #1E3A8A;
+  font-size: 14px;
+}
+
+.lottery-number-insight-head p,
+.lottery-number-insight > p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.lottery-number-insight-head strong {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #111827;
+  color: #FACC15;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.lottery-number-insight-metrics,
+.lottery-number-insight-tags,
+.lottery-number-insight-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lottery-number-insight-metrics span,
+.lottery-number-insight-tags span,
+.lottery-number-insight-sources span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.lottery-number-insight-metrics span {
+  background: #FFFFFF;
+  color: #334155;
+  border: 1px solid #BFDBFE;
+}
+
+.lottery-number-insight-tags span {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.lottery-number-insight-sources span {
+  background: #FFF7ED;
+  color: #9A3412;
+  border: 1px solid #FED7AA;
+}
+
+.lottery-trend-scroll {
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.lottery-trend-matrix {
+  display: grid;
+  gap: 5px;
+  min-width: 1820px;
+}
+
+.lottery-trend-row {
+  display: grid;
+  grid-template-columns: 130px repeat(80, 20px);
+  gap: 2px;
+  align-items: center;
+}
+
+.lottery-trend-row.is-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding-bottom: 2px;
+  background: #FFFFFF;
+}
+
+.lottery-trend-row.is-header span {
+  color: #64748B;
+  font-size: 10px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.lottery-trend-issue {
+  display: grid;
+  min-width: 0;
+  padding-right: 6px;
+}
+
+.lottery-trend-issue strong,
+.lottery-trend-issue small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lottery-trend-issue strong {
+  color: #18181B;
+  font-size: 12px;
+}
+
+.lottery-trend-issue small {
+  color: #71717A;
+  font-size: 10px;
+}
+
+.lottery-trend-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #E4E4E7;
+  border-radius: 5px;
+  background: #FFFFFF;
+  color: transparent;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.lottery-trend-cell:hover,
+.lottery-trend-cell:focus-visible {
+  border-color: #2563EB;
+  color: #1D4ED8;
+  outline: 2px solid #93C5FD;
+  outline-offset: 1px;
+}
+
+.lottery-trend-cell.is-hit {
+  background: #DBEAFE;
+  border-color: #60A5FA;
+  color: #1D4ED8;
+}
+
+.lottery-trend-cell.is-anchor {
+  box-shadow: inset 0 0 0 2px #F59E0B;
+}
+
+.lottery-trend-cell.is-neighbor {
+  border-color: #22C55E;
+}
+
+.lottery-trend-cell.is-neighbor:not(.is-hit) {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.lottery-trend-cell.is-recommended {
+  outline: 2px solid #F97316;
+  outline-offset: -2px;
+}
+
+.lottery-trend-cell.is-consecutive {
+  box-shadow: inset 0 0 0 2px #8B5CF6;
+}
+
 .lottery-feedback-panel {
   display: grid;
   gap: 10px;
@@ -15717,6 +16006,15 @@ p {
   .lottery-backtest-card,
   .lottery-portfolio-card {
     grid-column: span 1;
+  }
+
+  .lottery-trend-head {
+    display: grid;
+  }
+
+  .lottery-trend-summary {
+    justify-content: flex-start;
+    min-width: 0;
   }
 
   .free-promise-band {

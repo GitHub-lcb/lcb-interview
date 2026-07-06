@@ -11,7 +11,7 @@ import {
   syncKl8Draws,
 } from '../api/tools'
 import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
-import type { LotteryKl8Recommendation, PageResult } from '../types'
+import type { LotteryKl8Draw, LotteryKl8Recommendation, PageResult } from '../types'
 
 vi.mock('../api/tools', () => ({
   createKl8Recommendation: vi.fn(),
@@ -178,5 +178,93 @@ describe('LotteryKl8Panel', () => {
     const feedbackTabs = screen.getAllByRole('tab', { name: /命中反馈/ })
     await userEvent.click(feedbackTabs[feedbackTabs.length - 1])
     expect(screen.queryByText('对子命中反馈')).not.toBeInTheDocument()
+  })
+
+  it('shows trend matrix with latest neighbors recommended numbers and consecutive runs', async () => {
+    const draws: LotteryKl8Draw[] = [
+      {
+        issueNo: '20260629003',
+        drawDate: '2026-06-29',
+        numbers: [9, 10, 11, 20, 21, 22, 34, 35, 50, 51, 60, 61, 62, 63, 64, 70, 71, 72, 73, 74],
+        sourceName: 'test',
+      },
+      {
+        issueNo: '20260629002',
+        drawDate: '2026-06-28',
+        numbers: [10, 34, 45, 46, 47, 48, 49, 52, 53, 54, 55, 56, 57, 58, 59, 65, 66, 67, 68, 69],
+        sourceName: 'test',
+      },
+      {
+        issueNo: '20260629001',
+        drawDate: '2026-06-27',
+        numbers: [1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 36, 37, 38, 39, 40],
+        sourceName: 'test',
+      },
+    ]
+    const recommendation: LotteryKl8Recommendation = {
+      id: 3,
+      source: 'RULE_BASED',
+      baseIssueCount: 2000,
+      latestIssueNo: '20260629002',
+      groups: [
+        { numbers: [9, 10, 11, 33, 35], reason: '邻位连号生成 5 码' },
+      ],
+      featureSummary: '测试摘要',
+      analysisJson: JSON.stringify({
+        confidenceLabel: '中',
+        analysis: {
+          overview: '规则推荐',
+          featureSignals: [],
+          combinationLogic: [],
+          riskWarnings: [],
+        },
+        optimizedPortfolio: {
+          summary: '基于上一期左右邻位候选和连号结构生成 1 组精选号码。',
+          groups: [
+            { numbers: [9, 10, 11, 33, 35], score: 91.5, reason: '邻位连号', evidence: ['形成 9、10、11 三连号'] },
+          ],
+          diagnostics: { selectedNeighborCount: '5', longestConsecutiveRun: '3' },
+          neighborRecommendations: [
+            { number: 9, anchorNumbers: [10], directions: ['左邻'], score: 93, selected: true, reason: '上一期 10 左邻', evidence: ['来自上一期 10 的左邻位'] },
+            { number: 11, anchorNumbers: [10], directions: ['右邻'], score: 92, selected: true, reason: '上一期 10 右邻', evidence: ['来自上一期 10 的右邻位'] },
+            { number: 33, anchorNumbers: [34], directions: ['左邻'], score: 91, selected: true, reason: '上一期 34 左邻', evidence: ['来自上一期 34 的左邻位'] },
+            { number: 35, anchorNumbers: [34], directions: ['右邻'], score: 90, selected: true, reason: '上一期 34 右邻', evidence: ['来自上一期 34 的右邻位'] },
+          ],
+        },
+      }),
+      candidatePoolJson: JSON.stringify([
+        { number: 9, score: 88.8, roles: ['邻位候选', '趋势回补'], evidence: '近期开奖邻位回补，走势仍在抬升' },
+      ]),
+      disclaimer: '测试免责声明',
+      createdAt: '2026-06-29T10:00:00',
+    }
+    vi.mocked(listKl8Draws).mockResolvedValue(pageOf(draws, 30))
+    vi.mocked(listKl8Recommendations).mockResolvedValue(pageOf([recommendation], 8))
+
+    render(<LotteryKl8Panel />)
+
+    const trendTabs = await screen.findAllByRole('tab', { name: /走势分析/ })
+    await userEvent.click(trendTabs[trendTabs.length - 1])
+
+    expect(screen.getByText('近 3 期号码走势')).toBeInTheDocument()
+    expect(screen.getByText('上一期 20260629002')).toBeInTheDocument()
+    expect(screen.getByText('邻位候选 4 个')).toBeInTheDocument()
+    expect(screen.getByText('推荐号码 5 个')).toBeInTheDocument()
+    expect(screen.getByText('最长连号 3 连')).toBeInTheDocument()
+    const trendNumberCell = screen.getByLabelText('号码 9 在期号 20260629003，命中，推荐，邻位候选，连号')
+    expect(trendNumberCell).toBeInTheDocument()
+    expect(screen.getByText('09-10-11')).toBeInTheDocument()
+
+    await userEvent.click(trendNumberCell)
+
+    expect(screen.getByText('号码 09 详情')).toBeInTheDocument()
+    expect(screen.getByText('近 3 期开出 1 次')).toBeInTheDocument()
+    expect(screen.getByText('最近出现 20260629003')).toBeInTheDocument()
+    expect(screen.getByText('当前推荐')).toBeInTheDocument()
+    expect(screen.getAllByText('邻位候选').length).toBeGreaterThan(0)
+    expect(screen.getByText('连号结构')).toBeInTheDocument()
+    expect(screen.getByText('上一期 10 左邻')).toBeInTheDocument()
+    expect(screen.getByText('候选分 88.80')).toBeInTheDocument()
+    expect(screen.getByText('近期开奖邻位回补，走势仍在抬升')).toBeInTheDocument()
   })
 })
