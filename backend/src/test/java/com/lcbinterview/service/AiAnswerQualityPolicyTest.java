@@ -212,9 +212,20 @@ class AiAnswerQualityPolicyTest {
 
         assertThat(report.passed()).isFalse();
         assertThat(report.score()).isLessThan(85);
-        assertThat(report.issues()).contains("title 题目标题缺失或过短");
+        assertThat(report.issues()).doesNotContain("title 题目标题缺失或过短");
         assertThat(report.issues()).contains("difficulty 难度必须是 EASY/MEDIUM/HARD");
         assertThat(report.issues()).contains("content 内容少于 500 字");
+    }
+
+    @Test
+    void evaluateGeneratedQuestionAllowsShortTitleWhenContentIsQualified() {
+        Question generated = highQualityGeneratedQuestion("JVM");
+
+        AiAnswerQualityPolicy.QualityReport report =
+                policy.evaluateGeneratedQuestion("JVM", generated);
+
+        assertThat(report.issues()).doesNotContain("title 题目标题缺失或过短");
+        assertThat(report.passed()).isTrue();
     }
 
     @Test
@@ -297,6 +308,24 @@ class AiAnswerQualityPolicyTest {
         Question question = new Question();
         question.setTitle("线程池参数如何配置？");
         question.setDifficulty("HARD");
+        return question;
+    }
+
+    private Question highQualityGeneratedQuestion(String title) {
+        Question question = new Question();
+        JsonNode answer = highQualityAnswerWithDiagram(validQuotedFlowchart());
+        question.setTitle(title);
+        question.setDifficulty("MEDIUM");
+        question.setSummary(answer.path("summary").asText());
+        question.setContent(answer.path("content").asText());
+        question.setAnswer(answer.path("content").asText());
+        question.setPrinciple(answer.path("principle").asText());
+        question.setComparison(answer.path("comparison").asText());
+        question.setScenario(answer.path("scenario").asText());
+        question.setRisk(answer.path("risk").asText());
+        question.setProjectExp(answer.path("project_exp").asText());
+        question.setCodeExamples(answer.path("code_examples").toString());
+        question.setDiagrams(answer.path("diagrams").toString());
         return question;
     }
 

@@ -237,10 +237,6 @@ public class AiAnswerQualityPolicy {
         List<String> issues = new ArrayList<>(answerReport.issues());
         int score = answerReport.score();
 
-        if (question.getTitle() == null || question.getTitle().trim().length() < 8) {
-            issues.add("title 题目标题缺失或过短");
-            score -= 15;
-        }
         if (!VALID_DIFFICULTIES.contains(textOrDefault(question.getDifficulty(), ""))) {
             issues.add("difficulty 难度必须是 EASY/MEDIUM/HARD");
             score -= 5;
