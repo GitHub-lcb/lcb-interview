@@ -5,11 +5,12 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.lcbinterview.common.ApiResponse;
+import com.lcbinterview.common.BusinessException;
 import com.lcbinterview.dto.QuestionAdminVO;
 import com.lcbinterview.mapper.QuestionMapper;
 import com.lcbinterview.model.Question;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +19,11 @@ import java.util.List;
 
 /**
  * 管理端题目服务，负责草稿查询、编辑、审核发布和驳回等后台业务规则。
+ * <p>
+ * 分层约定：本类返回业务对象或抛出 {@link BusinessException}，由 Controller 层包装 {@code ApiResponse}。
+ * @author chongan
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class QuestionAdminService {
@@ -33,6 +38,7 @@ public class QuestionAdminService {
 
     private final QuestionMapper questionMapper;
     private final AiAnswerQualityPolicy aiAnswerQualityPolicy;
+    private final QuestionService questionService;
 
     /**
      * 分页查询草稿题目，并按审核风险和内容状态过滤。
@@ -68,61 +74,74 @@ public class QuestionAdminService {
     }
 
     /**
-     * 查询草稿题目详情。
+     * 查询草稿题目详情。仅允许查看 DRAFT 状态的题目。
      *
      * @param id 题目 ID
-     * @return 草稿详情响应
+     * @return 草稿详情 VO
+     * @throws BusinessException 题目不存在或非草稿状态时抛出
      */
     @Transactional(readOnly = true)
-    public ApiResponse<QuestionAdminVO> getDraft(Long id) {
+    public QuestionAdminVO getDraft(Long id) {
         Question q = questionMapper.selectById(id);
         if (q == null) {
-            return ApiResponse.error(404, "题目不存在");
+            throw new BusinessException(404, "题目不存在");
         }
-        return ApiResponse.success(QuestionAdminVO.from(q));
+        if (!STATUS_DRAFT.equals(q.getStatus())) {
+            throw new BusinessException(400, "该题目不是草稿状态，无法在草稿审核中查看");
+        }
+        return QuestionAdminVO.from(q);
     }
 
     /**
-     * 更新草稿题目内容。
+     * 更新草稿题目内容。仅允许更新 DRAFT 状态的题目。
      *
      * @param id 题目 ID
      * @param question 草稿内容
-     * @return 更新结果
+     * @throws BusinessException 题目不存在或非草稿状态时抛出
      */
     @Transactional
-    public ApiResponse<Void> updateDraft(Long id, Question question) {
+    public void updateDraft(Long id, Question question) {
+        Question existing = questionMapper.selectById(id);
+        if (existing == null) {
+            throw new BusinessException(404, "题目不存在");
+        }
+        if (!STATUS_DRAFT.equals(existing.getStatus())) {
+            throw new BusinessException(400, "该题目不是草稿状态，无法编辑");
+        }
         question.setId(id);
         questionMapper.updateById(question);
-        return ApiResponse.success(null);
     }
 
     /**
      * 审核通过草稿，普通草稿发布为 PUBLISHED，AI 重写草稿应用到原题后删除审核载体。
+     * 发布成功后失效热门题目缓存。
      *
      * @param id 草稿题目 ID
-     * @return 审核结果
+     * @throws BusinessException 题目不存在、答案为空或质量未达标时抛出
      */
     @Transactional
-    public ApiResponse<Void> approve(Long id) {
+    public void approve(Long id) {
         Question existing = questionMapper.selectById(id);
         if (existing == null) {
-            return ApiResponse.error(404, "题目不存在");
+            throw new BusinessException(404, "题目不存在");
         }
         if (isContentBlank(existing)) {
-            return ApiResponse.error(400, "题目答案为空，不能发布");
+            throw new BusinessException(400, "题目答案为空，不能发布");
         }
         AiAnswerQualityPolicy.QualityReport qualityReport = evaluateDraftQuality(existing);
         if (!qualityReport.passed()) {
-            return ApiResponse.error(400, "题目质量未达标：" + summarizeQualityIssues(qualityReport));
+            throw new BusinessException(400, "题目质量未达标：" + summarizeQualityIssues(qualityReport));
         }
         if (isRewriteDraft(existing)) {
-            return applyRewriteDraft(existing);
+            applyRewriteDraft(existing);
+        } else {
+            Question q = new Question();
+            q.setId(id);
+            q.setStatus("PUBLISHED");
+            questionMapper.updateById(q);
         }
-        Question q = new Question();
-        q.setId(id);
-        q.setStatus("PUBLISHED");
-        questionMapper.updateById(q);
-        return ApiResponse.success(null);
+        // 发布成功后失效热门题目缓存，保证排行及时更新
+        questionService.evictHotQuestionCache();
     }
 
     /**
@@ -130,10 +149,17 @@ public class QuestionAdminService {
      *
      * @param id 题目 ID
      * @param request 可选请求体，clearContent=true 时清空答案
-     * @return 驳回结果
+     * @throws BusinessException 题目不存在或非草稿状态时抛出
      */
     @Transactional
-    public ApiResponse<Void> reject(Long id, JsonNode request) {
+    public void reject(Long id, JsonNode request) {
+        Question existing = questionMapper.selectById(id);
+        if (existing == null) {
+            throw new BusinessException(404, "题目不存在");
+        }
+        if (!STATUS_DRAFT.equals(existing.getStatus())) {
+            throw new BusinessException(400, "该题目不是草稿状态，无法驳回");
+        }
         if (shouldClearContent(request)) {
             questionMapper.update(null, buildClearContentRejectWrapper(List.of(id)));
         } else {
@@ -142,32 +168,31 @@ public class QuestionAdminService {
             q.setStatus(STATUS_REJECTED);
             questionMapper.updateById(q);
         }
-        return ApiResponse.success(null);
     }
 
     /**
      * 批量审核通过草稿，任一草稿为空或质量不达标时整体拒绝。
      *
      * @param ids 草稿题目 ID 列表
-     * @return 批量审核结果
+     * @throws BusinessException ID 列表为空、答案为空或质量未达标时抛出
      */
     @Transactional
-    public ApiResponse<Void> batchApprove(List<Long> ids) {
+    public void batchApprove(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
-            return ApiResponse.error(400, "ID 列表不能为空");
+            throw new BusinessException(400, "ID 列表不能为空");
         }
         List<Question> drafts = questionMapper.selectBatchIds(ids);
         boolean hasBlankContent = drafts.stream()
                 .filter(q -> STATUS_DRAFT.equals(q.getStatus()))
                 .anyMatch(this::isContentBlank);
         if (hasBlankContent) {
-            return ApiResponse.error(400, "存在答案为空的草稿，不能批量发布");
+            throw new BusinessException(400, "存在答案为空的草稿，不能批量发布");
         }
         for (Question draft : drafts) {
             if (STATUS_DRAFT.equals(draft.getStatus())) {
                 AiAnswerQualityPolicy.QualityReport qualityReport = evaluateDraftQuality(draft);
                 if (!qualityReport.passed()) {
-                    return ApiResponse.error(400,
+                    throw new BusinessException(400,
                             "存在质量未达标的草稿：" + draftTitle(draft) + "；" + summarizeQualityIssues(qualityReport));
                 }
             }
@@ -178,10 +203,7 @@ public class QuestionAdminService {
                 continue;
             }
             if (isRewriteDraft(draft)) {
-                ApiResponse<Void> rewriteResponse = applyRewriteDraft(draft);
-                if (rewriteResponse.code() != 200) {
-                    return rewriteResponse;
-                }
+                applyRewriteDraft(draft);
             } else {
                 regularDraftIds.add(draft.getId());
             }
@@ -195,20 +217,21 @@ public class QuestionAdminService {
                     .isNotNull("content")
                     .apply("TRIM(content) <> ''"));
         }
-        return ApiResponse.success(null);
+        // 批量发布成功后失效热门题目缓存
+        questionService.evictHotQuestionCache();
     }
 
     /**
      * 批量驳回草稿，兼容旧版 ID 数组请求，也支持 clearContent=true 的对象请求。
      *
      * @param request ID 数组，或包含 ids/clearContent 的对象
-     * @return 批量驳回结果
+     * @throws BusinessException ID 列表为空时抛出
      */
     @Transactional
-    public ApiResponse<Void> batchReject(JsonNode request) {
+    public void batchReject(JsonNode request) {
         BatchRejectRequest rejectRequest = parseBatchRejectRequest(request);
         if (rejectRequest.ids().isEmpty()) {
-            return ApiResponse.error(400, "ID 列表不能为空");
+            throw new BusinessException(400, "ID 列表不能为空");
         }
         if (rejectRequest.clearContent()) {
             questionMapper.update(null, buildClearContentRejectWrapper(rejectRequest.ids()));
@@ -218,7 +241,6 @@ public class QuestionAdminService {
                     .in("id", rejectRequest.ids())
                     .eq("status", STATUS_DRAFT));
         }
-        return ApiResponse.success(null);
     }
 
     private void applyDraftFilters(
@@ -373,21 +395,20 @@ public class QuestionAdminService {
         return SOURCE_AI_REWRITE.equals(question.getSource());
     }
 
-    private ApiResponse<Void> applyRewriteDraft(Question rewriteDraft) {
+    private void applyRewriteDraft(Question rewriteDraft) {
         Long originalId = parseRewriteOriginalId(rewriteDraft);
         if (originalId == null) {
-            return ApiResponse.error(400, "重写草稿缺少原题关联 ID");
+            throw new BusinessException(400, "重写草稿缺少原题关联 ID");
         }
         Question original = questionMapper.selectById(originalId);
         if (original == null || !"PUBLISHED".equals(original.getStatus())) {
-            return ApiResponse.error(400, "原已发布题目不存在或状态不是已发布");
+            throw new BusinessException(400, "原已发布题目不存在或状态不是已发布");
         }
 
         Question update = buildOriginalAnswerUpdate(originalId, rewriteDraft);
         questionMapper.updateById(update);
         // 重写草稿只是审核载体，应用成功后逻辑删除，避免前台出现重复题目。
         questionMapper.deleteById(rewriteDraft.getId());
-        return ApiResponse.success(null);
     }
 
     private Question buildOriginalAnswerUpdate(Long originalId, Question rewriteDraft) {

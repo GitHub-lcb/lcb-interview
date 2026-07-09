@@ -16,13 +16,14 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * 快乐8推荐策略。负责校验推荐输出，并生成纯 Java 规则推荐。
+ * 快乐8推荐策略。负责校验推荐输出，并生成纯 Java 规则推荐，支持选1到选10玩法。
  */
 @Service
 public class LotteryKl8RecommendationPolicy {
 
+    /** 默认每组 5 个号码，兼容旧记录和旧调用方 */
+    public static final int DEFAULT_PICK_SIZE = 5;
     private static final int GROUP_COUNT = 1;
-    private static final int GROUP_SIZE = 5;
     private static final Set<String> CONFIDENCE_LABELS = Set.of("低", "中低", "中");
 
     private final ObjectMapper objectMapper;
@@ -37,22 +38,44 @@ public class LotteryKl8RecommendationPolicy {
     }
 
     /**
-     * 从 AI 文本中解析并校验 1 组推荐。
+     * 从 AI 文本中解析并校验 1 组推荐（默认选5）。
      *
      * @param content AI 输出文本
      * @return 通过校验的推荐组
      */
     public List<LotteryKl8RecommendationGroupVO> validateAiContent(String content) {
-        return validateAiResult(content).groups();
+        return validateAiContent(content, DEFAULT_PICK_SIZE);
     }
 
     /**
-     * 从 AI 文本中解析并校验深度推荐结果。
+     * 从 AI 文本中解析并校验 1 组推荐。
+     *
+     * @param content  AI 输出文本
+     * @param pickSize 每组号码数量（1-10）
+     * @return 通过校验的推荐组
+     */
+    public List<LotteryKl8RecommendationGroupVO> validateAiContent(String content, int pickSize) {
+        return validateAiResult(content, pickSize).groups();
+    }
+
+    /**
+     * 从 AI 文本中解析并校验深度推荐结果（默认选5）。
      *
      * @param content AI 输出文本
      * @return 通过校验的深度推荐结果
      */
     public ValidatedRecommendation validateAiResult(String content) {
+        return validateAiResult(content, DEFAULT_PICK_SIZE);
+    }
+
+    /**
+     * 从 AI 文本中解析并校验深度推荐结果。
+     *
+     * @param content  AI 输出文本
+     * @param pickSize 每组号码数量（1-10）
+     * @return 通过校验的深度推荐结果
+     */
+    public ValidatedRecommendation validateAiResult(String content, int pickSize) {
         try {
             JsonNode root = objectMapper.readTree(extractJson(content));
             JsonNode groupsNode = root.isArray() ? root : root.path("groups");
@@ -70,9 +93,9 @@ public class LotteryKl8RecommendationPolicy {
                     numbers.add(numberNode.asInt(-1));
                 }
                 String reason = item.path("reason").asText("");
-                groups.add(validateGroup(numbers, reason));
+                groups.add(validateGroup(numbers, reason, pickSize));
             }
-            List<LotteryKl8RecommendationGroupVO> validatedGroups = validateGroups(groups);
+            List<LotteryKl8RecommendationGroupVO> validatedGroups = validateGroups(groups, pickSize);
             String confidenceLabel = root.isObject() && CONFIDENCE_LABELS.contains(root.path("confidenceLabel").asText())
                     ? root.path("confidenceLabel").asText()
                     : "中低";
@@ -85,13 +108,35 @@ public class LotteryKl8RecommendationPolicy {
     }
 
     /**
-     * 根据历史特征生成带分析 JSON 的 Java 规则推荐。
+     * 根据历史特征生成带分析 JSON 的 Java 规则推荐（默认选5）。
      *
      * @param report 历史特征报告
      * @return Java 规则推荐结果
      */
     public ValidatedRecommendation fallbackResult(LotteryKl8FeatureReport report) {
-        return fallbackResult(report, null);
+        return fallbackResult(report, DEFAULT_PICK_SIZE);
+    }
+
+    /**
+     * 根据历史特征生成带分析 JSON 的 Java 规则推荐。
+     *
+     * @param report   历史特征报告
+     * @param pickSize 每组号码数量（1-10）
+     * @return Java 规则推荐结果
+     */
+    public ValidatedRecommendation fallbackResult(LotteryKl8FeatureReport report, int pickSize) {
+        return fallbackResult(report, null, pickSize);
+    }
+
+    /**
+     * 根据历史特征生成带分析 JSON 的 Java 规则推荐，并兼容旧 AI 失败诊断（默认选5）。
+     *
+     * @param report        历史特征报告
+     * @param failureDetail AI 失败诊断，可为空
+     * @return Java 规则推荐结果
+     */
+    public ValidatedRecommendation fallbackResult(LotteryKl8FeatureReport report, LotteryKl8AiFailureDetail failureDetail) {
+        return fallbackResult(report, failureDetail, DEFAULT_PICK_SIZE);
     }
 
     /**
@@ -99,10 +144,11 @@ public class LotteryKl8RecommendationPolicy {
      *
      * @param report        历史特征报告
      * @param failureDetail AI 失败诊断，可为空
+     * @param pickSize      每组号码数量（1-10）
      * @return Java 规则推荐结果
      */
-    public ValidatedRecommendation fallbackResult(LotteryKl8FeatureReport report, LotteryKl8AiFailureDetail failureDetail) {
-        List<LotteryKl8RecommendationGroupVO> groups = fallbackGroups(report);
+    public ValidatedRecommendation fallbackResult(LotteryKl8FeatureReport report, LotteryKl8AiFailureDetail failureDetail, int pickSize) {
+        List<LotteryKl8RecommendationGroupVO> groups = fallbackGroups(report, pickSize);
         try {
             ObjectNode root = objectMapper.createObjectNode();
             root.put("confidenceLabel", "低");
@@ -142,17 +188,28 @@ public class LotteryKl8RecommendationPolicy {
     }
 
     /**
-     * 根据历史特征生成 Java 规则推荐。
+     * 根据历史特征生成 Java 规则推荐（默认选5）。
      *
      * @param report 历史特征报告
      * @return 1 组规则推荐
      */
     public List<LotteryKl8RecommendationGroupVO> fallbackGroups(LotteryKl8FeatureReport report) {
+        return fallbackGroups(report, DEFAULT_PICK_SIZE);
+    }
+
+    /**
+     * 根据历史特征生成 Java 规则推荐。
+     *
+     * @param report   历史特征报告
+     * @param pickSize 每组号码数量（1-10）
+     * @return 1 组规则推荐
+     */
+    public List<LotteryKl8RecommendationGroupVO> fallbackGroups(LotteryKl8FeatureReport report, int pickSize) {
         if (!report.optimizedPortfolio().groups().isEmpty()) {
             return validateGroups(report.optimizedPortfolio().groups().stream()
                     .limit(GROUP_COUNT)
                     .map(group -> new LotteryKl8RecommendationGroupVO(group.numbers(), group.reason()))
-                    .toList());
+                    .toList(), pickSize);
         }
         Random random = new Random(System.nanoTime());
         List<LotteryKl8RecommendationGroupVO> groups = new ArrayList<>();
@@ -161,11 +218,19 @@ public class LotteryKl8RecommendationPolicy {
         List<Integer> candidateNumbers = candidateNumbers(report);
         while (groups.size() < GROUP_COUNT) {
             LinkedHashSet<Integer> numbers = new LinkedHashSet<>();
-            push(numbers, candidateNumbers, cursor, 2);
-            push(numbers, report.hotNumbers(), cursor + 3, 1);
-            push(numbers, missingCandidates(report), cursor + 5, 1);
-            push(numbers, report.coldNumbers(), cursor + 7, 1);
-            while (numbers.size() < GROUP_SIZE) {
+            // 根据选号数量动态分配候选来源比例
+            int hotCount = Math.max(1, pickSize / 4);
+            int missingCount = Math.max(1, pickSize / 4);
+            int coldCount = Math.max(1, pickSize / 4);
+            int candidateCount = pickSize - hotCount - missingCount - coldCount;
+            if (candidateCount < 1) {
+                candidateCount = 1;
+            }
+            push(numbers, candidateNumbers, cursor, candidateCount);
+            push(numbers, report.hotNumbers(), cursor + 3, hotCount);
+            push(numbers, missingCandidates(report), cursor + 5, missingCount);
+            push(numbers, report.coldNumbers(), cursor + 7, coldCount);
+            while (numbers.size() < pickSize) {
                 numbers.add(random.nextInt(80) + 1);
             }
             List<Integer> sorted = numbers.stream().sorted().toList();
@@ -177,17 +242,17 @@ public class LotteryKl8RecommendationPolicy {
             }
             cursor += 1;
         }
-        return validateGroups(groups);
+        return validateGroups(groups, pickSize);
     }
 
-    private List<LotteryKl8RecommendationGroupVO> validateGroups(List<LotteryKl8RecommendationGroupVO> groups) {
+    private List<LotteryKl8RecommendationGroupVO> validateGroups(List<LotteryKl8RecommendationGroupVO> groups, int pickSize) {
         if (groups.size() != GROUP_COUNT) {
             throw new IllegalArgumentException("必须返回 1 组推荐");
         }
         Set<String> used = new HashSet<>();
         List<LotteryKl8RecommendationGroupVO> result = new ArrayList<>();
         for (LotteryKl8RecommendationGroupVO group : groups) {
-            LotteryKl8RecommendationGroupVO validated = validateGroup(group.numbers(), group.reason());
+            LotteryKl8RecommendationGroupVO validated = validateGroup(group.numbers(), group.reason(), pickSize);
             String key = validated.numbers().toString();
             if (!used.add(key)) {
                 throw new IllegalArgumentException("推荐组合重复");
@@ -197,9 +262,9 @@ public class LotteryKl8RecommendationPolicy {
         return result;
     }
 
-    private LotteryKl8RecommendationGroupVO validateGroup(List<Integer> numbers, String reason) {
-        if (numbers.size() != GROUP_SIZE) {
-            throw new IllegalArgumentException("每组必须 5 个号码");
+    private LotteryKl8RecommendationGroupVO validateGroup(List<Integer> numbers, String reason, int pickSize) {
+        if (numbers.size() != pickSize) {
+            throw new IllegalArgumentException("每组必须 %d 个号码".formatted(pickSize));
         }
         LinkedHashSet<Integer> unique = new LinkedHashSet<>();
         for (Integer number : numbers) {
@@ -208,7 +273,7 @@ public class LotteryKl8RecommendationPolicy {
             }
             unique.add(number);
         }
-        if (unique.size() != GROUP_SIZE) {
+        if (unique.size() != pickSize) {
             throw new IllegalArgumentException("组内号码不能重复");
         }
         String finalReason = reason == null || reason.isBlank()

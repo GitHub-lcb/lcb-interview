@@ -7,7 +7,6 @@ import com.lcbinterview.mapper.QuestionMapper;
 import com.lcbinterview.model.Question;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -78,21 +77,6 @@ class AiQuestionServiceTest {
         verifyNoInteractions(context.questionMapper);
     }
 
-    @Test
-    void streamCallFailsFastWhenApiKeyIsBlank() throws Exception {
-        TestContext context = createService("");
-        SseStreamSession session = SseStreamSession.open(new SseEmitter());
-        Object pushMode = streamPushMode("HEARTBEAT_ONLY");
-
-        assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(
-                context.service, "callDeepSeekStreamInternal", "prompt", session, pushMode))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("AI 生成服务未配置密钥")
-                .hasMessageContaining("AI_OPENCODE_API_KEY");
-
-        verifyNoInteractions(context.questionMapper);
-    }
-
     private TestContext createService(String apiKey) {
         QuestionMapper questionMapper = mock(QuestionMapper.class);
         CategoryMapper categoryMapper = mock(CategoryMapper.class);
@@ -117,18 +101,14 @@ class AiQuestionServiceTest {
         AiQuestionService service = new AiQuestionService(
                 questionMapper,
                 categoryMapper,
+                mock(CategoryService.class),
                 answerQualityPolicy,
                 titleDeduplicator,
                 requestPolicy,
-                aiRuntimeConfigService);
+                aiRuntimeConfigService,
+                mock(AiHttpClient.class));
         ReflectionTestUtils.setField(service, "maxTokens", 1000);
         return new TestContext(service, questionMapper, answerQualityPolicy, requestPolicy);
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private Object streamPushMode(String name) throws ClassNotFoundException {
-        Class<?> pushModeType = Class.forName("com.lcbinterview.service.AiQuestionService$StreamPushMode");
-        return Enum.valueOf((Class<Enum>) pushModeType.asSubclass(Enum.class), name);
     }
 
     private record TestContext(

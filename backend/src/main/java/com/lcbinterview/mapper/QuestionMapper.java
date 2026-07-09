@@ -7,6 +7,7 @@ import com.lcbinterview.dto.QuestionTagName;
 import com.lcbinterview.model.Question;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import java.util.List;
 
 /**
@@ -30,6 +31,16 @@ public interface QuestionMapper extends BaseMapper<Question> {
             LIMIT #{size}
             """)
     List<Question> selectHot(@Param("size") int size);
+
+    /**
+     * 原子递增题目浏览次数，避免逐条 selectById + updateById 的 N+1 问题。
+     *
+     * @param questionId 题目 ID
+     * @param delta      增量
+     * @return 受影响行数
+     */
+    @Update("UPDATE question SET view_count = view_count + #{delta} WHERE id = #{questionId} AND is_deleted = 0")
+    int incrementViewCount(@Param("questionId") Long questionId, @Param("delta") int delta);
 
     /**
      * 根据标签 ID 查询关联题目（仅已发布）。

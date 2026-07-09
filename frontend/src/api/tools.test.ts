@@ -16,6 +16,7 @@ import { createKl8Recommendation, syncKl8Draws } from './tools'
 const recommendation: LotteryKl8Recommendation = {
   id: 1,
   source: 'RULE_BASED',
+  pickSize: 5,
   baseIssueCount: 120,
   latestIssueNo: '20260629001',
   groups: [
@@ -41,7 +42,7 @@ describe('tools api', () => {
 
     expect(api.post).toHaveBeenCalledWith(
       '/tools/lottery/kl8/recommendations',
-      { baseIssueCount: 120 },
+      { baseIssueCount: 120, pickSize: 5 },
       { timeout: 120000 },
     )
   })

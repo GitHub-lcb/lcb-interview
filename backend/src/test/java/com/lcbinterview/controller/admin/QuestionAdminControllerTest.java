@@ -9,6 +9,7 @@ import com.lcbinterview.mapper.QuestionMapper;
 import com.lcbinterview.model.Question;
 import com.lcbinterview.service.AiAnswerQualityPolicy;
 import com.lcbinterview.service.QuestionAdminService;
+import com.lcbinterview.service.QuestionService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,9 @@ class QuestionAdminControllerTest {
 
     @MockBean
     private AiAnswerQualityPolicy aiAnswerQualityPolicy;
+
+    @MockBean
+    private QuestionService questionService;
 
     @Test
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -145,7 +149,7 @@ class QuestionAdminControllerTest {
 
         mockMvc.perform(post("/api/admin/questions/draft/10/approve")
                         .header("Authorization", "Bearer test-token"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code", is(400)))
                 .andExpect(jsonPath("$.message", is("题目答案为空，不能发布")));
 
@@ -161,7 +165,7 @@ class QuestionAdminControllerTest {
 
         mockMvc.perform(post("/api/admin/questions/draft/12/approve")
                         .header("Authorization", "Bearer test-token"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code", is(400)))
                 .andExpect(jsonPath("$.message", is("题目质量未达标：content 内容少于 500 字")));
 
@@ -226,9 +230,14 @@ class QuestionAdminControllerTest {
         verify(questionMapper).deleteById(20L);
     }
 
-    @Test
+        @Test
     @SuppressWarnings({"unchecked", "rawtypes"})
     void rejectCanClearAnswerAndKeepDraftForRegeneration() throws Exception {
+        Question draft = new Question();
+        draft.setId(31L);
+        draft.setStatus("DRAFT");
+        when(questionMapper.selectById(31L)).thenReturn(draft);
+
         mockMvc.perform(post("/api/admin/questions/draft/31/reject")
                         .header("Authorization", "Bearer test-token")
                         .contentType("application/json")
@@ -264,7 +273,7 @@ class QuestionAdminControllerTest {
                         .header("Authorization", "Bearer test-token")
                         .contentType("application/json")
                         .content("[10,11]"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code", is(400)))
                 .andExpect(jsonPath("$.message", is("存在答案为空的草稿，不能批量发布")));
 
@@ -283,7 +292,7 @@ class QuestionAdminControllerTest {
                         .header("Authorization", "Bearer test-token")
                         .contentType("application/json")
                         .content("[14,15]"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code", is(400)))
                 .andExpect(jsonPath("$.message", is("存在质量未达标的草稿：Redis 缓存击穿是什么；risk 风险与避坑缺失或过短")));
 

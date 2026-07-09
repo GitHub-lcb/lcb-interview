@@ -10,7 +10,7 @@ import java.util.List;
  * @param count       基准期内共现次数
  * @param lift        相对独立出现的提升度
  * @param score       共现综合分
- * @param selected    是否进入本次最终 5 码组合，旧记录可能为 true，新邻位策略默认不再强制入选
+ * @param selected    是否进入本次最终推荐组合，旧记录可能为 true，新邻位策略默认不再强制入选
  * @param reason      参考理由
  * @param evidence    可展示的统计证据
  */

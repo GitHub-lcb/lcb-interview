@@ -66,10 +66,10 @@ describe('LotteryKl8Panel', () => {
     render(<LotteryKl8Panel />)
 
     await screen.findByText('20260629001')
-    await userEvent.click(screen.getByRole('button', { name: /Java 推荐 1 组/ }))
+    await userEvent.click(screen.getByRole('button', { name: /Java 推荐选5/ }))
 
     await waitFor(() => {
-      expect(createKl8Recommendation).toHaveBeenCalledWith(2000)
+      expect(createKl8Recommendation).toHaveBeenCalledWith(2000, 5)
     })
     expect(emitFeedbackWarning).toHaveBeenCalledWith('Java 推荐生成耗时较长，请稍后刷新推荐历史查看结果')
     expect(emitFeedbackSuccess).not.toHaveBeenCalled()
@@ -89,6 +89,7 @@ describe('LotteryKl8Panel', () => {
     const recommendation: LotteryKl8Recommendation = {
       id: 1,
       source: 'RULE_BASED',
+      pickSize: 5,
       baseIssueCount: 1000,
       latestIssueNo: '20260629001',
       groups: [
@@ -121,9 +122,10 @@ describe('LotteryKl8Panel', () => {
   })
 
   it('shows latest-neighbor candidates instead of required pair strategy', async () => {
-    const recommendation: LotteryKl8Recommendation = {
+        const recommendation: LotteryKl8Recommendation = {
       id: 2,
       source: 'RULE_BASED',
+      pickSize: 5,
       baseIssueCount: 2000,
       latestIssueNo: '20260629001',
       groups: [
@@ -201,9 +203,10 @@ describe('LotteryKl8Panel', () => {
         sourceName: 'test',
       },
     ]
-    const recommendation: LotteryKl8Recommendation = {
+        const recommendation: LotteryKl8Recommendation = {
       id: 3,
       source: 'RULE_BASED',
+      pickSize: 5,
       baseIssueCount: 2000,
       latestIssueNo: '20260629002',
       groups: [

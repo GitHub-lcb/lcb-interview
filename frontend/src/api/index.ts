@@ -37,7 +37,17 @@ api.interceptors.response.use(
   },
   (err) => {
     if (err.response?.status === 401) {
-      clearUserToken()
+      // 区分管理端和用户端 401，分别清除对应 Token
+      const url = err.config?.url || ''
+      if (url.startsWith('/admin/')) {
+        localStorage.removeItem('adminToken')
+        // 管理端 401 跳转登录页（避免在已注销状态下持续发送请求）
+        if (!window.location.pathname.startsWith('/admin/login')) {
+          window.location.href = '/admin/login'
+        }
+      } else {
+        clearUserToken()
+      }
     }
     if (!err.config?.silentGlobalError) {
       emitFeedbackError('网络错误，请稍后重试')

@@ -25,7 +25,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LotteryKl8RecommendationService {
 
-    private static final int DEFAULT_BASE_ISSUE_COUNT = 2000;
+        private static final int DEFAULT_BASE_ISSUE_COUNT = 2000;
+    private static final int DEFAULT_PICK_SIZE = 5;
     private static final String STRATEGY_VERSION = "KL8_JAVA_NEIGHBOR_RUN_SINGLE_V5";
     private static final String DISCLAIMER = "彩票结果具有随机性，本推荐仅为娱乐统计参考，不保证命中，不构成投注建议。";
 
@@ -36,8 +37,8 @@ public class LotteryKl8RecommendationService {
     private final LotteryKl8RecommendationMapper recommendationMapper;
     private final ObjectMapper objectMapper;
 
-    /**
-     * 为当前用户生成 1 组快乐8选5推荐。
+        /**
+     * 为当前用户生成 1 组快乐8推荐，支持选1到选10玩法。
      *
      * @param userId  用户 ID
      * @param request 推荐请求
@@ -46,14 +47,16 @@ public class LotteryKl8RecommendationService {
     @Transactional
     public LotteryKl8RecommendationVO recommend(Long userId, LotteryKl8RecommendationRequest request) {
         int baseIssueCount = request.baseIssueCount() == null ? DEFAULT_BASE_ISSUE_COUNT : request.baseIssueCount();
+        int pickSize = request.pickSize() == null ? DEFAULT_PICK_SIZE : request.pickSize();
         evaluationService.evaluatePendingRecommendations();
         LotteryKl8StrategyCalibration calibration = calibrationService.currentCalibration();
-        LotteryKl8FeatureReport report = featureService.buildReport(baseIssueCount, calibration);
+        LotteryKl8FeatureReport report = featureService.buildReport(baseIssueCount, calibration, pickSize);
         String source = "RULE_BASED";
-        LotteryKl8RecommendationPolicy.ValidatedRecommendation result = recommendationPolicy.fallbackResult(report);
+        LotteryKl8RecommendationPolicy.ValidatedRecommendation result = recommendationPolicy.fallbackResult(report, pickSize);
         LotteryKl8Recommendation recommendation = new LotteryKl8Recommendation();
         recommendation.setUserId(userId);
         recommendation.setSource(source);
+        recommendation.setPickSize(pickSize);
         recommendation.setBaseIssueCount(report.baseIssueCount());
         recommendation.setLatestIssueNo(report.latestIssueNo());
         recommendation.setRecommendationsJson(writeGroups(result.groups()));

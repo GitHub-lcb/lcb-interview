@@ -263,6 +263,7 @@ export interface LotteryKl8RecommendationGroup {
 export interface LotteryKl8Recommendation {
   id: number
   source: 'AI' | 'RULE_BASED'
+  pickSize: number
   baseIssueCount: number
   latestIssueNo: string
   groups: LotteryKl8RecommendationGroup[]

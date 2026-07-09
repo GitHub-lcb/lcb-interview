@@ -8,9 +8,9 @@ import java.util.Map;
  * 快乐8滚动回测摘要，描述历史策略在已开奖样本中的命中表现。
  *
  * @param evaluatedIssueCount 参与回测的历史转移样本数
- * @param averageHitCount 每组模拟 5 个号码的平均命中数
+ * @param averageHitCount 每组模拟号码的平均命中数
  * @param maxHitCount 单组模拟最高命中数
- * @param hitDistribution 命中数分布，key 为 0-5
+ * @param hitDistribution 命中数分布，key 为 0 到 pickSize
  * @param factorWeights 基于回测表现得到的因子权重
  * @param topFactorNames 表现较好的因子名称
  * @param summary 中文摘要

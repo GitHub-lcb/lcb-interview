@@ -9,10 +9,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 快乐8选5推荐展示对象。
+ * 快乐8推荐展示对象，支持选1到选10玩法。
  *
  * @param id             推荐 ID
  * @param source         推荐来源
+ * @param pickSize       每组推荐号码数量（1-10）
  * @param baseIssueCount 使用历史期数
  * @param latestIssueNo  最新期号
  * @param groups         推荐号码组，当前 Java 策略返回 1 组
@@ -33,6 +34,7 @@ import java.util.List;
 public record LotteryKl8RecommendationVO(
         Long id,
         String source,
+        Integer pickSize,
         Integer baseIssueCount,
         String latestIssueNo,
         List<LotteryKl8RecommendationGroupVO> groups,
@@ -64,6 +66,7 @@ public record LotteryKl8RecommendationVO(
         return new LotteryKl8RecommendationVO(
                 recommendation.getId(),
                 recommendation.getSource(),
+                recommendation.getPickSize(),
                 recommendation.getBaseIssueCount(),
                 recommendation.getLatestIssueNo(),
                 parseGroups(recommendation.getRecommendationsJson(), objectMapper),

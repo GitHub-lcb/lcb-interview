@@ -48,18 +48,19 @@ public class LotteryKl8AiRecommendationService {
     }
 
     /**
-     * 调用 AI 生成快乐8选5推荐 JSON。
+     * 调用 AI 生成快乐8推荐 JSON。
      *
-     * @param report 历史特征报告
+     * @param report   历史特征报告
+     * @param pickSize 每组号码数量（1-10）
      * @return AI 输出文本
      */
-    public String recommend(LotteryKl8FeatureReport report) {
+    public String recommend(LotteryKl8FeatureReport report, int pickSize) {
         AiRuntimeConfig config = aiRuntimeConfigService.current();
         if (!StringUtils.hasText(config.apiKey()) || !StringUtils.hasText(config.model()) || !StringUtils.hasText(config.apiUrl())) {
             throw new IllegalStateException("AI 推荐配置不完整");
         }
         try {
-            String body = objectMapper.writeValueAsString(buildPayload(report, config.model()));
+            String body = objectMapper.writeValueAsString(buildPayload(report, config.model(), pickSize));
             HttpRequest request = HttpRequest.newBuilder(URI.create(config.apiUrl()))
                     .timeout(Duration.ofSeconds(90))
                     .header("Content-Type", "application/json")
@@ -81,23 +82,23 @@ public class LotteryKl8AiRecommendationService {
         }
     }
 
-    private Map<String, Object> buildPayload(LotteryKl8FeatureReport report, String model) {
+    private Map<String, Object> buildPayload(LotteryKl8FeatureReport report, String model, int pickSize) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("model", model);
         payload.put("temperature", 0.42);
         payload.put("max_tokens", 5000);
         payload.put("messages", List.of(
-                Map.of("role", "system", "content", systemPrompt()),
-                Map.of("role", "user", "content", userPrompt(report))
+                Map.of("role", "system", "content", systemPrompt(pickSize)),
+                Map.of("role", "user", "content", userPrompt(report, pickSize))
         ));
         return payload;
     }
 
-    private String systemPrompt() {
+        private String systemPrompt(int pickSize) {
         return """
                 你是彩票历史数据统计分析助手，需要像多角色预测团队一样工作：
                 1. 统计分析员：只基于输入的历史特征识别冷热、遗漏、趋势、区间、尾数、上一期邻位、连号和波动信号。
-                2. 候选策略师：优先从上一期号码的左右邻位候选中组合 1 组选5号码，并尽量形成 10、11、12 这类连号结构。
+                2. 候选策略师：优先从上一期号码的左右邻位候选中组合 1 组选%d号码，并尽量形成连号结构。
                 3. 风险审稿员：主动指出随机性、过拟合和历史样本局限。
                 4. 最终选择器：输出可解析 JSON。
 
@@ -114,14 +115,14 @@ public class LotteryKl8AiRecommendationService {
                   },
                   "groups":[{"numbers":[1,2,3,4,5],"reason":"30到120字中文理由"}]
                 }。
-                必须恰好 1 组，每组恰好 5 个整数，号码范围 1-80，组内不重复。
+                必须恰好 1 组，每组恰好 %d 个整数，号码范围 1-80，组内不重复。
                 confidenceLabel 最高只能是“中”，不能输出“高”。
-                """;
+                """.formatted(pickSize, pickSize);
     }
 
-    private String userPrompt(LotteryKl8FeatureReport report) {
+    private String userPrompt(LotteryKl8FeatureReport report, int pickSize) {
         return """
-                请根据以下快乐8深度历史特征，为下一期选5玩法生成 1 组娱乐统计参考号码。
+                请根据以下快乐8深度历史特征，为下一期选%d玩法生成 1 组娱乐统计参考号码。
 
                 ## 深度摘要
                 %s
@@ -136,6 +137,7 @@ public class LotteryKl8AiRecommendationService {
                 - 推荐组要说明用到了哪些历史特征。
                 - 不要输出投注建议，不要暗示稳赚或必出。
                 """.formatted(
+                pickSize,
                 report.deepSummary(),
                 reportJson(report));
     }

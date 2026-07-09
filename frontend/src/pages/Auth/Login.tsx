@@ -23,7 +23,7 @@ export default function Login() {
       <section className="auth-panel">
         <div className="dashboard-kicker">个人工具</div>
         <h1>登录</h1>
-        <p>登录后管理自己的书摘库和快乐8选5娱乐统计记录。</p>
+        <p>登录后管理自己的书摘库和快乐8娱乐统计记录。</p>
         <Form layout="vertical" onFinish={handleFinish}>
           <Form.Item name="username" label="用户名" rules={[{ required: true, message: '请输入用户名' }]}>
             <Input prefix={<UserOutlined />} autoComplete="username" />

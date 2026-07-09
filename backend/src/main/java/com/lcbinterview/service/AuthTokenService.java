@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Base64;
@@ -70,7 +71,9 @@ public class AuthTokenService {
         String[] parts = token.split("\\.", 2);
         String encodedPayload = parts[0];
         String signature = parts[1];
-        if (!sign(encodedPayload).equals(signature)) {
+        // 使用常量时间比较防止通过响应时间差逐字节猜测签名
+        String expectedSignature = sign(encodedPayload);
+        if (!constantTimeEquals(signature, expectedSignature)) {
             throw invalidToken();
         }
         String payload = decode(encodedPayload);
@@ -116,5 +119,21 @@ public class AuthTokenService {
 
     private BusinessException invalidToken() {
         return new BusinessException(401, "登录状态已失效");
+    }
+
+    /**
+     * 常量时间字符串比较，防止通过响应时间差逐字节猜测签名。
+     *
+     * @param a 待比较字符串
+     * @param b 目标字符串
+     * @return true 表示内容相等
+     */
+    private boolean constantTimeEquals(String a, String b) {
+        if (a == null || b == null) {
+            return false;
+        }
+        byte[] bytesA = a.getBytes(StandardCharsets.UTF_8);
+        byte[] bytesB = b.getBytes(StandardCharsets.UTF_8);
+        return MessageDigest.isEqual(bytesA, bytesB);
     }
 }

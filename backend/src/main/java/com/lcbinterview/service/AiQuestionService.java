@@ -17,12 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -38,14 +32,15 @@ public class AiQuestionService {
 
     private final QuestionMapper questionMapper;
     private final CategoryMapper categoryMapper;
+    private final CategoryService categoryService;
     private final AiAnswerQualityPolicy answerQualityPolicy;
     private final QuestionTitleDeduplicator titleDeduplicator;
     private final AiGenerationRequestPolicy requestPolicy;
     private final AiRuntimeConfigService aiRuntimeConfigService;
+    private final AiHttpClient aiHttpClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
     private static final int ANSWER_QUALITY_MAX_ATTEMPTS = 3;
-    private static final int STREAM_HEARTBEAT_CHUNK_INTERVAL = 120;
     private static final String STATUS_PUBLISHED = "PUBLISHED";
     private static final String STATUS_DRAFT = "DRAFT";
     private static final String SOURCE_AI_REWRITE = "AI_REWRITE";
@@ -86,7 +81,7 @@ public class AiQuestionService {
         log.info("调用 DeepSeek, prompt长度={}字符", prompt.length());
         long t = System.currentTimeMillis();
 
-        String responseJson = callDeepSeek(prompt);
+        String responseJson = aiHttpClient.callSync(prompt, requireGenerationConfig());
         logResponseUsage(responseJson);
         List<Question> questions = parseQuestions(responseJson);
         List<Question> existingQuestions = loadComparableQuestions(categoryId);
@@ -129,7 +124,7 @@ public class AiQuestionService {
      */
     public FillAnswerResult fillAnswerSync(Question question) {
         requireGenerationConfig();
-        return fillAnswer(question, null, StreamPushMode.SILENT, "同步补答案");
+        return fillAnswer(question, null, AiHttpClient.StreamPushMode.SILENT, "同步补答案");
     }
 
     /**
@@ -199,7 +194,7 @@ public class AiQuestionService {
                                 i + 1, total, attempt, prompt.length());
 
                         try {
-                            StreamResult sr = callDeepSeekStreamInternal(prompt, session, StreamPushMode.FULL);
+                            AiHttpClient.StreamResult sr = aiHttpClient.callStream(prompt, requireGenerationConfig(), session, AiHttpClient.StreamPushMode.FULL);
                             reasoning = sr.reasoning();
                             log.info("流式生成 [{}/{}]: 第 {} 次收到响应, content={}字符, reasoning={}字符, chunks={}",
                                     i + 1, total, attempt, sr.content().length(), sr.reasoningLength(), sr.chunkCount());
@@ -345,7 +340,7 @@ public class AiQuestionService {
                     log.info("流式补答案 [{}/{}]: id={}, title='{}'", i + 1, total, q.getId(), truncate(q.getTitle(), 50));
 
                     FillAnswerResult result = fillAnswer(
-                            q, session, StreamPushMode.HEARTBEAT_ONLY, "流式补答案 [" + (i + 1) + "/" + total + "]");
+                            q, session, AiHttpClient.StreamPushMode.HEARTBEAT_ONLY, "流式补答案 [" + (i + 1) + "/" + total + "]");
 
                     if (result.success()) {
                         success++;
@@ -459,7 +454,7 @@ public class AiQuestionService {
                                 i + 1, total, attempt, prompt.length());
 
                         try {
-                            StreamResult sr = callDeepSeekStreamInternal(prompt, session, StreamPushMode.HEARTBEAT_ONLY);
+                            AiHttpClient.StreamResult sr = aiHttpClient.callStream(prompt, requireGenerationConfig(), session, AiHttpClient.StreamPushMode.HEARTBEAT_ONLY);
                             reasoningLength = sr.reasoningLength();
                             log.info("流式重写已发布答案 [{}/{}]: 第 {} 次收到响应, content={}字符, reasoning={}字符",
                                     i + 1, total, attempt, sr.content().length(), sr.reasoningLength());
@@ -550,26 +545,10 @@ public class AiQuestionService {
 
     // ==================== 内部方法 ====================
 
-    private record StreamResult(String content, String reasoning, int reasoningLength, int chunkCount) {}
-
     private record FillContext(String categoryName, List<String> tags) {}
 
-    private enum StreamPushMode {
-        FULL(true, true),
-        HEARTBEAT_ONLY(false, false),
-        SILENT(false, false);
-
-        private final boolean stopOnClosed;
-        private final boolean captureReasoning;
-
-        StreamPushMode(boolean stopOnClosed, boolean captureReasoning) {
-            this.stopOnClosed = stopOnClosed;
-            this.captureReasoning = captureReasoning;
-        }
-    }
-
     private FillAnswerResult fillAnswer(
-            Question question, SseStreamSession session, StreamPushMode pushMode, String logPrefix) {
+            Question question, SseStreamSession session, AiHttpClient.StreamPushMode pushMode, String logPrefix) {
         if (question == null || question.getId() == null) {
             throw new IllegalArgumentException("待补答案题目不能为空");
         }
@@ -589,7 +568,7 @@ public class AiQuestionService {
                     logPrefix, attempt, question.getId(), prompt.length());
 
             try {
-                StreamResult sr = callDeepSeekStreamInternal(prompt, session, pushMode);
+                AiHttpClient.StreamResult sr = aiHttpClient.callStream(prompt, requireGenerationConfig(), session, pushMode);
                 reasoningLength = sr.reasoningLength();
                 log.info("{}: 第 {} 次收到响应, id={}, content={}字符, reasoning={}字符",
                         logPrefix, attempt, question.getId(), sr.content().length(), sr.reasoningLength());
@@ -640,8 +619,11 @@ public class AiQuestionService {
                 qualityReport == null ? List.of() : List.copyOf(qualityReport.issues()));
     }
 
-    private static class SseStreamClosedException extends RuntimeException {
-        private SseStreamClosedException(String message) {
+    /**
+     * SSE 连接关闭异常，表示客户端已断开连接，后台任务应停止推送。
+     */
+    public static class SseStreamClosedException extends RuntimeException {
+        public SseStreamClosedException(String message) {
             super(message);
         }
     }
@@ -736,12 +718,12 @@ public class AiQuestionService {
         draft.setRisk(nullIfEmpty(parsed.path("risk").asText()));
         draft.setProjectExp(nullIfEmpty(parsed.path("project_exp").asText()));
         draft.setCodeExamples(nullIfEmpty(parsed.path("code_examples").toString()));
-        draft.setDiagrams(nullIfEmpty(parsed.path("diagrams").toString()) == null
-                ? original.getDiagrams()
-                : nullIfEmpty(parsed.path("diagrams").toString()));
-        draft.setDifficulty(nullIfEmpty(original.getDifficulty()) == null
-                ? parsed.path("difficulty").asText("MEDIUM")
-                : original.getDifficulty());
+        // diagrams 字段：AI 返回有效值时使用 AI 结果，否则保留原题图解
+        String aiDiagrams = nullIfEmpty(parsed.path("diagrams").toString());
+        draft.setDiagrams(aiDiagrams != null ? aiDiagrams : original.getDiagrams());
+        draft.setDifficulty(nullIfEmpty(original.getDifficulty()) != null
+                ? original.getDifficulty()
+                : parsed.path("difficulty").asText("MEDIUM"));
         draft.setStatus(STATUS_DRAFT);
         draft.setSource(SOURCE_AI_REWRITE);
         // 重写草稿只用 related_ids 记录原题 ID，避免新增数据库列即可完成审核替换链路。
@@ -764,12 +746,6 @@ public class AiQuestionService {
         return "质量分 " + report.score() + "，问题：" + String.join("；", report.issues());
     }
 
-    private void sendEventOrStop(SseStreamSession session, String name, String data) {
-        if (!session.sendEvent(name, data)) {
-            throw new SseStreamClosedException("发送事件失败: " + name);
-        }
-    }
-
     private void sendJsonOrStop(SseStreamSession session, String name, Object body) {
         if (!session.sendJson(name, body, objectMapper)) {
             throw new SseStreamClosedException("发送事件失败: " + name);
@@ -782,181 +758,6 @@ public class AiQuestionService {
 
     private void sendJsonBestEffort(SseStreamSession session, String name, Object body) {
         session.sendJson(name, body, objectMapper);
-    }
-
-    private void pushStreamDelta(SseStreamSession session, StreamPushMode pushMode,
-                                 String name, String data, int chunkCount) {
-        if (pushMode == StreamPushMode.SILENT) {
-            return;
-        }
-        if (pushMode == StreamPushMode.FULL) {
-            sendEventOrStop(session, name, data);
-            return;
-        }
-        if (session != null && chunkCount % STREAM_HEARTBEAT_CHUNK_INTERVAL == 0) {
-            sendEventBestEffort(session, "info", "AI 正在生成，已接收 " + chunkCount + " 个片段");
-        }
-    }
-
-    /** 流式调用 DeepSeek，将 thinking/content 实时推送到 emitter。 */
-    private StreamResult callDeepSeekStreamInternal(String prompt, SseStreamSession session, StreamPushMode pushMode) {
-        AiRuntimeConfig runtimeConfig = requireGenerationConfig();
-        if (pushMode.stopOnClosed && (session == null || !session.isOpen())) {
-            throw new SseStreamClosedException("SSE 连接已关闭");
-        }
-
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", runtimeConfig.model());
-        requestBody.put("messages", List.of(
-                Map.of("role", "system", "content",
-                        "你是一位资深技术面试官，擅长出高质量面试题并给出详细解答。"),
-                Map.of("role", "user", "content", prompt)
-        ));
-        requestBody.put("temperature", 0.7);
-        requestBody.put("max_tokens", maxTokens);
-        requestBody.put("stream", true);
-
-        HttpURLConnection conn = null;
-        try {
-            String json = objectMapper.writeValueAsString(requestBody);
-
-            conn = (HttpURLConnection) URI.create(runtimeConfig.apiUrl()).toURL().openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Authorization", "Bearer " + runtimeConfig.apiKey());
-            conn.setRequestProperty("Accept", "text/event-stream");
-            conn.setDoOutput(true);
-            conn.setConnectTimeout(15000);
-            conn.setReadTimeout(600000);
-
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write(json.getBytes(StandardCharsets.UTF_8));
-            }
-
-            int status = conn.getResponseCode();
-            if (status != 200) {
-                String errorBody = new String(
-                        conn.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
-                log.error("DeepSeek 流式 API 错误: status={}, body={}", status, truncate(errorBody, 500));
-                if (pushMode != StreamPushMode.SILENT && session != null) {
-                    sendEventOrStop(session, "error", "API 错误: " + status);
-                }
-                throw new RuntimeException("DeepSeek API 错误: " + status);
-            }
-
-            StringBuilder fullContent = new StringBuilder();
-            StringBuilder fullReasoning = new StringBuilder();
-            int reasoningLength = 0;
-            int chunkCount = 0;
-
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    if (pushMode.stopOnClosed && !session.isOpen()) {
-                        throw new SseStreamClosedException("SSE 连接已关闭");
-                    }
-                    if (line.isEmpty()) { continue; }
-                    if (!line.startsWith("data: ")) { continue; }
-
-                    String data = line.substring(6).trim();
-                    if ("[DONE]".equals(data)) { break; }
-
-                    try {
-                        JsonNode chunk = objectMapper.readTree(data);
-                        JsonNode choice = chunk.path("choices").get(0);
-                        if (choice == null || choice.isNull()) { continue; }
-                        chunkCount++;
-
-                        JsonNode delta = choice.path("delta");
-                        String reasoning = delta.path("reasoning_content").asText(null);
-                        if (reasoning != null && !reasoning.isEmpty()) {
-                            reasoningLength += reasoning.length();
-                            if (pushMode.captureReasoning) {
-                                fullReasoning.append(reasoning);
-                            }
-                            pushStreamDelta(session, pushMode, "thinking", reasoning, chunkCount);
-                        }
-
-                        String content = delta.path("content").asText(null);
-                        if (content != null && !content.isEmpty()) {
-                            fullContent.append(content);
-                            pushStreamDelta(session, pushMode, "content", content, chunkCount);
-                        }
-                    } catch (SseStreamClosedException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        log.warn("解析 chunk 失败: {} — {}", truncate(line, 100), e.getMessage());
-                    }
-                }
-            }
-
-            return new StreamResult(fullContent.toString().trim(), fullReasoning.toString(), reasoningLength, chunkCount);
-
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("DeepSeek 流式调用异常", e);
-            throw new RuntimeException("流式调用失败: " + e.getMessage(), e);
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-    }
-
-    /** 非流式调用 DeepSeek（供 generateSync 使用）。 */
-    private String callDeepSeek(String prompt) {
-        AiRuntimeConfig runtimeConfig = requireGenerationConfig();
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", runtimeConfig.model());
-        requestBody.put("messages", List.of(
-                Map.of("role", "system", "content",
-                        "你是一位资深技术面试官，擅长出高质量面试题并给出详细解答。"),
-                Map.of("role", "user", "content", prompt)
-        ));
-        requestBody.put("temperature", 0.7);
-        requestBody.put("max_tokens", maxTokens);
-
-        log.info("非流式请求: model={}, prompt长度={}字符, maxTokens={}", runtimeConfig.model(), prompt.length(), maxTokens);
-        long t = System.currentTimeMillis();
-
-        try {
-            String json = objectMapper.writeValueAsString(requestBody);
-
-            HttpURLConnection conn = (HttpURLConnection) URI.create(runtimeConfig.apiUrl()).toURL().openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Authorization", "Bearer " + runtimeConfig.apiKey());
-            conn.setDoOutput(true);
-            conn.setConnectTimeout(15000);
-            conn.setReadTimeout(600000);
-
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write(json.getBytes(StandardCharsets.UTF_8));
-            }
-
-            int status = conn.getResponseCode();
-            long apiTime = System.currentTimeMillis() - t;
-            log.info("DeepSeek 响应: status={}, 耗时={}ms", status, apiTime);
-
-            if (status == 200) {
-                String response = new String(
-                        conn.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-                log.info("响应体大小: {} 字符, 总耗时={}ms", response.length(), System.currentTimeMillis() - t);
-                return response;
-            }
-
-            String errorBody = new String(
-                    conn.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
-            log.error("DeepSeek API 错误: status={}, body={}", status, truncate(errorBody, 500));
-            throw new RuntimeException("DeepSeek API 错误: " + status + " " + errorBody);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("调用 DeepSeek API 异常: {}", e.getMessage());
-            throw new RuntimeException("调用 DeepSeek API 失败: " + e.getMessage(), e);
-        }
     }
 
     private AiRuntimeConfig requireGenerationConfig() {
@@ -1050,14 +851,14 @@ public class AiQuestionService {
 
     /**
      * 根据分类名称解析分类 ID。支持模糊匹配（包含关系）。
+     * 复用 CategoryService 缓存，避免每次全表扫描。
      */
     public Long resolveCategoryId(String categoryName) {
         if (categoryName == null || categoryName.isBlank()) {
             log.warn("分类名称为空，默认返回 categoryId=1");
             return 1L;
         }
-        List<Category> all = categoryMapper.selectList(
-                new LambdaQueryWrapper<Category>().select(Category::getId, Category::getName));
+        List<Category> all = categoryService.getAll();
         for (Category c : all) {
             if (c.getName().equals(categoryName)) {
                 log.debug("精确匹配分类: name='{}' -> id={}", categoryName, c.getId());

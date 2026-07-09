@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 快乐8选5工具接口，提供开奖同步、历史开奖和 Java 规则推荐能力。
+ * 快乐8工具接口，提供开奖同步、历史开奖和 Java 规则推荐能力，支持选1到选10玩法。
  */
-@Tag(name = "快乐8选5工具")
+@Tag(name = "快乐8工具")
 @RestController
 @RequestMapping("/api/tools/lottery/kl8")
 @RequiredArgsConstructor
@@ -72,12 +72,12 @@ public class LotteryKl8Controller {
     }
 
     /**
-     * 生成当前用户的快乐8选5推荐。
+     * 生成当前用户的快乐8推荐，支持选1到选10玩法。
      *
      * @param request 推荐请求
      * @return 推荐结果
      */
-    @Operation(summary = "生成快乐8选5推荐")
+    @Operation(summary = "生成快乐8推荐")
     @PostMapping("/recommendations")
     public ResponseEntity<ApiResponse<LotteryKl8RecommendationVO>> recommend(
             @Valid @RequestBody LotteryKl8RecommendationRequest request) {

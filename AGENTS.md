@@ -68,6 +68,7 @@ lcb-interview/
 | `DB_URL` / `DB_USERNAME` / `DB_PASSWORD` | MySQL 连接配置 |
 | `REDIS_HOST` / `REDIS_PORT` | Redis 连接配置 |
 | `ADMIN_TOKEN` | 管理后台 Token |
+| `CORS_ALLOWED_ORIGINS` | CORS 白名单域名，逗号分隔，留空时开发环境允许所有来源 |
 | `AI_INTERVIEW_ENABLED` / `AI_INTERVIEW_TIMEOUT_MS` | AI 面试评分开关与超时 |
 | `AI_OPENCODE_API_KEY` / `AI_DEEPSEEK_MODEL` / `AI_DEEPSEEK_URL` | OpenAI 兼容 AI 服务配置 |
 
@@ -173,7 +174,21 @@ if (tag != null) { ... }
 | `GET` | `/api/questions` | 分页查询题目，支持 `category`、`difficulty`、`tag`、`keyword`、`page`、`size` |
 | `GET` | `/api/questions/{id}` | 获取题目详情 |
 | `GET` | `/api/questions/hot` | 热门题目排行 |
+| `GET` | `/api/questions/list` | 按 ID 列表批量查询题目 |
 | `POST` | `/api/interview/evaluate` | 生成面试训练评分 |
+| `POST` | `/api/auth/register` | 普通用户注册 |
+| `POST` | `/api/auth/login` | 普通用户登录 |
+| `GET` | `/api/auth/me` | 查询当前普通用户（需登录） |
+| `GET` | `/api/tools/reading/excerpts` | 分页查询当前用户书摘（需登录） |
+| `POST` | `/api/tools/reading/excerpts` | 新增书摘（需登录） |
+| `PUT` | `/api/tools/reading/excerpts/{id}` | 更新书摘（需登录） |
+| `DELETE` | `/api/tools/reading/excerpts/{id}` | 删除书摘（需登录） |
+| `GET` | `/api/tools/reading/excerpts/export` | 导出书摘 Markdown（需登录） |
+| `POST` | `/api/tools/lottery/kl8/sync` | 同步快乐 8 开奖数据（需登录） |
+| `GET` | `/api/tools/lottery/kl8/sync-status` | 查询快乐 8 同步状态（需登录） |
+| `GET` | `/api/tools/lottery/kl8/draws` | 查询快乐 8 近期开奖（需登录） |
+| `POST` | `/api/tools/lottery/kl8/recommendations` | 生成快乐 8 推荐，支持选1到选10（需登录） |
+| `GET` | `/api/tools/lottery/kl8/recommendations` | 查询快乐 8 推荐历史（需登录） |
 
 管理后台接口：
 
@@ -190,8 +205,14 @@ if (tag != null) { ... }
 | `POST` | `/api/admin/questions/draft/batch-reject` | 批量拒绝草稿 |
 | `GET` | `/api/admin/ai/generate-stream` | SSE 方式生成题目答案 |
 | `GET` | `/api/admin/ai/fill-answer-stream` | SSE 方式补齐答案字段 |
+| `GET` | `/api/admin/ai/rewrite-published-stream` | SSE 方式重写已发布题目答案 |
+| `GET` | `/api/admin/ai/config-status` | 查询 AI 配置状态 |
+| `GET` | `/api/admin/ai/config` | 查询 AI 运行时配置（脱敏） |
+| `PUT` | `/api/admin/ai/config` | 更新 AI 运行时配置 |
 | `POST` | `/api/admin/ai/batch` | 启动批量生成任务 |
 | `GET` | `/api/admin/ai/batch/status` | 查询批量生成进度 |
+| `POST` | `/api/admin/ai/fill-answer-batch` | 启动批量补答案任务 |
+| `GET` | `/api/admin/ai/fill-answer-batch/status` | 查询批量补答案进度 |
 
 ## 前端规范
 
@@ -216,6 +237,9 @@ if (tag != null) { ... }
 | `/study` | 学习计划与进度中心 |
 | `/practice` | 模拟练习 |
 | `/experiences` | 面试经验与材料沉淀 |
+| `/tools` | 个人工具（号码预测、书摘库，需登录） |
+| `/auth/login` | 普通用户登录 |
+| `/auth/register` | 普通用户注册 |
 | `/admin/login` | 管理后台登录 |
 | `/admin/dashboard` | 题库质量总览 |
 | `/admin/ai-generate` | AI 批量生成答案 |

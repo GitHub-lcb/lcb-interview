@@ -14,6 +14,7 @@ import com.lcbinterview.model.Category;
 import com.lcbinterview.model.Question;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +44,14 @@ public class QuestionService {
     private final QuestionMapper questionMapper;
     private final ViewCountService viewCountService;
     private final CategoryMapper categoryMapper;
+
+    /**
+     * 失效热门题目相关缓存。在草稿发布或答案重写后调用，保证热门排行及时更新。
+     */
+    @CacheEvict(value = {"hotQuestions", "hotQuestionVos"}, allEntries = true)
+    public void evictHotQuestionCache() {
+        log.info("失效热门题目缓存");
+    }
 
     /**
      * 分页搜索题目。支持分类筛选、难度筛选、关键词全文搜索、标签筛选。

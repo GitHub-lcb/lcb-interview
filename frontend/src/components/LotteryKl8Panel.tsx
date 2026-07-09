@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Alert, Button, Empty, InputNumber, Spin, Tabs, Tag } from 'antd'
+import { Alert, Button, Empty, InputNumber, Select, Spin, Tabs, Tag } from 'antd'
 import { BulbOutlined, HistoryOutlined, LineChartOutlined, ReloadOutlined, ThunderboltOutlined, WarningOutlined } from '@ant-design/icons'
 import {
   createKl8Recommendation,
@@ -15,6 +15,7 @@ const DISCLAIMER = '彩票结果具有随机性，本推荐仅为娱乐统计参
 const KL8_MIN_NUMBER = 1
 const KL8_MAX_NUMBER = 80
 const KL8_NUMBER_RANGE = Array.from({ length: KL8_MAX_NUMBER }, (_, index) => index + 1)
+const PICK_SIZE_OPTIONS = Array.from({ length: 10 }, (_, index) => ({ label: `选${index + 1}`, value: index + 1 }))
 
 interface LotteryAnalysisPayload {
   confidenceLabel?: string
@@ -139,11 +140,13 @@ export default function LotteryKl8Panel() {
   const [history, setHistory] = useState<LotteryKl8Recommendation[]>([])
   const [current, setCurrent] = useState<LotteryKl8Recommendation | null>(null)
   const [baseIssueCount, setBaseIssueCount] = useState(2000)
+  const [pickSize, setPickSize] = useState(5)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [recommending, setRecommending] = useState(false)
 
   const latest = useMemo(() => current ?? history[0] ?? null, [current, history])
+  const currentPickSize = latest?.pickSize ?? 5
   const analysis = useMemo(() => parseJson<LotteryAnalysisPayload>(latest?.analysisJson), [latest])
   const aiFallback = analysis?.aiFallback
   const backtestSummary = analysis?.backtestSummary
@@ -152,7 +155,7 @@ export default function LotteryKl8Panel() {
   const optimizedGroups = optimizedPortfolio?.groups ?? []
   const pairRecommendations = optimizedPortfolio?.pairRecommendations ?? []
   const neighborRecommendations = optimizedPortfolio?.neighborRecommendations ?? []
-  const selectedNeighbors = neighborRecommendations.filter(candidate => candidate.selected).slice(0, 5)
+  const selectedNeighbors = neighborRecommendations.filter(candidate => candidate.selected).slice(0, currentPickSize)
   const candidates = useMemo(() => parseJson<LotteryCandidateNumber[]>(latest?.candidatePoolJson) ?? [], [latest])
   const calibration = useMemo(
     () => parseJson<LotteryCalibrationSnapshot>(latest?.calibrationSnapshotJson),
@@ -202,7 +205,7 @@ export default function LotteryKl8Panel() {
     }
     setRecommending(true)
     try {
-      const result = await createKl8Recommendation(baseIssueCount)
+      const result = await createKl8Recommendation(baseIssueCount, pickSize)
       setCurrent(result)
       await load()
       emitFeedbackSuccess('Java 推荐已生成')
@@ -216,10 +219,10 @@ export default function LotteryKl8Panel() {
   }
 
   return (
-    <section className="tool-section lottery-tool" aria-label="快乐8选5">
+    <section className="tool-section lottery-tool" aria-label={`快乐8选${pickSize}`}>
       <div className="tool-section-head">
         <div>
-          <div className="dashboard-kicker">快乐8选5</div>
+          <div className="dashboard-kicker">快乐8选{pickSize}</div>
           <h2>Java 历史数据回测推荐</h2>
           <p>后端同步公开开奖数据，使用纯 Java 提取冷热、遗漏、区间、上一期邻位、连号结构和回测特征，生成 1 组精选号码。</p>
         </div>
@@ -227,8 +230,8 @@ export default function LotteryKl8Panel() {
           <Button icon={<ReloadOutlined />} loading={syncing} onClick={handleSync}>
             同步开奖
           </Button>
-          <Button type="primary" icon={<ThunderboltOutlined />} loading={recommending} onClick={handleRecommend}>
-            Java 推荐 1 组
+                    <Button type="primary" icon={<ThunderboltOutlined />} loading={recommending} onClick={handleRecommend}>
+            Java 推荐选{pickSize}
           </Button>
         </div>
       </div>
@@ -252,10 +255,21 @@ export default function LotteryKl8Panel() {
                   <strong>{status?.drawCount ?? 0}</strong>
                   <small>{status?.message || '暂无状态'}</small>
                 </article>
-                <article>
+                                <article>
                   <span>推荐基准</span>
                   <InputNumber min={20} max={2000} value={baseIssueCount} onChange={value => setBaseIssueCount(value ?? 2000)} />
                   <small>历史期数，默认尽量取满</small>
+                </article>
+                <article>
+                  <span>玩法</span>
+                  <Select
+                    size="small"
+                    options={PICK_SIZE_OPTIONS}
+                    value={pickSize}
+                    onChange={value => setPickSize(value ?? 5)}
+                    style={{ width: 100 }}
+                  />
+                  <small>每组推荐号码数量</small>
                 </article>
               </div>
 
@@ -267,7 +281,7 @@ export default function LotteryKl8Panel() {
                       {analysis?.confidenceLabel && <Tag color="geekblue">参考强度 {analysis.confidenceLabel}</Tag>}
                       {latest.strategyVersion && <Tag>{latest.strategyVersion}</Tag>}
                       {latest.evaluatedIssueNo && <Tag color="cyan">已结算 {latest.evaluatedIssueNo}</Tag>}
-                      {typeof latest.maxHitCount === 'number' && <Tag color="green">最高命中 {latest.maxHitCount}/5</Tag>}
+                      {typeof latest.maxHitCount === 'number' && <Tag color="green">最高命中 {latest.maxHitCount}/{currentPickSize}</Tag>}
                       {calibration && calibration.evaluatedCount > 0 && <Tag color="purple">反馈校准 {calibration.evaluatedCount} 条</Tag>}
                       <strong>基于近 {latest.baseIssueCount} 期，最新期号 {latest.latestIssueNo}</strong>
                     </div>
@@ -339,7 +353,7 @@ export default function LotteryKl8Panel() {
                                 <div className="lottery-metric-row">
                                   <span>样本 {backtestSummary.evaluatedIssueCount}</span>
                                   <span>均值 {backtestSummary.averageHitCount.toFixed(2)}</span>
-                                  <span>最高 {backtestSummary.maxHitCount}/5</span>
+                                  <span>最高 {backtestSummary.maxHitCount}/{currentPickSize}</span>
                                 </div>
                                 {backtestWeights && (
                                   <div className="lottery-weight-row">
@@ -476,7 +490,7 @@ export default function LotteryKl8Panel() {
                                 <div className="lottery-hit-grid">
                                   {hitSummary.groups.map(group => (
                                     <article key={group.groupIndex}>
-                                      <strong>第 {group.groupIndex} 组 · 命中 {group.hitCount}/5</strong>
+                                      <strong>第 {group.groupIndex} 组 · 命中 {group.hitCount}/{currentPickSize}</strong>
                                       <div>
                                         {group.numbers.map(number => (
                                           <em key={number} className={group.hitNumbers.includes(number) ? 'is-hit' : undefined}>

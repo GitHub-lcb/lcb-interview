@@ -67,7 +67,7 @@ public class QuestionAdminController {
     @Operation(summary = "查询草稿题目详情")
     @GetMapping("/draft/{id}")
     public ResponseEntity<ApiResponse<QuestionAdminVO>> getDraft(@PathVariable Long id) {
-        return ResponseEntity.ok(questionAdminService.getDraft(id));
+        return ResponseEntity.ok(ApiResponse.success(questionAdminService.getDraft(id)));
     }
 
     /**
@@ -82,7 +82,8 @@ public class QuestionAdminController {
     public ResponseEntity<ApiResponse<Void>> updateDraft(
             @PathVariable Long id,
             @RequestBody Question question) {
-        return ResponseEntity.ok(questionAdminService.updateDraft(id, question));
+        questionAdminService.updateDraft(id, question);
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     /**
@@ -94,7 +95,8 @@ public class QuestionAdminController {
     @Operation(summary = "发布单个草稿")
     @PostMapping("/draft/{id}/approve")
     public ResponseEntity<ApiResponse<Void>> approve(@PathVariable Long id) {
-        return ResponseEntity.ok(questionAdminService.approve(id));
+        questionAdminService.approve(id);
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     /**
@@ -109,7 +111,8 @@ public class QuestionAdminController {
     public ResponseEntity<ApiResponse<Void>> reject(
             @PathVariable Long id,
             @RequestBody(required = false) JsonNode request) {
-        return ResponseEntity.ok(questionAdminService.reject(id, request));
+        questionAdminService.reject(id, request);
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     /**
@@ -121,7 +124,8 @@ public class QuestionAdminController {
     @Operation(summary = "批量发布草稿")
     @PostMapping("/draft/batch-approve")
     public ResponseEntity<ApiResponse<Void>> batchApprove(@RequestBody List<Long> ids) {
-        return ResponseEntity.ok(questionAdminService.batchApprove(ids));
+        questionAdminService.batchApprove(ids);
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     /**
@@ -133,6 +137,7 @@ public class QuestionAdminController {
     @Operation(summary = "批量拒绝草稿")
     @PostMapping("/draft/batch-reject")
     public ResponseEntity<ApiResponse<Void>> batchReject(@RequestBody JsonNode request) {
-        return ResponseEntity.ok(questionAdminService.batchReject(request));
+        questionAdminService.batchReject(request);
+        return ResponseEntity.ok(ApiResponse.success());
     }
 }

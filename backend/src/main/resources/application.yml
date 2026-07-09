@@ -31,6 +31,15 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
 logging:
   level:
     com.lcbinterview: info
@@ -38,6 +47,12 @@ logging:
 
 admin:
   token: ${ADMIN_TOKEN:dev-admin-token-change-me}
+
+cors:
+  # 生产环境通过环境变量 CORS_ALLOWED_ORIGINS 指定白名单域名，逗号分隔
+  # 例：https://interview.example.com,https://admin.example.com
+  # 留空时开发环境默认允许所有来源
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:}
 
 app:
   auth:
