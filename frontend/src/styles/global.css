@@ -16008,6 +16008,48 @@ p {
     grid-column: span 1;
   }
 
+  .lottery-recommendation,
+  .lottery-recommendation > *,
+  .lottery-recommendation-head,
+  .lottery-recommendation-head > div,
+  .lottery-group-card,
+  .lottery-group-card p {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .lottery-recommendation-head {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .lottery-recommendation-head small {
+    overflow-wrap: anywhere;
+  }
+
+  .lottery-recommendation-head .ant-tag {
+    max-width: 100%;
+    margin-inline-end: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.35;
+  }
+
+  .lottery-recommendation > p,
+  .lottery-group-card p,
+  .lottery-pair-list span,
+  .lottery-pair-list p,
+  .lottery-analysis-panel p,
+  .lottery-analysis-panel li,
+  .lottery-portfolio-list p,
+  .lottery-candidate-grid p,
+  .lottery-candidate-grid span,
+  .lottery-calibration-panel p,
+  .lottery-hit-panel p {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
   .lottery-group-grid.is-single .lottery-group-card {
     padding: 14px;
     border-radius: 12px;
