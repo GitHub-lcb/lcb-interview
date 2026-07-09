@@ -16,6 +16,8 @@ const KL8_MIN_NUMBER = 1
 const KL8_MAX_NUMBER = 80
 const KL8_NUMBER_RANGE = Array.from({ length: KL8_MAX_NUMBER }, (_, index) => index + 1)
 const PICK_SIZE_OPTIONS = Array.from({ length: 10 }, (_, index) => ({ label: `选${index + 1}`, value: index + 1 }))
+const PICK_SIZE_VALUES = PICK_SIZE_OPTIONS.map(option => option.value)
+const RECOMMENDATION_HISTORY_SIZE = 12
 
 interface LotteryAnalysisPayload {
   confidenceLabel?: string
@@ -144,9 +146,10 @@ export default function LotteryKl8Panel() {
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [recommending, setRecommending] = useState(false)
+  const [recommendingAll, setRecommendingAll] = useState(false)
 
   const latest = useMemo(() => current ?? history[0] ?? null, [current, history])
-  const currentPickSize = latest?.pickSize ?? 5
+  const currentPickSize = latest?.pickSize ?? pickSize
   const analysis = useMemo(() => parseJson<LotteryAnalysisPayload>(latest?.analysisJson), [latest])
   const aiFallback = analysis?.aiFallback
   const backtestSummary = analysis?.backtestSummary
@@ -169,7 +172,7 @@ export default function LotteryKl8Panel() {
       const [nextStatus, drawPage, recommendationPage] = await Promise.all([
         getKl8SyncStatus(),
         listKl8Draws(0, 30),
-        listKl8Recommendations(0, 8),
+        listKl8Recommendations(0, RECOMMENDATION_HISTORY_SIZE),
       ])
       setStatus(nextStatus)
       setDraws(drawPage.content)
@@ -218,19 +221,48 @@ export default function LotteryKl8Panel() {
     }
   }
 
+  const handleRecommendAll = async () => {
+    if ((status?.drawCount ?? 0) < 20) {
+      emitFeedbackWarning('历史开奖不足 20 期，请先同步开奖数据')
+      return
+    }
+    setRecommendingAll(true)
+    try {
+      let lastResult: LotteryKl8Recommendation | null = null
+      for (const nextPickSize of PICK_SIZE_VALUES) {
+        lastResult = await createKl8Recommendation(baseIssueCount, nextPickSize)
+      }
+      if (lastResult) {
+        setCurrent(lastResult)
+        setPickSize(lastResult.pickSize)
+      }
+      await load()
+      emitFeedbackSuccess('已生成选1到选10共 10 条推荐')
+    } catch (error) {
+      if (isTimeoutError(error)) {
+        emitFeedbackWarning('批量推荐生成耗时较长，请稍后刷新推荐历史查看结果')
+      }
+    } finally {
+      setRecommendingAll(false)
+    }
+  }
+
   return (
-    <section className="tool-section lottery-tool" aria-label={`快乐8选${pickSize}`}>
+    <section className="tool-section lottery-tool" aria-label={`快乐8选${currentPickSize}`}>
       <div className="tool-section-head">
         <div>
-          <div className="dashboard-kicker">快乐8选{pickSize}</div>
+          <div className="dashboard-kicker">快乐8选{currentPickSize}</div>
           <h2>Java 历史数据回测推荐</h2>
           <p>后端同步公开开奖数据，使用纯 Java 提取冷热、遗漏、区间、上一期邻位、连号结构和回测特征，生成 1 组精选号码。</p>
         </div>
         <div className="tool-actions">
-          <Button icon={<ReloadOutlined />} loading={syncing} onClick={handleSync}>
+          <Button icon={<ReloadOutlined />} loading={syncing} disabled={recommending || recommendingAll} onClick={handleSync}>
             同步开奖
           </Button>
-                    <Button type="primary" icon={<ThunderboltOutlined />} loading={recommending} onClick={handleRecommend}>
+          <Button icon={<ThunderboltOutlined />} loading={recommendingAll} disabled={syncing || recommending} onClick={handleRecommendAll}>
+            一键生成选1-选10
+          </Button>
+          <Button type="primary" icon={<ThunderboltOutlined />} loading={recommending} disabled={syncing || recommendingAll} onClick={handleRecommend}>
             Java 推荐选{pickSize}
           </Button>
         </div>
@@ -267,6 +299,7 @@ export default function LotteryKl8Panel() {
                     options={PICK_SIZE_OPTIONS}
                     value={pickSize}
                     onChange={value => setPickSize(value ?? 5)}
+                    disabled={recommending || recommendingAll}
                     style={{ width: 100 }}
                   />
                   <small>每组推荐号码数量</small>
@@ -546,8 +579,11 @@ export default function LotteryKl8Panel() {
                 <h3><HistoryOutlined /> 推荐历史</h3>
                 <div className="lottery-history-list">
                   {history.map(item => (
-                    <button key={item.id} type="button" onClick={() => setCurrent(item)}>
-                      <strong>{item.source === 'AI' ? '历史 AI 推荐' : 'Java 推荐'} · {item.latestIssueNo}</strong>
+                    <button key={item.id} type="button" onClick={() => {
+                      setCurrent(item)
+                      setPickSize(item.pickSize)
+                    }}>
+                      <strong>{item.source === 'AI' ? '历史 AI 推荐' : 'Java 推荐'}选{item.pickSize} · {item.latestIssueNo}</strong>
                       <small>{formatDateTime(item.createdAt)}</small>
                     </button>
                   ))}
