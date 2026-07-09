@@ -16008,6 +16008,27 @@ p {
     grid-column: span 1;
   }
 
+  .lottery-group-grid.is-single .lottery-group-card {
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .lottery-group-grid.is-single .lottery-number-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(42px, 1fr));
+    gap: 8px;
+    align-items: center;
+  }
+
+  .lottery-group-grid.is-single .lottery-number-row em {
+    justify-self: center;
+    width: 100%;
+    max-width: 48px;
+    height: auto;
+    aspect-ratio: 1;
+    font-size: 18px;
+  }
+
   .lottery-trend-head {
     display: grid;
   }
