@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 快乐8推荐展示对象，支持选1到选10玩法。
+ * 快乐8推荐展示对象，固定选5玩法，pickSize 字段保留用于兼容旧记录。
  *
  * @param id             推荐 ID
  * @param source         推荐来源
- * @param pickSize       每组推荐号码数量（1-10）
+ * @param pickSize       每组推荐号码数量，新记录固定为 5，旧记录可能为其他值
  * @param baseIssueCount 使用历史期数
  * @param latestIssueNo  最新期号
  * @param groups         推荐号码组，当前 Java 策略返回 1 组

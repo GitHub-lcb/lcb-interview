@@ -72,7 +72,7 @@ public class LotteryKl8Controller {
     }
 
     /**
-     * 生成当前用户的快乐8推荐，支持选1到选10玩法。
+     * 生成当前用户的快乐8选5推荐。
      *
      * @param request 推荐请求
      * @return 推荐结果

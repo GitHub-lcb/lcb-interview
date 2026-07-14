@@ -42,7 +42,7 @@ describe('tools api', () => {
 
     expect(api.post).toHaveBeenCalledWith(
       '/tools/lottery/kl8/recommendations',
-      { baseIssueCount: 120, pickSize: 5 },
+      { baseIssueCount: 120 },
       { timeout: 120000 },
     )
   })

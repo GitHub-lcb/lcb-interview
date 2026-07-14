@@ -64,7 +64,7 @@ public class LotteryKl8FeatureService {
      */
     @Transactional(readOnly = true)
     public LotteryKl8FeatureReport buildReport(int baseIssueCount, LotteryKl8StrategyCalibration calibration) {
-        return buildReport(baseIssueCount, calibration, DEFAULT_PICK_SIZE);
+        return buildReport(baseIssueCount, calibration, DEFAULT_PICK_SIZE, Map.of());
     }
 
     /**
@@ -77,9 +77,29 @@ public class LotteryKl8FeatureService {
      */
     @Transactional(readOnly = true)
     public LotteryKl8FeatureReport buildReport(int baseIssueCount, LotteryKl8StrategyCalibration calibration, int pickSize) {
+        return buildReport(baseIssueCount, calibration, pickSize, Map.of());
+    }
+
+    /**
+     * 基于最近指定期数、校准参数、选号数量和单号命中反馈构建快乐8特征报告。
+     * 单号命中反馈来自当前用户历史推荐命中统计，用于微调每个号码的综合分。
+     *
+     * @param baseIssueCount    使用历史期数
+     * @param calibration       策略校准参数，空值时使用中性参数
+     * @param pickSize          每组号码数量（1-10）
+     * @param numberHitFeedback 单号命中反馈分映射，空映射表示无有效反馈
+     * @return 特征报告
+     */
+    @Transactional(readOnly = true)
+    public LotteryKl8FeatureReport buildReport(
+            int baseIssueCount,
+            LotteryKl8StrategyCalibration calibration,
+            int pickSize,
+            Map<Integer, Double> numberHitFeedback) {
         LotteryKl8StrategyCalibration calibrationToUse = calibration == null
                 ? LotteryKl8StrategyCalibration.neutral()
                 : calibration;
+        Map<Integer, Double> feedbackToUse = numberHitFeedback == null ? Map.of() : numberHitFeedback;
         int limit = Math.max(20, Math.min(MAX_BASE_ISSUE_COUNT, baseIssueCount));
         List<LotteryKl8Draw> draws = drawMapper.selectList(Wrappers.<LotteryKl8Draw>lambdaQuery()
                 .orderByDesc(LotteryKl8Draw::getDrawDate)
@@ -128,7 +148,8 @@ public class LotteryKl8FeatureService {
                 hot,
                 cold,
                 calibrationToUse,
-                backtestSummary.factorWeights());
+                backtestSummary.factorWeights(),
+                feedbackToUse);
         List<LotteryKl8CandidateNumber> candidatePool = buildCandidatePool(profiles);
         Map<String, Integer> pairCounts = buildPairCounts(drawSets);
         List<LotteryKl8PairProfile> pairHighlights = buildPairHighlights(pairCounts, drawSets.size(), frequency);
@@ -477,7 +498,8 @@ public class LotteryKl8FeatureService {
             List<Integer> hot,
             List<Integer> cold,
             LotteryKl8StrategyCalibration calibration,
-            LotteryKl8BacktestFactorWeights backtestWeights) {
+            LotteryKl8BacktestFactorWeights backtestWeights,
+            Map<Integer, Double> numberHitFeedback) {
         int total = drawSets.size();
         int recent30Window = Math.min(30, total);
         int recent60Window = Math.min(60, total);
@@ -512,6 +534,8 @@ public class LotteryKl8FeatureService {
             double coldRecoveryScore = coldSet.contains(number)
                     ? Math.min(1, missingScore + Math.max(0, trendScore) * 2)
                     : 0;
+            // 单号命中反馈：历史推荐命中率高于随机基线的号码加分，低于的扣分
+            double feedbackScore = numberHitFeedback.getOrDefault(number, 0.0);
             double compositeScore = round((frequencyScore * 20 + recentScore * 16 + midTermScore * 8)
                     * calibration.hotMultiplier() * backtestWeights.hotWeight()
                     + decayedFrequencyScore * 18 * calibration.hotMultiplier() * backtestWeights.decayWeight()
@@ -519,7 +543,8 @@ public class LotteryKl8FeatureService {
                     * 18 * calibration.missingMultiplier() * backtestWeights.missingWeight()
                     + Math.min(1, trendPositive) * 12 * calibration.trendMultiplier() * backtestWeights.trendWeight()
                     + stabilityScore * 8 * calibration.balanceMultiplier() * backtestWeights.balanceWeight()
-                    + coldRecoveryScore * 8 * (calibration.coldMultiplier() - 1));
+                    + coldRecoveryScore * 8 * (calibration.coldMultiplier() - 1)
+                    + feedbackScore * 15);
             List<String> tags = tags(number, hotSet, coldSet, missing, trendScore, volatility,
                     recent30, recent120, decayedFrequencyScore, omissionPressureScore);
             profiles.add(new LotteryKl8NumberProfile(
@@ -962,13 +987,15 @@ public class LotteryKl8FeatureService {
             List<Integer> candidates,
             List<LotteryKl8NeighborRecommendation> neighborRecommendations,
             int pickSize) {
+        // 邻位候选优先入池（LinkedHashSet 保持插入顺序，邻位排前），
+        // 但始终补充完整候选池，确保 bestConsecutiveSeed 能从热号中找到连号种子。
+        // 否则当上一期开奖号码无连号时，邻位候选（±1）之间也不连号，
+        // bestConsecutiveSeed 返回空列表，连号结构完全丢失。
         LinkedHashSet<Integer> pool = new LinkedHashSet<>();
         neighborRecommendations.stream()
                 .map(LotteryKl8NeighborRecommendation::number)
                 .forEach(pool::add);
-        if (pool.size() < pickSize) {
-            candidates.forEach(pool::add);
-        }
+        candidates.forEach(pool::add);
         return List.copyOf(pool);
     }
 
@@ -1092,11 +1119,13 @@ public class LotteryKl8FeatureService {
         List<Integer> simulated = new ArrayList<>(selected);
         simulated.add(number);
         int longestRun = longestConsecutiveRun(simulated);
+        // 连号加分需与 compositeScore 量级（50-120）竞争，
+        // 原值 34/20 过低，常被 baseScore 差异淹没导致连号丢失。
         if (longestRun >= 3) {
-            return 34;
+            return 55;
         }
         if (selected.contains(number - 1) || selected.contains(number + 1)) {
-            return 20;
+            return 35;
         }
         return 0;
     }

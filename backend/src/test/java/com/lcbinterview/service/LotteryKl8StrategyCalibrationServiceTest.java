@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,6 +33,53 @@ class LotteryKl8StrategyCalibrationServiceTest {
         assertTrue(calibration.pairMultiplier() > 1.0);
         assertTrue(calibration.summary().contains("历史命中反馈"));
         assertTrue(calibration.summary().contains("对子"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void userCalibrationFallsBackToGlobalWhenInsufficient() {
+        LotteryKl8RecommendationMapper mapper = mock(LotteryKl8RecommendationMapper.class);
+        // 第一次调用（用户级）返回空列表，第二次调用（全局）返回有效数据
+        when(mapper.selectList(any())).thenReturn(List.of(), List.of(evaluatedRecommendation()));
+        LotteryKl8StrategyCalibrationService service =
+                new LotteryKl8StrategyCalibrationService(mapper, new ObjectMapper());
+
+        LotteryKl8StrategyCalibration calibration = service.currentCalibration(42L);
+
+        // 用户样本不足 10 条，回退全局后应返回有效校准
+        assertEquals(1, calibration.evaluatedCount());
+        assertTrue(calibration.hotMultiplier() > 1.0);
+    }
+
+    @Test
+    void numberHitFeedbackTracksPerNumberHitRate() {
+        LotteryKl8RecommendationMapper mapper = mock(LotteryKl8RecommendationMapper.class);
+        when(mapper.selectList(any())).thenReturn(List.of(evaluatedRecommendation()));
+        LotteryKl8StrategyCalibrationService service =
+                new LotteryKl8StrategyCalibrationService(mapper, new ObjectMapper());
+
+        Map<Integer, Double> feedback = service.numberHitFeedback(null);
+
+        // 号码 1 在 5 组推荐中全部命中，命中率 100%，反馈分应为正值
+        assertTrue(feedback.containsKey(1));
+        assertTrue(feedback.get(1) > 0, "命中率高于随机基线的号码应有正反馈分");
+        // 号码 60 从未命中，反馈分应为负值
+        assertTrue(feedback.containsKey(60));
+        assertTrue(feedback.get(60) < 0, "从未命中的号码应有负反馈分");
+        // 号码 1 的反馈分应高于号码 60
+        assertTrue(feedback.get(1) > feedback.get(60));
+    }
+
+    @Test
+    void numberHitFeedbackReturnsEmptyWhenNoEvaluatedRecords() {
+        LotteryKl8RecommendationMapper mapper = mock(LotteryKl8RecommendationMapper.class);
+        when(mapper.selectList(any())).thenReturn(List.of());
+        LotteryKl8StrategyCalibrationService service =
+                new LotteryKl8StrategyCalibrationService(mapper, new ObjectMapper());
+
+        Map<Integer, Double> feedback = service.numberHitFeedback(null);
+
+        assertTrue(feedback.isEmpty());
     }
 
     private LotteryKl8Recommendation evaluatedRecommendation() {
