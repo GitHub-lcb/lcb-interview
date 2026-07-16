@@ -38,7 +38,7 @@ class LotteryKl8RecommendationServiceTest {
         LotteryKl8FeatureReport report = reportWithSingleOptimizedGroup();
         when(calibrationService.currentCalibration(7L)).thenReturn(calibration);
         when(calibrationService.numberHitFeedback(7L)).thenReturn(Map.of());
-        when(featureService.buildReport(eq(2000), any(LotteryKl8StrategyCalibration.class), eq(5), any())).thenReturn(report);
+        when(featureService.buildReport(eq(100), any(LotteryKl8StrategyCalibration.class), eq(5), any())).thenReturn(report);
         when(recommendationMapper.insert(any())).thenAnswer(invocation -> {
             LotteryKl8Recommendation recommendation = invocation.getArgument(0);
             recommendation.setId(99L);
@@ -64,7 +64,7 @@ class LotteryKl8RecommendationServiceTest {
                 saved.getRecommendationsJson(), new TypeReference<>() {
                 });
         assertEquals("RULE_BASED", saved.getSource());
-        assertEquals("KL8_JAVA_NEIGHBOR_RUN_SINGLE_V5", saved.getStrategyVersion());
+        assertEquals("KL8_JAVA_HOT_FREQ_W100_V12", saved.getStrategyVersion());
         assertEquals(1, savedGroups.size());
         assertEquals(List.of(1, 2, 3, 4, 5), savedGroups.get(0).numbers());
         assertEquals(1, result.groups().size());
