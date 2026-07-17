@@ -64,7 +64,7 @@ class LotteryKl8RecommendationServiceTest {
                 saved.getRecommendationsJson(), new TypeReference<>() {
                 });
         assertEquals("RULE_BASED", saved.getSource());
-        assertEquals("KL8_JAVA_HOT_FREQ_W100_V13", saved.getStrategyVersion());
+        assertEquals("KL8_JAVA_HOT_FREQ_W100_V14", saved.getStrategyVersion());
         assertEquals(1, savedGroups.size());
         assertEquals(List.of(1, 2, 3, 4, 5), savedGroups.get(0).numbers());
         assertEquals(1, result.groups().size());
