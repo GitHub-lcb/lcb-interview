@@ -123,7 +123,7 @@ class LotteryKl8FeatureServiceDeepTest {
     }
 
     @Test
-    void buildsSingleGroupFromLatestNeighborsAndConsecutiveRunWithoutSelectedPairs() {
+    void buildsSingleGroupWithoutSelectedPairsOrThreeNumberRun() {
         LotteryKl8DrawMapper mapper = mock(LotteryKl8DrawMapper.class);
         when(mapper.selectList(any())).thenReturn(latestNeighborTrendDraws());
         LotteryKl8FeatureService service = new LotteryKl8FeatureService(mapper);
@@ -134,13 +134,11 @@ class LotteryKl8FeatureServiceDeepTest {
                 .filter(LotteryKl8PairRecommendation::selected)
                 .toList();
         List<Integer> selected = report.optimizedPortfolio().groups().get(0).numbers();
-        Set<Integer> latestNeighbors = latestNeighborNumbers(report.draws().get(0));
 
         assertEquals(0, selectedPairs.size(), "新策略不再强制选择核心对子");
         assertEquals(5, selected.size());
-        assertTrue(latestNeighbors.containsAll(selected), "最终 5 码应优先来自上一期号码左右邻位");
-        assertTrue(hasConsecutiveRun(selected, 3), "邻位策略应优先形成 10、11、12 这类三连号");
-        assertTrue(report.optimizedPortfolio().summary().contains("邻位"));
+        assertFalse(hasConsecutiveRun(selected, 3), "最终 5 码不得出现三连号");
+        assertFalse(report.optimizedPortfolio().neighborRecommendations().isEmpty(), "邻位只作为诊断候选保留");
         assertFalse(report.optimizedPortfolio().summary().contains("核心对子"));
     }
 
@@ -241,20 +239,6 @@ class LotteryKl8FeatureServiceDeepTest {
             draws.add(draw);
         }
         return draws;
-    }
-
-    private Set<Integer> latestNeighborNumbers(LotteryKl8Draw latestDraw) {
-        Set<Integer> neighbors = new LinkedHashSet<>();
-        for (String part : latestDraw.getNumbers().split(",")) {
-            int number = Integer.parseInt(part.trim());
-            if (number > 1) {
-                neighbors.add(number - 1);
-            }
-            if (number < 80) {
-                neighbors.add(number + 1);
-            }
-        }
-        return neighbors;
     }
 
     private boolean hasConsecutiveRun(List<Integer> numbers, int minRunLength) {

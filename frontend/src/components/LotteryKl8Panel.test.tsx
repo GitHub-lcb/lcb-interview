@@ -73,40 +73,39 @@ describe('LotteryKl8Panel', () => {
     await userEvent.click(screen.getByRole('button', { name: /Java 推荐选5/ }))
 
     await waitFor(() => {
-      expect(createKl8Recommendation).toHaveBeenCalledWith(2000, 5)
+      expect(createKl8Recommendation).toHaveBeenCalledWith(2000)
     })
     expect(emitFeedbackWarning).toHaveBeenCalledWith('Java 推荐生成耗时较长，请稍后刷新推荐历史查看结果')
     expect(emitFeedbackSuccess).not.toHaveBeenCalled()
   })
 
-  it('generates recommendations for pick sizes 1 through 10 in one action', async () => {
-    vi.mocked(createKl8Recommendation).mockImplementation(async (baseIssueCount = 2000, pickSize = 5) => ({
-      id: pickSize,
+  it('generates one pick-5 recommendation', async () => {
+    vi.mocked(createKl8Recommendation).mockImplementation(async (baseIssueCount = 2000) => ({
+      id: 5,
       source: 'RULE_BASED',
-      pickSize,
+      pickSize: 5,
       baseIssueCount,
       latestIssueNo: '20260629001',
       groups: [
-        { numbers: Array.from({ length: pickSize }, (_, index) => index + 1), reason: `选${pickSize} 测试推荐` },
+        { numbers: [7, 19, 34, 52, 68], reason: '选5 测试推荐' },
       ],
-      featureSummary: `选${pickSize} 测试摘要`,
+      featureSummary: '选5 测试摘要',
       disclaimer: '测试免责声明',
-      createdAt: `2026-06-29T10:00:${String(pickSize).padStart(2, '0')}`,
+      createdAt: '2026-06-29T10:00:05',
     }))
 
     render(<LotteryKl8Panel />)
 
     await screen.findByText('20260629001')
-    await userEvent.click(screen.getByRole('button', { name: /一键生成选1-选10/ }))
+    await userEvent.click(screen.getByRole('button', { name: /Java 推荐选5/ }))
 
     await waitFor(() => {
-      expect(createKl8Recommendation).toHaveBeenCalledTimes(10)
+      expect(createKl8Recommendation).toHaveBeenCalledTimes(1)
     })
-    expect(createKl8Recommendation).toHaveBeenNthCalledWith(1, 2000, 1)
-    expect(createKl8Recommendation).toHaveBeenNthCalledWith(10, 2000, 10)
-    expect((await screen.findAllByText('选10 测试摘要')).length).toBeGreaterThan(0)
-    expect(screen.getByText('快乐8选10')).toBeInTheDocument()
-    expect(emitFeedbackSuccess).toHaveBeenCalledWith('已生成选1到选10共 10 条推荐')
+    expect(createKl8Recommendation).toHaveBeenCalledWith(2000)
+    expect((await screen.findAllByText('选5 测试摘要')).length).toBeGreaterThan(0)
+    expect(screen.getByText('快乐8选5')).toBeInTheDocument()
+    expect(emitFeedbackSuccess).toHaveBeenCalledWith('Java 推荐已生成')
   })
 
   it('contains protected load failures without an unhandled rejection', async () => {
