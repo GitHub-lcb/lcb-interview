@@ -1,17 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Alert } from 'antd'
 import CategoryGrid from './CategoryGrid'
 import HotQuestions from './HotQuestions'
-import AbilityMapPanel from '../../components/AbilityMapPanel'
-import DailyPlanCompletionPanel from '../../components/DailyPlanCompletionPanel'
-import DailyMissionPanel from '../../components/DailyMissionPanel'
 import FirstRunLaunchpad from '../../components/FirstRunLaunchpad'
-import InterviewReviewPanel from '../../components/InterviewReviewPanel'
-import PrepHealthRadarPanel from '../../components/PrepHealthRadarPanel'
-import StudyCommandCenter from '../../components/StudyCommandCenter'
-import StudyDashboard from '../../components/StudyDashboard'
+import HomeCoachOverview from '../../components/HomeCoachOverview'
 import { getHotQuestions } from '../../api/question'
-import { freePromiseItems } from '../../data/freeSuperiority'
+import { buildHomeCoach } from '../../utils/homeCoach'
+import { readPracticeAnswerDrafts } from '../../utils/practiceAnswerDraftStore'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
 import type { Question } from '../../types'
 
@@ -20,11 +15,16 @@ export default function Home() {
   const [hotLoading, setHotLoading] = useState(true)
   const [hotError, setHotError] = useState(false)
   const { progress, rememberQuestions } = useStudyProgress()
+  const answerDrafts = useMemo(() => readPracticeAnswerDrafts(), [])
+  const coachModel = useMemo(
+    () => buildHomeCoach(progress, hotQuestions, { answerDrafts, loading: hotLoading }),
+    [answerDrafts, hotLoading, hotQuestions, progress],
+  )
 
   const fetchHotQuestions = () => {
     setHotLoading(true)
     setHotError(false)
-    getHotQuestions(10, { silentGlobalError: true })
+    getHotQuestions(20, { silentGlobalError: true })
       .then(data => {
         setHotQuestions(data)
         rememberQuestions(data)
@@ -42,39 +42,21 @@ export default function Home() {
 
   return (
     <div className="home-page">
-      <FirstRunLaunchpad hotQuestions={hotQuestions} loading={hotLoading} />
+      <FirstRunLaunchpad
+        hotQuestions={hotQuestions}
+        loading={hotLoading}
+        launchpadModel={coachModel.launchpad}
+      />
 
-      <DailyPlanCompletionPanel progress={progress} />
-
-      <StudyDashboard hotQuestions={hotQuestions} />
-
-      <StudyCommandCenter />
-
-      <DailyMissionPanel />
-
-      <PrepHealthRadarPanel />
-
-      <InterviewReviewPanel progress={progress} />
-
-      <AbilityMapPanel />
-
-      <section className="free-promise-band" aria-label="免费承诺">
-        {freePromiseItems.map(item => (
-          <div key={item.title}>
-            <strong>{item.metric}</strong>
-            <span>{item.title}</span>
-            <p>{item.description}</p>
-          </div>
-        ))}
-      </section>
+      <HomeCoachOverview model={coachModel} candidates={hotQuestions} />
 
       <section className="home-section">
         <div className="home-section-header">
           <div>
             <h2 className="section-title">题库入口</h2>
-            <p className="section-subtitle">按技术方向进入系统刷题，先建立知识面，再补重点短板。</p>
+            <p className="section-subtitle">按目标岗位筛选核心方向，需要时再进入完整题库。</p>
           </div>
-          <span>46 个方向</span>
+          <span>46 个技术方向</span>
         </div>
         <CategoryGrid />
       </section>
@@ -82,8 +64,8 @@ export default function Home() {
       <section className="home-section home-hot-section">
         <div className="home-section-header">
           <div>
-            <h2 className="section-title">热门题目排行</h2>
-            <p className="section-subtitle">优先挑高频题加入今日计划。</p>
+            <h2 className="section-title">热门题目</h2>
+            <p className="section-subtitle">看看其他面试者正在关注什么。</p>
           </div>
           <span>高频优先</span>
         </div>
@@ -96,7 +78,7 @@ export default function Home() {
           />
         )}
         <HotQuestions
-          questions={hotQuestions}
+          questions={hotQuestions.slice(0, 5)}
           loading={hotLoading}
           error={hotError}
           onRetry={fetchHotQuestions}

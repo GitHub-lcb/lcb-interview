@@ -114,7 +114,7 @@ export default function PracticePostScoreNextStepPanel({
       ? '筛选进度'
     : isFirstRunRepairProgress
     ? '补弱进度'
-    : isFirstRunRehearsalProgress ? '复述进度' : '首练进度'
+    : isFirstRunRehearsalProgress ? '复述进度' : '摸底进度'
   const listItemHandoffSource = shouldShowScopedQueueProgress
     ? isActiveRecallProgress
       ? 'review-due'
@@ -167,7 +167,7 @@ export default function PracticePostScoreNextStepPanel({
                     ? '继续面试简报热身队列'
                     : isPaceCoachProgress
                       ? '继续配速训练队列'
-                    : isFilteredListProgress ? '继续当前筛选题单' : '继续完成首练队列'
+                    : isFilteredListProgress ? '继续当前筛选题单' : '继续完成岗位摸底'
     : isFirstRunRepairCleared
       ? '首练补弱已过线'
     : isFirstRunRehearsalCleared
@@ -197,7 +197,7 @@ export default function PracticePostScoreNextStepPanel({
                       ? '面试简报热身队列已完成'
                       : isPaceCoachProgress
                         ? '配速训练队列已完成'
-                      : isFilteredListProgress ? '当前筛选题单已完成' : '首练队列已完成'
+                      : isFilteredListProgress ? '当前筛选题单已完成' : '岗位摸底已完成'
       : visibleNextTrainingCount > 0 ? '趁热处理下一轮训练' : dailyClosure.title
   const summary = activeScopedQueueProgress
     ? activeScopedQueueProgress.nextQuestionTitle
@@ -448,7 +448,7 @@ export default function PracticePostScoreNextStepPanel({
                       ? '配速题'
                     : isFilteredListProgress
                       ? '筛选题'
-                    : isFirstRunRepairProgress ? '首练风险题' : isFirstRunRehearsalProgress ? '首练过线题' : '本轮高频题'}
+                    : isFirstRunRepairProgress ? '首练风险题' : isFirstRunRehearsalProgress ? '首练过线题' : '岗位摸底题'}
                 </small>
               </>
             ) : (

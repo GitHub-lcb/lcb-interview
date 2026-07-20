@@ -10,24 +10,27 @@ import { useNavigate } from 'react-router-dom'
 import type { Question } from '../types'
 import { useStudyProgress } from '../hooks/useStudyProgress'
 import { buildFirstRunLaunchpad } from '../utils/firstRunLaunchpad'
+import type { FirstRunLaunchpadModel } from '../utils/firstRunLaunchpad'
 import { buildContinuePracticePath } from '../utils/practiceRoute'
 import { readPracticeAnswerDrafts } from '../utils/practiceAnswerDraftStore'
 
 interface Props {
   hotQuestions: Question[]
   loading?: boolean
+  launchpadModel?: FirstRunLaunchpadModel
 }
 
-const roleOptions = ['Java 后端', '前端工程师', 'AI 大模型', '系统架构师']
+const roleOptions = ['Java 后端', '前端工程师', 'AI 大模型', '系统架构师', '全栈工程师']
 
-export default function FirstRunLaunchpad({ hotQuestions, loading = false }: Props) {
+export default function FirstRunLaunchpad({ hotQuestions, loading = false, launchpadModel }: Props) {
   const navigate = useNavigate()
   const { addDailyPlanQuestions, progress, rememberQuestions, setDailyPlan, updateSettings } = useStudyProgress()
   const answerDrafts = useMemo(() => readPracticeAnswerDrafts(), [])
-  const model = useMemo(
+  const builtModel = useMemo(
     () => buildFirstRunLaunchpad(progress, hotQuestions, { answerDrafts, loading }),
     [answerDrafts, hotQuestions, loading, progress],
   )
+  const model = launchpadModel ?? builtModel
   const primaryDisabled = model.mode === 'loading'
     || (model.primaryAction.kind === 'plan' && model.recommendedQuestionIds.length === 0)
 
@@ -51,9 +54,11 @@ export default function FirstRunLaunchpad({ hotQuestions, loading = false }: Pro
   }
 
   return (
-    <section className={`first-run-launchpad mode-${model.mode}`} aria-label="3 分钟首练启动台">
+    <section className={`first-run-launchpad mode-${model.mode}`} aria-label="个性化面试教练">
       <div className="first-run-copy">
-        <div className="dashboard-kicker">3 分钟首练</div>
+        <div className="dashboard-kicker">
+          {model.mode === 'first-run' ? '岗位摸底' : '下一步训练'}
+        </div>
         <h1>{model.title}</h1>
         <p>{model.summary}</p>
         <div className="first-run-role-row" aria-label="目标岗位">
@@ -82,7 +87,7 @@ export default function FirstRunLaunchpad({ hotQuestions, loading = false }: Pro
         <Button
           type="primary"
           aria-label={model.primaryAction.label}
-          icon={<ThunderboltOutlined />}
+          icon={model.mode === 'first-run' ? <PlayCircleOutlined /> : <ThunderboltOutlined />}
           loading={model.mode === 'loading'}
           disabled={primaryDisabled}
           onClick={runPrimaryAction}
@@ -114,13 +119,15 @@ export default function FirstRunLaunchpad({ hotQuestions, loading = false }: Pro
               {action.label}
             </Button>
           ))}
-          <Button
-            aria-label="直接模拟"
-            icon={<PlayCircleOutlined />}
-            onClick={() => navigate(buildContinuePracticePath(progress))}
-          >
-            直接模拟
-          </Button>
+          {model.mode !== 'first-run' && (
+            <Button
+              aria-label="直接模拟"
+              icon={<PlayCircleOutlined />}
+              onClick={() => navigate(buildContinuePracticePath(progress))}
+            >
+              直接模拟
+            </Button>
+          )}
         </div>
       </div>
     </section>

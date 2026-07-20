@@ -956,13 +956,13 @@ describe('Practice page answer draft lifecycle', () => {
 
     expect(await screen.findByRole('heading', { name: 'HashMap 并发问题' })).toBeInTheDocument()
 
-    const context = screen.getByLabelText('首练队列上下文')
-    expect(context).toHaveTextContent('首练队列')
-    await waitFor(() => expect(context).toHaveTextContent('先完成这 3 道高频题'))
-    expect(context).toHaveTextContent('提交评分后系统会生成补弱和复习队列。')
+    const context = screen.getByLabelText('岗位摸底上下文')
+    expect(context).toHaveTextContent('岗位摸底')
+    await waitFor(() => expect(context).toHaveTextContent('完成这 3 道岗位高频题'))
+    expect(context).toHaveTextContent('首页会据此生成能力画像和补弱队列。')
     expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('0 / 3')
-    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('当前来源首练队列')
-    expect(screen.getByText('首练队列 · Java 基础')).toBeInTheDocument()
+    expect(screen.getByLabelText('本轮训练状态')).toHaveTextContent('当前来源岗位摸底')
+    expect(screen.getByText('岗位摸底 · Java 基础')).toBeInTheDocument()
 
     await waitFor(() => expect(screen.getByRole('textbox')).toHaveFocus())
   })
@@ -1347,13 +1347,13 @@ describe('Practice page answer draft lifecycle', () => {
     await userEvent.click(screen.getByRole('button', { name: /提交评分/ }))
 
     const panel = await screen.findByLabelText('评分后下一步')
-    expect(panel).toHaveTextContent('继续完成首练队列')
+    expect(panel).toHaveTextContent('继续完成岗位摸底')
     expect(panel).toHaveTextContent('已完成 1 / 3，下一题继续回答「Redis 缓存雪崩」。')
 
     await userEvent.click(screen.getByRole('button', { name: /继续第 2 题/ }))
 
     expect(await screen.findByRole('heading', { name: 'Redis 缓存雪崩' })).toBeInTheDocument()
-    expect(screen.getByLabelText('首练队列上下文')).toHaveTextContent('先完成这 3 道高频题')
+    expect(screen.getByLabelText('岗位摸底上下文')).toHaveTextContent('完成这 3 道岗位高频题')
   })
 
   it('shows first-run completion after the last queue question is scored', async () => {
@@ -1426,9 +1426,9 @@ describe('Practice page answer draft lifecycle', () => {
     await userEvent.click(screen.getByRole('button', { name: /提交评分/ }))
 
     const panel = await screen.findByLabelText('评分后下一步')
-    expect(panel).toHaveTextContent('首练队列已完成')
+    expect(panel).toHaveTextContent('岗位摸底已完成')
     expect(panel).toHaveTextContent('已完成 3 / 3，先看本轮战报，再按风险题补弱。')
-    expect(panel).toHaveTextContent('首练进度3 / 3本轮高频题')
+    expect(panel).toHaveTextContent('摸底进度3 / 3岗位摸底题')
   })
 
   it('shows same-question interview context when opened from a question detail page', async () => {

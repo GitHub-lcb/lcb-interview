@@ -118,9 +118,9 @@ describe('PracticePostScoreNextStepPanel', () => {
 
     const panel = screen.getByLabelText('评分后下一步')
 
-    expect(within(panel).getByText('继续完成首练队列')).toBeInTheDocument()
+    expect(within(panel).getByText('继续完成岗位摸底')).toBeInTheDocument()
     expect(within(panel).getByText('已完成 1 / 3，下一题继续回答「Redis 缓存雪崩」。')).toBeInTheDocument()
-    expect(within(panel).getByLabelText('首练进度 1 / 3')).toBeInTheDocument()
+    expect(within(panel).getByLabelText('摸底进度 1 / 3')).toBeInTheDocument()
 
     await user.click(within(panel).getByRole('button', { name: /继续第 2 题/ }))
 
@@ -286,9 +286,9 @@ describe('PracticePostScoreNextStepPanel', () => {
 
     const panel = screen.getByLabelText('评分后下一步')
 
-    expect(within(panel).getByText('首练队列已完成')).toBeInTheDocument()
+    expect(within(panel).getByText('岗位摸底已完成')).toBeInTheDocument()
     expect(within(panel).getByText('已完成 3 / 3，先看本轮战报，再按风险题补弱。')).toBeInTheDocument()
-    expect(within(panel).getByLabelText('首练进度 3 / 3')).toBeInTheDocument()
+    expect(within(panel).getByLabelText('摸底进度 3 / 3')).toBeInTheDocument()
 
     await user.click(within(panel).getByRole('button', { name: /按战报补弱/ }))
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Empty, InputNumber, Progress, Select } from 'antd'
+import { Button, Empty, InputNumber, Progress, Segmented, Select } from 'antd'
 import { emitFeedbackSuccess, emitFeedbackWarning } from '../../utils/feedbackMessage'
 import {
   ArrowRightOutlined,
@@ -10,7 +10,8 @@ import {
   SettingOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import AbilityMapPanel from '../../components/AbilityMapPanel'
 import StudyActionButtons from '../../components/StudyActionButtons'
 import InterviewBriefPanel from '../../components/InterviewBriefPanel'
 import InterviewMistakeLedgerPanel from '../../components/InterviewMistakeLedgerPanel'
@@ -20,6 +21,7 @@ import StudyPaceCoachPanel from '../../components/StudyPaceCoachPanel'
 import DailyPlanBriefPanel from '../../components/DailyPlanBriefPanel'
 import DailyPlanCompletionPanel from '../../components/DailyPlanCompletionPanel'
 import NextTrainingQueuePanel from '../../components/NextTrainingQueuePanel'
+import PrepHealthRadarPanel from '../../components/PrepHealthRadarPanel'
 import InterviewEmergencyKitPanel from '../../components/InterviewEmergencyKitPanel'
 import InterviewLastMinuteBriefPanel from '../../components/InterviewLastMinuteBriefPanel'
 import InterviewMaterialVaultPanel from '../../components/InterviewMaterialVaultPanel'
@@ -66,6 +68,21 @@ const dueStatusLabels: Record<ReviewDueStatus, string> = {
 }
 const ACTIVE_RECALL_ENCOUNTER_THRESHOLD = 2
 const FIRST_RUN_REHEARSAL_SOURCE = 'first-run-rehearsal'
+type StudyCenterView = 'today' | 'ability' | 'review' | 'materials'
+
+const studyCenterViews: { label: string; value: StudyCenterView }[] = [
+  { label: '今日训练', value: 'today' },
+  { label: '能力分析', value: 'ability' },
+  { label: '复盘计划', value: 'review' },
+  { label: '面试素材', value: 'materials' },
+]
+
+const studyCenterTitles: Record<StudyCenterView, { title: string; summary: string }> = {
+  today: { title: '今日训练', summary: '先完成今日队列，再处理到期复习。' },
+  ability: { title: '能力分析', summary: '定位岗位短板，决定下一轮训练重点。' },
+  review: { title: '复盘计划', summary: '收回薄弱题、复习债和面试风险。' },
+  materials: { title: '面试素材', summary: '沉淀高分回答、项目证据和追问口径。' },
+}
 
 function formatScheduleDate(value?: string) {
   if (!value) {
@@ -80,6 +97,7 @@ function formatScheduleDate(value?: string) {
 
 export default function StudyPlan() {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const {
     getState,
     progress,
@@ -122,6 +140,17 @@ export default function StudyPlan() {
   const trackedCount = Object.keys(progress.questionStates).length
   const canGeneratePlan = generatedPlanIds.length > 0
   const canFillPacePlan = hotQuestions.length > 0 || Object.keys(progress.questionSnapshots).length > 0
+  const requestedView = searchParams.get('view')
+  const activeView: StudyCenterView = studyCenterViews.some(view => view.value === requestedView)
+    ? requestedView as StudyCenterView
+    : 'today'
+  const activeViewMeta = studyCenterTitles[activeView]
+
+  const changeStudyCenterView = (view: StudyCenterView) => {
+    const next = new URLSearchParams(searchParams)
+    next.set('view', view)
+    setSearchParams(next)
+  }
 
   useEffect(() => {
     let ignore = false
@@ -212,9 +241,9 @@ export default function StudyPlan() {
     <div>
       <div className="study-plan-header">
         <div>
-          <div className="dashboard-kicker">学习计划</div>
-          <h1>{progress.targetRole} · 今日复习</h1>
-          <p>从薄弱题开始复盘，再推进今日计划。这里的数据保存在本机。</p>
+          <div className="dashboard-kicker">学习中心</div>
+          <h1>{progress.targetRole} · {activeViewMeta.title}</h1>
+          <p>{activeViewMeta.summary} 数据保存在本机。</p>
         </div>
         <div className="study-plan-header-actions">
           <Button
@@ -271,15 +300,27 @@ export default function StudyPlan() {
         </div>
       </section>
 
-      <StudyPaceCoachPanel
-        progress={progress}
-        canFillPlan={canFillPacePlan}
-        isFillingPlan={isLoadingSeeds}
-        onFillPlan={handleFillPacePlan}
-      />
-      <DailyPlanBriefPanel progress={progress} candidates={hotQuestions} />
-      <DailyPlanCompletionPanel progress={progress} />
-      {firstRunCompletionReport && (
+      <div className="study-center-switcher">
+        <Segmented<StudyCenterView>
+          aria-label="学习中心分区"
+          block
+          value={activeView}
+          options={studyCenterViews}
+          onChange={changeStudyCenterView}
+        />
+      </div>
+
+      {activeView === 'today' && (
+        <div className="study-center-view">
+          <StudyPaceCoachPanel
+            progress={progress}
+            canFillPlan={canFillPacePlan}
+            isFillingPlan={isLoadingSeeds}
+            onFillPlan={handleFillPacePlan}
+          />
+          <DailyPlanBriefPanel progress={progress} candidates={hotQuestions} />
+          <DailyPlanCompletionPanel progress={progress} />
+          {firstRunCompletionReport && (
         <section className="first-run-completion-report" aria-label="首练成果沉淀">
           <div className="first-run-completion-head">
             <div>
@@ -363,16 +404,37 @@ export default function StudyPlan() {
             ))}
           </div>
         </section>
+          )}
+        </div>
       )}
-      <NextTrainingQueuePanel progress={progress} />
-      <InterviewEmergencyKitPanel progress={progress} />
-      <InterviewLastMinuteBriefPanel progress={progress} />
-      <InterviewMaterialVaultPanel progress={progress} onNavigate={navigate} />
-      <InterviewFollowUpDefensePanel progress={progress} onNavigate={navigate} />
-      <InterviewBriefPanel progress={progress} />
-      <InterviewMistakeLedgerPanel progress={progress} />
 
-      <div className="study-plan-metrics">
+      {activeView === 'ability' && (
+        <div className="study-center-view">
+          <PrepHealthRadarPanel />
+          <AbilityMapPanel />
+          <NextTrainingQueuePanel progress={progress} />
+        </div>
+      )}
+
+      {activeView === 'review' && (
+        <div className="study-center-view">
+          <InterviewEmergencyKitPanel progress={progress} />
+          <InterviewLastMinuteBriefPanel progress={progress} />
+          <InterviewBriefPanel progress={progress} />
+          <InterviewMistakeLedgerPanel progress={progress} />
+        </div>
+      )}
+
+      {activeView === 'materials' && (
+        <div className="study-center-view">
+          <InterviewMaterialVaultPanel progress={progress} onNavigate={navigate} />
+          <InterviewFollowUpDefensePanel progress={progress} onNavigate={navigate} />
+        </div>
+      )}
+
+      {activeView === 'today' && (
+        <div className="study-center-view">
+          <div className="study-plan-metrics">
         <div>
           <span>掌握度</span>
           <strong>{summary.masteryRate}%</strong>
@@ -393,9 +455,9 @@ export default function StudyPlan() {
           <strong>{trackedCount}</strong>
           <small>本机记录</small>
         </div>
-      </div>
+          </div>
 
-      <section className="review-schedule-band" aria-label="智能复习排期">
+          <section className="review-schedule-band" aria-label="智能复习排期">
         <div className="overdue">
           <span>已逾期</span>
           <strong>{reviewSummary.overdue}</strong>
@@ -421,9 +483,9 @@ export default function StudyPlan() {
           <strong>{formatScheduleDate(reviewSummary.nextReviewAt)}</strong>
           <small>按间隔重复自动计算</small>
         </div>
-      </section>
+          </section>
 
-      <div className="study-plan-grid">
+          <div className="study-plan-grid">
         <section className="study-plan-section">
           <div className="study-plan-section-title">
             <span>今日计划</span>
@@ -539,7 +601,9 @@ export default function StudyPlan() {
             </div>
           )}
         </section>
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

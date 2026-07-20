@@ -90,10 +90,10 @@ describe('FirstRunLaunchpad', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('heading', { name: '3 分钟开始首轮训练' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Java 后端 岗位摸底' })).toBeInTheDocument()
     expect(screen.getByLabelText('本轮题单预览')).toHaveTextContent('HashMap 并发问题')
     expect(screen.getByLabelText('本轮题单预览')).toHaveTextContent('Java 集合 · HARD')
-    await userEvent.click(screen.getByRole('button', { name: /生成 5 题首练队列/ }))
+    await userEvent.click(screen.getByRole('button', { name: /开始 5 题摸底/ }))
 
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('/practice?queue=1,2,3,4,5&from=first-run'))
     const stored = JSON.parse(window.localStorage.getItem(STUDY_PROGRESS_STORAGE_KEY) ?? '{}') as StudyProgress
@@ -357,15 +357,15 @@ describe('FirstRunLaunchpad', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('heading', { name: '今日首练闭环已完成' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '本轮训练闭环已完成' })).toBeInTheDocument()
     expect(screen.getByText(/先按低分优先复述/)).toBeInTheDocument()
     expect(screen.getByLabelText('本轮题单预览')).toHaveTextContent('JVM GC 调优')
     expect(screen.getByText('已掌握')).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: /优先复述 2 道过线题/ }))
 
     expect(navigate).toHaveBeenCalledWith('/practice?queue=4,2&from=first-run-rehearsal')
-    await userEvent.click(screen.getByRole('button', { name: /查看今日战报/ }))
-    expect(navigate).toHaveBeenCalledWith('/study')
+    await userEvent.click(screen.getByRole('button', { name: /查看训练战报/ }))
+    expect(navigate).toHaveBeenCalledWith('/study?view=today')
   })
 
   it('updates the target role from the launchpad', async () => {
@@ -388,8 +388,8 @@ describe('FirstRunLaunchpad', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('heading', { name: '正在准备首练题' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /正在准备首练题/ })).toBeDisabled()
+    expect(screen.getByRole('heading', { name: '正在准备岗位摸底' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /正在准备摸底题/ })).toBeDisabled()
     expect(screen.queryByLabelText('本轮题单预览')).not.toBeInTheDocument()
   })
 
@@ -406,9 +406,9 @@ describe('FirstRunLaunchpad', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('heading', { name: '3 分钟开始首轮训练' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Java 后端 岗位摸底' })).toBeInTheDocument()
     expect(screen.getByLabelText('本轮题单预览')).toHaveTextContent('HashMap 并发问题')
-    await userEvent.click(screen.getByRole('button', { name: /生成 5 题首练队列/ }))
+    await userEvent.click(screen.getByRole('button', { name: /开始 5 题摸底/ }))
 
     expect(navigate).toHaveBeenCalledWith('/practice?queue=1,2,3,4,5&from=first-run')
     const stored = JSON.parse(window.localStorage.getItem(STUDY_PROGRESS_STORAGE_KEY) ?? '{}') as StudyProgress

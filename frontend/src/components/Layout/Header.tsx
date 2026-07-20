@@ -4,7 +4,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   BookOutlined,
   CalendarOutlined,
-  FireOutlined,
+  HomeOutlined,
   PlayCircleOutlined,
   ReadOutlined,
   SearchOutlined,
@@ -16,13 +16,13 @@ const { Header } = Layout
 const { Search } = Input
 
 const navItems = [
-  { path: '/', label: '热门', icon: <FireOutlined /> },
+  { path: '/', label: '首页', icon: <HomeOutlined /> },
+  { path: '/practice', label: '模拟', icon: <PlayCircleOutlined /> },
+  { path: '/study', label: '学习', icon: <CalendarOutlined /> },
   { path: '/banks', label: '题库', icon: <BookOutlined /> },
   { path: '/routes', label: '路线', icon: <ReadOutlined /> },
   { path: '/experiences', label: '面经', icon: <SolutionOutlined /> },
   { path: '/tools', label: '工具', icon: <ToolOutlined /> },
-  { path: '/study', label: '计划', icon: <CalendarOutlined /> },
-  { path: '/practice', label: '训练', icon: <PlayCircleOutlined /> },
 ]
 
 export default function AppHeader() {

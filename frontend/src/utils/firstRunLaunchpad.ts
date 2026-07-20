@@ -1,6 +1,7 @@
 import type { InterviewAttempt, Question, QuestionSnapshot, StudyProgress } from '../types'
 import type { PracticeAnswerDraft } from './practiceAnswerDraftStore'
 import { buildDailyPlan, buildReviewQueue, getQuestionState } from './studyProgress'
+import { prioritizeQuestionsForRole } from './roleFocus'
 
 export type FirstRunLaunchpadMode = 'first-run' | 'continue-plan' | 'repair' | 'resume-draft' | 'complete' | 'loading' | 'empty'
 
@@ -40,7 +41,7 @@ export interface FirstRunLaunchpadOptions {
 
 type PracticeQueueSource = 'first-run' | 'first-run-repair' | 'first-run-rehearsal' | 'daily-plan' | 'resume-draft'
 
-const FIRST_RUN_LIMIT = 5
+const FIRST_RUN_LIMIT = 10
 const CONTINUE_LIMIT = 12
 const FIRST_RUN_REHEARSAL_MIN_SCORE = 80
 
@@ -109,8 +110,8 @@ export function buildFirstRunLaunchpad(
     const rehearsalIds = buildCompletedPlanRehearsalIds(progress, dailyPlanIds)
     return {
       mode: 'complete',
-      title: '今日首练闭环已完成',
-      summary: '本轮计划题已经全部过线，先按低分优先复述，确认最低分题也能脱稿，再去战报沉淀可复述证据。',
+      title: '本轮训练闭环已完成',
+      summary: '本轮计划题已经全部过线，先按低分优先复述，确认最低分题也能脱稿，再到学习中心沉淀表达证据。',
       primaryAction: {
         label: `优先复述 ${rehearsalIds.length} 道过线题`,
         description: '从最低分已过线题开始脱稿验证',
@@ -160,7 +161,7 @@ export function buildFirstRunLaunchpad(
     return {
       mode: 'continue-plan',
       title: '继续今日训练',
-      summary: '已经有未过线的学习中题目，先把这批题补成有效开口样本，再开启新的首练队列。',
+      summary: '已经有未过线的学习中题目，先把这批题补成有效开口样本，再开启新的摸底队列。',
       primaryAction: {
         label: `继续 ${learningReviewIds.length} 题队列`,
         description: '从学习中题目继续训练',
@@ -181,17 +182,17 @@ export function buildFirstRunLaunchpad(
   if (options.loading) {
     return {
       mode: 'loading',
-      title: '正在准备首练题',
-      summary: '正在拉取高频题。题目到达前，路线和学习计划仍然可以先打开。',
+      title: '正在准备岗位摸底',
+      summary: '正在按目标岗位组合高频题，题目到达前可以先查看备考路线。',
       primaryAction: {
-        label: '正在准备首练题',
+        label: '正在准备摸底题',
         description: '等待热门题加载完成',
         to: '/routes',
         kind: 'route',
       },
       secondaryActions: baseSecondaryActions(),
       metrics: [
-        { label: '首练题', value: '准备中' },
+        { label: '摸底题', value: '准备中' },
         { label: '目标', value: progress.targetRole },
         { label: '冲刺天数', value: String(progress.sprintDays) },
       ],
@@ -206,7 +207,7 @@ export function buildFirstRunLaunchpad(
     return {
       mode: 'empty',
       title: '先选择一条备考路线',
-      summary: '当前还没有可生成首练的热门题，先按岗位路线进入题库，系统会在浏览题目后建立本地训练队列。',
+      summary: '当前还没有可生成摸底的热门题，先按岗位路线进入题库，系统会在浏览后建立训练队列。',
       primaryAction: {
         label: '按岗位选路线',
         description: '从岗位路线进入题库训练',
@@ -215,7 +216,7 @@ export function buildFirstRunLaunchpad(
       },
       secondaryActions: emptyFallbackSecondaryActions(),
       metrics: [
-        { label: '首练题', value: '0' },
+        { label: '摸底题', value: '0' },
         { label: '目标', value: progress.targetRole },
         { label: '冲刺天数', value: String(progress.sprintDays) },
       ],
@@ -226,17 +227,17 @@ export function buildFirstRunLaunchpad(
 
   return {
     mode: 'first-run',
-    title: '3 分钟开始首轮训练',
-    summary: `不用先研究题库结构，先拿 ${firstRunIds.length} 道高频题开口训练，系统会根据结果生成复习和补弱队列。`,
+    title: `${progress.targetRole} 岗位摸底`,
+    summary: `先完成 ${firstRunIds.length} 道高频题口述评分，系统会据此识别短板并生成后续训练计划。`,
     primaryAction: {
-      label: `生成 ${firstRunIds.length} 题首练队列`,
-      description: '把高频题加入今日训练并开始模拟',
+      label: `开始 ${firstRunIds.length} 题摸底`,
+      description: '建立首份岗位能力画像',
       to: buildPracticeQueuePath(firstRunIds, 'first-run'),
       kind: 'plan',
     },
     secondaryActions: baseSecondaryActions(),
     metrics: [
-      { label: '首练题', value: String(firstRunIds.length) },
+      { label: '摸底题', value: String(firstRunIds.length) },
       { label: '目标', value: progress.targetRole },
       { label: '冲刺天数', value: String(progress.sprintDays) },
     ],
@@ -283,9 +284,9 @@ function baseSecondaryActions(): LaunchpadAction[] {
 function completedSecondaryActions(): LaunchpadAction[] {
   return [
     {
-      label: '查看今日战报',
-      description: '沉淀首练高分素材和复述证据',
-      to: '/study',
+      label: '查看训练战报',
+      description: '沉淀高分素材和复述证据',
+      to: '/study?view=today',
       kind: 'study',
     },
     {
@@ -391,8 +392,9 @@ function buildFirstRunCandidates(progress: StudyProgress, hotQuestions: Question
       candidates.set(snapshot.id, toQuestionCandidate(snapshot, progress.updatedAt))
     }
   }
-  return [...candidates.values()]
+  const available = [...candidates.values()]
     .filter(question => !isFirstRunQuestionComplete(progress, question.id))
+  return prioritizeQuestionsForRole(progress.targetRole, available)
 }
 
 function toPreviewSnapshot(question: Question): QuestionSnapshot {

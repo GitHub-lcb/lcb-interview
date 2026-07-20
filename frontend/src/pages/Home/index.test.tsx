@@ -94,18 +94,18 @@ describe('Home', () => {
     vi.clearAllMocks()
   })
 
-  it('surfaces the daily completion gate on the homepage', async () => {
+  it('compresses completed progress into the coach action and ability summary', async () => {
     render(
       <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Home />
       </MemoryRouter>,
     )
 
-    await waitFor(() => {
-      expect(screen.getByLabelText('今日闭环验收')).toBeInTheDocument()
-    })
-    expect(screen.getByText('题目已清完，待面试验收')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /补一次模拟面试/ })).toBeInTheDocument()
+    expect(await screen.findByLabelText('个性化面试教练')).toBeInTheDocument()
+    expect(screen.getByLabelText('今日训练与能力画像')).toBeInTheDocument()
+    expect(screen.getByText('今日行动')).toBeInTheDocument()
+    expect(screen.getByText('能力画像')).toBeInTheDocument()
+    expect(screen.queryByLabelText('今日闭环验收')).not.toBeInTheDocument()
   })
 
   it('refreshes hot questions silently so homepage recovery content is not interrupted by backend misses', async () => {
@@ -116,7 +116,7 @@ describe('Home', () => {
     )
 
     await waitFor(() => {
-      expect(vi.mocked(getHotQuestions)).toHaveBeenCalledWith(10, { silentGlobalError: true })
+      expect(vi.mocked(getHotQuestions)).toHaveBeenCalledWith(20, { silentGlobalError: true })
     })
   })
 

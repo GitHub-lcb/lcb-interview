@@ -102,11 +102,11 @@ describe('buildFirstRunLaunchpad', () => {
     const model = buildFirstRunLaunchpad(createDefaultProgress('2026-06-20T00:00:00.000Z'), questions)
 
     expect(model.mode).toBe('first-run')
-    expect(model.title).toBe('3 分钟开始首轮训练')
-    expect(model.primaryAction.label).toBe('生成 5 题首练队列')
-    expect(model.primaryAction.to).toBe('/practice?queue=1,2,3,4,5&from=first-run')
-    expect(model.recommendedQuestionIds).toEqual([1, 2, 3, 4, 5])
-    expect(model.metrics).toContainEqual({ label: '首练题', value: '5' })
+    expect(model.title).toBe('Java 后端 岗位摸底')
+    expect(model.primaryAction.label).toBe('开始 6 题摸底')
+    expect(model.primaryAction.to).toBe('/practice?queue=1,2,3,4,5,6&from=first-run')
+    expect(model.recommendedQuestionIds).toEqual([1, 2, 3, 4, 5, 6])
+    expect(model.metrics).toContainEqual({ label: '摸底题', value: '6' })
     expect(model.previewItems).toEqual([
       { id: 1, title: 'Question 1', meta: 'Java 并发 · HARD' },
       { id: 2, title: 'Question 2', meta: 'Redis · MEDIUM' },
@@ -122,8 +122,8 @@ describe('buildFirstRunLaunchpad', () => {
     )
 
     expect(model.mode).toBe('loading')
-    expect(model.title).toBe('正在准备首练题')
-    expect(model.primaryAction.label).toBe('正在准备首练题')
+    expect(model.title).toBe('正在准备岗位摸底')
+    expect(model.primaryAction.label).toBe('正在准备摸底题')
     expect(model.primaryAction.to).toBe('/routes')
     expect(model.recommendedQuestionIds).toEqual([])
     expect(model.previewItems).toEqual([])
@@ -139,9 +139,9 @@ describe('buildFirstRunLaunchpad', () => {
     const model = buildFirstRunLaunchpad(progress, [])
 
     expect(model.mode).toBe('first-run')
-    expect(model.primaryAction.label).toBe('生成 5 题首练队列')
-    expect(model.primaryAction.to).toBe('/practice?queue=1,2,3,4,5&from=first-run')
-    expect(model.recommendedQuestionIds).toEqual([1, 2, 3, 4, 5])
+    expect(model.primaryAction.label).toBe('开始 6 题摸底')
+    expect(model.primaryAction.to).toBe('/practice?queue=1,2,3,4,5,6&from=first-run')
+    expect(model.recommendedQuestionIds).toEqual([1, 2, 3, 4, 5, 6])
     expect(model.previewItems).toEqual([
       { id: 1, title: 'Question 1', meta: 'Java 并发 · HARD' },
       { id: 2, title: 'Question 2', meta: 'Redis · MEDIUM' },
@@ -167,10 +167,10 @@ describe('buildFirstRunLaunchpad', () => {
     const model = buildFirstRunLaunchpad(progress, questions.slice(0, 5))
 
     expect(model.mode).toBe('first-run')
-    expect(model.primaryAction.label).toBe('生成 3 题首练队列')
+    expect(model.primaryAction.label).toBe('开始 3 题摸底')
     expect(model.primaryAction.to).toBe('/practice?queue=3,4,5&from=first-run')
     expect(model.recommendedQuestionIds).toEqual([3, 4, 5])
-    expect(model.metrics).toContainEqual({ label: '首练题', value: '3' })
+    expect(model.metrics).toContainEqual({ label: '摸底题', value: '3' })
   })
 
   it('falls back to route selection when no first-run questions are available', () => {
@@ -267,15 +267,15 @@ describe('buildFirstRunLaunchpad', () => {
     const model = buildFirstRunLaunchpad(progress, questions)
 
     expect(model.mode).toBe('complete')
-    expect(model.title).toBe('今日首练闭环已完成')
+    expect(model.title).toBe('本轮训练闭环已完成')
     expect(model.summary).toContain('先按低分优先复述')
     expect(model.primaryAction.label).toBe('优先复述 2 道过线题')
     expect(model.primaryAction.to).toBe('/practice?queue=2,5&from=first-run-rehearsal')
     expect(model.primaryAction.kind).toBe('practice')
     expect(model.secondaryActions).toContainEqual({
-      label: '查看今日战报',
-      description: '沉淀首练高分素材和复述证据',
-      to: '/study',
+      label: '查看训练战报',
+      description: '沉淀高分素材和复述证据',
+      to: '/study?view=today',
       kind: 'study',
     })
     expect(model.metrics).toContainEqual({ label: '已掌握', value: '2' })

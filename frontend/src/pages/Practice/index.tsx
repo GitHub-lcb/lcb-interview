@@ -528,7 +528,7 @@ export default function Practice() {
     : isFirstRunRehearsalPractice
       ? '首练复述'
       : isFirstRunLaunchpadPractice
-        ? '首练队列'
+        ? '岗位摸底'
           : isReviewDueHandoffSource
             ? isActiveRecallHandoffSource ? '主动回忆' : '到期复习'
           : isDailyPlanPractice
@@ -832,7 +832,7 @@ export default function Practice() {
       <section className="practice-main">
         <div className="practice-header">
           <div className="practice-title-block">
-            <div className="dashboard-kicker">今日面试训练</div>
+            <div className="dashboard-kicker">{isFirstRunLaunchpadPractice ? '岗位能力摸底' : '今日面试训练'}</div>
             <h1>{progress.targetRole} · 第 {currentIndex + 1} 题</h1>
           </div>
           <Button icon={<ReloadOutlined />} onClick={() => setCurrentIndex(0)}>
@@ -869,11 +869,11 @@ export default function Practice() {
             <span>{focusQuestionId === current.id ? '当前题' : `Q${currentIndex + 1}`}</span>
           </div>
           {isFirstRunLaunchpadPractice ? (
-            <div className="practice-question-focus-context" aria-label="首练队列上下文">
+            <div className="practice-question-focus-context" aria-label="岗位摸底上下文">
               <div>
-                <span>首练队列</span>
-                <strong>先完成这 {queue.length} 道高频题</strong>
-                <small>不用再选题，提交评分后系统会生成补弱和复习队列。</small>
+                <span>岗位摸底</span>
+                <strong>完成这 {queue.length} 道岗位高频题</strong>
+                <small>每题提交一次口述评分，首页会据此生成能力画像和补弱队列。</small>
               </div>
               <Button
                 size="small"

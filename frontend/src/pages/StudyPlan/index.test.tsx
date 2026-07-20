@@ -245,6 +245,25 @@ describe('StudyPlan', () => {
     vi.clearAllMocks()
   })
 
+  it('switches the learning center between focused views', async () => {
+    render(
+      <MemoryRouter
+        initialEntries={['/study?view=ability']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <StudyPlan />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Java 后端 · 能力分析' })).toBeInTheDocument()
+    expect(screen.getByLabelText('备考健康雷达')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByText('面试素材'))
+
+    expect(screen.getByRole('heading', { name: 'Java 后端 · 面试素材' })).toBeInTheDocument()
+    expect(screen.getByLabelText('高分表达素材库')).toBeInTheDocument()
+  })
+
   it('copies review schedule markdown from the study plan page', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.defineProperty(navigator, 'clipboard', {
