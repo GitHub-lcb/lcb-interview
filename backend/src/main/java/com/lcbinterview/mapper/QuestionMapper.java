@@ -27,7 +27,7 @@ public interface QuestionMapper extends BaseMapper<Question> {
                    create_time, update_time
             FROM question
             WHERE status = 'PUBLISHED' AND is_deleted = 0
-            ORDER BY view_count DESC
+            ORDER BY view_count DESC, id DESC
             LIMIT #{size}
             """)
     List<Question> selectHot(@Param("size") int size);
@@ -55,7 +55,7 @@ public interface QuestionMapper extends BaseMapper<Question> {
             INNER JOIN question_tag qt ON q.id = qt.question_id
             WHERE qt.tag_id = #{tagId}
               AND q.status = 'PUBLISHED' AND q.is_deleted = 0
-            ORDER BY q.create_time DESC
+            ORDER BY q.create_time DESC, q.id DESC
             """)
     List<Question> selectByTagId(@Param("tagId") Long tagId);
 
@@ -75,8 +75,8 @@ public interface QuestionMapper extends BaseMapper<Question> {
               AND q.status = 'PUBLISHED' AND q.is_deleted = 0
             ORDER BY
               <choose>
-                <when test="sort == 'hot'">q.view_count DESC, q.create_time DESC</when>
-                <otherwise>q.create_time DESC</otherwise>
+                <when test="sort == 'hot'">q.view_count DESC, q.create_time DESC, q.id DESC</when>
+                <otherwise>q.create_time DESC, q.id DESC</otherwise>
               </choose>
             </script>
             """)
@@ -122,11 +122,11 @@ public interface QuestionMapper extends BaseMapper<Question> {
               </if>
             ORDER BY
               <choose>
-                <when test="sort == 'hot'">view_count DESC, create_time DESC</when>
-                <when test="sort == 'latest'">create_time DESC</when>
+                <when test="sort == 'hot'">view_count DESC, create_time DESC, id DESC</when>
+                <when test="sort == 'latest'">create_time DESC, id DESC</when>
                 <otherwise>
                   CASE WHEN title LIKE CONCAT('%', #{keyword}, '%') THEN 0 ELSE 1 END,
-                  view_count DESC
+                  view_count DESC, id DESC
                 </otherwise>
               </choose>
             </script>
@@ -166,11 +166,11 @@ public interface QuestionMapper extends BaseMapper<Question> {
               </if>
             ORDER BY
               <choose>
-                <when test="sort == 'hot'">view_count DESC, create_time DESC</when>
-                <when test="sort == 'latest'">create_time DESC</when>
+                <when test="sort == 'hot'">view_count DESC, create_time DESC, id DESC</when>
+                <when test="sort == 'latest'">create_time DESC, id DESC</when>
                 <otherwise>
                   CASE WHEN title LIKE CONCAT('%', #{keyword}, '%') THEN 0 ELSE 1 END,
-                  view_count DESC
+                  view_count DESC, id DESC
                 </otherwise>
               </choose>
             </script>

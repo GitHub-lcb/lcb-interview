@@ -104,9 +104,11 @@ public class QuestionService {
 
         if (SORT_HOT.equals(safeSort)) {
             wrapper.orderByDesc(Question::getViewCount)
-                    .orderByDesc(Question::getCreateTime);
+                    .orderByDesc(Question::getCreateTime)
+                    .orderByDesc(Question::getId);
         } else {
-            wrapper.orderByDesc(Question::getCreateTime);
+            wrapper.orderByDesc(Question::getCreateTime)
+                    .orderByDesc(Question::getId);
         }
 
         log.info("搜索题目: categoryId={}, difficulty={}, keyword={}, page={}, size={}",
