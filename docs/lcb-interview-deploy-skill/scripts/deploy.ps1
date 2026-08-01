@@ -40,18 +40,30 @@ git -C $repo status --short
 if (-not $SkipTests) {
   Write-Step "Run backend tests"
   Push-Location (Join-Path $repo "backend")
-  mvn test
+  cmd /c "mvn test 2>&1"
   Pop-Location
 }
 
 Write-Step "Package backend jar"
 Push-Location (Join-Path $repo "backend")
-mvn -q -DskipTests package
+# 本机 JAVA_HOME 可能指向旧 JDK 导致 Maven 无法启动；此时依赖已预构建的
+# target/lcb-interview-0.0.1-SNAPSHOT.jar（可用服务器 Docker 构建后拉回）。
+cmd /c "mvn -q -DskipTests package 2>&1"
+if ($LASTEXITCODE -ne 0 -and -not (Test-Path "target/lcb-interview-0.0.1-SNAPSHOT.jar")) {
+  throw "backend jar build failed and no existing jar in backend/target"
+}
 Pop-Location
 
 Write-Step "Build frontend"
 Push-Location (Join-Path $repo "frontend")
-npm run build
+cmd /c "npm run build 2>&1"
+if ($LASTEXITCODE -ne 0) { throw "frontend build failed" }
+Pop-Location
+
+Write-Step "Generate SEO prerender pages"
+Push-Location (Join-Path $repo "frontend")
+cmd /c "node scripts/prerender.mjs --base http://$ServerHost 2>&1"
+if ($LASTEXITCODE -ne 0) { throw "prerender failed" }
 Pop-Location
 
 Write-Step "Create deploy archive"
@@ -115,13 +127,26 @@ if ($BuildOnly) {
 
 $remote = "$ServerUser@$ServerHost"
 Write-Step "Upload archive and deploy scripts to $remote"
-scp $archive $migration $remoteScript "${remote}:/tmp/"
+# 用 cmd /c 合并 stderr，避免 PowerShell 5.1 把 native stderr 当作终止错误（$ErrorActionPreference=Stop 下）
+cmd /c "scp $archive $migration $remoteScript ${remote}:/tmp/ 2>&1"
 
 Write-Step "Run remote deployment"
-ssh $remote "bash /tmp/lcb-interview-remote-deploy.sh"
+cmd /c "ssh $remote bash /tmp/lcb-interview-remote-deploy.sh 2>&1"
+if ($LASTEXITCODE -ne 0) { throw "remote deployment failed" }
 
 Write-Step "Smoke check public API"
-$categories = Invoke-RestMethod -Uri "http://$ServerHost/api/categories" -Method Get
+# 后端重启后 JVM 启动需要 10-20 秒，冒烟检查带重试等待
+$categories = $null
+for ($attempt = 1; $attempt -le 12; $attempt++) {
+  try {
+    $categories = Invoke-RestMethod -Uri "http://$ServerHost/api/categories" -Method Get -TimeoutSec 8
+    break
+  } catch {
+    if ($attempt -eq 12) { throw }
+    Write-Host "backend not ready yet, retry $attempt/12..."
+    Start-Sleep -Seconds 5
+  }
+}
 if ($categories.code -ne 200) {
   throw "Category smoke check failed: $($categories | ConvertTo-Json -Compress)"
 }
