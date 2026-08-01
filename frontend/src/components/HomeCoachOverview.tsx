@@ -55,7 +55,7 @@ export default function HomeCoachOverview({ model, candidates }: Props) {
           </div>
 
           <div className="home-today-progress">
-            <Progress percent={model.focusProgress} showInfo={false} strokeColor="#2563EB" />
+            <Progress percent={model.focusProgress} showInfo={false} strokeColor="#0F8A8F" />
             <span>{model.focusCompleted} / {model.focusQuestions.length || 0} 已评分</span>
           </div>
 

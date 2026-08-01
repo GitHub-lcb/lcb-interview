@@ -126,7 +126,7 @@ function resolveProgressColor(tone: PracticeAttemptDeltaTone, latestScore: numbe
     return '#059669'
   }
   if (latestScore >= 60) {
-    return '#2563EB'
+    return '#0F8A8F'
   }
   return '#D97706'
 }

@@ -85,7 +85,7 @@ export default function AbilityMapPanel() {
 
               <div className="ability-map-score">
                 <strong>{item.readinessScore}</strong>
-                <Progress percent={item.readinessScore} showInfo={false} strokeColor={item.readinessScore >= 75 ? '#059669' : '#2563EB'} />
+                <Progress percent={item.readinessScore} showInfo={false} strokeColor={item.readinessScore >= 75 ? '#059669' : '#0F8A8F'} />
               </div>
 
               <div className="ability-map-metrics">

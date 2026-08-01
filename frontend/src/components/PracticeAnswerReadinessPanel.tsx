@@ -38,7 +38,7 @@ export default function PracticeAnswerReadinessPanel({
         <Progress
           percent={readiness.score}
           showInfo={false}
-          strokeColor={readiness.score >= 75 ? '#059669' : readiness.score >= 50 ? '#2563EB' : '#D97706'}
+          strokeColor={readiness.score >= 75 ? '#059669' : readiness.score >= 50 ? '#0F8A8F' : '#D97706'}
         />
       </div>
 

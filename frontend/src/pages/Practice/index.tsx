@@ -841,7 +841,7 @@ export default function Practice() {
         </div>
 
         <div className="practice-progress-row">
-          <Progress percent={progressPercent} showInfo={false} strokeColor="#2563EB" />
+          <Progress percent={progressPercent} showInfo={false} strokeColor="#0F8A8F" />
           <span>{currentIndex + 1} / {queue.length}</span>
         </div>
 

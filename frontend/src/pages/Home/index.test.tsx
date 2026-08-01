@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import type { StudyProgress } from '../../types'
 import { createDefaultProgress, STUDY_PROGRESS_STORAGE_KEY } from '../../utils/studyProgress'
-import { getHotQuestions } from '../../api/question'
+import { getHotQuestions, getQuestions } from '../../api/question'
 import { getCategories } from '../../api/category'
 import Home from './index'
 
@@ -31,10 +31,17 @@ const fixtures = vi.hoisted(() => ({
       sortOrder: 1,
     },
   ],
+  totalQuestions: 6386,
 }))
 
 vi.mock('../../api/question', () => ({
   getHotQuestions: vi.fn().mockResolvedValue(fixtures.hotQuestions),
+  // 带 category 参数的是工作区题目列表，否则是 Hero 的题目总数查询（size=1）。
+  getQuestions: vi.fn().mockImplementation((params?: { category?: number }) => Promise.resolve(
+    params?.category != null
+      ? { content: fixtures.hotQuestions, page: 0, size: 12, total: fixtures.hotQuestions.length, totalPages: 1 }
+      : { content: [], page: 0, size: 1, total: fixtures.totalQuestions, totalPages: fixtures.totalQuestions },
+  )),
 }))
 
 vi.mock('../../api/category', () => ({
@@ -120,7 +127,7 @@ describe('Home', () => {
     })
   })
 
-  it('loads homepage categories silently because the grid owns its inline failure state', async () => {
+  it('loads homepage categories silently because the workspace owns its inline failure state', async () => {
     render(
       <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Home />
@@ -130,6 +137,42 @@ describe('Home', () => {
     await waitFor(() => {
       expect(vi.mocked(getCategories)).toHaveBeenCalledWith({ silentGlobalError: true })
     })
+  })
+
+  it('shows category count and total questions in the lab hero stats', async () => {
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Home />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText('6,386')).toBeInTheDocument()
+    expect(screen.getByText('学习模块')).toBeInTheDocument()
+    expect(screen.getByText('道面试题')).toBeInTheDocument()
+    expect(screen.getByText('免费体验')).toBeInTheDocument()
+  })
+
+  it('renders chinese numeral module tabs and auto loads the first module workspace', async () => {
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Home />
+      </MemoryRouter>,
+    )
+
+    const tab = await screen.findByRole('tab', { name: '模块一 Java 集合' })
+    expect(tab).toHaveAttribute('aria-selected', 'true')
+
+    await waitFor(() => {
+      expect(vi.mocked(getQuestions)).toHaveBeenCalledWith(
+        { category: 1, size: 12 },
+        { silentGlobalError: true },
+      )
+    })
+
+    // 工作区默认选中第一题并给出完整解析入口
+    expect(
+      await screen.findByRole('link', { name: /打开完整解析/ }),
+    ).toHaveAttribute('href', '/question/1')
   })
 
   it('exposes each hot question as a direct detail link', async () => {
@@ -142,19 +185,5 @@ describe('Home', () => {
     expect(
       await screen.findByRole('link', { name: `打开热门题目 ${fixtures.hotQuestions[0].title}` }),
     ).toHaveAttribute('href', '/question/1')
-  })
-
-  it('uses clean homepage category card links without decorative icon noise', async () => {
-    render(
-      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <Home />
-      </MemoryRouter>,
-    )
-
-    expect(
-      await screen.findByRole('link', {
-        name: 'Java 集合 集合框架与并发场景 浏览题库',
-      }),
-    ).toHaveAttribute('href', '/bank/1')
   })
 })

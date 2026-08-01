@@ -1,8 +1,8 @@
 import type { StudyQuestionStatus } from '../types'
 
 const meta: Record<StudyQuestionStatus, { label: string; bg: string; color: string }> = {
-  new: { label: '未学', bg: '#F4F4F5', color: '#71717A' },
-  learning: { label: '学习中', bg: '#EFF6FF', color: '#2563EB' },
+  new: { label: '未学', bg: '#E7ECEF', color: '#586069' },
+  learning: { label: '学习中', bg: '#E7F3EC', color: '#0F8A8F' },
   weak: { label: '薄弱', bg: '#FEF2F2', color: '#DC2626' },
   mastered: { label: '已掌握', bg: '#ECFDF5', color: '#059669' },
 }

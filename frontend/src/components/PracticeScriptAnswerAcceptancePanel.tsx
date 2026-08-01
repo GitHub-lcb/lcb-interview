@@ -40,7 +40,7 @@ export default function PracticeScriptAnswerAcceptancePanel({
         <Progress
           percent={acceptance.score}
           showInfo={false}
-          strokeColor={acceptance.score >= 75 ? '#059669' : acceptance.score >= 50 ? '#2563EB' : '#D97706'}
+          strokeColor={acceptance.score >= 75 ? '#059669' : acceptance.score >= 50 ? '#0F8A8F' : '#D97706'}
         />
       </div>
 

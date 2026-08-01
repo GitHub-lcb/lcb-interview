@@ -32,7 +32,7 @@ export default function DiagramBlock({ diagrams }: Props) {
               textAlign: 'center',
               marginTop: 12,
               fontSize: 13,
-              color: '#71717A',
+              color: '#586069',
               fontStyle: 'italic',
             }}>
               {d.caption}

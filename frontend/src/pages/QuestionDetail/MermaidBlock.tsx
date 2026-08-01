@@ -38,11 +38,11 @@ export default function MermaidBlock({ code }: Props) {
             // 内嵌在详请页容器内，统一使用中性背景。
             themeVariables: {
               background: '#FFFFFF',
-              primaryColor: '#EFF6FF',
-              primaryTextColor: '#18181B',
-              primaryBorderColor: '#2563EB',
-              lineColor: '#71717A',
-              secondaryColor: '#F4F4F5',
+              primaryColor: '#E7F3EC',
+              primaryTextColor: '#1A1E23',
+              primaryBorderColor: '#0F8A8F',
+              lineColor: '#586069',
+              secondaryColor: '#E7ECEF',
               tertiaryColor: '#FAFAFA',
             },
             flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
@@ -110,7 +110,7 @@ export default function MermaidBlock({ code }: Props) {
           borderRadius: 8,
           overflowX: 'auto',
           fontSize: 13,
-          color: '#52525B',
+          color: '#4E5960',
         }}>
           {code}
         </pre>
@@ -123,7 +123,7 @@ export default function MermaidBlock({ code }: Props) {
       {loading ? (
         <div style={{ textAlign: 'center', padding: 24 }}>
           <Spin size="small" />
-          <div style={{ marginTop: 8, fontSize: 13, color: '#71717A' }}>渲染图表中...</div>
+          <div style={{ marginTop: 8, fontSize: 13, color: '#586069' }}>渲染图表中...</div>
         </div>
       ) : (
         rendered

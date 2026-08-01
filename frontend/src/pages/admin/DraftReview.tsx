@@ -193,7 +193,7 @@ export default function DraftReview() {
       title: '摘要', dataIndex: 'summary', width: 300, ellipsis: true,
       render: (_: any, r: QuestionAdmin) => {
         const txt = r.summary || (r.content || r.answer || '').replace(/<[^>]*>/g, '').replace(/```[\s\S]*?```/g, '').slice(0, 120)
-        return txt ? <span style={{ color: '#71717A', fontSize: 13 }}>{txt}...</span> : <Tag color="warning">无内容</Tag>
+        return txt ? <span style={{ color: '#586069', fontSize: 13 }}>{txt}...</span> : <Tag color="warning">无内容</Tag>
       },
     },
     {

@@ -1,19 +1,25 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Alert } from 'antd'
-import CategoryGrid from './CategoryGrid'
+import LabHero from './LabHero'
+import CategoryWorkspace from './CategoryWorkspace'
 import HotQuestions from './HotQuestions'
 import FirstRunLaunchpad from '../../components/FirstRunLaunchpad'
 import HomeCoachOverview from '../../components/HomeCoachOverview'
-import { getHotQuestions } from '../../api/question'
+import { getCategories } from '../../api/category'
+import { getHotQuestions, getQuestions } from '../../api/question'
 import { buildHomeCoach } from '../../utils/homeCoach'
 import { readPracticeAnswerDrafts } from '../../utils/practiceAnswerDraftStore'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
-import type { Question } from '../../types'
+import type { Category, Question } from '../../types'
 
 export default function Home() {
   const [hotQuestions, setHotQuestions] = useState<Question[]>([])
   const [hotLoading, setHotLoading] = useState(true)
   const [hotError, setHotError] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
+  const [categoriesError, setCategoriesError] = useState(false)
+  const [totalQuestions, setTotalQuestions] = useState<number | null>(null)
   const { progress, rememberQuestions } = useStudyProgress()
   const answerDrafts = useMemo(() => readPracticeAnswerDrafts(), [])
   const coachModel = useMemo(
@@ -36,12 +42,52 @@ export default function Home() {
       })
   }
 
+  const fetchCategories = () => {
+    setCategoriesLoading(true)
+    setCategoriesError(false)
+    getCategories({ silentGlobalError: true })
+      .then(data => {
+        setCategories(data)
+        setCategoriesLoading(false)
+      })
+      .catch(() => {
+        setCategoriesError(true)
+        setCategoriesLoading(false)
+      })
+  }
+
   useEffect(() => {
     fetchHotQuestions()
+    fetchCategories()
+  }, [])
+
+  // 题目总数只取分页接口的 total（size=1 几乎无传输成本），失败时 Hero 显示占位符。
+  useEffect(() => {
+    getQuestions({ size: 1 }, { silentGlobalError: true })
+      .then(page => setTotalQuestions(page.total))
+      .catch(() => setTotalQuestions(null))
   }, [])
 
   return (
     <div className="home-page">
+      <LabHero categoryCount={categories.length} totalQuestions={totalQuestions} />
+
+      <section className="home-section">
+        <div className="home-section-header">
+          <div>
+            <h2 className="section-title">题库实验室</h2>
+            <p className="section-subtitle">按中文数字编号切换模块，选中题目即可在右侧预览。</p>
+          </div>
+          <span>选中即练</span>
+        </div>
+        <CategoryWorkspace
+          categories={categories}
+          loading={categoriesLoading}
+          error={categoriesError}
+          onRetry={fetchCategories}
+        />
+      </section>
+
       <FirstRunLaunchpad
         hotQuestions={hotQuestions}
         loading={hotLoading}
@@ -49,17 +95,6 @@ export default function Home() {
       />
 
       <HomeCoachOverview model={coachModel} candidates={hotQuestions} />
-
-      <section className="home-section">
-        <div className="home-section-header">
-          <div>
-            <h2 className="section-title">题库入口</h2>
-            <p className="section-subtitle">按目标岗位筛选核心方向，需要时再进入完整题库。</p>
-          </div>
-          <span>46 个技术方向</span>
-        </div>
-        <CategoryGrid />
-      </section>
 
       <section className="home-section home-hot-section">
         <div className="home-section-header">

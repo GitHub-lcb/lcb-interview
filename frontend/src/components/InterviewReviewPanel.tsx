@@ -122,7 +122,7 @@ export default function InterviewReviewPanel({ progress, compact = false }: Inte
         <div className="interview-review-score">
           <span>平均分</span>
           <strong>{summary.averageScore}</strong>
-          <Progress percent={summary.averageScore} showInfo={false} strokeColor={summary.averageScore >= 80 ? '#059669' : '#2563EB'} />
+          <Progress percent={summary.averageScore} showInfo={false} strokeColor={summary.averageScore >= 80 ? '#059669' : '#0F8A8F'} />
           {summary.latestScore !== undefined && <small>最近一次 {summary.latestScore} 分</small>}
         </div>
 

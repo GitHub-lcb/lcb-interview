@@ -219,6 +219,8 @@ if (tag != null) { ... }
 - Vite 代理 `/api` 到 `http://localhost:8080`，代理配置在 `frontend/vite.config.ts`。
 - Axios 实例统一放在 `src/api/`，继续使用统一拦截规则处理 `res.data.code !== 200`。
 - Ant Design 5 主题配置在 `src/styles/theme.ts`；新增页面和组件优先使用现有布局、主题和组件模式。
+- 全站视觉遵循「墨纸实验室」设计系统（对标粒子先生物理实验室）：坐标纸背景 `#EEF1F4`（body 18px 网格）、墨迹 `#1A1E23`、青绿强调 `#0F8A8F`、等宽数字用 `--font-mono`；核心色值集中在 `global.css` 的 `:root` 变量，改色优先改变量而非散落硬编码。
+- 首页为「LabHero 大统计 + 中文数字模块 Tab + CategoryWorkspace 内嵌题目工作区」结构；中文数字编号用 `src/utils/chineseNumeral.ts` 的 `toChineseNumeral`，新增 lab 风格组件沿用 `lab-*` CSS 类约定。
 - Markdown 渲染使用 `react-markdown` + `rehype-highlight` + `remark-gfm`；编辑场景使用 `@uiw/react-md-editor`。
 - 构建分包策略在 `src/build/manualChunks.ts`，新增重量级依赖时同步评估分包影响。
 - 测试使用 Vitest + Testing Library；新增纯逻辑放入 `src/utils/` 时配套 `*.test.ts`。

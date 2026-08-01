@@ -34,7 +34,7 @@ function strokeColor(level: PrepHealthLevel) {
     return '#059669'
   }
   if (level === 'watch') {
-    return '#2563EB'
+    return '#0F8A8F'
   }
   if (level === 'risk') {
     return '#DC2626'

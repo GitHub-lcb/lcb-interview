@@ -8,7 +8,7 @@ const { Content, Footer } = Layout
 
 export default function AppLayout() {
   return (
-    <Layout style={{ minHeight: '100vh', background: '#FAFAF9' }}>
+    <Layout style={{ minHeight: '100vh', background: 'transparent' }}>
       <AppHeader />
       <Content className="main-content" style={{
         padding: '28px 24px',

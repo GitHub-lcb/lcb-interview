@@ -73,7 +73,7 @@ export default function AdminLayout() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#FAFAF9',
+        background: '#EEF1F4',
       }}>
         <Spin />
       </div>
@@ -95,13 +95,13 @@ export default function AdminLayout() {
 
   if (isMobile) {
     return (
-      <Layout style={{ minHeight: '100vh', background: '#FAFAF9' }}>
+      <Layout style={{ minHeight: '100vh', background: '#EEF1F4' }}>
         <div style={{
           position: 'sticky', top: 0, zIndex: 10,
           display: 'flex', alignItems: 'center', gap: 12,
           padding: '12px 16px',
           background: '#FFFFFF',
-          borderBottom: '1px solid #E4E4E7',
+          borderBottom: '1px solid #D3D9DF',
         }}>
           <Button
             type="text"
@@ -113,7 +113,7 @@ export default function AdminLayout() {
             fontFamily: "'DM Serif Display', serif",
             fontSize: 16,
             fontWeight: 700,
-            color: '#18181B',
+            color: '#1A1E23',
             letterSpacing: '-0.03em',
           }}>
             LCB Admin
@@ -137,14 +137,14 @@ export default function AdminLayout() {
   }
 
   return (
-    <Layout style={{ minHeight: '100vh', background: '#FAFAF9' }}>
-      <Sider theme="light" width={220} style={{ borderRight: '1px solid #E4E4E7', background: '#FFFFFF' }}>
+    <Layout style={{ minHeight: '100vh', background: '#EEF1F4' }}>
+      <Sider theme="light" width={220} style={{ borderRight: '1px solid #D3D9DF', background: '#FFFFFF' }}>
         <div style={{
           padding: '20px 16px',
           fontFamily: "'DM Serif Display', serif",
           fontSize: 18,
           fontWeight: 700,
-          color: '#18181B',
+          color: '#1A1E23',
           letterSpacing: '-0.03em',
           borderBottom: '1px solid #F1F1F3',
         }}>

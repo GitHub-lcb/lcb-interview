@@ -36,7 +36,7 @@ export default function AdminLogin() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: '#FAFAF9',
+      background: '#EEF1F4',
       padding: 16,
     }}>
       <div className="magazine-card" style={{
@@ -49,13 +49,13 @@ export default function AdminLogin() {
           fontFamily: "'DM Serif Display', serif",
           fontSize: 24,
           fontWeight: 700,
-          color: '#18181B',
+          color: '#1A1E23',
           letterSpacing: '-0.03em',
           margin: '0 0 8px 0',
         }}>
           管理员登录
         </h1>
-        <p style={{ fontSize: 14, color: '#71717A', margin: '0 0 28px 0' }}>
+        <p style={{ fontSize: 14, color: '#586069', margin: '0 0 28px 0' }}>
           请输入管理员 Token 登录后台
         </p>
         <Input.Password

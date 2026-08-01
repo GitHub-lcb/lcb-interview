@@ -40,7 +40,7 @@ export default function AnswerQualityPanel({ question }: Props) {
           </Button>
         </div>
         <div className="quality-score">{quality.score}</div>
-        <Progress percent={quality.score} showInfo={false} strokeColor={quality.score >= 85 ? '#059669' : '#2563EB'} />
+        <Progress percent={quality.score} showInfo={false} strokeColor={quality.score >= 85 ? '#059669' : '#0F8A8F'} />
         <div className="panel-muted">
           {quality.level === 'excellent' ? '结构完整，可直接复述' : quality.level === 'good' ? '可用，建议补齐弱项' : '缺少关键面试模块'}
         </div>

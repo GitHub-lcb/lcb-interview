@@ -90,7 +90,7 @@ const FALLBACK_LABELS: Record<string, [string, number]> = {
 
 export function getCategoryIcon(iconKey: string | undefined, size = 40): React.ReactNode {
   if (!iconKey) {
-    return fallbackSvg('#2563EB', '?', 20, size)
+    return fallbackSvg('#0F8A8F', '?', 20, size)
   }
 
   const pngPath = iconKey.startsWith('/icons/') ? iconKey : ICON_PATHS[iconKey]
@@ -110,7 +110,7 @@ export function getCategoryIcon(iconKey: string | undefined, size = 40): React.R
     )
   }
 
-  const color = FALLBACK_COLORS[iconKey] || '#2563EB'
+  const color = FALLBACK_COLORS[iconKey] || '#0F8A8F'
   const [label, fontSize] = FALLBACK_LABELS[iconKey] || ['?', 20]
   return fallbackSvg(color, label, fontSize, size)
 }

@@ -22,13 +22,13 @@ export default function CodeBlock({ examples }: Props) {
   }
 
   return (
-    <div style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid #E4E4E7' }}>
+    <div style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid #D3D9DF' }}>
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         background: '#F8F8FA',
-        borderBottom: '1px solid #E4E4E7',
+        borderBottom: '1px solid #D3D9DF',
         padding: '0 4px',
       }}>
         <div style={{ display: 'flex', gap: 2 }}>
@@ -44,7 +44,7 @@ export default function CodeBlock({ examples }: Props) {
                 cursor: 'pointer',
                 fontSize: 13,
                 fontWeight: activeTab === i ? 500 : 400,
-                color: activeTab === i ? '#18181B' : '#71717A',
+                color: activeTab === i ? '#1A1E23' : '#586069',
                 borderRadius: '6px 6px 0 0',
                 marginTop: 4,
                 transition: 'all 0.15s',
@@ -66,7 +66,7 @@ export default function CodeBlock({ examples }: Props) {
       </div>
       <div style={{ padding: '16px 20px', background: '#FAFAFA', overflowX: 'auto' }}>
         {examples[activeTab].description && (
-          <div style={{ fontSize: 13, color: '#71717A', marginBottom: 12, lineHeight: 1.5 }}>
+          <div style={{ fontSize: 13, color: '#586069', marginBottom: 12, lineHeight: 1.5 }}>
             {examples[activeTab].description}
           </div>
         )}

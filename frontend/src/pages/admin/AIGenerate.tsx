@@ -361,7 +361,7 @@ export default function AIGenerate() {
           <Tag color={tagColor}>{batchFillProgress.status === 'RUNNING' ? '运行中' : batchFillProgress.status === 'COMPLETED' ? '已完成' : '失败'}</Tag>
         </Space>
         <Progress percent={percent} />
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px', fontSize: 14, color: '#52525B' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px', fontSize: 14, color: '#4E5960' }}>
           <span>题目: {completed}/{total}</span>
           <span>成功: {batchFillProgress.generatedQuestions}</span>
           <span>失败: {batchFillProgress.failedCategories}</span>
@@ -621,7 +621,7 @@ export default function AIGenerate() {
           {batchProgress?.status === 'RUNNING' && (
             <Card size="small" style={{ marginBottom: 16 }}>
               <Progress percent={batchProgress.totalCategories > 0 ? Math.round(batchProgress.completedCategories / batchProgress.totalCategories * 100) : 0} />
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px', fontSize: 14, color: '#52525B' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px', fontSize: 14, color: '#4E5960' }}>
                 <span>分类: {batchProgress.completedCategories}/{batchProgress.totalCategories}</span>
                 <span>题目: {batchProgress.generatedQuestions}/{batchProgress.totalQuestions}</span>
                 <span>失败: {batchProgress.failedCategories}</span>

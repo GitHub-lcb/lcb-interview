@@ -35,7 +35,7 @@ const metricCardStyle: React.CSSProperties = {
 }
 
 const compactMetaStyle: React.CSSProperties = {
-  color: '#71717A',
+  color: '#586069',
   fontSize: 12,
 }
 
@@ -308,7 +308,7 @@ function todoColor(todo: AdminQualityTodo) {
   if (todo.tone === 'success') {
     return '#16A34A'
   }
-  return '#2563EB'
+  return '#0F8A8F'
 }
 
 function todoPath(todo: AdminQualityTodo) {
