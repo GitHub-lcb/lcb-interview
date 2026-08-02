@@ -97,6 +97,15 @@ export default function AppHeader() {
       </nav>
 
       <div className="app-header-side">
+        {/* 窄屏下搜索框隐藏，保留图标入口跳转搜索页（见 global.css 480px 断点） */}
+        <button
+          type="button"
+          className="app-header-mobile-search"
+          aria-label="搜索"
+          onClick={() => navigate('/search')}
+        >
+          <SearchOutlined />
+        </button>
         <span className="app-header-clock" aria-label="实时时钟">
           <span className="app-header-clock-dot" aria-hidden="true" />
           {clock} 已连接

@@ -1276,6 +1276,26 @@ p {
   min-width: 0;
 }
 
+/* 移动端搜索图标按钮，默认隐藏，480px 以下显示（搜索框此时已隐藏） */
+.app-header-mobile-search {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #586069;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.app-header-mobile-search:hover {
+  background: #E7ECEF;
+  color: #1A1E23;
+}
+
 .app-header-search .ant-input-affix-wrapper,
 .app-header-search .ant-input-group-addon .ant-btn {
   height: 34px;
@@ -1398,6 +1418,8 @@ p {
   font-size: 15px;
   line-height: 1.8;
   color: #4E5960;
+  /* 作为 grid/flex 子项时允许收缩，防止长代码把容器撑破 */
+  min-width: 0;
 }
 
 .prose h1, .prose h2, .prose h3, .prose h4 {
@@ -1449,6 +1471,8 @@ p {
   margin: 0 0 16px 0;
   font-size: 13px;
   line-height: 1.6;
+  /* 长代码由 pre 内部横向滚动，不撑破外层 overflow:hidden 容器 */
+  max-width: 100%;
 }
 
 .prose pre code {
@@ -1898,6 +1922,8 @@ p {
   border-radius: 8px;
   padding: 8px;
   overflow: hidden;
+  /* 列轨道允许收缩，防止长代码把卡片撑破后又被 overflow:hidden 裁切 */
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .content-card:hover {
@@ -16449,6 +16475,10 @@ p {
 }
 
 @media (max-width: 760px) {
+  .main-content {
+    padding: 20px 16px !important;
+  }
+
   .first-run-launchpad,
   .home-coach-overview,
   .study-dashboard-top,
@@ -16903,10 +16933,17 @@ p {
 
   .app-nav {
     justify-content: flex-start;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .app-nav::-webkit-scrollbar {
+    display: none;
   }
 
   .app-nav-item {
-    width: 30px;
+    width: 36px;
+    min-height: 36px;
     justify-content: center;
     padding: 5px;
   }
@@ -17321,8 +17358,20 @@ p {
   }
 
   .app-header {
-    grid-template-columns: 30px minmax(112px, auto) minmax(90px, 1fr);
+    grid-template-columns: 30px minmax(0, 1fr) auto;
     gap: 8px;
+  }
+
+  .app-brand-version {
+    display: none;
+  }
+
+  .app-header-side .app-header-search {
+    display: none;
+  }
+
+  .app-header-mobile-search {
+    display: inline-flex;
   }
 
   .app-header-search .ant-input {
@@ -17378,6 +17427,17 @@ p {
   .section-subtitle {
     font-size: 13px !important;
     margin-bottom: 16px !important;
+  }
+}
+
+/* 触屏设备不保留 hover 残留背景，避免点击导航后按钮"粘住"高亮。 */
+@media (hover: none) {
+  .app-nav-item:hover {
+    background: transparent;
+  }
+
+  .app-header-mobile-search:hover {
+    background: transparent;
   }
 }
 
