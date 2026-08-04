@@ -221,8 +221,10 @@ export default function LotteryKl8Panel() {
     if (!latest || latest.groups.length === 0) {
       return
     }
-    // 每组号码占一行、号码之间用空格分隔，方便直接粘贴到文档或聊天工具
-    const text = latest.groups.map(group => group.numbers.join(' ')).join('\n')
+    // 每组号码占一行、号码之间用空格分隔，个位数补 0 对齐，方便直接粘贴到文档或聊天工具
+    const text = latest.groups
+      .map(group => group.numbers.map(formatTrendNumber).join(' '))
+      .join('\n')
     const copied = await copyToClipboard(text)
     if (copied) {
       emitFeedbackSuccess(`已复制 ${latest.groups.length} 组号码`)

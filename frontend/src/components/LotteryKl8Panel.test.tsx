@@ -137,7 +137,7 @@ describe('LotteryKl8Panel', () => {
     await userEvent.click(screen.getByRole('button', { name: /一键复制/ }))
 
     await waitFor(() => {
-      expect(writeText).toHaveBeenCalledWith('7 19 34 52 68\n1 8 23 45 67\n2 9 30 50 70')
+      expect(writeText).toHaveBeenCalledWith('07 19 34 52 68\n01 08 23 45 67\n02 09 30 50 70')
     })
     expect(emitFeedbackSuccess).toHaveBeenCalledWith('已复制 3 组号码')
   })
