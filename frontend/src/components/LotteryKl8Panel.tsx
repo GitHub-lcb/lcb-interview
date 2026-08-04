@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Empty, InputNumber, Spin, Tabs, Tag } from 'antd'
-import { BulbOutlined, HistoryOutlined, LineChartOutlined, ReloadOutlined, ThunderboltOutlined, WarningOutlined } from '@ant-design/icons'
+import { BulbOutlined, CopyOutlined, HistoryOutlined, LineChartOutlined, ReloadOutlined, ThunderboltOutlined, WarningOutlined } from '@ant-design/icons'
 import {
   createKl8Recommendation,
   getKl8SyncStatus,
@@ -217,13 +217,27 @@ export default function LotteryKl8Panel() {
     }
   }
 
+  const handleCopyGroups = async () => {
+    if (!latest || latest.groups.length === 0) {
+      return
+    }
+    // 每组号码占一行、号码之间用空格分隔，方便直接粘贴到文档或聊天工具
+    const text = latest.groups.map(group => group.numbers.join(' ')).join('\n')
+    const copied = await copyToClipboard(text)
+    if (copied) {
+      emitFeedbackSuccess(`已复制 ${latest.groups.length} 组号码`)
+    } else {
+      emitFeedbackWarning('复制失败，请手动选择号码复制')
+    }
+  }
+
   return (
     <section className="tool-section lottery-tool" aria-label="快乐8选5">
       <div className="tool-section-head">
         <div>
           <div className="dashboard-kicker">快乐8选5</div>
           <h2>Java 历史数据回测推荐</h2>
-          <p>后端同步公开开奖数据，使用纯 Java 提取冷热、遗漏、区间、上一期邻位、连号结构和回测特征，生成 1 组精选号码。</p>
+          <p>后端同步公开开奖数据，使用纯 Java 提取冷热、遗漏、区间、上一期邻位、连号结构和回测特征，生成 3 组精选号码，组间去重覆盖提高整体命中机会。</p>
         </div>
         <div className="tool-actions">
           <Button icon={<ReloadOutlined />} loading={syncing} disabled={recommending} onClick={handleSync}>
@@ -268,12 +282,20 @@ export default function LotteryKl8Panel() {
                       <Tag color={latest.source === 'AI' ? 'blue' : 'orange'}>{latest.source === 'AI' ? '历史 AI 推荐' : 'Java 推荐'}</Tag>
                       {analysis?.confidenceLabel && <Tag color="geekblue">参考强度 {analysis.confidenceLabel}</Tag>}
                       {latest.strategyVersion && <Tag>{latest.strategyVersion}</Tag>}
+                      {latest.groups.length > 1 && (
+                        <Tag color="gold">{latest.groups.length} 组覆盖 {new Set(latest.groups.flatMap(group => group.numbers)).size} 个号码</Tag>
+                      )}
                       {latest.evaluatedIssueNo && <Tag color="cyan">已结算 {latest.evaluatedIssueNo}</Tag>}
                       {typeof latest.maxHitCount === 'number' && <Tag color="green">最高命中 {latest.maxHitCount}/{currentPickSize}</Tag>}
                       {calibration && calibration.evaluatedCount > 0 && <Tag color="purple">反馈校准 {calibration.evaluatedCount} 条</Tag>}
                       <strong>基于近 {latest.baseIssueCount} 期，最新期号 {latest.latestIssueNo}</strong>
                     </div>
-                    <small>{formatDateTime(latest.createdAt)}</small>
+                    <div className="lottery-recommendation-head-actions">
+                      <Button size="small" icon={<CopyOutlined />} onClick={handleCopyGroups}>
+                        一键复制
+                      </Button>
+                      <small>{formatDateTime(latest.createdAt)}</small>
+                    </div>
                   </div>
                   <p>{latest.featureSummary}</p>
                   {aiFallback && (
@@ -882,6 +904,19 @@ function parseJson<T>(value?: string): T | null {
     return JSON.parse(value) as T
   } catch {
     return null
+  }
+}
+
+async function copyToClipboard(text: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) {
+    return false
+  }
+
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch {
+    return false
   }
 }
 

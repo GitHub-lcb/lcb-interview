@@ -23,7 +23,8 @@ public class LotteryKl8RecommendationPolicy {
 
     /** 默认每组 5 个号码，兼容旧记录和旧调用方 */
     public static final int DEFAULT_PICK_SIZE = 5;
-    private static final int GROUP_COUNT = 1;
+    /** 每次输出 3 组号码，组间由特征层做覆盖去重，提升整体命中感知 */
+    private static final int GROUP_COUNT = 3;
     private static final Set<String> CONFIDENCE_LABELS = Set.of("低", "中低", "中");
 
     private final ObjectMapper objectMapper;
@@ -160,8 +161,8 @@ public class LotteryKl8RecommendationPolicy {
             }
             ObjectNode analysis = root.putObject("analysis");
             String overview = failureDetail == null
-                    ? "已使用后端 Java 回测策略生成 1 组号码。"
-                    : "AI 推荐不可用（%s），已使用后端 Java 回测策略生成 1 组号码。".formatted(failureDetail.message());
+                    ? "已使用后端 Java 回测策略生成 %d 组号码。".formatted(GROUP_COUNT)
+                    : "AI 推荐不可用（%s），已使用后端 Java 回测策略生成 %d 组号码。".formatted(failureDetail.message(), GROUP_COUNT);
             analysis.put("overview", overview);
             ArrayNode featureSignals = analysis.putArray("featureSignals");
             report.analysisSections().forEach(featureSignals::add);
@@ -199,23 +200,31 @@ public class LotteryKl8RecommendationPolicy {
 
     /**
      * 根据历史特征生成 Java 规则推荐。
+     * 优先复用组合优化组，不足 3 组时用规则候选补齐，组间号码尽量不重复。
      *
      * @param report   历史特征报告
      * @param pickSize 每组号码数量（1-10）
-     * @return 1 组规则推荐
+     * @return 3 组规则推荐
      */
     public List<LotteryKl8RecommendationGroupVO> fallbackGroups(LotteryKl8FeatureReport report, int pickSize) {
-        if (!report.optimizedPortfolio().groups().isEmpty()) {
-            return validateGroups(report.optimizedPortfolio().groups().stream()
-                    .limit(GROUP_COUNT)
-                    .map(group -> new LotteryKl8RecommendationGroupVO(group.numbers(), group.reason()))
-                    .toList(), pickSize);
-        }
         Random random = new Random(System.nanoTime());
         List<LotteryKl8RecommendationGroupVO> groups = new ArrayList<>();
-        Set<String> used = new HashSet<>();
+        Set<String> usedKeys = new HashSet<>();
+        Set<Integer> usedNumbers = new HashSet<>();
+        // 组合优化生成的组优先直接采用，并登记已用号码用于后续补齐组的覆盖去重
+        for (LotteryKl8OptimizedGroup optimizedGroup : report.optimizedPortfolio().groups()) {
+            if (groups.size() >= GROUP_COUNT) {
+                break;
+            }
+            LotteryKl8RecommendationGroupVO group = new LotteryKl8RecommendationGroupVO(
+                    optimizedGroup.numbers(), optimizedGroup.reason());
+            groups.add(group);
+            usedKeys.add(group.numbers().toString());
+            usedNumbers.addAll(group.numbers());
+        }
         int cursor = 0;
         List<Integer> candidateNumbers = candidateNumbers(report);
+        List<Integer> freshCandidates = withoutUsed(candidateNumbers, usedNumbers);
         while (groups.size() < GROUP_COUNT) {
             LinkedHashSet<Integer> numbers = new LinkedHashSet<>();
             // 根据选号数量动态分配候选来源比例
@@ -226,7 +235,8 @@ public class LotteryKl8RecommendationPolicy {
             if (candidateCount < 1) {
                 candidateCount = 1;
             }
-            push(numbers, candidateNumbers, cursor, candidateCount);
+            List<Integer> candidatesSource = freshCandidates.isEmpty() ? candidateNumbers : freshCandidates;
+            push(numbers, candidatesSource, cursor, candidateCount);
             push(numbers, report.hotNumbers(), cursor + 3, hotCount);
             push(numbers, missingCandidates(report), cursor + 5, missingCount);
             push(numbers, report.coldNumbers(), cursor + 7, coldCount);
@@ -235,19 +245,34 @@ public class LotteryKl8RecommendationPolicy {
             }
             List<Integer> sorted = numbers.stream().sorted().toList();
             String key = sorted.toString();
-            if (used.add(key)) {
+            if (usedKeys.add(key)) {
                 groups.add(new LotteryKl8RecommendationGroupVO(
                         sorted,
                         "Java 规则推荐：结合深度候选池、热号、冷号、遗漏和随机扰动生成，仅作娱乐参考。"));
+                usedNumbers.addAll(sorted);
             }
             cursor += 1;
         }
         return validateGroups(groups, pickSize);
     }
 
+    /**
+     * 过滤掉已被前面组使用的号码，供补齐组优先选择新鲜号码。
+     *
+     * @param source      候选号码源
+     * @param usedNumbers 已使用号码集合
+     * @return 未使用过的号码列表
+     */
+    private List<Integer> withoutUsed(List<Integer> source, Set<Integer> usedNumbers) {
+        List<Integer> fresh = source.stream()
+                .filter(number -> !usedNumbers.contains(number))
+                .toList();
+        return fresh.isEmpty() ? source : fresh;
+    }
+
     private List<LotteryKl8RecommendationGroupVO> validateGroups(List<LotteryKl8RecommendationGroupVO> groups, int pickSize) {
-        if (groups.size() != GROUP_COUNT) {
-            throw new IllegalArgumentException("必须返回 1 组推荐");
+        if (groups.isEmpty()) {
+            throw new IllegalArgumentException("必须返回至少 1 组推荐");
         }
         Set<String> used = new HashSet<>();
         List<LotteryKl8RecommendationGroupVO> result = new ArrayList<>();

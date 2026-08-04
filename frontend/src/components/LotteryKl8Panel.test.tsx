@@ -108,6 +108,40 @@ describe('LotteryKl8Panel', () => {
     expect(emitFeedbackSuccess).toHaveBeenCalledWith('Java 推荐已生成')
   })
 
+  it('copies all groups with one number per space and one group per line', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    })
+    const recommendation: LotteryKl8Recommendation = {
+      id: 6,
+      source: 'RULE_BASED',
+      pickSize: 5,
+      baseIssueCount: 2000,
+      latestIssueNo: '20260629001',
+      groups: [
+        { numbers: [7, 19, 34, 52, 68], reason: '第一组' },
+        { numbers: [1, 8, 23, 45, 67], reason: '第二组' },
+        { numbers: [2, 9, 30, 50, 70], reason: '第三组' },
+      ],
+      featureSummary: '三组测试摘要',
+      disclaimer: '测试免责声明',
+      createdAt: '2026-06-29T10:00:00',
+    }
+    vi.mocked(listKl8Recommendations).mockResolvedValue(pageOf([recommendation], 8))
+
+    render(<LotteryKl8Panel />)
+
+    await screen.findAllByText('三组测试摘要')
+    await userEvent.click(screen.getByRole('button', { name: /一键复制/ }))
+
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith('7 19 34 52 68\n1 8 23 45 67\n2 9 30 50 70')
+    })
+    expect(emitFeedbackSuccess).toHaveBeenCalledWith('已复制 3 组号码')
+  })
+
   it('contains protected load failures without an unhandled rejection', async () => {
     vi.mocked(getKl8SyncStatus).mockRejectedValue(Object.assign(new Error('Unauthorized'), { response: { status: 401 } }))
 

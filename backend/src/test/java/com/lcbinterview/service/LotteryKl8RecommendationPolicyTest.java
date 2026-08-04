@@ -84,8 +84,10 @@ class LotteryKl8RecommendationPolicyTest {
 
         List<LotteryKl8RecommendationGroupVO> groups = policy.fallbackGroups(report);
 
-        assertEquals(1, groups.size());
+        assertEquals(3, groups.size());
         groups.forEach(group -> assertEquals(5, group.numbers().size()));
+        // 补齐组之间不能出现完全相同的一组号码
+        assertEquals(3, groups.stream().map(LotteryKl8RecommendationGroupVO::numbers).distinct().count());
     }
 
     @Test
@@ -158,8 +160,11 @@ class LotteryKl8RecommendationPolicyTest {
 
         List<LotteryKl8RecommendationGroupVO> groups = policy.fallbackGroups(report);
 
-        assertEquals(1, groups.size());
+        // 组合优化已有 5 组候选，取前 3 组作为本次推荐
+        assertEquals(3, groups.size());
         assertEquals(List.of(1, 2, 3, 4, 5), groups.get(0).numbers());
+        assertEquals(List.of(6, 7, 8, 9, 10), groups.get(1).numbers());
+        assertEquals(List.of(11, 12, 13, 14, 15), groups.get(2).numbers());
         assertTrue(groups.get(0).reason().contains("组合优化"));
     }
 

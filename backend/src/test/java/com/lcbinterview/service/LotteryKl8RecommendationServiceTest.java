@@ -64,10 +64,11 @@ class LotteryKl8RecommendationServiceTest {
                 saved.getRecommendationsJson(), new TypeReference<>() {
                 });
         assertEquals("RULE_BASED", saved.getSource());
-        assertEquals("KL8_JAVA_HOT_FREQ_W100_V18", saved.getStrategyVersion());
-        assertEquals(1, savedGroups.size());
+        assertEquals("KL8_JAVA_MULTI_GROUP_V19", saved.getStrategyVersion());
+        // 组合优化组不足 3 组时由规则补齐，最终固定输出 3 组，首组沿用组合优化结果
+        assertEquals(3, savedGroups.size());
         assertEquals(List.of(1, 2, 3, 4, 5), savedGroups.get(0).numbers());
-        assertEquals(1, result.groups().size());
+        assertEquals(3, result.groups().size());
         assertEquals(List.of(1, 2, 3, 4, 5), result.groups().get(0).numbers());
     }
 

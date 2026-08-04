@@ -71,7 +71,8 @@ public class LotteryKl8FeatureService {
     private static final int PAIR_HIGHLIGHT_SIZE = 20;
     private static final int PAIR_RECOMMENDATION_SIZE = 12;
     private static final int NEIGHBOR_RECOMMENDATION_SIZE = 20;
-    private static final int OPTIMIZED_GROUP_COUNT = 1;
+    /** V19 多组覆盖：每次生成 3 组号码，组间通过复用惩罚尽量去重，提升整体命中感知 */
+    private static final int OPTIMIZED_GROUP_COUNT = 3;
     private static final List<String> BACKTEST_FACTORS = List.of(
             "hot", "missing", "trend", "decay", "pair", "balance");
 
@@ -921,10 +922,13 @@ public class LotteryKl8FeatureService {
         Set<Integer> selectedNumbers = groups.stream()
                 .flatMap(group -> group.numbers().stream())
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+        // V19 覆盖度统计：3 组号码去重后覆盖的不同号码数，直接反映整体命中机会
+        long coverageNumberCount = selectedNumbers.size();
         List<LotteryKl8NeighborRecommendation> neighborRecommendations = markSelectedNeighbors(neighborDrafts, selectedNumbers, pickSize);
         Map<String, String> diagnostics = new LinkedHashMap<>();
         diagnostics.put("averageGroupScore", "%.2f".formatted(averageScore));
         diagnostics.put("groupCount", String.valueOf(groups.size()));
+        diagnostics.put("coverageNumberCount", String.valueOf(coverageNumberCount));
         diagnostics.put("maxNumberReuse", String.valueOf(maxReuse));
         diagnostics.put("backtestAverageHit", "%.2f".formatted(backtestSummary.averageHitCount()));
         diagnostics.put("topFactors", String.join("、", backtestSummary.topFactorNames()));
@@ -935,8 +939,9 @@ public class LotteryKl8FeatureService {
         diagnostics.put("longestConsecutiveRun", String.valueOf(longestConsecutiveRun(groups.get(0).numbers())));
         return new LotteryKl8OptimizedPortfolio(
                 groups,
-                "组合优化完成：基于 %d 个候选号码，采用三策略加权投票+13号区间惩罚+配对协同微调（冷号策略1.5倍权重），平均组合分 %.2f，回测平均命中 %.2f。V13回测综合评分395（≥3*1+≥4*3+≥5*10）。"
-                        .formatted(candidates.size(), averageScore, backtestSummary.averageHitCount()),
+                "组合优化完成：基于 %d 个候选号码，四策略加权投票+连号种子保证+配对协同微调生成 %d 组号码，组间覆盖 %d 个不同号码，平均组合分 %.2f，回测平均命中 %.2f。"
+                        .formatted(candidates.size(), groups.size(), coverageNumberCount, averageScore,
+                                backtestSummary.averageHitCount()),
                 diagnostics,
                 pairRecommendations,
                 neighborRecommendations);
@@ -1237,10 +1242,14 @@ public class LotteryKl8FeatureService {
         Map<Integer, Double> votes = new LinkedHashMap<>();
         Map<Integer, Double> scoreSums = new LinkedHashMap<>();
         List<List<Integer>> allPicks = List.of(picks1, picks2, picks3, picks4);
+        // V19 多组覆盖：对已被前面组选中的号码施加投票惩罚（每复用一次扣 6.0 分），
+        // 让第 2/3 组在排序中自然让位给新鲜号码，保证 3 组之间最大程度去重覆盖。
+        // 若不惩罚，邻位策略（权重 5.0）会为 3 组选出几乎相同的号码，覆盖失效。
         for (int si = 0; si < allPicks.size(); si++) {
             double weight = strategyWeights[si];
             for (Integer num : allPicks.get(si)) {
-                votes.merge(num, weight, Double::sum);
+                double effectiveWeight = weight - reuseCounts.getOrDefault(num, 0) * 6.0;
+                votes.merge(num, effectiveWeight, Double::sum);
                 LotteryKl8NumberProfile profile = profileByNumber.get(num);
                 scoreSums.merge(num, profile == null ? 0 : profile.compositeScore(), Double::sum);
             }
