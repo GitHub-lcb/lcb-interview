@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   BookOutlined,
   CalendarOutlined,
+  FireOutlined,
   HomeOutlined,
   PlayCircleOutlined,
   ReadOutlined,
@@ -21,6 +22,7 @@ const navItems = [
   { path: '/practice', label: '模拟', icon: <PlayCircleOutlined /> },
   { path: '/study', label: '学习', icon: <CalendarOutlined /> },
   { path: '/banks', label: '题库', icon: <BookOutlined /> },
+  { path: '/knowledge', label: '考点', icon: <FireOutlined /> },
   { path: '/routes', label: '路线', icon: <ReadOutlined /> },
   { path: '/experiences', label: '面经', icon: <SolutionOutlined /> },
   { path: '/tools', label: '工具', icon: <ToolOutlined /> },

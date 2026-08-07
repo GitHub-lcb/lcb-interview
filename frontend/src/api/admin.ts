@@ -81,8 +81,7 @@ export const batchRejectDrafts = (ids: number[], options: import('../types').Dra
  * SSE 流式生成单道题。
  * 返回一个 AbortController，可用于取消连接。
  * onEvent 接收事件类型和数据的回调。
- */
-export function streamGenerate(
+ */export function streamGenerate(
   params: { category: string; difficulty?: string; count?: number; topic?: string },
   onEvent: (event: import('../types').StreamEvent) => void
 ): AbortController {
@@ -152,6 +151,37 @@ export function streamFillAnswer(
 
   return abort
 }
+
+export const startKnowledgeCleaning = () =>
+  api.post<{ data: boolean }>('/admin/knowledge/clean-start')
+    .then(res => res.data.data)
+
+export const getKnowledgeCleaningStatus = () =>
+  api.get<{ data: import('../types').KnowledgeCleanProgress }>('/admin/knowledge/clean-status')
+    .then(res => res.data.data)
+
+export const importCorpus = (items: Array<{
+  sourceUrl: string
+  sourceName?: string
+  company?: string
+  position?: string
+  publishDate?: string | null
+  rawContent: string
+}>) =>
+  api.post<{ data: number }>('/admin/knowledge/corpus/import', items)
+    .then(res => res.data.data)
+
+export const startCorpusExtract = () =>
+  api.post<{ data: boolean }>('/admin/knowledge/corpus/extract-start')
+    .then(res => res.data.data)
+
+export const getCorpusStatus = () =>
+  api.get<{ data: import('../types').KnowledgeCorpusProgress }>('/admin/knowledge/corpus/status')
+    .then(res => res.data.data)
+
+export const recalculateKnowledgeWeights = () =>
+  api.post<{ data: number }>('/admin/knowledge/weight-recalculate')
+    .then(res => res.data.data)
 
 /**
  * SSE 流式重写已发布题目答案（结果进入草稿审核）。

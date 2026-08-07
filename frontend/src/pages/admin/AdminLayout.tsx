@@ -3,7 +3,7 @@ import { Layout, Menu, Drawer, Button, Grid, Spin } from 'antd'
 import { Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import {
-  DashboardOutlined, RobotOutlined, FileSearchOutlined, MenuOutlined
+  DashboardOutlined, RobotOutlined, FileSearchOutlined, MenuOutlined, FireOutlined
 } from '@ant-design/icons'
 
 const { Content, Sider } = Layout
@@ -15,6 +15,7 @@ const menuItems = [
   { key: '/admin/dashboard', icon: <DashboardOutlined />, label: '运营总览' },
   { key: '/admin/ai-generate', icon: <RobotOutlined />, label: '生成题目' },
   { key: '/admin/draft-review', icon: <FileSearchOutlined />, label: '审核草稿' },
+  { key: '/admin/knowledge', icon: <FireOutlined />, label: '高频考点' },
 ]
 
 export default function AdminLayout() {

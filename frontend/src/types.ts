@@ -180,6 +180,38 @@ export interface PageResult<T> {
   totalPages: number
 }
 
+export interface KnowledgePointVO {
+  id: number
+  name: string
+  categoryId: number
+  categoryName: string
+  hotScore: number
+  hotScoreSource: string
+  mentionTotal: number
+  docCount: number
+  questionCount: number
+}
+
+export interface KnowledgeCleanProgress {
+  running: boolean
+  totalQuestions: number
+  processedQuestions: number
+  newKnowledgePoints: number
+  taggedQuestions: number
+  failedBatches: number
+  totalBatches: number
+  message: string
+}
+
+export interface KnowledgeCorpusProgress {
+  running: boolean
+  totalSources: number
+  processedSources: number
+  newMentions: number
+  failedBatches: number
+  message: string
+}
+
 export interface AuthUser {
   id: number
   username: string

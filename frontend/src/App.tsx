@@ -13,6 +13,7 @@ const Practice = lazy(() => import('./pages/Practice'))
 const PrepRoutes = lazy(() => import('./pages/PrepRoutes'))
 const Experiences = lazy(() => import('./pages/Experiences'))
 const Tools = lazy(() => import('./pages/Tools'))
+const Knowledge = lazy(() => import('./pages/Knowledge'))
 const Login = lazy(() => import('./pages/Auth/Login'))
 const Register = lazy(() => import('./pages/Auth/Register'))
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'))
@@ -20,6 +21,7 @@ const AdminLogin = lazy(() => import('./pages/admin/Login'))
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'))
 const AIGenerate = lazy(() => import('./pages/admin/AIGenerate'))
 const DraftReview = lazy(() => import('./pages/admin/DraftReview'))
+const AdminKnowledge = lazy(() => import('./pages/admin/Knowledge'))
 
 function RouteFallback() {
   return (
@@ -44,6 +46,8 @@ export default function App() {
           <Route path="/tools" element={<Tools />} />
           <Route path="/study" element={<StudyPlan />} />
           <Route path="/practice" element={<Practice />} />
+          <Route path="/knowledge" element={<Knowledge />} />
+          <Route path="/knowledge/:pointId" element={<Knowledge />} />
         </Route>
         <Route path="/auth/login" element={<Login />} />
         <Route path="/auth/register" element={<Register />} />
@@ -53,6 +57,7 @@ export default function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="ai-generate" element={<AIGenerate />} />
           <Route path="draft-review" element={<DraftReview />} />
+          <Route path="knowledge" element={<AdminKnowledge />} />
         </Route>
       </Routes>
     </Suspense>
