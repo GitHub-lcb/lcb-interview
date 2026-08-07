@@ -9,6 +9,7 @@ import com.lcbinterview.controller.admin.AdminAuthController;
 import com.lcbinterview.controller.admin.AdminDashboardController;
 import com.lcbinterview.controller.admin.AiGenerationController;
 import com.lcbinterview.controller.admin.QuestionAdminController;
+import com.lcbinterview.controller.admin.KnowledgeAdminController;
 import com.lcbinterview.controller.tools.LotteryKl8Controller;
 import com.lcbinterview.controller.tools.ReadingToolController;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,6 +48,7 @@ class ControllerConventionTest {
             AdminDashboardController.class,
             AiGenerationController.class,
             QuestionAdminController.class,
+            KnowledgeAdminController.class,
             LotteryKl8Controller.class,
             ReadingToolController.class
     );

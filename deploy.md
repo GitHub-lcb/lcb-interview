@@ -67,7 +67,7 @@ http://服务器公网IP/admin/login
 
 ## 数据初始化
 
-MySQL 容器第一次创建数据卷时，会自动执行 `backend/scripts/sql/init.sql`。如果 `mysql_data` 卷已经存在，初始化 SQL 不会重复执行，避免覆盖已有数据。
+MySQL 容器第一次创建数据卷时，会自动执行 `backend/scripts/sql/init.sql`。如果 `mysql_data` 卷已经存在，初始化 SQL 不会重复执行，避免覆盖已有数据；后端启动时会从 JAR 内自动执行幂等的 `lcb-knowledge-migration.sql`，补齐高频考点相关表和索引。
 
 如果确实要重建数据库，需要先备份数据，再删除 `mysql_data` 卷后重新启动。
 
@@ -85,6 +85,7 @@ docker compose -f docker-compose.runtime.yml up -d
 
 ```text
 JAVA_OPTS=-Xms256m -Xmx768m -XX:+ExitOnOutOfMemoryError
+BACKEND_MEMORY_LIMIT=1280m
 REDIS_MAXMEMORY=128mb
 ```
 
@@ -92,4 +93,8 @@ REDIS_MAXMEMORY=128mb
 
 ```text
 JAVA_OPTS=-Xms256m -Xmx1024m -XX:+ExitOnOutOfMemoryError
+BACKEND_MEMORY_LIMIT=1536m
 ```
+
+`JAVA_OPTS` 限制 Java 堆，`BACKEND_MEMORY_LIMIT` 限制后端容器总内存；总内存需为堆外元数据、线程栈和直接缓冲预留空间。
+Nginx 对 `/api/` 请求体保留 10MB 硬上限，应用内 `KNOWLEDGE_CORPUS_MAX_IMPORT_BODY_BYTES` 可设置得更小，不能超过该代理上限。

@@ -3,6 +3,8 @@ package com.lcbinterview.architecture;
 import com.lcbinterview.service.AiQuestionService;
 import com.lcbinterview.service.BatchFillAnswerRunner;
 import com.lcbinterview.service.BatchGenerationRunner;
+import com.lcbinterview.service.KnowledgePointCleaningService;
+import com.lcbinterview.service.KnowledgePointCorpusService;
 import jakarta.annotation.PreDestroy;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +24,9 @@ class AsyncExecutorLifecycleTest {
     private static final List<Class<?>> SERVICES_WITH_BACKGROUND_EXECUTORS = List.of(
             AiQuestionService.class,
             BatchGenerationRunner.class,
-            BatchFillAnswerRunner.class
+            BatchFillAnswerRunner.class,
+            KnowledgePointCleaningService.class,
+            KnowledgePointCorpusService.class
     );
 
     /**

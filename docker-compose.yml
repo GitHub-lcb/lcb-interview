@@ -50,6 +50,7 @@ services:
       context: ./backend
     container_name: lcb-backend
     restart: unless-stopped
+    mem_limit: ${BACKEND_MEMORY_LIMIT:-1280m}
     depends_on:
       mysql:
         condition: service_healthy

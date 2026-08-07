@@ -58,6 +58,18 @@
         </dependency>
     </dependencies>
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>scripts/sql</directory>
+                <targetPath>db</targetPath>
+                <includes>
+                    <include>lcb-knowledge-migration.sql</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -82,6 +94,20 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 本地启动与生产 Docker 的堆上限保持一致，避免批量任务挤占整机内存。 -->
+                    <jvmArguments>-Xms256m -Xmx768m -XX:+ExitOnOutOfMemoryError</jvmArguments>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- 测试只复用一个受限 JVM，避免异常循环或并行 fork 挤占本机内存。 -->
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
+                    <argLine>-Xms128m -Xmx512m -XX:+ExitOnOutOfMemoryError</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>

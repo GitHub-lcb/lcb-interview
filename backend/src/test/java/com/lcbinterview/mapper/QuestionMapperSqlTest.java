@@ -26,6 +26,21 @@ class QuestionMapperSqlTest {
                 .forEach(this::assertValidSelectScript);
     }
 
+    @Test
+    void staticSelectAnnotationsUseNativeComparisonOperators() {
+        List.of(QuestionMapper.class, InterviewSourceMapper.class).stream()
+                .flatMap(mapper -> Arrays.stream(mapper.getDeclaredMethods()))
+                .filter(method -> method.isAnnotationPresent(Select.class))
+                .forEach(method -> {
+                    String sql = String.join("\n", method.getAnnotation(Select.class).value()).trim();
+                    if (!sql.startsWith("<script>")) {
+                        assertThat(sql)
+                                .as("%s 的静态注解 SQL 不会解析 XML 实体", method.getName())
+                                .doesNotContain("&lt;", "&gt;");
+                    }
+                });
+    }
+
     private void assertValidSelectScript(Method method) {
         String sql = String.join("\n", method.getAnnotation(Select.class).value()).trim();
         boolean hasDynamicTag = DYNAMIC_TAGS.stream().anyMatch(sql::contains);

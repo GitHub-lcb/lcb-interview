@@ -5,8 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import jakarta.annotation.PreDestroy;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -15,6 +20,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * DeepSeek API HTTP 客户端，封装流式和非流式调用逻辑。
@@ -32,9 +39,13 @@ import java.util.Map;
 public class AiHttpClient {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Set<HttpURLConnection> activeConnections = ConcurrentHashMap.newKeySet();
 
     @Value("${ai.deepseek.max-tokens:65536}")
     private int maxTokens;
+
+    @Value("${ai.deepseek.max-response-bytes:4194304}")
+    private int maxResponseBytes;
 
     /**
      * 流式调用结果，包含完整内容、推理文本和统计信息。
@@ -89,6 +100,32 @@ public class AiHttpClient {
      * @return 完整 JSON 响应字符串
      */
     public String callSync(String prompt, AiRuntimeConfig runtimeConfig) {
+        return callSync(prompt, runtimeConfig, maxTokens);
+    }
+
+    /**
+     * 非流式调用 DeepSeek，并为当前任务指定最大响应 token 数。
+     *
+     * @param prompt            用户提示词
+     * @param runtimeConfig     运行时配置
+     * @param responseMaxTokens 当前任务最大响应 token 数
+     * @return 完整 JSON 响应字符串
+     */
+    public String callSync(String prompt, AiRuntimeConfig runtimeConfig, int responseMaxTokens) {
+        return callSync(prompt, runtimeConfig, responseMaxTokens, 600000);
+    }
+
+    /**
+     * 非流式调用 DeepSeek，并为当前任务指定响应 token 和读取超时上限。
+     *
+     * @param prompt            用户提示词
+     * @param runtimeConfig     运行时配置
+     * @param responseMaxTokens 当前任务最大响应 token 数
+     * @param readTimeoutMs     读取超时毫秒数
+     * @return 完整 JSON 响应字符串
+     */
+    public String callSync(String prompt, AiRuntimeConfig runtimeConfig,
+                           int responseMaxTokens, int readTimeoutMs) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", runtimeConfig.model());
         requestBody.put("messages", List.of(
@@ -97,21 +134,25 @@ public class AiHttpClient {
                 Map.of("role", "user", "content", prompt)
         ));
         requestBody.put("temperature", 0.7);
-        requestBody.put("max_tokens", maxTokens);
+        requestBody.put("max_tokens", responseMaxTokens);
 
-        log.info("非流式请求: model={}, prompt长度={}字符, maxTokens={}", runtimeConfig.model(), prompt.length(), maxTokens);
+        log.info("非流式请求: model={}, prompt长度={}字符, maxTokens={}",
+                runtimeConfig.model(), prompt.length(), responseMaxTokens);
         long t = System.currentTimeMillis();
 
+        HttpURLConnection conn = null;
+        java.io.InputStream body = null;
         try {
             String json = objectMapper.writeValueAsString(requestBody);
 
-            HttpURLConnection conn = (HttpURLConnection) URI.create(runtimeConfig.apiUrl()).toURL().openConnection();
+            conn = (HttpURLConnection) URI.create(runtimeConfig.apiUrl()).toURL().openConnection();
+            activeConnections.add(conn);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("Authorization", "Bearer " + runtimeConfig.apiKey());
             conn.setDoOutput(true);
             conn.setConnectTimeout(15000);
-            conn.setReadTimeout(600000);
+            conn.setReadTimeout(readTimeoutMs);
 
             try (OutputStream os = conn.getOutputStream()) {
                 os.write(json.getBytes(StandardCharsets.UTF_8));
@@ -122,8 +163,8 @@ public class AiHttpClient {
             log.info("DeepSeek 响应: status={}, 耗时={}ms", status, apiTime);
 
             if (status == 200) {
-                String response = new String(
-                        conn.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+                body = conn.getInputStream();
+                String response = readBodyWithLimit(body);
                 log.info("响应体大小: {} 字符, 总耗时={}ms", response.length(), System.currentTimeMillis() - t);
                 return response;
             }
@@ -136,6 +177,18 @@ public class AiHttpClient {
         } catch (Exception e) {
             log.error("调用 DeepSeek API 异常: {}", e.getMessage());
             throw new RuntimeException("调用 DeepSeek API 失败: " + e.getMessage(), e);
+        } finally {
+            // 批量任务高频调用，必须释放连接与输入流，否则 socket 与缓冲持续泄漏
+            if (body != null) {
+                try {
+                    body.close();
+                } catch (java.io.IOException ignored) {
+                }
+            }
+            if (conn != null) {
+                activeConnections.remove(conn);
+                conn.disconnect();
+            }
         }
     }
 
@@ -170,6 +223,7 @@ public class AiHttpClient {
             String json = objectMapper.writeValueAsString(requestBody);
 
             conn = (HttpURLConnection) URI.create(runtimeConfig.apiUrl()).toURL().openConnection();
+            activeConnections.add(conn);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("Authorization", "Bearer " + runtimeConfig.apiKey());
@@ -198,7 +252,8 @@ public class AiHttpClient {
             int chunkCount = 0;
 
             try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                    new InputStreamReader(new LimitedInputStream(conn.getInputStream(), maxResponseBytes),
+                            StandardCharsets.UTF_8))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     if (pushMode.stopOnClosed() && !session.isOpen()) {
@@ -256,9 +311,21 @@ public class AiHttpClient {
             throw new RuntimeException("流式调用失败: " + e.getMessage(), e);
         } finally {
             if (conn != null) {
+                activeConnections.remove(conn);
                 conn.disconnect();
             }
         }
+    }
+
+    /**
+     * 应用关闭时断开全部活跃 AI 连接，使阻塞读取及时退出。
+     */
+    @PreDestroy
+    public void disconnectActiveConnections() {
+        for (HttpURLConnection connection : activeConnections) {
+            connection.disconnect();
+        }
+        activeConnections.clear();
     }
 
     /**
@@ -297,10 +364,61 @@ public class AiHttpClient {
             if (errorStream == null) {
                 return "";
             }
-            return new String(errorStream.readAllBytes(), StandardCharsets.UTF_8);
-        } catch (Exception e) {
+            return readBodyWithLimit(errorStream);
+        } catch (IOException e) {
             log.warn("读取错误流失败: {}", e.getMessage());
             return "";
+        }
+    }
+
+    private String readBodyWithLimit(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream(Math.min(maxResponseBytes, 8192));
+        byte[] buffer = new byte[8192];
+        int total = 0;
+        int read;
+        while ((read = inputStream.read(buffer)) >= 0) {
+            total += read;
+            if (total > maxResponseBytes) {
+                throw new IOException("AI 响应体超过限制: " + maxResponseBytes + " bytes");
+            }
+            output.write(buffer, 0, read);
+        }
+        return output.toString(StandardCharsets.UTF_8);
+    }
+
+    private static final class LimitedInputStream extends FilterInputStream {
+
+        private final long maxBytes;
+        private long bytesRead;
+
+        private LimitedInputStream(InputStream inputStream, long maxBytes) {
+            super(inputStream);
+            this.maxBytes = maxBytes;
+        }
+
+        @Override
+        public int read() throws IOException {
+            int value = super.read();
+            if (value >= 0) {
+                count(1);
+            }
+            return value;
+        }
+
+        @Override
+        public int read(byte[] buffer, int offset, int length) throws IOException {
+            int count = super.read(buffer, offset, length);
+            if (count > 0) {
+                count(count);
+            }
+            return count;
+        }
+
+        private void count(int count) throws IOException {
+            bytesRead += count;
+            if (bytesRead > maxBytes) {
+                throw new IOException("AI 响应体超过限制: " + maxBytes + " bytes");
+            }
         }
     }
 

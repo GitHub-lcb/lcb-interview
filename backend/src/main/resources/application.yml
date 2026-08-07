@@ -58,6 +58,9 @@ app:
   auth:
     secret: ${APP_AUTH_SECRET:dev-user-auth-secret-change-me}
     token-ttl-hours: ${APP_AUTH_TOKEN_TTL_HOURS:168}
+  knowledge:
+    corpus:
+      max-import-body-bytes: ${KNOWLEDGE_CORPUS_MAX_IMPORT_BODY_BYTES:10485760}
 
 ai:
   interview:
@@ -69,4 +72,5 @@ ai:
     url: ${AI_DEEPSEEK_URL:https://opencode.ai/zen/go/v1/chat/completions}
     # 1M 上下文 + max 模式
     max-tokens: 65536
+    max-response-bytes: ${AI_MAX_RESPONSE_BYTES:4194304}
     thinking-tokens: 32768

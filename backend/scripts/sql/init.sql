@@ -6,6 +6,13 @@ SET NAMES utf8mb4;
 -- 包含: 建表 + 46个分类 + 71个标签 + 6386道DRAFT题目
 -- =============================================
 
+DROP TABLE IF EXISTS study_plan_item;
+DROP TABLE IF EXISTS interview_feedback;
+DROP TABLE IF EXISTS knowledge_point_mention;
+DROP TABLE IF EXISTS question_knowledge_point;
+DROP TABLE IF EXISTS study_plan;
+DROP TABLE IF EXISTS interview_source;
+DROP TABLE IF EXISTS knowledge_point;
 DROP TABLE IF EXISTS lottery_kl8_recommendation;
 DROP TABLE IF EXISTS lottery_kl8_draw;
 DROP TABLE IF EXISTS reading_excerpt;
@@ -154,6 +161,109 @@ CREATE TABLE IF NOT EXISTS question_tag (
     PRIMARY KEY (question_id, tag_id),
     INDEX idx_tag_id (tag_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '题目标签关联';
+
+-- =============================================
+-- 高频考点体系（2026-08-05 设计：分类 → 考点 → 题目）
+-- =============================================
+
+CREATE TABLE IF NOT EXISTS knowledge_point (
+    id              BIGINT       AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    category_id     BIGINT       NOT NULL COMMENT '所属分类 ID',
+    name            VARCHAR(80)  NOT NULL COMMENT '考点名称，如 HashMap原理',
+    slug            VARCHAR(100) DEFAULT '' COMMENT '唯一英文标识',
+    parent_id       BIGINT       DEFAULT NULL COMMENT '依赖的父考点 ID，可空',
+    hot_score       INT          DEFAULT 0 COMMENT '高频权重分 0-100',
+    hot_score_source VARCHAR(20) DEFAULT 'CORPUS' COMMENT '权重来源：CORPUS/FEEDBACK/BLEND',
+    status          VARCHAR(20)  DEFAULT 'DRAFT' COMMENT 'DRAFT 待审核/ACTIVE 生效',
+    description     VARCHAR(500) DEFAULT '' COMMENT '考点说明',
+    create_time     DATETIME     NOT NULL COMMENT '创建时间',
+    update_time     DATETIME     NOT NULL COMMENT '更新时间',
+    is_deleted      TINYINT      DEFAULT 0 COMMENT '逻辑删除标记',
+    UNIQUE KEY uk_knowledge_point_category_name (category_id, name),
+    UNIQUE KEY uk_knowledge_point_slug (slug),
+    INDEX idx_knowledge_point_category (category_id),
+    INDEX idx_knowledge_point_parent (parent_id),
+    INDEX idx_knowledge_point_hot (hot_score DESC)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '高频考点';
+
+CREATE TABLE IF NOT EXISTS question_knowledge_point (
+    question_id       BIGINT NOT NULL COMMENT '题目 ID',
+    knowledge_point_id BIGINT NOT NULL COMMENT '考点 ID',
+    source              VARCHAR(20) DEFAULT 'MANUAL' COMMENT '关联来源：AI/MANUAL',
+    PRIMARY KEY (question_id, knowledge_point_id),
+    INDEX idx_qkp_knowledge_point (knowledge_point_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '题目-考点关联';
+
+CREATE TABLE IF NOT EXISTS interview_source (
+    id            BIGINT       AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    source_url    VARCHAR(500) NOT NULL COMMENT '原文地址，去重键',
+    source_name   VARCHAR(80)  DEFAULT '' COMMENT '来源站点',
+    company       VARCHAR(80)  DEFAULT '' COMMENT 'AI 提取的公司',
+    position      VARCHAR(80)  DEFAULT '' COMMENT 'AI 提取的岗位',
+    publish_date  DATE         DEFAULT NULL COMMENT '发布日期',
+    raw_content   MEDIUMTEXT COMMENT '原文文本，仅本地处理不对外展示',
+    status        VARCHAR(20)  DEFAULT 'RAW' COMMENT 'RAW/EXTRACTED/FAILED',
+    extract_error VARCHAR(500) DEFAULT '' COMMENT '提取失败原因',
+    create_time   DATETIME     NOT NULL COMMENT '创建时间',
+    update_time   DATETIME     NOT NULL COMMENT '更新时间',
+    is_deleted    TINYINT      DEFAULT 0 COMMENT '逻辑删除标记',
+    UNIQUE KEY uk_interview_source_url (source_url),
+    INDEX idx_interview_source_status (status),
+    INDEX idx_interview_source_company (company)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '面经语料';
+
+CREATE TABLE IF NOT EXISTS knowledge_point_mention (
+    id                   BIGINT       AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    interview_source_id  BIGINT       NOT NULL COMMENT '语料 ID',
+    knowledge_point_id   BIGINT       NOT NULL COMMENT '考点 ID',
+    mention_count        INT          DEFAULT 1 COMMENT '该篇中被问次数',
+    context              VARCHAR(500) DEFAULT '' COMMENT '提及上下文片段，用于权重解释',
+    create_time          DATETIME     NOT NULL COMMENT '创建时间',
+    is_deleted           TINYINT      DEFAULT 0 COMMENT '逻辑删除标记',
+    UNIQUE KEY uk_kpm_source_point (interview_source_id, knowledge_point_id),
+    INDEX idx_kpm_knowledge_point (knowledge_point_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '考点提及统计';
+
+CREATE TABLE IF NOT EXISTS interview_feedback (
+    id                 BIGINT       AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    user_id            BIGINT       NOT NULL COMMENT '回填用户 ID',
+    company            VARCHAR(80)  DEFAULT '' COMMENT '面试公司',
+    position           VARCHAR(80)  DEFAULT '' COMMENT '面试岗位',
+    question_id        BIGINT       DEFAULT NULL COMMENT '被问到的题目 ID，可空',
+    knowledge_point_id BIGINT       DEFAULT NULL COMMENT '命中考点 ID',
+    interview_date     DATE         DEFAULT NULL COMMENT '面试日期',
+    create_time        DATETIME     NOT NULL COMMENT '创建时间',
+    update_time        DATETIME     NOT NULL COMMENT '更新时间',
+    is_deleted         TINYINT      DEFAULT 0 COMMENT '逻辑删除标记',
+    INDEX idx_ifb_user_time (user_id, create_time),
+    INDEX idx_ifb_knowledge_point (knowledge_point_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '用户面试回填';
+
+CREATE TABLE IF NOT EXISTS study_plan (
+    id            BIGINT       AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    user_id       BIGINT       NOT NULL COMMENT '所属用户 ID',
+    target_date   DATE         NOT NULL COMMENT '目标面试日期',
+    position      VARCHAR(80)  DEFAULT '' COMMENT '目标岗位',
+    status        VARCHAR(20)  DEFAULT 'ACTIVE' COMMENT 'ACTIVE/DONE/ABANDONED',
+    create_time   DATETIME     NOT NULL COMMENT '创建时间',
+    update_time   DATETIME     NOT NULL COMMENT '更新时间',
+    is_deleted    TINYINT      DEFAULT 0 COMMENT '逻辑删除标记',
+    INDEX idx_study_plan_user (user_id, create_time)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '突击计划';
+
+CREATE TABLE IF NOT EXISTS study_plan_item (
+    id                 BIGINT       AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    plan_id            BIGINT       NOT NULL COMMENT '计划 ID',
+    knowledge_point_id BIGINT       DEFAULT NULL COMMENT '考点 ID',
+    question_id        BIGINT       NOT NULL COMMENT '题目 ID',
+    scheduled_date     DATE         NOT NULL COMMENT '计划背诵日期',
+    status             VARCHAR(20)  DEFAULT 'TODO' COMMENT 'TODO/DONE/REVIEW',
+    create_time        DATETIME     NOT NULL COMMENT '创建时间',
+    update_time        DATETIME     NOT NULL COMMENT '更新时间',
+    is_deleted         TINYINT      DEFAULT 0 COMMENT '逻辑删除标记',
+    INDEX idx_spi_plan (plan_id, scheduled_date),
+    INDEX idx_spi_question (question_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '突击计划明细';
 
 -- =============================================
 -- 分类 & 标签数据

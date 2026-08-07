@@ -17,6 +17,46 @@ import java.util.List;
 public interface QuestionMapper extends BaseMapper<Question> {
 
     /**
+     * 查询当前已发布题目的最大 ID，作为清洗任务高水位。
+     *
+     * @return 最大 ID，无已发布题目时为 null
+     */
+    @Select("SELECT MAX(id) FROM question WHERE status = 'PUBLISHED' AND is_deleted = 0")
+    Long selectMaxPublishedId();
+
+    /**
+     * 统计高水位以内的已发布题目数。
+     *
+     * @param maxId 本轮最大 ID
+     * @return 题目数量
+     */
+    @Select("""
+            SELECT COUNT(*) FROM question
+            WHERE status = 'PUBLISHED' AND is_deleted = 0 AND id <= #{maxId}
+            """)
+    long countPublishedUpTo(@Param("maxId") long maxId);
+
+    /**
+     * 使用 ID 游标查询本轮下一批已发布题目。
+     *
+     * @param lastId 上一批最后 ID
+     * @param maxId  本轮高水位 ID
+     * @param size   批大小
+     * @return 下一批题目
+     */
+    @Select("""
+            SELECT id, category_id, title, content, status
+            FROM question
+            WHERE status = 'PUBLISHED' AND is_deleted = 0
+              AND id > #{lastId} AND id <= #{maxId}
+            ORDER BY id ASC
+            LIMIT #{size}
+            """)
+    List<Question> selectPublishedBatchAfter(@Param("lastId") long lastId,
+                                              @Param("maxId") long maxId,
+                                              @Param("size") int size);
+
+    /**
      * 查询热门题目，按浏览次数倒序（仅已发布）。
      */
     @Select("""
