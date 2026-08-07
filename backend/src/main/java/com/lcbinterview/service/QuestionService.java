@@ -9,6 +9,7 @@ import com.lcbinterview.dto.PageResult;
 import com.lcbinterview.dto.QuestionTagName;
 import com.lcbinterview.dto.QuestionVO;
 import com.lcbinterview.mapper.CategoryMapper;
+import com.lcbinterview.mapper.QuestionKnowledgePointMapper;
 import com.lcbinterview.mapper.QuestionMapper;
 import com.lcbinterview.model.Category;
 import com.lcbinterview.model.Question;
@@ -44,6 +45,7 @@ public class QuestionService {
     private final QuestionMapper questionMapper;
     private final ViewCountService viewCountService;
     private final CategoryMapper categoryMapper;
+    private final QuestionKnowledgePointMapper questionKnowledgePointMapper;
 
     /**
      * 失效热门题目相关缓存。在草稿发布或答案重写后调用，保证热门排行及时更新。
@@ -147,6 +149,25 @@ public class QuestionService {
     public PageResult<QuestionVO> searchVo(Long categoryId, String difficulty, String keyword,
                                            Long tagId, int page, int size, String sort) {
         IPage<Question> result = search(categoryId, difficulty, keyword, tagId, page, size, sort);
+        return PageResult.of(result, toVos(result.getRecords()));
+    }
+
+    /**
+     * 分页查询指定考点关联的已发布题目，并组装 VO。
+     * 供公开高频考点页跳转看题使用，仅返回 PUBLISHED 题目。
+     *
+     * @param knowledgePointId 考点 ID
+     * @param page             页码，从 0 开始
+     * @param size             每页条数
+     * @return 题目分页 VO
+     */
+    public PageResult<QuestionVO> searchVoByKnowledgePoint(Long knowledgePointId, int page, int size) {
+        int safePage = normalizePage(page);
+        int safeSize = normalizeSize(size);
+        Page<Question> mpPage = new Page<>(safePage + 1L, safeSize);
+        IPage<Question> result = questionKnowledgePointMapper.selectQuestionsByPointId(mpPage, knowledgePointId);
+        log.info("查询考点题目: knowledgePointId={}, page={}, size={}, 命中 {} 条",
+                knowledgePointId, safePage, safeSize, result.getTotal());
         return PageResult.of(result, toVos(result.getRecords()));
     }
 

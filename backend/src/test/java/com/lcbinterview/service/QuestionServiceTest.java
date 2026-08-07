@@ -10,6 +10,7 @@ import com.lcbinterview.dto.PageResult;
 import com.lcbinterview.dto.QuestionTagName;
 import com.lcbinterview.dto.QuestionVO;
 import com.lcbinterview.mapper.CategoryMapper;
+import com.lcbinterview.mapper.QuestionKnowledgePointMapper;
 import com.lcbinterview.mapper.QuestionMapper;
 import com.lcbinterview.model.Category;
 import com.lcbinterview.model.Question;
@@ -49,7 +50,8 @@ class QuestionServiceTest {
         questionMapper = mock(QuestionMapper.class);
         categoryMapper = mock(CategoryMapper.class);
         viewCountService = mock(ViewCountService.class);
-        questionService = new QuestionService(questionMapper, viewCountService, categoryMapper);
+        questionService = new QuestionService(questionMapper, viewCountService, categoryMapper,
+                mock(QuestionKnowledgePointMapper.class));
     }
 
     @Test

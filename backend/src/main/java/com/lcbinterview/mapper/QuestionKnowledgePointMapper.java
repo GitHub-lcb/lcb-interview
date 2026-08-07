@@ -1,6 +1,9 @@
 package com.lcbinterview.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lcbinterview.model.Question;
 import com.lcbinterview.model.QuestionKnowledgePoint;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -61,6 +64,28 @@ public interface QuestionKnowledgePointMapper extends BaseMapper<QuestionKnowled
             </script>
             """)
     int deleteAiByQuestionIds(@Param("questionIds") List<Long> questionIds);
+
+    /**
+     * 分页查询考点关联的已发布题目，供公开考点页跳转看题。
+     *
+     * @param page            分页参数
+     * @param knowledgePointId 考点 ID
+     * @return 题目分页结果
+     */
+    @Select("""
+            SELECT q.id, q.category_id, q.title, q.summary, q.content,
+                   q.principle, q.comparison, q.scenario, q.risk,
+                   q.project_exp, q.code_examples, q.diagrams, q.related_ids,
+                   q.difficulty, q.view_count, q.status, q.source,
+                   q.create_time, q.update_time
+            FROM question_knowledge_point qkp
+            INNER JOIN question q ON q.id = qkp.question_id
+            WHERE qkp.knowledge_point_id = #{knowledgePointId}
+              AND q.status = 'PUBLISHED' AND q.is_deleted = 0
+            ORDER BY q.view_count DESC, q.id DESC
+            """)
+    IPage<Question> selectQuestionsByPointId(Page<Question> page,
+                                             @Param("knowledgePointId") Long knowledgePointId);
 
     /**
      * 考点聚合行。

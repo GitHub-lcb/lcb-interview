@@ -41,6 +41,7 @@ public class KnowledgePointWeightService {
     private final KnowledgePointMentionMapper knowledgePointMentionMapper;
     private final QuestionKnowledgePointMapper questionKnowledgePointMapper;
     private final InterviewFeedbackMapper interviewFeedbackMapper;
+    private final KnowledgePointService knowledgePointService;
 
     /**
      * 重算全量考点高频权重，返回更新条数。
@@ -123,6 +124,8 @@ public class KnowledgePointWeightService {
         }
         log.info("考点权重重算完成: {} 个考点, 反馈样本 {} 条, 反馈融合占比 {}", updated, totalFeedback,
                 String.format("%.0f%%", feedbackRatio * 100));
+        // 权重变化后主动失效公开排行缓存，避免用户看到最长 10 分钟的旧排行
+        knowledgePointService.evictHotCache();
         return updated;
     }
 

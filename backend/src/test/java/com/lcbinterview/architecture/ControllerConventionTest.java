@@ -3,6 +3,7 @@ package com.lcbinterview.architecture;
 import com.lcbinterview.controller.AuthController;
 import com.lcbinterview.controller.CategoryController;
 import com.lcbinterview.controller.InterviewCoachController;
+import com.lcbinterview.controller.KnowledgePointController;
 import com.lcbinterview.controller.QuestionController;
 import com.lcbinterview.controller.TagController;
 import com.lcbinterview.controller.admin.AdminAuthController;
@@ -49,6 +50,7 @@ class ControllerConventionTest {
             AiGenerationController.class,
             QuestionAdminController.class,
             KnowledgeAdminController.class,
+            KnowledgePointController.class,
             LotteryKl8Controller.class,
             ReadingToolController.class
     );

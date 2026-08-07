@@ -35,7 +35,8 @@ class KnowledgePointWeightServiceTest {
         when(feedbackMapper.selectFeedbackCounts()).thenReturn(List.of());
 
         KnowledgePointWeightService service = new KnowledgePointWeightService(
-                knowledgePointMapper, mentionMapper, relationMapper, feedbackMapper);
+                knowledgePointMapper, mentionMapper, relationMapper, feedbackMapper,
+                mock(KnowledgePointService.class));
         int updated = service.recalculate();
 
         assertEquals(2, updated);
@@ -69,7 +70,8 @@ class KnowledgePointWeightServiceTest {
                 new InterviewFeedbackMapper.IdCount(1L, 10L)));
 
         KnowledgePointWeightService service = new KnowledgePointWeightService(
-                knowledgePointMapper, mentionMapper, relationMapper, feedbackMapper);
+                knowledgePointMapper, mentionMapper, relationMapper, feedbackMapper,
+                mock(KnowledgePointService.class));
         service.recalculate();
 
         ArgumentCaptor<KnowledgePoint> captor = ArgumentCaptor.forClass(KnowledgePoint.class);
@@ -87,7 +89,8 @@ class KnowledgePointWeightServiceTest {
         when(knowledgePointMapper.selectAllIds()).thenReturn(List.of());
 
         KnowledgePointWeightService service = new KnowledgePointWeightService(
-                knowledgePointMapper, mentionMapper, relationMapper, feedbackMapper);
+                knowledgePointMapper, mentionMapper, relationMapper, feedbackMapper,
+                mock(KnowledgePointService.class));
 
         assertEquals(0, service.recalculate());
     }
