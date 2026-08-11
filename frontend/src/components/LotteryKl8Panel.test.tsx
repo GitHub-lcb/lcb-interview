@@ -70,7 +70,7 @@ describe('LotteryKl8Panel', () => {
     render(<LotteryKl8Panel />)
 
     await screen.findByText('20260629001')
-    await userEvent.click(screen.getByRole('button', { name: /Java 推荐选5/ }))
+    await userEvent.click(screen.getByRole('button', { name: /Java 推荐选4/ }))
 
     await waitFor(() => {
       expect(createKl8Recommendation).toHaveBeenCalledWith(2000)
@@ -79,17 +79,17 @@ describe('LotteryKl8Panel', () => {
     expect(emitFeedbackSuccess).not.toHaveBeenCalled()
   })
 
-  it('generates one pick-5 recommendation', async () => {
+  it('generates one pick-4 recommendation', async () => {
     vi.mocked(createKl8Recommendation).mockImplementation(async (baseIssueCount = 2000) => ({
       id: 5,
       source: 'RULE_BASED',
-      pickSize: 5,
+      pickSize: 4,
       baseIssueCount,
       latestIssueNo: '20260629001',
       groups: [
-        { numbers: [7, 19, 34, 52, 68], reason: '选5 测试推荐' },
+        { numbers: [7, 19, 34, 52], reason: '选4 测试推荐' },
       ],
-      featureSummary: '选5 测试摘要',
+      featureSummary: '选4 测试摘要',
       disclaimer: '测试免责声明',
       createdAt: '2026-06-29T10:00:05',
     }))
@@ -97,14 +97,14 @@ describe('LotteryKl8Panel', () => {
     render(<LotteryKl8Panel />)
 
     await screen.findByText('20260629001')
-    await userEvent.click(screen.getByRole('button', { name: /Java 推荐选5/ }))
+    await userEvent.click(screen.getByRole('button', { name: /Java 推荐选4/ }))
 
     await waitFor(() => {
       expect(createKl8Recommendation).toHaveBeenCalledTimes(1)
     })
     expect(createKl8Recommendation).toHaveBeenCalledWith(2000)
-    expect((await screen.findAllByText('选5 测试摘要')).length).toBeGreaterThan(0)
-    expect(screen.getByText('快乐8选5')).toBeInTheDocument()
+    expect((await screen.findAllByText('选4 测试摘要')).length).toBeGreaterThan(0)
+    expect(screen.getByText('快乐8选4')).toBeInTheDocument()
     expect(emitFeedbackSuccess).toHaveBeenCalledWith('Java 推荐已生成')
   })
 
@@ -117,15 +117,14 @@ describe('LotteryKl8Panel', () => {
     const recommendation: LotteryKl8Recommendation = {
       id: 6,
       source: 'RULE_BASED',
-      pickSize: 5,
+      pickSize: 4,
       baseIssueCount: 2000,
       latestIssueNo: '20260629001',
       groups: [
-        { numbers: [7, 19, 34, 52, 68], reason: '第一组' },
-        { numbers: [1, 8, 23, 45, 67], reason: '第二组' },
-        { numbers: [2, 9, 30, 50, 70], reason: '第三组' },
+        { numbers: [7, 19, 34, 52], reason: '第一组' },
+        { numbers: [1, 8, 23, 45], reason: '第二组' },
       ],
-      featureSummary: '三组测试摘要',
+      featureSummary: '两组测试摘要',
       disclaimer: '测试免责声明',
       createdAt: '2026-06-29T10:00:00',
     }
@@ -133,13 +132,13 @@ describe('LotteryKl8Panel', () => {
 
     render(<LotteryKl8Panel />)
 
-    await screen.findAllByText('三组测试摘要')
+    await screen.findAllByText('两组测试摘要')
     await userEvent.click(screen.getByRole('button', { name: /一键复制/ }))
 
     await waitFor(() => {
-      expect(writeText).toHaveBeenCalledWith('07 19 34 52 68\n01 08 23 45 67\n02 09 30 50 70')
+      expect(writeText).toHaveBeenCalledWith('07 19 34 52\n01 08 23 45')
     })
-    expect(emitFeedbackSuccess).toHaveBeenCalledWith('已复制 3 组号码')
+    expect(emitFeedbackSuccess).toHaveBeenCalledWith('已复制 2 组号码')
   })
 
   it('contains protected load failures without an unhandled rejection', async () => {
@@ -156,7 +155,7 @@ describe('LotteryKl8Panel', () => {
     const recommendation: LotteryKl8Recommendation = {
       id: 1,
       source: 'RULE_BASED',
-      pickSize: 5,
+      pickSize: 4,
       baseIssueCount: 1000,
       latestIssueNo: '20260629001',
       groups: [
@@ -192,7 +191,7 @@ describe('LotteryKl8Panel', () => {
         const recommendation: LotteryKl8Recommendation = {
       id: 2,
       source: 'RULE_BASED',
-      pickSize: 5,
+      pickSize: 4,
       baseIssueCount: 2000,
       latestIssueNo: '20260629001',
       groups: [
@@ -273,7 +272,7 @@ describe('LotteryKl8Panel', () => {
         const recommendation: LotteryKl8Recommendation = {
       id: 3,
       source: 'RULE_BASED',
-      pickSize: 5,
+      pickSize: 4,
       baseIssueCount: 2000,
       latestIssueNo: '20260629002',
       groups: [

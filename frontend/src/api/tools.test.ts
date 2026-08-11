@@ -16,7 +16,7 @@ import { createKl8Recommendation, syncKl8Draws } from './tools'
 const recommendation: LotteryKl8Recommendation = {
   id: 1,
   source: 'RULE_BASED',
-  pickSize: 5,
+  pickSize: 4,
   baseIssueCount: 120,
   latestIssueNo: '20260629001',
   groups: [

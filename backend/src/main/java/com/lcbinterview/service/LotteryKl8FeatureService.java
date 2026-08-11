@@ -66,13 +66,13 @@ public class LotteryKl8FeatureService {
     /** V15 和值约束范围：选号和值须落在 [130, 270] 区间内，排除极端和值组合 */
     private static final int SUM_CONSTRAINT_MIN = 130;
     private static final int SUM_CONSTRAINT_MAX = 270;
-    /** 默认选5，兼容旧调用方 */
-    private static final int DEFAULT_PICK_SIZE = 5;
+    /** 默认选4，兼容旧调用方 */
+    private static final int DEFAULT_PICK_SIZE = 4;
     private static final int PAIR_HIGHLIGHT_SIZE = 20;
     private static final int PAIR_RECOMMENDATION_SIZE = 12;
     private static final int NEIGHBOR_RECOMMENDATION_SIZE = 20;
-    /** V19 多组覆盖：每次生成 3 组号码，组间通过复用惩罚尽量去重，提升整体命中感知 */
-    private static final int OPTIMIZED_GROUP_COUNT = 3;
+    /** V20 多组覆盖：每次生成 2 组号码，组间通过复用惩罚尽量去重；号码更少组间去重更充分，提升整体命中感知 */
+    private static final int OPTIMIZED_GROUP_COUNT = 2;
     private static final List<String> BACKTEST_FACTORS = List.of(
             "hot", "missing", "trend", "decay", "pair", "balance");
 
@@ -1167,8 +1167,8 @@ public class LotteryKl8FeatureService {
             Map<String, Integer> pairCounts,
             int pickSize,
             List<Integer> latestNumbers) {
-        // V9 集成投票：pickSize >= 5 时启用四策略集成，否则走单策略
-        if (pickSize >= 5 && candidates.size() >= pickSize * 2) {
+        // V9 集成投票：pickSize >= 4 时启用四策略集成，否则走单策略
+        if (pickSize >= 4 && candidates.size() >= pickSize * 2) {
             List<Integer> ensembleResult = selectByEnsembleVoting(
                     groupIndex, candidates, candidateRanks, reuseCounts,
                     profileByNumber, neighborScores, factorWeights, pairCounts, pickSize, latestNumbers);
@@ -1181,7 +1181,7 @@ public class LotteryKl8FeatureService {
                 groupIndex, candidates, candidateRanks, reuseCounts,
                 profileByNumber, neighborScores, factorWeights, pickSize);
         List<Integer> result = selected;
-        if (pickSize >= 5 && selected.size() == pickSize) {
+        if (pickSize >= 4 && selected.size() == pickSize) {
             result = applyColdReplacement(selected, candidates, profileByNumber);
         }
         return result.stream().sorted().toList();
@@ -1226,7 +1226,7 @@ public class LotteryKl8FeatureService {
         List<Integer> picks2 = selectMixed(
                 candidates, profileByNumber, factorWeights, pickSize);
         // 子策略3：贪心 + 冷号替换（V8 策略）
-        List<Integer> picks3 = pickSize >= 5 && picks1.size() == pickSize
+        List<Integer> picks3 = pickSize >= 4 && picks1.size() == pickSize
                 ? applyColdReplacement(picks1, candidates, profileByNumber)
                 : picks1;
         // 子策略4：邻位回归选号（V17新增，V18优化热号分计算）

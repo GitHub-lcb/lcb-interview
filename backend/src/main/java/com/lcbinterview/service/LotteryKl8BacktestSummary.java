@@ -43,7 +43,8 @@ public record LotteryKl8BacktestSummary(
 
     private static Map<Integer, Integer> emptyHitDistribution() {
         Map<Integer, Integer> distribution = new LinkedHashMap<>();
-        for (int hit = 0; hit <= 5; hit += 1) {
+        // 命中分布按默认选4玩法展示 0-4
+        for (int hit = 0; hit <= 4; hit += 1) {
             distribution.put(hit, 0);
         }
         return distribution;

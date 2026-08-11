@@ -21,10 +21,10 @@ import java.util.Set;
 @Service
 public class LotteryKl8RecommendationPolicy {
 
-    /** 默认每组 5 个号码，兼容旧记录和旧调用方 */
-    public static final int DEFAULT_PICK_SIZE = 5;
-    /** 每次输出 3 组号码，组间由特征层做覆盖去重，提升整体命中感知 */
-    private static final int GROUP_COUNT = 3;
+    /** 默认每组 4 个号码，兼容旧记录和旧调用方 */
+    public static final int DEFAULT_PICK_SIZE = 4;
+    /** 每次输出 2 组号码，组间由特征层做覆盖去重，提升整体命中感知 */
+    private static final int GROUP_COUNT = 2;
     private static final Set<String> CONFIDENCE_LABELS = Set.of("低", "中低", "中");
 
     private final ObjectMapper objectMapper;

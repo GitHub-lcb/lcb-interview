@@ -145,7 +145,7 @@ export default function LotteryKl8Panel() {
   const [recommending, setRecommending] = useState(false)
 
   const latest = useMemo(() => current ?? history[0] ?? null, [current, history])
-  const currentPickSize = latest?.pickSize ?? 5
+  const currentPickSize = latest?.pickSize ?? 4
   const analysis = useMemo(() => parseJson<LotteryAnalysisPayload>(latest?.analysisJson), [latest])
   const aiFallback = analysis?.aiFallback
   const backtestSummary = analysis?.backtestSummary
@@ -234,19 +234,19 @@ export default function LotteryKl8Panel() {
   }
 
   return (
-    <section className="tool-section lottery-tool" aria-label="快乐8选5">
+    <section className="tool-section lottery-tool" aria-label="快乐8选4">
       <div className="tool-section-head">
         <div>
-          <div className="dashboard-kicker">快乐8选5</div>
+          <div className="dashboard-kicker">快乐8选4</div>
           <h2>Java 历史数据回测推荐</h2>
-          <p>后端同步公开开奖数据，使用纯 Java 提取冷热、遗漏、区间、上一期邻位、连号结构和回测特征，生成 3 组精选号码，组间去重覆盖提高整体命中机会。</p>
+          <p>后端同步公开开奖数据，使用纯 Java 提取冷热、遗漏、区间、上一期邻位、连号结构和回测特征，生成 2 组精选号码，组间去重覆盖提高整体命中机会。</p>
         </div>
         <div className="tool-actions">
           <Button icon={<ReloadOutlined />} loading={syncing} disabled={recommending} onClick={handleSync}>
             同步开奖
           </Button>
           <Button type="primary" icon={<ThunderboltOutlined />} loading={recommending} disabled={syncing} onClick={handleRecommend}>
-            Java 推荐选5
+            Java 推荐选4
           </Button>
         </div>
       </div>

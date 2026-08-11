@@ -22,14 +22,14 @@ class LotteryKl8RecommendationPolicyTest {
     void validatesAiGroups() {
         String json = """
                 {"groups":[
-                  {"numbers":[1,2,3,4,5],"reason":"冷热均衡，覆盖低区间。"}
+                  {"numbers":[1,2,3,4],"reason":"冷热均衡，覆盖低区间。"}
                 ]}
                 """;
 
         List<LotteryKl8RecommendationGroupVO> groups = policy.validateAiContent(json);
 
         assertEquals(1, groups.size());
-        assertEquals(List.of(1, 2, 3, 4, 5), groups.get(0).numbers());
+        assertEquals(List.of(1, 2, 3, 4), groups.get(0).numbers());
     }
 
     @Test
@@ -44,7 +44,7 @@ class LotteryKl8RecommendationPolicyTest {
                     "riskWarnings":["彩票开奖结果独立随机，历史统计不能保证命中"]
                   },
                   "groups":[
-                    {"numbers":[1,8,23,45,67],"reason":"热号与区间均衡组合，兼顾近期频率和分散性。"}
+                    {"numbers":[1,8,23,45],"reason":"热号与区间均衡组合，兼顾近期频率和分散性。"}
                   ]
                 }
                 """;
@@ -84,10 +84,10 @@ class LotteryKl8RecommendationPolicyTest {
 
         List<LotteryKl8RecommendationGroupVO> groups = policy.fallbackGroups(report);
 
-        assertEquals(3, groups.size());
-        groups.forEach(group -> assertEquals(5, group.numbers().size()));
+        assertEquals(2, groups.size());
+        groups.forEach(group -> assertEquals(4, group.numbers().size()));
         // 补齐组之间不能出现完全相同的一组号码
-        assertEquals(3, groups.stream().map(LotteryKl8RecommendationGroupVO::numbers).distinct().count());
+        assertEquals(2, groups.stream().map(LotteryKl8RecommendationGroupVO::numbers).distinct().count());
     }
 
     @Test
@@ -147,11 +147,11 @@ class LotteryKl8RecommendationPolicyTest {
                 LotteryKl8BacktestSummary.empty(),
                 new LotteryKl8OptimizedPortfolio(
                         List.of(
-                                new LotteryKl8OptimizedGroup(List.of(1, 2, 3, 4, 5), 90, "组合优化第一组", List.of("测试证据")),
-                                new LotteryKl8OptimizedGroup(List.of(6, 7, 8, 9, 10), 89, "组合优化第二组", List.of("测试证据")),
-                                new LotteryKl8OptimizedGroup(List.of(11, 12, 13, 14, 15), 88, "组合优化第三组", List.of("测试证据")),
-                                new LotteryKl8OptimizedGroup(List.of(16, 17, 18, 19, 20), 87, "组合优化第四组", List.of("测试证据")),
-                                new LotteryKl8OptimizedGroup(List.of(21, 22, 23, 24, 25), 86, "组合优化第五组", List.of("测试证据"))),
+                                new LotteryKl8OptimizedGroup(List.of(1, 2, 3, 4), 90, "组合优化第一组", List.of("测试证据")),
+                                new LotteryKl8OptimizedGroup(List.of(5, 6, 7, 8), 89, "组合优化第二组", List.of("测试证据")),
+                                new LotteryKl8OptimizedGroup(List.of(9, 10, 11, 12), 88, "组合优化第三组", List.of("测试证据")),
+                                new LotteryKl8OptimizedGroup(List.of(13, 14, 15, 16), 87, "组合优化第四组", List.of("测试证据")),
+                                new LotteryKl8OptimizedGroup(List.of(17, 18, 19, 20), 86, "组合优化第五组", List.of("测试证据"))),
                         "组合优化测试",
                         Map.of("maxNumberReuse", "1")),
                 List.of("组合层：测试"),
@@ -160,11 +160,10 @@ class LotteryKl8RecommendationPolicyTest {
 
         List<LotteryKl8RecommendationGroupVO> groups = policy.fallbackGroups(report);
 
-        // 组合优化已有 5 组候选，取前 3 组作为本次推荐
-        assertEquals(3, groups.size());
-        assertEquals(List.of(1, 2, 3, 4, 5), groups.get(0).numbers());
-        assertEquals(List.of(6, 7, 8, 9, 10), groups.get(1).numbers());
-        assertEquals(List.of(11, 12, 13, 14, 15), groups.get(2).numbers());
+        // 组合优化已有 5 组候选，取前 2 组作为本次推荐
+        assertEquals(2, groups.size());
+        assertEquals(List.of(1, 2, 3, 4), groups.get(0).numbers());
+        assertEquals(List.of(5, 6, 7, 8), groups.get(1).numbers());
         assertTrue(groups.get(0).reason().contains("组合优化"));
     }
 

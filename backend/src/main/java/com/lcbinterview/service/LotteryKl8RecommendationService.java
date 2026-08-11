@@ -26,9 +26,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LotteryKl8RecommendationService {
 
-        private static final int DEFAULT_BASE_ISSUE_COUNT = 100;
-    private static final int DEFAULT_PICK_SIZE = 5;
-    private static final String STRATEGY_VERSION = "KL8_JAVA_MULTI_GROUP_V19";
+    private static final int DEFAULT_BASE_ISSUE_COUNT = 100;
+    private static final int DEFAULT_PICK_SIZE = 4;
+    private static final String STRATEGY_VERSION = "KL8_JAVA_MULTI_GROUP_V20";
     private static final String DISCLAIMER = "彩票结果具有随机性，本推荐仅为娱乐统计参考，不保证命中，不构成投注建议。";
 
     private final LotteryKl8FeatureService featureService;
@@ -39,7 +39,7 @@ public class LotteryKl8RecommendationService {
     private final ObjectMapper objectMapper;
 
 /**
- * 为当前用户生成 3 组快乐8选5推荐，组间覆盖去重。
+ * 为当前用户生成 2 组快乐8选4推荐，组间覆盖去重。
  *
  * @param userId  用户 ID
  * @param request 推荐请求

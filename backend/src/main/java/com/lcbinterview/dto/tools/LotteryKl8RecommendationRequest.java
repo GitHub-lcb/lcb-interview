@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
 /**
- * 快乐8推荐请求，固定选5玩法。
+ * 快乐8推荐请求，固定选4玩法。
  *
  * @param baseIssueCount 使用的历史期数
  */

@@ -61,14 +61,14 @@ class LotteryKl8FeatureServiceDeepTest {
         assertTrue(report.backtestSummary().hitDistribution().values().stream().mapToInt(Integer::intValue).sum() > 0);
         assertTrue(report.backtestSummary().factorWeights().decayWeight() >= report.backtestSummary().factorWeights().missingWeight());
         assertNotNull(report.optimizedPortfolio());
-        assertEquals(3, report.optimizedPortfolio().groups().size());
-        assertTrue(report.optimizedPortfolio().groups().stream().allMatch(group -> group.numbers().size() == 5));
-        // V19 多组覆盖：3 组号码去重后覆盖至少 13 个不同号码，避免组间大量重复
+        assertEquals(2, report.optimizedPortfolio().groups().size());
+        assertTrue(report.optimizedPortfolio().groups().stream().allMatch(group -> group.numbers().size() == 4));
+        // V20 多组覆盖：2 组号码去重后覆盖至少 6 个不同号码，避免组间大量重复
         long coverage = report.optimizedPortfolio().groups().stream()
                 .flatMap(group -> group.numbers().stream())
                 .distinct()
                 .count();
-        assertTrue(coverage >= 13, "3 组推荐应尽量覆盖不同号码，实际覆盖 " + coverage);
+        assertTrue(coverage >= 6, "2 组推荐应尽量覆盖不同号码，实际覆盖 " + coverage);
         assertTrue(report.optimizedPortfolio().summary().contains("组合"));
         assertTrue(report.optimizedPortfolio().diagnostics().containsKey("coverageNumberCount"));
         assertNotNull(report.deepSummary());
@@ -143,8 +143,8 @@ class LotteryKl8FeatureServiceDeepTest {
         List<Integer> selected = report.optimizedPortfolio().groups().get(0).numbers();
 
         assertEquals(0, selectedPairs.size(), "新策略不再强制选择核心对子");
-        assertEquals(5, selected.size());
-        assertFalse(hasConsecutiveRun(selected, 3), "最终 5 码不得出现三连号");
+        assertEquals(4, selected.size());
+        assertFalse(hasConsecutiveRun(selected, 3), "最终 4 码不得出现三连号");
         assertFalse(report.optimizedPortfolio().neighborRecommendations().isEmpty(), "邻位只作为诊断候选保留");
         assertFalse(report.optimizedPortfolio().summary().contains("核心对子"));
     }

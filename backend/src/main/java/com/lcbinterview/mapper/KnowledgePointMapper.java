@@ -74,6 +74,7 @@ public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {
      * @return 考点排行行
      */
     @Select("""
+            <script>
             SELECT kp.id, kp.name, kp.category_id, c.name AS category_name,
                    kp.hot_score, kp.hot_score_source,
                    COALESCE(m.total, 0) AS mention_total,
@@ -107,6 +108,7 @@ public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {
               </if>
             ORDER BY kp.hot_score DESC, kp.id DESC
             LIMIT #{size}
+            </script>
             """)
     List<HotPointRow> selectHotPoints(@Param("categoryId") Long categoryId,
                                       @Param("size") int size);
