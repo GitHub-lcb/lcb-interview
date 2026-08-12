@@ -5,7 +5,8 @@ param(
   [string]$AppDir = "/opt/lcb-interview",
   [string]$AdminToken = "",
   [switch]$SkipTests,
-  [switch]$BuildOnly
+  [switch]$BuildOnly,
+  [string]$JavaHome = "E:\develop-lcb\env\java\jdk21"
 )
 
 $ErrorActionPreference = "Stop"
@@ -29,6 +30,19 @@ if (-not (Test-Path -LiteralPath $RepoPath)) {
   throw "RepoPath not found: $RepoPath"
 }
 
+# Maven 工具链校验：显式指定 JDK 21，避免 JAVA_HOME 指向旧 JRE 时
+# mvn 静默失败、部署脚本继续用旧 jar 上线（曾导致接口缺失事故）。
+if ($JavaHome -and (Test-Path -LiteralPath (Join-Path $JavaHome "bin\java.exe"))) {
+  $env:JAVA_HOME = $JavaHome
+  Write-Step "Maven toolchain JAVA_HOME=$JavaHome"
+} else {
+  Write-Host "JavaHome 参数无效，沿用当前 JAVA_HOME=$env:JAVA_HOME" -ForegroundColor Yellow
+}
+cmd /c "mvn -v 2>&1" | Select-Object -First 1
+if ($LASTEXITCODE -ne 0) {
+  throw "Maven 不可用（JAVA_HOME 无效），请检查 -JavaHome 参数或本机 JDK 安装"
+}
+
 $repo = (Resolve-Path -LiteralPath $RepoPath).Path
 $archive = Join-Path $env:TEMP "lcb-interview-deploy.tar.gz"
 $migration = Join-Path $env:TEMP "lcb-ai-config-migration.sql"
@@ -41,16 +55,28 @@ if (-not $SkipTests) {
   Write-Step "Run backend tests"
   Push-Location (Join-Path $repo "backend")
   cmd /c "mvn test 2>&1"
+  if ($LASTEXITCODE -ne 0) { throw "backend tests failed" }
   Pop-Location
 }
 
 Write-Step "Package backend jar"
 Push-Location (Join-Path $repo "backend")
-# 本机 JAVA_HOME 可能指向旧 JDK 导致 Maven 无法启动；此时依赖已预构建的
-# target/lcb-interview-0.0.1-SNAPSHOT.jar（可用服务器 Docker 构建后拉回）。
+$jarPath = "target/lcb-interview-0.0.1-SNAPSHOT.jar"
+# 构建前后用哈希校验，确保上传的一定是本次构建产物，杜绝旧 jar 静默上线
+$jarHashBefore = if (Test-Path -LiteralPath $jarPath) { (Get-FileHash -LiteralPath $jarPath).Hash } else { "" }
 cmd /c "mvn -q -DskipTests package 2>&1"
-if ($LASTEXITCODE -ne 0 -and -not (Test-Path "target/lcb-interview-0.0.1-SNAPSHOT.jar")) {
-  throw "backend jar build failed and no existing jar in backend/target"
+if ($LASTEXITCODE -ne 0) {
+  throw "backend jar build failed (exit $LASTEXITCODE)"
+}
+if (-not (Test-Path -LiteralPath $jarPath)) {
+  throw "backend jar not produced after build"
+}
+$jarHashAfter = (Get-FileHash -LiteralPath $jarPath).Hash
+if ($jarHashAfter -eq $jarHashBefore) {
+  # 纯前端部署时后端源码未变化，增量打包产物一致属正常；mvn 已成功，放行并提示
+  Write-Host "Jar unchanged after build (backend sources unchanged), continuing" -ForegroundColor Yellow
+} else {
+  Write-Host "Jar rebuilt and verified: $jarPath"
 }
 Pop-Location
 
