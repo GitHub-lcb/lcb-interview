@@ -184,10 +184,15 @@ export default function LotteryKl8Panel() {
   const handleEvaluate = async () => {
     setEvaluating(true)
     try {
+      // 结算返回 0 有两种可能：全部已结算，或有待结算但下一期开奖尚未同步入库。
+      // 用点击时的 history 区分，避免把「等今晚开奖」误报成「已全部结算」。
+      const hasPending = history.some(item => !item.evaluatedIssueNo)
       const count = await evaluateKl8Recommendations()
       await load()
       if (count > 0) {
         emitFeedbackSuccess(`结算完成，更新 ${count} 条推荐命中`)
+      } else if (hasPending) {
+        emitFeedbackWarning('下一期开奖尚未同步，暂无法结算')
       } else {
         emitFeedbackWarning('已全部结算，没有待结算的推荐')
       }

@@ -236,6 +236,21 @@ describe('LotteryKl8Panel', () => {
     expect(emitFeedbackWarning).toHaveBeenCalledWith('已全部结算，没有待结算的推荐')
   })
 
+  it('explains pending recommendations await tonight draw when evaluate returns zero', async () => {
+    vi.mocked(listKl8Recommendations).mockResolvedValue(pageOf([recommendation()], 1))
+    vi.mocked(evaluateKl8Recommendations).mockResolvedValue(0)
+
+    render(<LotteryKl8Panel />)
+
+    await screen.findAllByText('今晚开 · 预测 2026214')
+    await userEvent.click(screen.getByRole('button', { name: /手动结算/ }))
+
+    await waitFor(() => {
+      expect(evaluateKl8Recommendations).toHaveBeenCalledTimes(1)
+    })
+    expect(emitFeedbackWarning).toHaveBeenCalledWith('下一期开奖尚未同步，暂无法结算')
+  })
+
   it('shows recent draws in the side column', async () => {
     const draws: LotteryKl8Draw[] = [
       {
