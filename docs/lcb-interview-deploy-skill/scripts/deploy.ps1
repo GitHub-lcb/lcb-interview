@@ -38,7 +38,7 @@ if ($JavaHome -and (Test-Path -LiteralPath (Join-Path $JavaHome "bin\java.exe"))
 } else {
   Write-Host "JavaHome 参数无效，沿用当前 JAVA_HOME=$env:JAVA_HOME" -ForegroundColor Yellow
 }
-cmd /c "mvn -v 2>&1" | Select-Object -First 1
+cmd /c "mvn -v >nul 2>&1"
 if ($LASTEXITCODE -ne 0) {
   throw "Maven 不可用（JAVA_HOME 无效），请检查 -JavaHome 参数或本机 JDK 安装"
 }
