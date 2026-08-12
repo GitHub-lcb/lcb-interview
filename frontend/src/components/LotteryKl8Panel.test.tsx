@@ -4,6 +4,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
   createKl8Recommendation,
+  evaluateKl8Recommendations,
   getKl8SyncStatus,
   listKl8Draws,
   listKl8Recommendations,
@@ -19,6 +20,7 @@ vi.mock('../api/tools', () => ({
   listKl8Recommendations: vi.fn(),
   syncKl8Draws: vi.fn(),
   createKl8Recommendation: vi.fn(),
+  evaluateKl8Recommendations: vi.fn(),
 }))
 
 vi.mock('../utils/feedbackMessage', () => ({
@@ -204,6 +206,34 @@ describe('LotteryKl8Panel', () => {
     await waitFor(() => {
       expect(screen.getByText('暂无开奖数据，先点击同步开奖。')).toBeInTheDocument()
     })
+  })
+
+  it('settles pending recommendations manually with success feedback', async () => {
+    vi.mocked(evaluateKl8Recommendations).mockResolvedValue(3)
+
+    render(<LotteryKl8Panel />)
+
+    await screen.findByText('暂无推荐历史。')
+    await userEvent.click(screen.getByRole('button', { name: /手动结算/ }))
+
+    await waitFor(() => {
+      expect(evaluateKl8Recommendations).toHaveBeenCalledTimes(1)
+    })
+    expect(emitFeedbackSuccess).toHaveBeenCalledWith('结算完成，更新 3 条推荐命中')
+  })
+
+  it('reminds user when everything is already settled', async () => {
+    vi.mocked(evaluateKl8Recommendations).mockResolvedValue(0)
+
+    render(<LotteryKl8Panel />)
+
+    await screen.findByText('暂无推荐历史。')
+    await userEvent.click(screen.getByRole('button', { name: /手动结算/ }))
+
+    await waitFor(() => {
+      expect(evaluateKl8Recommendations).toHaveBeenCalledTimes(1)
+    })
+    expect(emitFeedbackWarning).toHaveBeenCalledWith('已全部结算，没有待结算的推荐')
   })
 
   it('shows recent draws in the side column', async () => {

@@ -3,7 +3,7 @@ import {
   Alert, Button, Empty, InputNumber, Spin, Tag,
 } from 'antd'
 import {
-  CopyOutlined, HistoryOutlined, ReloadOutlined, ThunderboltOutlined,
+  CopyOutlined, HistoryOutlined, ReloadOutlined, ThunderboltOutlined, AuditOutlined,
 } from '@ant-design/icons'
 import {
   getKl8SyncStatus,
@@ -11,6 +11,7 @@ import {
   listKl8Recommendations,
   syncKl8Draws,
   createKl8Recommendation,
+  evaluateKl8Recommendations,
 } from '../api/tools'
 import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import type {
@@ -129,6 +130,7 @@ export default function LotteryKl8Panel() {
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [recommending, setRecommending] = useState(false)
+  const [evaluating, setEvaluating] = useState(false)
 
   const latest = useMemo(() => current ?? history[0] ?? null, [current, history])
   const currentPickSize = latest?.pickSize ?? 4
@@ -179,8 +181,24 @@ export default function LotteryKl8Panel() {
     }
   }
 
-  const handleRecommend = async () => {
-    if ((status?.drawCount ?? 0) < 20) {
+  const handleEvaluate = async () => {
+    setEvaluating(true)
+    try {
+      const count = await evaluateKl8Recommendations()
+      await load()
+      if (count > 0) {
+        emitFeedbackSuccess(`结算完成，更新 ${count} 条推荐命中`)
+      } else {
+        emitFeedbackWarning('已全部结算，没有待结算的推荐')
+      }
+    } catch {
+      // 结算失败时保留按钮状态恢复，错误反馈交给全局请求拦截器。
+    } finally {
+      setEvaluating(false)
+    }
+  }
+
+  const handleRecommend = async () => {    if ((status?.drawCount ?? 0) < 20) {
       emitFeedbackWarning('历史开奖不足 20 期，请先同步开奖数据')
       return
     }
@@ -199,8 +217,7 @@ export default function LotteryKl8Panel() {
     }
   }
 
-  const handleCopyGroups = async () => {
-    if (!latest || latest.groups.length === 0) {
+  const handleCopyGroups = async () => {    if (!latest || latest.groups.length === 0) {
       return
     }
     // 每组号码占一行、号码之间用空格分隔，个位数补 0 对齐，方便直接粘贴到文档或聊天工具
@@ -224,10 +241,13 @@ export default function LotteryKl8Panel() {
           <p>每天同步开奖后自动生成 2 组精选号码，开奖后自动结算，命中与否一眼可见。</p>
         </div>
         <div className="tool-actions">
-          <Button icon={<ReloadOutlined />} loading={syncing} disabled={recommending} onClick={handleSync}>
+          <Button icon={<AuditOutlined />} loading={evaluating} disabled={recommending || syncing} onClick={handleEvaluate}>
+            手动结算
+          </Button>
+          <Button icon={<ReloadOutlined />} loading={syncing} disabled={recommending || evaluating} onClick={handleSync}>
             同步开奖
           </Button>
-          <Button type="primary" icon={<ThunderboltOutlined />} loading={recommending} disabled={syncing} onClick={handleRecommend}>
+          <Button type="primary" icon={<ThunderboltOutlined />} loading={recommending} disabled={syncing || evaluating} onClick={handleRecommend}>
             Java 推荐选4
           </Button>
         </div>

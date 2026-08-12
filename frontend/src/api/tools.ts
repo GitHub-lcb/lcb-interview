@@ -67,6 +67,11 @@ export async function createKl8Recommendation(baseIssueCount = 2000): Promise<Lo
   return res.data.data
 }
 
+export async function evaluateKl8Recommendations(): Promise<number> {
+  const res = await api.post('/tools/lottery/kl8/evaluate')
+  return res.data.data
+}
+
 export async function listKl8Recommendations(page = 0, size = 10): Promise<PageResult<LotteryKl8Recommendation>> {
   const res = await api.get('/tools/lottery/kl8/recommendations', { params: { page, size } })
   return res.data.data

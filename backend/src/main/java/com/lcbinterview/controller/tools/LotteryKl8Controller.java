@@ -8,12 +8,14 @@ import com.lcbinterview.dto.tools.LotteryKl8RecommendationRequest;
 import com.lcbinterview.dto.tools.LotteryKl8RecommendationVO;
 import com.lcbinterview.dto.tools.LotteryKl8SyncResultVO;
 import com.lcbinterview.dto.tools.LotteryKl8SyncStatusVO;
+import com.lcbinterview.service.LotteryKl8RecommendationEvaluationService;
 import com.lcbinterview.service.LotteryKl8RecommendationService;
 import com.lcbinterview.service.LotteryKl8SyncService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 快乐8工具接口，提供开奖同步、历史开奖和 Java 规则推荐能力，支持选1到选10玩法。
  */
+@Slf4j
 @Tag(name = "快乐8工具")
 @RestController
 @RequestMapping("/api/tools/lottery/kl8")
@@ -33,6 +36,7 @@ public class LotteryKl8Controller {
 
     private final LotteryKl8SyncService syncService;
     private final LotteryKl8RecommendationService recommendationService;
+    private final LotteryKl8RecommendationEvaluationService evaluationService;
 
     /**
      * 手动同步快乐8开奖数据。
@@ -83,6 +87,19 @@ public class LotteryKl8Controller {
             @Valid @RequestBody LotteryKl8RecommendationRequest request) {
         return ResponseEntity.ok(ApiResponse.success(
                 recommendationService.recommend(AuthUserContext.currentUserId(), request)));
+    }
+
+    /**
+     * 手动结算所有待结算推荐。已全部结算时返回 0，前端据此提示用户。
+     *
+     * @return 本次结算的推荐条数
+     */
+    @Operation(summary = "手动结算推荐命中")
+    @PostMapping("/evaluate")
+    public ResponseEntity<ApiResponse<Integer>> evaluate() {
+        int evaluated = evaluationService.evaluatePendingRecommendations();
+        log.info("手动结算推荐命中: {} 条", evaluated);
+        return ResponseEntity.ok(ApiResponse.success(evaluated));
     }
 
     /**
