@@ -158,7 +158,7 @@ describe('LotteryKl8Panel', () => {
     await userEvent.click(screen.getByRole('button', { name: /一键复制/ }))
 
     await waitFor(() => {
-      expect(writeText).toHaveBeenCalledWith('选4 02 11 12 73 ×2\n选4 04 07 32 51 ×2\n选8 02 11 12 73 04 07 32 51 ×1')
+      expect(writeText).toHaveBeenCalledWith('选4 02 11 12 73 2倍\n选4 04 07 32 51 2倍\n选8 02 04 07 11 12 32 51 73 1倍')
     })
     expect(emitFeedbackSuccess).toHaveBeenCalledWith('已复制 10 元组合（选4×2倍 + 选4×2倍 + 选8×1倍）')
   })

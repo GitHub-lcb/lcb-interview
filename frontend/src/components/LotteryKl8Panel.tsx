@@ -226,18 +226,19 @@ export default function LotteryKl8Panel() {
     if (!latest || latest.groups.length === 0) {
       return
     }
-    // 按 10 元投注组合复制：第 1 组选4 ×2倍 + 第 2 组选4 ×2倍 + 两组合并的选8 ×1倍。
-    // 合计 2+2+1 注共 10 元，方便直接粘贴到投注站或官方 APP。
+    // 按 10 元投注组合复制：第 1 组选4 2倍 + 第 2 组选4 2倍 + 两组合并的选8 1倍。
+    // 合计 2+2+1 注共 10 元，方便直接粘贴到投注站或官方 APP；第三行合并号按大小排序。
     let text: string
     if (latest.groups.length === 2) {
       const first = latest.groups[0].numbers.map(formatTrendNumber).join(' ')
       const second = latest.groups[1].numbers.map(formatTrendNumber).join(' ')
       const merged = [...latest.groups[0].numbers, ...latest.groups[1].numbers]
+        .sort((a, b) => a - b)
         .map(formatTrendNumber).join(' ')
       text = [
-        `选4 ${first} ×2`,
-        `选4 ${second} ×2`,
-        `选8 ${merged} ×1`,
+        `选4 ${first} 2倍`,
+        `选4 ${second} 2倍`,
+        `选8 ${merged} 1倍`,
       ].join('\n')
     } else {
       // 单组或历史多组记录回退为通用格式：每组一行、空格分隔、个位补 0
