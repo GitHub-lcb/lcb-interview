@@ -203,13 +203,13 @@ export default function SsqPanel() {
           <p>每周二四日开奖后自动生成 7 红 + 1 蓝复式组合，开奖后自动结算命中。</p>
         </div>
         <div className="tool-actions">
-          <Button icon={<AuditOutlined />} loading={evaluating} disabled={recommending || syncing} onClick={handleEvaluate}>
+          <Button icon={<AuditOutlined />} loading={evaluating} onClick={handleEvaluate}>
             手动结算
           </Button>
-          <Button icon={<ReloadOutlined />} loading={syncing} disabled={recommending || evaluating} onClick={handleSync}>
+          <Button icon={<ReloadOutlined />} loading={syncing} onClick={handleSync}>
             同步开奖
           </Button>
-          <Button type="primary" icon={<ThunderboltOutlined />} loading={recommending} disabled={syncing || evaluating} onClick={handleRecommend}>
+          <Button type="primary" icon={<ThunderboltOutlined />} loading={recommending} onClick={handleRecommend}>
             推荐 7+1
           </Button>
         </div>

@@ -263,13 +263,13 @@ export default function LotteryKl8Panel() {
           <p>每天同步开奖后自动生成 2 组精选号码，开奖后自动结算，命中与否一眼可见。</p>
         </div>
         <div className="tool-actions">
-          <Button icon={<AuditOutlined />} loading={evaluating} disabled={recommending || syncing} onClick={handleEvaluate}>
+          <Button icon={<AuditOutlined />} loading={evaluating} onClick={handleEvaluate}>
             手动结算
           </Button>
-          <Button icon={<ReloadOutlined />} loading={syncing} disabled={recommending || evaluating} onClick={handleSync}>
+          <Button icon={<ReloadOutlined />} loading={syncing} onClick={handleSync}>
             同步开奖
           </Button>
-          <Button type="primary" icon={<ThunderboltOutlined />} loading={recommending} disabled={syncing || evaluating} onClick={handleRecommend}>
+          <Button type="primary" icon={<ThunderboltOutlined />} loading={recommending} onClick={handleRecommend}>
             Java 推荐选4
           </Button>
         </div>
