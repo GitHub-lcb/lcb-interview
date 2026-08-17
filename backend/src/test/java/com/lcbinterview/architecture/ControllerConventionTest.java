@@ -11,6 +11,7 @@ import com.lcbinterview.controller.admin.AdminDashboardController;
 import com.lcbinterview.controller.admin.AiGenerationController;
 import com.lcbinterview.controller.admin.QuestionAdminController;
 import com.lcbinterview.controller.admin.KnowledgeAdminController;
+import com.lcbinterview.controller.tools.DltController;
 import com.lcbinterview.controller.tools.LotteryKl8Controller;
 import com.lcbinterview.controller.tools.ReadingToolController;
 import com.lcbinterview.controller.tools.SsqController;
@@ -54,7 +55,8 @@ class ControllerConventionTest {
             KnowledgePointController.class,
             LotteryKl8Controller.class,
             ReadingToolController.class,
-            SsqController.class
+            SsqController.class,
+            DltController.class
     );
 
     /**

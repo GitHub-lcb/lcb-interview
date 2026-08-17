@@ -68,6 +68,7 @@
                 <includes>
                     <include>lcb-knowledge-migration.sql</include>
                     <include>lcb-ssq-migration.sql</include>
+                    <include>lcb-dlt-migration.sql</include>
                 </includes>
             </resource>
         </resources>
