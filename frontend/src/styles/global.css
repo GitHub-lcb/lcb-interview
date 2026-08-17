@@ -596,6 +596,47 @@ p {
   box-shadow: 0 10px 20px rgba(15, 23, 42, 0.18);
 }
 
+/* 命中的号码：青绿实心高亮，一眼区分于普通号码 */
+.lottery-number-row em.is-hit {
+  background: #0F8A8F;
+  color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(15, 138, 143, 0.25);
+}
+
+.lottery-group-grid.is-single .lottery-number-row em.is-hit {
+  background: #0F8A8F;
+  color: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(15, 138, 143, 0.3);
+}
+
+/* 历史列表号码预览：小号紧凑展示，命中青绿高亮 */
+.lottery-history-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.lottery-history-numbers em {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 3px;
+  border-radius: 50%;
+  background: #E9ECEF;
+  color: #1A1E23;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.lottery-history-numbers em.is-hit {
+  background: #0F8A8F;
+  color: #FFFFFF;
+}
+
 .lottery-group-card p {
   margin: 0;
   color: #475569;

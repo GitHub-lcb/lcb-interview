@@ -360,17 +360,38 @@ export default function LotteryKl8Panel() {
               <section>
                 <h3><HistoryOutlined /> 推荐历史</h3>
                 <div className="lottery-history-list">
-                  {history.map(item => (
-                    <button key={item.id} type="button" onClick={() => {
-                      setCurrent(item)
-                    }}>
-                      <strong>
-                        <i className={`lottery-status-dot ${item.evaluatedIssueNo ? (item.totalHitCount ?? 0) > 0 ? 'is-hit' : 'is-miss' : 'is-pending'}`} />
-                        {item.evaluatedIssueNo ? `已开 · 命中 ${item.totalHitCount ?? 0}` : `今晚开 · 预测 ${nextIssueNo(item.latestIssueNo)}`}
-                      </strong>
-                      <small>{item.latestIssueNo} · {formatDateTime(item.createdAt)}</small>
-                    </button>
-                  ))}
+                  {history.map(item => {
+                    const itemHit = parseJson<LotteryHitSummary>(item.hitSummaryJson)
+                    const itemHitByGroup = new Map<number, number[]>()
+                    if (itemHit) {
+                      for (const group of itemHit.groups) {
+                        itemHitByGroup.set(group.groupIndex, group.hitNumbers)
+                      }
+                    }
+                    return (
+                      <button key={item.id} type="button" onClick={() => {
+                        setCurrent(item)
+                      }}>
+                        <strong>
+                          <i className={`lottery-status-dot ${item.evaluatedIssueNo ? (item.totalHitCount ?? 0) > 0 ? 'is-hit' : 'is-miss' : 'is-pending'}`} />
+                          {item.evaluatedIssueNo ? `已开 · 命中 ${item.totalHitCount ?? 0}` : `今晚开 · 预测 ${nextIssueNo(item.latestIssueNo)}`}
+                        </strong>
+                        <small>{item.latestIssueNo} · {formatDateTime(item.createdAt)}</small>
+                        <span className="lottery-history-numbers">
+                          {item.groups.map((group, groupIndex) => (
+                            group.numbers.map(number => (
+                              <em
+                                key={`${item.id}-${groupIndex}-${number}`}
+                                className={itemHitByGroup.get(groupIndex + 1)?.includes(number) ? 'is-hit' : undefined}
+                              >
+                                {formatTrendNumber(number)}
+                              </em>
+                            ))
+                          ))}
+                        </span>
+                      </button>
+                    )
+                  })}
                   {history.length === 0 && <p>暂无推荐历史。</p>}
                 </div>
               </section>

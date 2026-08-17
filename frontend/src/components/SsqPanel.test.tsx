@@ -94,6 +94,11 @@ describe('SsqPanel', () => {
     expect((await screen.findAllByText('已开 · 命中 3')).length).toBeGreaterThan(0)
     expect(screen.getByText('命中 3/7')).toBeInTheDocument()
     expect(screen.getByText('红球命中 3/7')).toBeInTheDocument()
+    // 历史列表号码预览：命中的红球 01、03、19 高亮（is-hit），未中的不高亮
+    const hitBadges = document.querySelectorAll('.lottery-history-numbers em.is-hit')
+    expect(hitBadges.length).toBe(3)
+    const missBadges = document.querySelectorAll('.lottery-history-numbers em:not(.is-hit)')
+    expect(missBadges.length).toBe(5)
   })
 
   it('copies 7+1 compound format', async () => {

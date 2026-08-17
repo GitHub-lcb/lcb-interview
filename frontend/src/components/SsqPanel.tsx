@@ -309,17 +309,30 @@ export default function SsqPanel() {
               <section>
                 <h3><HistoryOutlined /> 推荐历史</h3>
                 <div className="lottery-history-list">
-                  {history.map(item => (
-                    <button key={item.id} type="button" onClick={() => {
-                      setCurrent(item)
-                    }}>
-                      <strong>
-                        <i className={`lottery-status-dot ${item.evaluatedIssueNo ? (item.totalHitCount ?? 0) > 0 ? 'is-hit' : 'is-miss' : 'is-pending'}`} />
-                        {item.evaluatedIssueNo ? `已开 · 命中 ${item.totalHitCount ?? 0}` : `今晚开 · 预测 ${nextIssueNo(item.latestIssueNo)}`}
-                      </strong>
-                      <small>{item.latestIssueNo} · {formatDateTime(item.createdAt)}</small>
-                    </button>
-                  ))}
+                  {history.map(item => {
+                    const itemHit = parseHitSummary(item.hitSummaryJson)
+                    return (
+                      <button key={item.id} type="button" onClick={() => {
+                        setCurrent(item)
+                      }}>
+                        <strong>
+                          <i className={`lottery-status-dot ${item.evaluatedIssueNo ? (item.totalHitCount ?? 0) > 0 ? 'is-hit' : 'is-miss' : 'is-pending'}`} />
+                          {item.evaluatedIssueNo ? `已开 · 命中 ${item.totalHitCount ?? 0}` : `今晚开 · 预测 ${nextIssueNo(item.latestIssueNo)}`}
+                        </strong>
+                        <small>{item.latestIssueNo} · {formatDateTime(item.createdAt)}</small>
+                        <span className="lottery-history-numbers">
+                          {item.redNumbers.map(number => (
+                            <em key={`${item.id}-r-${number}`} className={itemHit?.hitReds?.includes(number) ? 'is-hit' : undefined}>
+                              {formatNumber(number)}
+                            </em>
+                          ))}
+                          <em key={`${item.id}-b-${item.blueNumber}`} className={itemHit?.blueHit ? 'is-hit' : undefined}>
+                            {formatNumber(item.blueNumber)}
+                          </em>
+                        </span>
+                      </button>
+                    )
+                  })}
                   {history.length === 0 && <p>暂无推荐历史。</p>}
                 </div>
               </section>
