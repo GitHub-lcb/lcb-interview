@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Button, Spin, Tabs } from 'antd'
-import { LogoutOutlined, ReadOutlined, ThunderboltOutlined, FireOutlined } from '@ant-design/icons'
+import { LogoutOutlined, ReadOutlined, ThunderboltOutlined, FireOutlined, GiftOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import ReadingExcerptPanel from '../../components/ReadingExcerptPanel'
 import LotteryKl8Panel from '../../components/LotteryKl8Panel'
 import SsqPanel from '../../components/SsqPanel'
+import DltPanel from '../../components/DltPanel'
 import { getCurrentUser } from '../../api/auth'
 import { clearUserToken, readUserToken } from '../../utils/authToken'
 import type { AuthUser } from '../../types'
@@ -84,6 +85,11 @@ export default function Tools() {
             key: 'ssq',
             label: <span><FireOutlined /> 双色球</span>,
             children: <SsqPanel />,
+          },
+          {
+            key: 'dlt',
+            label: <span><GiftOutlined /> 大乐透</span>,
+            children: <DltPanel />,
           },
           {
             key: 'reading',

@@ -1,5 +1,9 @@
 import api from './index'
 import type {
+  DltDraw,
+  DltRecommendation,
+  DltSyncResult,
+  DltSyncStatus,
   LotteryKl8Draw,
   LotteryKl8Recommendation,
   LotteryKl8SyncResult,
@@ -18,6 +22,8 @@ const KL8_RECOMMENDATION_TIMEOUT_MS = 120000
 const KL8_SYNC_TIMEOUT_MS = 120000
 const SSQ_RECOMMENDATION_TIMEOUT_MS = 120000
 const SSQ_SYNC_TIMEOUT_MS = 120000
+const DLT_RECOMMENDATION_TIMEOUT_MS = 120000
+const DLT_SYNC_TIMEOUT_MS = 120000
 
 export interface ReadingExcerptListParams {
   page?: number
@@ -112,5 +118,37 @@ export async function listSsqRecommendations(page = 0, size = 10): Promise<PageR
 
 export async function evaluateSsqRecommendations(): Promise<number> {
   const res = await api.post('/tools/lottery/ssq/evaluate')
+  return res.data.data
+}
+
+export async function syncDltDraws(): Promise<DltSyncResult> {
+  const res = await api.post('/tools/lottery/dlt/sync', null, { timeout: DLT_SYNC_TIMEOUT_MS })
+  return res.data.data
+}
+
+export async function getDltSyncStatus(): Promise<DltSyncStatus> {
+  const res = await api.get('/tools/lottery/dlt/sync-status')
+  return res.data.data
+}
+
+export async function listDltDraws(page = 0, size = 30): Promise<PageResult<DltDraw>> {
+  const res = await api.get('/tools/lottery/dlt/draws', { params: { page, size } })
+  return res.data.data
+}
+
+export async function createDltRecommendation(baseIssueCount?: number): Promise<DltRecommendation> {
+  const res = await api.post('/tools/lottery/dlt/recommendations', { baseIssueCount }, {
+    timeout: DLT_RECOMMENDATION_TIMEOUT_MS,
+  })
+  return res.data.data
+}
+
+export async function listDltRecommendations(page = 0, size = 10): Promise<PageResult<DltRecommendation>> {
+  const res = await api.get('/tools/lottery/dlt/recommendations', { params: { page, size } })
+  return res.data.data
+}
+
+export async function evaluateDltRecommendations(): Promise<number> {
+  const res = await api.post('/tools/lottery/dlt/evaluate')
   return res.data.data
 }

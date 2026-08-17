@@ -356,6 +356,48 @@ export interface SsqRecommendation {
   createdAt: string
 }
 
+export interface DltDraw {
+  issueNo: string
+  drawDate: string
+  frontNumbers: number[]
+  backNumbers: number[]
+}
+
+export interface DltSyncStatus {
+  latestIssueNo: string
+  latestDrawDate?: string
+  drawCount: number
+  stale: boolean
+  message: string
+}
+
+export interface DltSyncResult {
+  success: boolean
+  fetchedCount: number
+  insertedCount: number
+  latestIssueNo: string
+  evaluatedCount: number
+  message: string
+}
+
+export interface DltRecommendation {
+  id: number
+  source: string
+  frontNumbers: number[]
+  backNumbers: number[]
+  baseIssueCount: number
+  latestIssueNo: string
+  featureSummary: string
+  analysisJson?: string
+  evaluatedIssueNo?: string
+  evaluatedDrawDate?: string
+  totalHitCount?: number
+  maxHitCount?: number
+  hitSummaryJson?: string
+  disclaimer: string
+  createdAt: string
+}
+
 export type StudyQuestionStatus = 'new' | 'learning' | 'mastered' | 'weak'
 export interface QuestionStudyState {
   status: StudyQuestionStatus
