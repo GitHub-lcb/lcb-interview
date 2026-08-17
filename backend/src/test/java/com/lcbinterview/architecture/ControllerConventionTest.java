@@ -13,6 +13,7 @@ import com.lcbinterview.controller.admin.QuestionAdminController;
 import com.lcbinterview.controller.admin.KnowledgeAdminController;
 import com.lcbinterview.controller.tools.LotteryKl8Controller;
 import com.lcbinterview.controller.tools.ReadingToolController;
+import com.lcbinterview.controller.tools.SsqController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,8 @@ class ControllerConventionTest {
             KnowledgeAdminController.class,
             KnowledgePointController.class,
             LotteryKl8Controller.class,
-            ReadingToolController.class
+            ReadingToolController.class,
+            SsqController.class
     );
 
     /**

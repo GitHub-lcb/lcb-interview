@@ -67,6 +67,7 @@
                 <targetPath>db</targetPath>
                 <includes>
                     <include>lcb-knowledge-migration.sql</include>
+                    <include>lcb-ssq-migration.sql</include>
                 </includes>
             </resource>
         </resources>
