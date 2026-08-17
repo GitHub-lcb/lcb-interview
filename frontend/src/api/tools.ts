@@ -8,10 +8,16 @@ import type {
   PageResult,
   ReadingExcerpt,
   ReadingExcerptPayload,
+  SsqDraw,
+  SsqRecommendation,
+  SsqSyncResult,
+  SsqSyncStatus,
 } from '../types'
 
 const KL8_RECOMMENDATION_TIMEOUT_MS = 120000
 const KL8_SYNC_TIMEOUT_MS = 120000
+const SSQ_RECOMMENDATION_TIMEOUT_MS = 120000
+const SSQ_SYNC_TIMEOUT_MS = 120000
 
 export interface ReadingExcerptListParams {
   page?: number
@@ -74,5 +80,37 @@ export async function evaluateKl8Recommendations(): Promise<number> {
 
 export async function listKl8Recommendations(page = 0, size = 10): Promise<PageResult<LotteryKl8Recommendation>> {
   const res = await api.get('/tools/lottery/kl8/recommendations', { params: { page, size } })
+  return res.data.data
+}
+
+export async function syncSsqDraws(): Promise<SsqSyncResult> {
+  const res = await api.post('/tools/lottery/ssq/sync', null, { timeout: SSQ_SYNC_TIMEOUT_MS })
+  return res.data.data
+}
+
+export async function getSsqSyncStatus(): Promise<SsqSyncStatus> {
+  const res = await api.get('/tools/lottery/ssq/sync-status')
+  return res.data.data
+}
+
+export async function listSsqDraws(page = 0, size = 30): Promise<PageResult<SsqDraw>> {
+  const res = await api.get('/tools/lottery/ssq/draws', { params: { page, size } })
+  return res.data.data
+}
+
+export async function createSsqRecommendation(baseIssueCount?: number): Promise<SsqRecommendation> {
+  const res = await api.post('/tools/lottery/ssq/recommendations', { baseIssueCount }, {
+    timeout: SSQ_RECOMMENDATION_TIMEOUT_MS,
+  })
+  return res.data.data
+}
+
+export async function listSsqRecommendations(page = 0, size = 10): Promise<PageResult<SsqRecommendation>> {
+  const res = await api.get('/tools/lottery/ssq/recommendations', { params: { page, size } })
+  return res.data.data
+}
+
+export async function evaluateSsqRecommendations(): Promise<number> {
+  const res = await api.post('/tools/lottery/ssq/evaluate')
   return res.data.data
 }

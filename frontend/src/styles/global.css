@@ -486,6 +486,17 @@ p {
   color: #0F8A8F;
 }
 
+/* 双色球：红球红色、蓝球青色，与福彩传统配色一致 */
+.lottery-draw-list .ssq-red-numbers {
+  color: #DC2626;
+  font-weight: 600;
+}
+
+.lottery-draw-list .ssq-blue-number {
+  color: #0F8A8F;
+  font-weight: 700;
+}
+
 .lottery-recommendation::before {
   content: '';
   position: absolute;

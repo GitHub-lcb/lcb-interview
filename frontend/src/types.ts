@@ -314,8 +314,49 @@ export interface LotteryKl8Recommendation {
   createdAt: string
 }
 
-export type StudyQuestionStatus = 'new' | 'learning' | 'mastered' | 'weak'
+export interface SsqDraw {
+  issueNo: string
+  drawDate: string
+  redNumbers: number[]
+  blueNumber: number
+}
 
+export interface SsqSyncStatus {
+  latestIssueNo: string
+  latestDrawDate?: string
+  drawCount: number
+  stale: boolean
+  message: string
+}
+
+export interface SsqSyncResult {
+  success: boolean
+  fetchedCount: number
+  insertedCount: number
+  latestIssueNo: string
+  evaluatedCount: number
+  message: string
+}
+
+export interface SsqRecommendation {
+  id: number
+  source: string
+  redNumbers: number[]
+  blueNumber: number
+  baseIssueCount: number
+  latestIssueNo: string
+  featureSummary: string
+  analysisJson?: string
+  evaluatedIssueNo?: string
+  evaluatedDrawDate?: string
+  totalHitCount?: number
+  maxHitCount?: number
+  hitSummaryJson?: string
+  disclaimer: string
+  createdAt: string
+}
+
+export type StudyQuestionStatus = 'new' | 'learning' | 'mastered' | 'weak'
 export interface QuestionStudyState {
   status: StudyQuestionStatus
   addedToPlan: boolean
