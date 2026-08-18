@@ -306,6 +306,7 @@ export interface LotteryKl8Recommendation {
   strategyVersion?: string
   evaluatedIssueNo?: string
   evaluatedDrawDate?: string
+  predictedDrawDate?: string
   hitSummaryJson?: string
   totalHitCount?: number
   maxHitCount?: number
@@ -349,6 +350,7 @@ export interface SsqRecommendation {
   analysisJson?: string
   evaluatedIssueNo?: string
   evaluatedDrawDate?: string
+  predictedDrawDate?: string
   totalHitCount?: number
   maxHitCount?: number
   hitSummaryJson?: string
@@ -391,6 +393,7 @@ export interface DltRecommendation {
   analysisJson?: string
   evaluatedIssueNo?: string
   evaluatedDrawDate?: string
+  predictedDrawDate?: string
   totalHitCount?: number
   maxHitCount?: number
   hitSummaryJson?: string

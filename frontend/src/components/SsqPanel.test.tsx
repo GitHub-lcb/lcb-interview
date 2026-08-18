@@ -42,6 +42,7 @@ function recommendation(overrides: Partial<SsqRecommendation> = {}): SsqRecommen
     latestIssueNo: '2026094',
     featureSummary: '测试摘要',
     disclaimer: '测试免责声明',
+    predictedDrawDate: '2026-08-18',
     createdAt: '2026-08-16T10:00:00',
     ...overrides,
   }

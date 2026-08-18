@@ -47,6 +47,28 @@ function formatNumber(number: number): string {
   return String(number).padStart(2, '0')
 }
 
+/**
+ * 根据预测开奖日期与当前日期，准确显示「今晚开 / 明天开 / X月X日开」。
+ */
+function drawLabel(predictedDrawDate?: string): string {
+  if (!predictedDrawDate) {
+    return '开奖日'
+  }
+  const now = new Date()
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  const diffDays = Math.round(
+    (new Date(`${predictedDrawDate}T00:00:00`).getTime() - new Date(`${todayStr}T00:00:00`).getTime()) / 86400000,
+  )
+  if (diffDays <= 0) {
+    return '今晚开'
+  }
+  if (diffDays === 1) {
+    return '明天开'
+  }
+  const date = new Date(`${predictedDrawDate}T00:00:00`)
+  return `${date.getMonth() + 1}月${date.getDate()}日开`
+}
+
 function DltStatusBadge({ recommendation }: { recommendation: DltRecommendation }) {
   const evaluated = Boolean(recommendation.evaluatedIssueNo)
   if (evaluated) {
@@ -62,7 +84,7 @@ function DltStatusBadge({ recommendation }: { recommendation: DltRecommendation 
   return (
     <span className="lottery-status-badge is-pending">
       <i className="lottery-status-dot" />
-      今晚开{issue ? ` · 预测 ${issue}` : ''}
+      {drawLabel(recommendation.predictedDrawDate)}{issue ? ` · 预测 ${issue}` : ''}
     </span>
   )
 }
@@ -317,7 +339,7 @@ export default function DltPanel() {
                       }}>
                         <strong>
                           <i className={`lottery-status-dot ${item.evaluatedIssueNo ? (item.totalHitCount ?? 0) > 0 ? 'is-hit' : 'is-miss' : 'is-pending'}`} />
-                          {item.evaluatedIssueNo ? `已开 · 命中 ${item.totalHitCount ?? 0}` : `今晚开 · 预测 ${nextIssueNo(item.latestIssueNo)}`}
+                          {item.evaluatedIssueNo ? `已开 · 命中 ${item.totalHitCount ?? 0}` : `${drawLabel(item.predictedDrawDate)} · 预测 ${nextIssueNo(item.latestIssueNo)}`}
                         </strong>
                         <small>{item.latestIssueNo} · {formatDateTime(item.createdAt)}</small>
                         <span className="lottery-history-numbers">

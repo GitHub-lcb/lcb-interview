@@ -42,6 +42,7 @@ function recommendation(overrides: Partial<DltRecommendation> = {}): DltRecommen
     latestIssueNo: '26092',
     featureSummary: '测试摘要',
     disclaimer: '测试免责声明',
+    predictedDrawDate: '2026-08-18',
     createdAt: '2026-08-15T10:00:00',
     ...overrides,
   }

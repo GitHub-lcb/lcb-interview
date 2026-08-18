@@ -49,6 +49,7 @@ function recommendation(overrides: Partial<LotteryKl8Recommendation> = {}): Lott
     ],
     featureSummary: '测试摘要',
     disclaimer: '测试免责声明',
+    predictedDrawDate: '2026-08-18',
     createdAt: '2026-08-11T22:45:00',
     ...overrides,
   }
