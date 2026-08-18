@@ -415,6 +415,8 @@ export interface LotterySimulation {
   zeroHitCount: number
   maxHits: number
   secondaryAvg: number
+  hit4Count: number
+  hitDistribution: string
   summary: string
   createdAt: string
 }

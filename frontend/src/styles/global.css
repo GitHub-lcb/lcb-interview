@@ -637,6 +637,54 @@ p {
   color: #FFFFFF;
 }
 
+.simulation-hit-distribution {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #E2E8F0;
+}
+
+.simulation-hit-distribution-title {
+  margin-bottom: 10px;
+  color: #1A1E23;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.simulation-hit-distribution-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(86px, 1fr));
+  gap: 8px;
+}
+
+.simulation-hit-distribution-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 10px;
+  border: 1px solid #D3D9DF;
+  border-radius: 8px;
+  background: #F8FAFC;
+}
+
+.simulation-hit-distribution-item strong {
+  color: #1A1E23;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 12px;
+}
+
+.simulation-hit-distribution-item span {
+  color: #586069;
+  font-size: 12px;
+}
+
+.simulation-hit-distribution-item em {
+  color: #0F8A8F;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 800;
+}
+
 .lottery-group-card p {
   margin: 0;
   color: #475569;

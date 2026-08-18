@@ -104,6 +104,8 @@ public class LotterySimulationService {
         simulation.setZeroHitCount(stats.zeroHitCount());
         simulation.setMaxHits(stats.maxHits());
         simulation.setSecondaryAvg(stats.secondaryAvg());
+        simulation.setHit4Count(stats.hit4Count());
+        simulation.setHitDistributionJson(writeDistributionJson(stats.distribution()));
         simulation.setResultJson(writeResultJson(entries));
         simulation.setSummary(buildSummary(type, window, stats));
         simulationMapper.insert(simulation);
@@ -194,12 +196,11 @@ public class LotterySimulationService {
         // 数据降序（最新在前），倒序后升序（最旧在前）便于逐期滚动
         List<SimulationDraw> ordered = new ArrayList<>(draws);
         java.util.Collections.reverse(ordered);
-        List<List<Integer>> history = new ArrayList<>();
-        for (SimulationDraw draw : ordered) {
-            history.add(draw.numbers());
-        }
         // 评估窗口 = 最后 window 期（时间上最新），其之前为前置历史
         int evaluationStart = Math.max(0, ordered.size() - window);
+        // 只能使用模拟窗口之前已经开奖的真实数据，不能把待预测期提前放入历史，避免数据泄漏。
+        List<List<Integer>> history = new ArrayList<>(ordered.subList(0, evaluationStart).stream()
+                .map(SimulationDraw::numbers).toList());
         for (int index = evaluationStart; index < ordered.size(); index += 1) {
             SimulationDraw target = ordered.get(index);
             List<Integer> predicted = predictFrequency(history, 8, 80);
@@ -223,13 +224,11 @@ public class LotterySimulationService {
         List<SimulationEntry> entries = new ArrayList<>();
         List<SimulationDraw> ordered = new ArrayList<>(draws);
         java.util.Collections.reverse(ordered);
-        List<List<Integer>> redHistory = new ArrayList<>();
-        List<List<Integer>> blueHistory = new ArrayList<>();
-        for (SimulationDraw draw : ordered) {
-            redHistory.add(draw.numbers());
-            blueHistory.add(draw.backNumbers());
-        }
         int evaluationStart = Math.max(0, ordered.size() - window);
+        List<List<Integer>> redHistory = new ArrayList<>(ordered.subList(0, evaluationStart).stream()
+                .map(SimulationDraw::numbers).toList());
+        List<List<Integer>> blueHistory = new ArrayList<>(ordered.subList(0, evaluationStart).stream()
+                .map(SimulationDraw::backNumbers).toList());
         for (int index = evaluationStart; index < ordered.size(); index += 1) {
             SimulationDraw target = ordered.get(index);
             List<Integer> reds = predictFrequency(redHistory, 7, 33);
@@ -252,13 +251,11 @@ public class LotterySimulationService {
         List<SimulationEntry> entries = new ArrayList<>();
         List<SimulationDraw> ordered = new ArrayList<>(draws);
         java.util.Collections.reverse(ordered);
-        List<List<Integer>> frontHistory = new ArrayList<>();
-        List<List<Integer>> backHistory = new ArrayList<>();
-        for (SimulationDraw draw : ordered) {
-            frontHistory.add(draw.numbers());
-            backHistory.add(draw.backNumbers());
-        }
         int evaluationStart = Math.max(0, ordered.size() - window);
+        List<List<Integer>> frontHistory = new ArrayList<>(ordered.subList(0, evaluationStart).stream()
+                .map(SimulationDraw::numbers).toList());
+        List<List<Integer>> backHistory = new ArrayList<>(ordered.subList(0, evaluationStart).stream()
+                .map(SimulationDraw::backNumbers).toList());
         for (int index = evaluationStart; index < ordered.size(); index += 1) {
             SimulationDraw target = ordered.get(index);
             List<Integer> fronts = predictFrequency(frontHistory, 5, 35);
@@ -342,23 +339,38 @@ public class LotterySimulationService {
 
     private SimulationStats aggregate(List<SimulationEntry> entries, boolean kl8) {
         if (entries.isEmpty()) {
-            return new SimulationStats(0, BigDecimal.ZERO, BigDecimal.ZERO, 0, 0, BigDecimal.ZERO);
+            return new SimulationStats(0, BigDecimal.ZERO, BigDecimal.ZERO, 0, 0, BigDecimal.ZERO, 0, Map.of());
         }
         long totalPrimary = 0;
         long totalSecondary = 0;
         int zeroHit = 0;
         int maxHits = 0;
         int hitAtLeastOne = 0;
+        int hit4Count = 0;
+        Map<Integer, Integer> distribution = new java.util.TreeMap<>();
         for (SimulationEntry entry : entries) {
             totalPrimary += entry.primaryHits();
             totalSecondary += entry.secondaryHits();
-            if (entry.primaryHits() == 0 && entry.secondaryHits() == 0) {
-                zeroHit += 1;
+            distribution.merge(entry.primaryHits(), 1, Integer::sum);
+            if (kl8) {
+                // 快乐8 口径：单组中 2 个及以上才算有效命中，中 1 个不计奖励
+                if (entry.primaryHits() >= 2) {
+                    hitAtLeastOne += 1;
+                } else {
+                    zeroHit += 1;
+                }
+                if (entry.primaryHits() == 4) {
+                    hit4Count += 1;
+                }
+            } else {
+                if (entry.primaryHits() == 0 && entry.secondaryHits() == 0) {
+                    zeroHit += 1;
+                }
+                if (entry.primaryHits() > 0 || entry.secondaryHits() > 0) {
+                    hitAtLeastOne += 1;
+                }
             }
             maxHits = Math.max(maxHits, entry.primaryHits());
-            if (entry.primaryHits() > 0 || entry.secondaryHits() > 0) {
-                hitAtLeastOne += 1;
-            }
         }
         int count = entries.size();
         BigDecimal avgPrimary = BigDecimal.valueOf(totalPrimary)
@@ -367,7 +379,16 @@ public class LotterySimulationService {
                 .divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP);
         BigDecimal rate = BigDecimal.valueOf(hitAtLeastOne * 100)
                 .divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP);
-        return new SimulationStats((int) totalPrimary, avgPrimary, rate, zeroHit, maxHits, avgSecondary);
+        return new SimulationStats((int) totalPrimary, avgPrimary, rate, zeroHit, maxHits, avgSecondary, hit4Count,
+                distribution);
+    }
+
+    private String writeDistributionJson(Map<Integer, Integer> distribution) {
+        try {
+            return objectMapper.writeValueAsString(distribution);
+        } catch (Exception e) {
+            return "{}";
+        }
     }
 
     private String writeResultJson(List<SimulationEntry> entries) {
@@ -395,6 +416,11 @@ public class LotterySimulationService {
             case "DLT" -> "大乐透 5+3";
             default -> type;
         };
+        if ("KL8".equals(type)) {
+            return "%s 模拟 %d 期：平均命中 %.2f 个，中 2 个及以上占比 %.1f%%，无有效命中 %d 期，单组全中 4 个 %d 期，单期最高 %d 个"
+                    .formatted(label, window, stats.avgHits(), stats.hitRate(), stats.zeroHitCount(),
+                            stats.hit4Count(), stats.maxHits());
+        }
         return "%s 模拟 %d 期：平均命中 %.2f 个，至少命中 1 个占比 %.1f%%，全不中 %d 期，单期最高 %d 个"
                 .formatted(label, window, stats.avgHits(), stats.hitRate(), stats.zeroHitCount(), stats.maxHits());
     }
@@ -414,6 +440,8 @@ public class LotterySimulationService {
                 entity.getZeroHitCount(),
                 entity.getMaxHits(),
                 entity.getSecondaryAvg(),
+                entity.getHit4Count(),
+                entity.getHitDistributionJson(),
                 entity.getSummary(),
                 entity.getCreateTime());
     }
@@ -473,8 +501,11 @@ public class LotterySimulationService {
 
     /**
      * 模拟统计结果。
+     *
+     * @param distribution 主维度命中数分布（0-N 各多少期）
      */
     private record SimulationStats(int totalHits, BigDecimal avgHits, BigDecimal hitRate,
-                                   int zeroHitCount, int maxHits, BigDecimal secondaryAvg) {
+                                   int zeroHitCount, int maxHits, BigDecimal secondaryAvg,
+                                   int hit4Count, Map<Integer, Integer> distribution) {
     }
 }

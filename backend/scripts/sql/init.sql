@@ -206,6 +206,8 @@ CREATE TABLE IF NOT EXISTS lottery_simulation (
     zero_hit_count     INT          DEFAULT 0 COMMENT '全不中期数',
     max_hits           INT          DEFAULT 0 COMMENT '单期最高命中',
     secondary_avg      DECIMAL(6,2) DEFAULT 0 COMMENT '次维度平均命中（KL8 两组总命中/SSQ 蓝球/DLT 后区）',
+    hit4_count         INT          DEFAULT 0 COMMENT 'KL8 单组全中 4 个的期数',
+    hit_distribution_json VARCHAR(500) DEFAULT '' COMMENT '主维度命中数分布 JSON，如 {"0":5,"1":20,"2":40}',
     result_json        MEDIUMTEXT COMMENT '逐期模拟明细 JSON',
     summary            VARCHAR(500) DEFAULT '' COMMENT '统计摘要',
     create_time        DATETIME     NOT NULL COMMENT '创建时间',

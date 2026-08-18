@@ -75,6 +75,14 @@ public class LotterySimulation {
     @TableField("secondary_avg")
     private BigDecimal secondaryAvg;
 
+    /** KL8 单组全中 4 个的期数 */
+    @TableField("hit4_count")
+    private Integer hit4Count;
+
+    /** 主维度命中数分布 JSON，如 {"0":5,"1":20,"2":40} */
+    @TableField("hit_distribution_json")
+    private String hitDistributionJson;
+
     /** 逐期模拟明细 JSON */
     @TableField("result_json")
     private String resultJson;

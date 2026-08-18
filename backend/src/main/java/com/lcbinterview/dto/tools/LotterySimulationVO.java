@@ -21,6 +21,8 @@ import java.time.LocalDateTime;
  * @param zeroHitCount  全不中期数
  * @param maxHits       单期最高命中
  * @param secondaryAvg  次维度平均命中
+ * @param hit4Count     KL8 单组全中 4 个的期数
+ * @param hitDistribution 主维度命中数分布 JSON（{"0":5,"1":20,"2":40}）
  * @param summary       统计摘要
  * @param createdAt     创建时间
  */
@@ -39,6 +41,8 @@ public record LotterySimulationVO(
         Integer zeroHitCount,
         Integer maxHits,
         BigDecimal secondaryAvg,
+        Integer hit4Count,
+        String hitDistribution,
         String summary,
         LocalDateTime createdAt
 ) {

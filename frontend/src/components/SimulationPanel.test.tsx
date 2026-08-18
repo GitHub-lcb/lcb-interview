@@ -52,6 +52,8 @@ function simulation(overrides: Partial<LotterySimulation> = {}): LotterySimulati
     zeroHitCount: 20,
     maxHits: 4,
     secondaryAvg: 0.08,
+    hit4Count: 10,
+    hitDistribution: '{"0":20,"1":60,"2":80,"3":30,"4":10}',
     summary: '双色球 7+1 模拟 200 期：平均命中 1.37 个，至少命中 1 个占比 80.0%',
     createdAt: '2026-08-18T10:00:00',
     ...overrides,
@@ -80,6 +82,9 @@ describe('SimulationPanel', () => {
       expect(runLotterySimulation).toHaveBeenCalledWith('SSQ', 200)
     })
     expect(await screen.findByText('双色球 7+1 模拟 200 期：平均命中 1.37 个，至少命中 1 个占比 80.0%')).toBeInTheDocument()
+    expect(screen.getByText('中4个')).toBeInTheDocument()
+    expect(screen.getByText('10期')).toBeInTheDocument()
+    expect(screen.getByText('5.0%')).toBeInTheDocument()
     expect(emitFeedbackSuccess).toHaveBeenCalled()
   })
 

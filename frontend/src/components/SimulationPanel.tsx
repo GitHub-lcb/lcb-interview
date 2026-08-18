@@ -31,6 +31,25 @@ function formatDateTime(value?: string): string {
   return `${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
+function parseHitDistribution(value: string | undefined, evaluatedCount: number) {
+  if (!value) {
+    return []
+  }
+  try {
+    const parsed = JSON.parse(value) as Record<string, number>
+    const total = evaluatedCount || Object.values(parsed).reduce((sum, count) => sum + count, 0)
+    return Object.entries(parsed)
+      .map(([hits, count]) => ({
+        hits: Number(hits),
+        count,
+        rate: total > 0 ? (count * 100) / total : 0,
+      }))
+      .sort((left, right) => left.hits - right.hits)
+  } catch {
+    return []
+  }
+}
+
 const TYPE_LABELS: Record<string, string> = {
   KL8: '快乐8 选4×2组',
   SSQ: '双色球 7+1',
@@ -62,6 +81,11 @@ export default function SimulationPanel() {
   }, [])
 
   const latest = useMemo(() => current ?? history[0] ?? null, [current, history])
+  const hitDistribution = useMemo(
+    () => parseHitDistribution(latest?.hitDistribution, latest?.evaluatedCount ?? 0),
+    [latest],
+  )
+  const hitRateLabel = latest?.lotteryType === 'KL8' ? '中2个及以上' : '至少命中1个'
 
   const handleRun = async () => {
     setRunning(true)
@@ -129,7 +153,7 @@ export default function SimulationPanel() {
               <Statistic title="平均命中" value={latest.avgHits} precision={2} />
             </Col>
             <Col xs={12} md={6}>
-              <Statistic title="至少命中 1 个" value={latest.hitRate} suffix="%" />
+              <Statistic title={`${hitRateLabel}比例`} value={latest.hitRate} suffix="%" />
             </Col>
             <Col xs={12} md={6}>
               <Statistic title="单期最高命中" value={latest.maxHits} />
@@ -144,10 +168,27 @@ export default function SimulationPanel() {
                 precision={2}
               />
             </Col>
+            {latest.lotteryType === 'KL8' && (
+              <Col xs={12} md={6}>
+                <Statistic title="中4个期数" value={latest.hit4Count} suffix="期" />
+              </Col>
+            )}
           </Row>
           <div style={{ marginTop: 12 }}>
             <Progress percent={Math.min(100, latest.hitRate)} format={() => `${latest.hitRate}%`} strokeColor="#0F8A8F" />
-            <span style={{ color: '#586069', fontSize: 12 }}>至少命中 1 个的比例</span>
+            <span style={{ color: '#586069', fontSize: 12 }}>{hitRateLabel}比例</span>
+          </div>
+          <div className="simulation-hit-distribution" aria-label="命中数分布">
+            <div className="simulation-hit-distribution-title">命中数分布</div>
+            <div className="simulation-hit-distribution-grid">
+              {hitDistribution.map(item => (
+                <div className="simulation-hit-distribution-item" key={item.hits}>
+                  <strong>中{item.hits}个</strong>
+                  <span>{item.count}期</span>
+                  <em>{item.rate.toFixed(1)}%</em>
+                </div>
+              ))}
+            </div>
           </div>
           <Alert type="success" showIcon style={{ marginTop: 12 }} message={latest.summary} />
         </Card>

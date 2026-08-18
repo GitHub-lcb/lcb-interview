@@ -113,4 +113,43 @@ class LotterySimulationServiceTest {
         assertEquals(1000, vo.windowSize());
         assertEquals(1000, vo.evaluatedCount());
     }
+
+    @Test
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    void kl8SimulationCountsFullFourAndRewardThreshold() {
+        SsqDrawMapper ssqMapper = mock(SsqDrawMapper.class);
+        DltDrawMapper dltMapper = mock(DltDrawMapper.class);
+        LotterySimulationMapper simulationMapper = mock(LotterySimulationMapper.class);
+        LotteryKl8DrawMapper kl8Mapper = mock(LotteryKl8DrawMapper.class);
+
+        // 构造 KL8 历史：前 100 期固定号码 1-20，使预测稳定命中
+        List<LotteryKl8Draw> draws = new ArrayList<>();
+        for (int index = 0; index < 150; index += 1) {
+            LotteryKl8Draw draw = new LotteryKl8Draw();
+            draw.setIssueNo(String.format("%07d", 2026001 + index));
+            draw.setDrawDate(LocalDate.now());
+            draw.setNumbers("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20");
+            draws.add(draw);
+        }
+        java.util.Collections.reverse(draws);
+        when(kl8Mapper.selectList(any(Wrapper.class))).thenReturn(draws);
+
+        LotterySimulationService service = new LotterySimulationService(
+                kl8Mapper, ssqMapper, dltMapper, simulationMapper, new com.fasterxml.jackson.databind.ObjectMapper());
+
+        LotterySimulationVO vo = service.run(7L, "KL8", 100);
+
+        assertEquals("KL8", vo.lotteryType());
+        assertEquals(100, vo.evaluatedCount());
+        // 固定开奖 1-20，预测 8 个高频号应全部命中两组各 4 个：中4 期数 > 0
+        assertTrue(vo.hit4Count() > 0, "固定历史下应存在单组全中 4 个的期数，实际 " + vo.hit4Count());
+        // 中 2 个及以上占比应为 100%（每组都中 4 个）
+        assertEquals(100.00, vo.hitRate().doubleValue(), 0.001);
+        assertEquals(0, vo.zeroHitCount());
+        assertTrue(vo.summary().contains("中 2 个及以上"));
+        assertTrue(vo.summary().contains("单组全中 4 个"));
+        // 命中分布：固定历史下 4 个命中期数 = 全部 100 期
+        String distribution = vo.hitDistribution();
+        assertTrue(distribution.contains("\"4\""), "分布应包含中4期数，实际 " + distribution);
+    }
 }
