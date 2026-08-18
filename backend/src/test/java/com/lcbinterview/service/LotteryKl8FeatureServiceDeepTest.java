@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,6 +32,8 @@ class LotteryKl8FeatureServiceDeepTest {
         LotteryKl8FeatureService service = new LotteryKl8FeatureService(mapper);
 
         LotteryKl8FeatureReport report = service.buildReport(60);
+        LotteryKl8FeatureReport historyReport = service.buildReportFromDraws(
+                sampleDraws(), LotteryKl8StrategyCalibration.neutral(), 4, Map.of());
 
         assertEquals(80, report.numberProfiles().size());
         assertTrue(report.candidatePool().size() >= 20);
@@ -71,6 +74,8 @@ class LotteryKl8FeatureServiceDeepTest {
         assertTrue(coverage >= 6, "2 组推荐应尽量覆盖不同号码，实际覆盖 " + coverage);
         assertTrue(report.optimizedPortfolio().summary().contains("组合"));
         assertTrue(report.optimizedPortfolio().diagnostics().containsKey("coverageNumberCount"));
+        assertEquals(report.optimizedPortfolio().groups().stream().map(LotteryKl8OptimizedGroup::numbers).toList(),
+                historyReport.optimizedPortfolio().groups().stream().map(LotteryKl8OptimizedGroup::numbers).toList());
         assertNotNull(report.deepSummary());
         assertTrue(report.deepSummary().contains("候选池"));
     }

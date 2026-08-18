@@ -52,11 +52,13 @@ class SsqFeatureServiceTest {
     @Test
     void generatesSevenRedsAndOneBlue() {
         SsqDrawMapper mapper = mock(SsqDrawMapper.class);
-        when(mapper.selectOne(any(Wrapper.class))).thenReturn(history(90).getLast());
-        when(mapper.selectRecentUpTo(anyString(), anyInt())).thenReturn(history(90));
+        List<SsqDraw> draws = history(90);
+        when(mapper.selectOne(any(Wrapper.class))).thenReturn(draws.getFirst());
+        when(mapper.selectRecentUpTo(anyString(), anyInt())).thenReturn(draws);
 
         SsqFeatureService service = new SsqFeatureService(mapper);
         SsqFeatureService.SsqPicks picks = service.generatePicks(80);
+        SsqFeatureService.SsqPicks historyPicks = service.generatePicksFromDraws(draws, 80);
 
         assertEquals(7, picks.redPicks().size());
         assertTrue(picks.redPicks().stream().allMatch(number -> number >= 1 && number <= 33));
@@ -68,6 +70,8 @@ class SsqFeatureServiceTest {
         assertTrue(picks.redPicks().contains(3));
         // 回测摘要应生成
         assertTrue(picks.report().backtest().evaluatedIssueCount() > 0);
+        assertEquals(picks.redPicks(), historyPicks.redPicks());
+        assertEquals(picks.bluePick(), historyPicks.bluePick());
     }
 
     @Test

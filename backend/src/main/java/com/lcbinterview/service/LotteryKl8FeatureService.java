@@ -142,6 +142,14 @@ public class LotteryKl8FeatureService {
         if (draws.size() < 20) {
             throw new BusinessException(400, "历史开奖数据不足 20 期，请先同步开奖数据");
         }
+        return buildReportInternal(draws, calibrationToUse, pickSize, feedbackToUse);
+    }
+
+    private LotteryKl8FeatureReport buildReportInternal(
+            List<LotteryKl8Draw> draws,
+            LotteryKl8StrategyCalibration calibrationToUse,
+            int pickSize,
+            Map<Integer, Double> feedbackToUse) {
         Map<Integer, Integer> frequency = initNumberMap(0);
         Map<Integer, Integer> missing = initNumberMap(draws.size());
         List<Set<Integer>> drawSets = new ArrayList<>();
@@ -230,6 +238,34 @@ public class LotteryKl8FeatureService {
                 buildSummary(draws.size(), latestIssueNo, hot, cold, ranges, odd, even),
                 buildDeepSummary(draws.size(), latestIssueNo, candidatePool, pairHighlights, analysisSections,
                         backtestSummary, optimizedPortfolio));
+    }
+
+    /**
+     * 使用指定历史开奖构建与每日推荐完全相同的快乐8特征报告。
+     * 历史必须按开奖日期、期号倒序排列（最新一期在前）；模拟战场传入当前期之前的历史，
+     * 因此不会读取未来开奖。
+     *
+     * @param sourceDraws       历史开奖（最新在前）
+     * @param calibration       用户策略校准
+     * @param pickSize          每组号码数量
+     * @param numberHitFeedback 用户单号命中反馈
+     * @return 特征报告
+     */
+    public LotteryKl8FeatureReport buildReportFromDraws(
+            List<LotteryKl8Draw> sourceDraws,
+            LotteryKl8StrategyCalibration calibration,
+            int pickSize,
+            Map<Integer, Double> numberHitFeedback) {
+        LotteryKl8StrategyCalibration calibrationToUse = calibration == null
+                ? LotteryKl8StrategyCalibration.neutral()
+                : calibration;
+        Map<Integer, Double> feedbackToUse = numberHitFeedback == null ? Map.of() : numberHitFeedback;
+        List<LotteryKl8Draw> draws = sourceDraws == null ? List.of()
+                : sourceDraws.stream().limit(MAX_BASE_ISSUE_COUNT).toList();
+        if (draws.size() < 20) {
+            throw new BusinessException(400, "历史开奖数据不足 20 期，请先同步开奖数据");
+        }
+        return buildReportInternal(draws, calibrationToUse, pickSize, feedbackToUse);
     }
 
     /**

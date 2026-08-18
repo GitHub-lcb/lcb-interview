@@ -51,11 +51,13 @@ class DltFeatureServiceTest {
     @Test
     void generatesFiveFrontsAndThreeBacks() {
         DltDrawMapper mapper = mock(DltDrawMapper.class);
-        when(mapper.selectOne(any(Wrapper.class))).thenReturn(history(90).getFirst());
-        when(mapper.selectRecentUpTo(anyString(), anyInt())).thenReturn(history(90));
+        List<DltDraw> draws = history(90);
+        when(mapper.selectOne(any(Wrapper.class))).thenReturn(draws.getFirst());
+        when(mapper.selectRecentUpTo(anyString(), anyInt())).thenReturn(draws);
 
         DltFeatureService service = new DltFeatureService(mapper);
         DltFeatureService.DltPicks picks = service.generatePicks(80);
+        DltFeatureService.DltPicks historyPicks = service.generatePicksFromDraws(draws, 80);
 
         assertEquals(5, picks.frontPicks().size());
         assertTrue(picks.frontPicks().stream().allMatch(number -> number >= 1 && number <= 35));
@@ -68,6 +70,8 @@ class DltFeatureServiceTest {
         assertTrue(picks.frontPicks().contains(2));
         assertTrue(picks.frontPicks().contains(3));
         assertTrue(picks.report().backtest().evaluatedIssueCount() > 0);
+        assertEquals(picks.frontPicks(), historyPicks.frontPicks());
+        assertEquals(picks.backPicks(), historyPicks.backPicks());
     }
 
     @Test

@@ -16,15 +16,39 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class LotterySimulationServiceTest {
+
+    private LotterySimulationService service(
+            LotteryKl8DrawMapper kl8Mapper,
+            SsqDrawMapper ssqMapper,
+            DltDrawMapper dltMapper,
+            LotterySimulationMapper simulationMapper) {
+        LotteryKl8StrategyCalibrationService calibrationService = mock(LotteryKl8StrategyCalibrationService.class);
+        when(calibrationService.currentCalibration(anyLong())).thenReturn(LotteryKl8StrategyCalibration.neutral());
+        when(calibrationService.numberHitFeedback(anyLong())).thenReturn(Map.of());
+        com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        return new LotterySimulationService(
+                kl8Mapper,
+                ssqMapper,
+                dltMapper,
+                simulationMapper,
+                objectMapper,
+                new LotteryKl8FeatureService(kl8Mapper),
+                new LotteryKl8RecommendationPolicy(objectMapper),
+                calibrationService,
+                new SsqFeatureService(ssqMapper),
+                new DltFeatureService(dltMapper));
+    }
 
     private SsqDraw ssqDraw(int index, String reds, String blue) {
         SsqDraw draw = new SsqDraw();
@@ -63,8 +87,7 @@ class LotterySimulationServiceTest {
         when(kl8Mapper.selectList(any(Wrapper.class))).thenReturn(List.of());
         when(dltMapper.selectList(any(Wrapper.class))).thenReturn(List.of());
 
-        LotterySimulationService service = new LotterySimulationService(
-                kl8Mapper, ssqMapper, dltMapper, simulationMapper, new com.fasterxml.jackson.databind.ObjectMapper());
+        LotterySimulationService service = service(kl8Mapper, ssqMapper, dltMapper, simulationMapper);
 
         // 请求 100 期：最近 100 期评估 + 50 期前置历史
         LotterySimulationVO vo = service.run(7L, "SSQ", 100);
@@ -86,8 +109,7 @@ class LotterySimulationServiceTest {
         DltDrawMapper dltMapper = mock(DltDrawMapper.class);
         LotterySimulationMapper simulationMapper = mock(LotterySimulationMapper.class);
 
-        LotterySimulationService service = new LotterySimulationService(
-                kl8Mapper, ssqMapper, dltMapper, simulationMapper, new com.fasterxml.jackson.databind.ObjectMapper());
+        LotterySimulationService service = service(kl8Mapper, ssqMapper, dltMapper, simulationMapper);
 
         try {
             service.run(7L, "UNKNOWN", 100);
@@ -106,8 +128,7 @@ class LotterySimulationServiceTest {
         LotterySimulationMapper simulationMapper = mock(LotterySimulationMapper.class);
 
         when(ssqMapper.selectList(any(Wrapper.class))).thenReturn(ssqHistory(1050));
-        LotterySimulationService service = new LotterySimulationService(
-                kl8Mapper, ssqMapper, dltMapper, simulationMapper, new com.fasterxml.jackson.databind.ObjectMapper());
+        LotterySimulationService service = service(kl8Mapper, ssqMapper, dltMapper, simulationMapper);
 
         LotterySimulationVO vo = service.run(7L, "SSQ", 9999);
         assertEquals(1000, vo.windowSize());
@@ -122,8 +143,7 @@ class LotterySimulationServiceTest {
         LotterySimulationMapper simulationMapper = mock(LotterySimulationMapper.class);
 
         when(ssqMapper.selectList(any(Wrapper.class))).thenReturn(ssqHistory(60));
-        LotterySimulationService service = new LotterySimulationService(
-                kl8Mapper, ssqMapper, dltMapper, simulationMapper, new com.fasterxml.jackson.databind.ObjectMapper());
+        LotterySimulationService service = service(kl8Mapper, ssqMapper, dltMapper, simulationMapper);
 
         LotterySimulationVO vo = service.run(7L, "SSQ", 1);
         assertEquals(10, vo.windowSize());
@@ -150,8 +170,7 @@ class LotterySimulationServiceTest {
         java.util.Collections.reverse(draws);
         when(kl8Mapper.selectList(any(Wrapper.class))).thenReturn(draws);
 
-        LotterySimulationService service = new LotterySimulationService(
-                kl8Mapper, ssqMapper, dltMapper, simulationMapper, new com.fasterxml.jackson.databind.ObjectMapper());
+        LotterySimulationService service = service(kl8Mapper, ssqMapper, dltMapper, simulationMapper);
 
         LotterySimulationVO vo = service.run(7L, "KL8", 100);
 

@@ -60,6 +60,24 @@ public class SsqFeatureService {
         if (draws.size() < 20) {
             throw new IllegalStateException("双色球历史开奖不足 20 期，请先同步");
         }
+        return buildReportFromDraws(draws, window);
+    }
+
+    /**
+     * 使用指定历史开奖生成与每日推荐完全相同的特征报告。
+     * 历史必须按期号倒序排列（最新一期在前），模拟战场据此避免读取未来数据。
+     *
+     * @param sourceDraws 历史开奖（最新在前）
+     * @param baseIssueCount 使用历史期数
+     * @return 特征报告
+     */
+    public SsqFeatureReport buildReportFromDraws(List<SsqDraw> sourceDraws, int baseIssueCount) {
+        int window = Math.max(30, Math.min(500, baseIssueCount));
+        List<SsqDraw> draws = sourceDraws == null ? List.of()
+                : sourceDraws.stream().limit(window).toList();
+        if (draws.size() < 20) {
+            throw new IllegalStateException("双色球历史开奖不足 20 期，请先同步");
+        }
         List<List<Integer>> redHistory = new ArrayList<>();
         List<Integer> blueHistory = new ArrayList<>();
         for (SsqDraw draw : draws) {
@@ -106,6 +124,7 @@ public class SsqFeatureService {
                 + "蓝球按历史频次最高且遗漏较大者选择，回测 " + backtest.evaluatedIssueCount()
                 + " 期平均红球命中 " + String.format("%.2f", backtest.averageRedHit()) + " 个。";
 
+        SsqDraw latest = draws.getFirst();
         return new SsqFeatureReport(window, latest.getIssueNo(), latest.getDrawDate(),
                 redProfiles, redPicks, bluePick, backtest, deepSummary);
     }
@@ -118,6 +137,18 @@ public class SsqFeatureService {
      */
     public SsqPicks generatePicks(int baseIssueCount) {
         SsqFeatureReport report = buildReport(baseIssueCount);
+        return new SsqPicks(report.redPicks(), report.bluePick(), report);
+    }
+
+    /**
+     * 使用指定历史开奖生成与每日推荐完全相同的 7 红 + 1 蓝号码。
+     *
+     * @param draws 历史开奖（最新在前）
+     * @param baseIssueCount 使用历史期数
+     * @return 推荐号码与特征报告
+     */
+    public SsqPicks generatePicksFromDraws(List<SsqDraw> draws, int baseIssueCount) {
+        SsqFeatureReport report = buildReportFromDraws(draws, baseIssueCount);
         return new SsqPicks(report.redPicks(), report.bluePick(), report);
     }
 

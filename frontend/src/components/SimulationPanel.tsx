@@ -131,7 +131,7 @@ export default function SimulationPanel() {
             />
           </div>
           <div>
-            <div style={{ marginBottom: 6, color: '#586069', fontSize: 12 }}>模拟最近期数（10-1000；每一步严格只用此前最近 50 期）</div>
+            <div style={{ marginBottom: 6, color: '#586069', fontSize: 12 }}>模拟最近期数（10-1000；每一步使用与每日推荐相同的最近 100 期）</div>
             <Space wrap size={8}>
               <Space.Compact>
                 <InputNumber
@@ -213,7 +213,7 @@ export default function SimulationPanel() {
             showIcon
             style={{ marginTop: 12 }}
             message="不同窗口请比较概率，不要只看中4的绝对期数"
-            description="100期只代表最近一段历史，500期覆盖更长周期，低表现阶段会稀释概率。修正后的模拟每一步固定只用此前最近50期，所以500期包含最近100期时，同一重叠区间的预测结果一致。"
+            description="100期只代表最近一段历史，500期覆盖更长周期，低表现阶段会稀释概率。模拟与每日推荐共用同一个预测内核，每一步都只传入此前最近100期，因此不会读取未来开奖。"
           />
           <Alert type="success" showIcon style={{ marginTop: 12 }} message={latest.summary} />
         </Card>

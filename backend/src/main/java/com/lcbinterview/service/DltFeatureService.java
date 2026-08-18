@@ -59,6 +59,24 @@ public class DltFeatureService {
         if (draws.size() < 20) {
             throw new IllegalStateException("大乐透历史开奖不足 20 期，请先同步");
         }
+        return buildReportFromDraws(draws, window);
+    }
+
+    /**
+     * 使用指定历史开奖生成与每日推荐完全相同的特征报告。
+     * 历史必须按期号倒序排列（最新一期在前）。
+     *
+     * @param sourceDraws 历史开奖（最新在前）
+     * @param baseIssueCount 使用历史期数
+     * @return 特征报告
+     */
+    public DltFeatureReport buildReportFromDraws(List<DltDraw> sourceDraws, int baseIssueCount) {
+        int window = Math.max(30, Math.min(500, baseIssueCount));
+        List<DltDraw> draws = sourceDraws == null ? List.of()
+                : sourceDraws.stream().limit(window).toList();
+        if (draws.size() < 20) {
+            throw new IllegalStateException("大乐透历史开奖不足 20 期，请先同步");
+        }
         List<List<Integer>> frontHistory = new ArrayList<>();
         List<List<Integer>> backHistory = new ArrayList<>();
         for (DltDraw draw : draws) {
@@ -102,6 +120,7 @@ public class DltFeatureService {
                 + "后区频次 60% + 遗漏回补 40%，回测 " + backtest.evaluatedIssueCount()
                 + " 期平均前区命中 " + String.format("%.2f", backtest.averageFrontHit()) + " 个。";
 
+        DltDraw latest = draws.getFirst();
         return new DltFeatureReport(window, latest.getIssueNo(), latest.getDrawDate(),
                 frontPicks, backPicks, backtest, deepSummary);
     }
@@ -114,6 +133,18 @@ public class DltFeatureService {
      */
     public DltPicks generatePicks(int baseIssueCount) {
         DltFeatureReport report = buildReport(baseIssueCount);
+        return new DltPicks(report.frontPicks(), report.backPicks(), report);
+    }
+
+    /**
+     * 使用指定历史开奖生成与每日推荐完全相同的 5 前区 + 3 后区号码。
+     *
+     * @param draws 历史开奖（最新在前）
+     * @param baseIssueCount 使用历史期数
+     * @return 推荐号码与特征报告
+     */
+    public DltPicks generatePicksFromDraws(List<DltDraw> draws, int baseIssueCount) {
+        DltFeatureReport report = buildReportFromDraws(draws, baseIssueCount);
         return new DltPicks(report.frontPicks(), report.backPicks(), report);
     }
 

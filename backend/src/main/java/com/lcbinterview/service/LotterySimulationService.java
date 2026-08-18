@@ -7,12 +7,14 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lcbinterview.common.BusinessException;
 import com.lcbinterview.dto.PageResult;
+import com.lcbinterview.dto.tools.LotteryKl8RecommendationGroupVO;
 import com.lcbinterview.dto.tools.LotterySimulationVO;
 import com.lcbinterview.mapper.DltDrawMapper;
 import com.lcbinterview.mapper.LotterySimulationMapper;
 import com.lcbinterview.mapper.SsqDrawMapper;
 import com.lcbinterview.mapper.LotteryKl8DrawMapper;
 import com.lcbinterview.model.DltDraw;
+import com.lcbinterview.model.LotteryKl8Draw;
 import com.lcbinterview.model.LotterySimulation;
 import com.lcbinterview.model.SsqDraw;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +32,7 @@ import java.util.Set;
 
 /**
  * 彩票模拟战场服务：选择最近 N 期（10-1000），假设全部未开，
- * 逐期用「该期之前的历史」预测下一期并结算，最终统计命中表现。
+ * 逐期调用与每日推荐相同的 FeatureService/Policy 预测并结算，最终统计命中表现。
  * <p>
  * 三种玩法独立预测口径：
  * - KL8：选4 × 2 组，统计单组最高命中与两组总命中
@@ -46,8 +46,9 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class LotterySimulationService {
 
-    /** 每期预测使用的前置历史期数（窗口外真实历史，保证特征数据充足） */
-    private static final int LEAD_HISTORY = 50;
+    /** 每日自动推荐默认使用最近 100 期，模拟必须保持同一输入窗口。 */
+    private static final int LEAD_HISTORY = 100;
+    private static final int KL8_PICK_SIZE = 4;
     private static final int MIN_WINDOW = 10;
     private static final int MAX_WINDOW = 1000;
 
@@ -56,6 +57,11 @@ public class LotterySimulationService {
     private final DltDrawMapper dltDrawMapper;
     private final LotterySimulationMapper simulationMapper;
     private final ObjectMapper objectMapper;
+    private final LotteryKl8FeatureService kl8FeatureService;
+    private final LotteryKl8RecommendationPolicy kl8RecommendationPolicy;
+    private final LotteryKl8StrategyCalibrationService kl8CalibrationService;
+    private final SsqFeatureService ssqFeatureService;
+    private final DltFeatureService dltFeatureService;
 
     /**
      * 执行一次模拟并保存结果。
@@ -73,17 +79,17 @@ public class LotterySimulationService {
         List<SimulationEntry> entries;
         switch (type) {
             case "KL8" -> {
-                List<SimulationDraw> draws = loadKl8Draws(window);
-                entries = simulateKl8(draws, window);
+                List<LotteryKl8Draw> draws = loadKl8Draws(window);
+                entries = simulateKl8(userId, draws, window);
                 stats = aggregate(entries, true);
             }
             case "SSQ" -> {
-                List<SimulationDraw> draws = loadSsqDraws(window);
+                List<SsqDraw> draws = loadSsqDraws(window);
                 entries = simulateSsq(draws, window);
                 stats = aggregate(entries, false);
             }
             case "DLT" -> {
-                List<SimulationDraw> draws = loadDltDraws(window);
+                List<DltDraw> draws = loadDltDraws(window);
                 entries = simulateDlt(draws, window);
                 stats = aggregate(entries, false);
             }
@@ -151,196 +157,120 @@ public class LotterySimulationService {
 
     // ============ 数据加载 ============
 
-    private List<SimulationDraw> loadKl8Draws(int window) {
-        List<com.lcbinterview.model.LotteryKl8Draw> draws = kl8DrawMapper.selectList(
-                Wrappers.<com.lcbinterview.model.LotteryKl8Draw>lambdaQuery()
-                        .orderByDesc(com.lcbinterview.model.LotteryKl8Draw::getIssueNo)
+    private List<LotteryKl8Draw> loadKl8Draws(int window) {
+        return kl8DrawMapper.selectList(
+                Wrappers.<LotteryKl8Draw>lambdaQuery()
+                        .orderByDesc(LotteryKl8Draw::getIssueNo)
                         .last("LIMIT " + (window + LEAD_HISTORY)));
-        return draws.stream()
-                .map(draw -> new SimulationDraw(draw.getIssueNo(), draw.getDrawDate(),
-                        parseNumbers(draw.getNumbers()), List.of(), draw.getNumbers()))
-                .toList();
     }
 
-    private List<SimulationDraw> loadSsqDraws(int window) {
-        List<SsqDraw> draws = ssqDrawMapper.selectList(
+    private List<SsqDraw> loadSsqDraws(int window) {
+        return ssqDrawMapper.selectList(
                 Wrappers.<SsqDraw>lambdaQuery()
                         .orderByDesc(SsqDraw::getIssueNo)
                         .last("LIMIT " + (window + LEAD_HISTORY)));
-        return draws.stream()
-                .map(draw -> new SimulationDraw(draw.getIssueNo(), draw.getDrawDate(),
-                        parseNumbers(draw.getRedNumbers()), List.of(parseBlue(draw.getBlueNumber())),
-                        draw.getRedNumbers() + "," + draw.getBlueNumber()))
-                .toList();
     }
 
-    private List<SimulationDraw> loadDltDraws(int window) {
-        List<DltDraw> draws = dltDrawMapper.selectList(
+    private List<DltDraw> loadDltDraws(int window) {
+        return dltDrawMapper.selectList(
                 Wrappers.<DltDraw>lambdaQuery()
                         .orderByDesc(DltDraw::getIssueNo)
                         .last("LIMIT " + (window + LEAD_HISTORY)));
-        return draws.stream()
-                .map(draw -> new SimulationDraw(draw.getIssueNo(), draw.getDrawDate(),
-                        parseNumbers(draw.getFrontNumbers()), parseNumbers(draw.getBackNumbers()),
-                        draw.getFrontNumbers() + "," + draw.getBackNumbers()))
-                .toList();
     }
 
     // ============ 模拟算法 ============
 
     /**
-     * 快乐8 模拟：前 50 期为前置历史，逐期用频次+遗漏预测 2 组选4，结算单组最高命中。
+     * 快乐8 模拟：逐期调用 V20 每日正式策略（四策略投票、邻位、覆盖去重、用户校准）。
      */
-    private List<SimulationEntry> simulateKl8(List<SimulationDraw> draws, int window) {
+    private List<SimulationEntry> simulateKl8(Long userId, List<LotteryKl8Draw> draws, int window) {
         List<SimulationEntry> entries = new ArrayList<>();
-        // 数据降序（最新在前），倒序后升序（最旧在前）便于逐期滚动
-        List<SimulationDraw> ordered = new ArrayList<>(draws);
+        List<LotteryKl8Draw> ordered = new ArrayList<>(draws);
         java.util.Collections.reverse(ordered);
-        // 评估窗口 = 最后 window 期（时间上最新），其之前为前置历史
         int evaluationStart = Math.max(0, ordered.size() - window);
-        // 只能使用模拟窗口之前已经开奖的真实数据，不能把待预测期提前放入历史，避免数据泄漏。
-        List<List<Integer>> history = new ArrayList<>(ordered.subList(0, evaluationStart).stream()
-                .map(SimulationDraw::numbers).toList());
+        List<LotteryKl8Draw> history = new ArrayList<>(ordered.subList(0, evaluationStart));
+        LotteryKl8StrategyCalibration calibration = kl8CalibrationService.currentCalibration(userId);
+        Map<Integer, Double> numberHitFeedback = kl8CalibrationService.numberHitFeedback(userId);
         for (int index = evaluationStart; index < ordered.size(); index += 1) {
-            SimulationDraw target = ordered.get(index);
-            List<Integer> predicted = predictFrequency(recentHistory(history), 8, 80);
-            List<Integer> group1 = predicted.subList(0, 4);
-            List<Integer> group2 = predicted.subList(4, 8);
-            Set<Integer> actual = new LinkedHashSet<>(target.numbers());
+            LotteryKl8Draw target = ordered.get(index);
+            LotteryKl8FeatureReport report = kl8FeatureService.buildReportFromDraws(
+                    recentDrawsDescending(history), calibration, KL8_PICK_SIZE, numberHitFeedback);
+            List<LotteryKl8RecommendationGroupVO> groups = kl8RecommendationPolicy
+                    .fallbackResult(report, KL8_PICK_SIZE).groups();
+            List<Integer> group1 = groups.get(0).numbers();
+            List<Integer> group2 = groups.get(1).numbers();
+            Set<Integer> actual = new LinkedHashSet<>(kl8FeatureService.parseNumbers(target.getNumbers()));
             int g1Hit = (int) group1.stream().filter(actual::contains).count();
             int g2Hit = (int) group2.stream().filter(actual::contains).count();
             int primary = Math.max(g1Hit, g2Hit);
-            entries.add(new SimulationEntry(target.issueNo(), target.drawDate(),
+            entries.add(new SimulationEntry(target.getIssueNo(), target.getDrawDate(),
                     group1, group2, List.of(), primary, g1Hit + g2Hit));
-            history.add(target.numbers());
+            history.add(target);
         }
         return entries;
     }
 
     /**
-     * 双色球模拟：7 红 + 1 蓝，逐期用频次+遗漏预测，结算红球命中（主）与蓝球（次）。
+     * 双色球模拟：逐期调用每日正式策略（频次、遗漏、邻位、区间均衡、蓝球频次遗漏）。
      */
-    private List<SimulationEntry> simulateSsq(List<SimulationDraw> draws, int window) {
+    private List<SimulationEntry> simulateSsq(List<SsqDraw> draws, int window) {
         List<SimulationEntry> entries = new ArrayList<>();
-        List<SimulationDraw> ordered = new ArrayList<>(draws);
+        List<SsqDraw> ordered = new ArrayList<>(draws);
         java.util.Collections.reverse(ordered);
         int evaluationStart = Math.max(0, ordered.size() - window);
-        List<List<Integer>> redHistory = new ArrayList<>(ordered.subList(0, evaluationStart).stream()
-                .map(SimulationDraw::numbers).toList());
-        List<List<Integer>> blueHistory = new ArrayList<>(ordered.subList(0, evaluationStart).stream()
-                .map(SimulationDraw::backNumbers).toList());
+        List<SsqDraw> history = new ArrayList<>(ordered.subList(0, evaluationStart));
         for (int index = evaluationStart; index < ordered.size(); index += 1) {
-            SimulationDraw target = ordered.get(index);
-            List<Integer> reds = predictFrequency(recentHistory(redHistory), 7, 33);
-            int blue = predictMostFrequent(recentHistory(blueHistory), 16);
-            Set<Integer> actualReds = new LinkedHashSet<>(target.numbers());
+            SsqDraw target = ordered.get(index);
+            SsqFeatureService.SsqPicks picks = ssqFeatureService.generatePicksFromDraws(
+                    recentDrawsDescending(history), LEAD_HISTORY);
+            List<Integer> reds = picks.redPicks();
+            int blue = picks.bluePick();
+            Set<Integer> actualReds = new LinkedHashSet<>(parseNumbers(target.getRedNumbers()));
             int redHit = (int) reds.stream().filter(actualReds::contains).count();
-            int blueHit = target.backNumbers().contains(blue) ? 1 : 0;
-            entries.add(new SimulationEntry(target.issueNo(), target.drawDate(),
+            int blueHit = parseBlue(target.getBlueNumber()) == blue ? 1 : 0;
+            entries.add(new SimulationEntry(target.getIssueNo(), target.getDrawDate(),
                     reds, List.of(blue), List.of(), redHit, blueHit));
-            redHistory.add(target.numbers());
-            blueHistory.add(target.backNumbers());
+            history.add(target);
         }
         return entries;
     }
 
     /**
-     * 大乐透模拟：5 前区 + 3 后区，逐期用频次+遗漏预测，结算前区命中（主）与后区（次）。
+     * 大乐透模拟：逐期调用每日正式策略（前区频次/遗漏/邻位/均衡，后区频次/遗漏）。
      */
-    private List<SimulationEntry> simulateDlt(List<SimulationDraw> draws, int window) {
+    private List<SimulationEntry> simulateDlt(List<DltDraw> draws, int window) {
         List<SimulationEntry> entries = new ArrayList<>();
-        List<SimulationDraw> ordered = new ArrayList<>(draws);
+        List<DltDraw> ordered = new ArrayList<>(draws);
         java.util.Collections.reverse(ordered);
         int evaluationStart = Math.max(0, ordered.size() - window);
-        List<List<Integer>> frontHistory = new ArrayList<>(ordered.subList(0, evaluationStart).stream()
-                .map(SimulationDraw::numbers).toList());
-        List<List<Integer>> backHistory = new ArrayList<>(ordered.subList(0, evaluationStart).stream()
-                .map(SimulationDraw::backNumbers).toList());
+        List<DltDraw> history = new ArrayList<>(ordered.subList(0, evaluationStart));
         for (int index = evaluationStart; index < ordered.size(); index += 1) {
-            SimulationDraw target = ordered.get(index);
-            List<Integer> fronts = predictFrequency(recentHistory(frontHistory), 5, 35);
-            List<Integer> backs = predictFrequency(recentHistory(backHistory), 3, 12);
-            Set<Integer> actualFronts = new LinkedHashSet<>(target.numbers());
+            DltDraw target = ordered.get(index);
+            DltFeatureService.DltPicks picks = dltFeatureService.generatePicksFromDraws(
+                    recentDrawsDescending(history), LEAD_HISTORY);
+            List<Integer> fronts = picks.frontPicks();
+            List<Integer> backs = picks.backPicks();
+            Set<Integer> actualFronts = new LinkedHashSet<>(parseNumbers(target.getFrontNumbers()));
             int frontHit = (int) fronts.stream().filter(actualFronts::contains).count();
-            int backHit = (int) backs.stream().filter(target.backNumbers()::contains).count();
-            entries.add(new SimulationEntry(target.issueNo(), target.drawDate(),
+            List<Integer> actualBacks = parseNumbers(target.getBackNumbers());
+            int backHit = (int) backs.stream().filter(actualBacks::contains).count();
+            entries.add(new SimulationEntry(target.getIssueNo(), target.getDrawDate(),
                     fronts, backs, List.of(), frontHit, backHit));
-            frontHistory.add(target.numbers());
-            backHistory.add(target.backNumbers());
+            history.add(target);
         }
         return entries;
     }
 
-    // ============ 预测算法（与线上策略同源：频次 + 遗漏回补） ============
+    // ============ 预测算法输入窗口 ============
 
     /**
-     * 每一步预测严格只使用最近 50 期，保证不同模拟窗口在重叠区间使用完全相同的输入历史。
+     * 每一步预测严格只使用每日推荐默认的最近 100 期，并转换为 FeatureService 要求的倒序。
      */
-    private List<List<Integer>> recentHistory(List<List<Integer>> history) {
+    private <T> List<T> recentDrawsDescending(List<T> history) {
         int fromIndex = Math.max(0, history.size() - LEAD_HISTORY);
-        return history.subList(fromIndex, history.size());
-    }
-
-    /**
-     * 频次 + 遗漏回补预测：按频次占比 60% + 遗漏压力 40% 综合分排序，取前 size 个。
-     *
-     * @param history 历史号码序列（升序，最新在后）
-     * @param size    预测数量
-     * @param max     号码范围上限
-     * @return 预测号码（升序）
-     */
-    private List<Integer> predictFrequency(List<List<Integer>> history, int size, int max) {
-        Map<Integer, Integer> freq = new HashMap<>();
-        for (List<Integer> draw : history) {
-            for (int number : draw) {
-                freq.merge(number, 1, Integer::sum);
-            }
-        }
-        int maxFreq = freq.values().stream().mapToInt(Integer::intValue).max().orElse(1);
-        List<int[]> scored = new ArrayList<>(); // [number, score*100]
-        for (int number = 1; number <= max; number += 1) {
-            int f = freq.getOrDefault(number, 0);
-            int omission = currentOmission(history, number);
-            int score = (int) (f * 60.0 / maxFreq + Math.min(omission, 20) * 40.0 / 20);
-            scored.add(new int[]{number, score});
-        }
-        return scored.stream()
-                .sorted(Comparator.comparingInt((int[] item) -> item[1]).reversed()
-                        .thenComparing(item -> -item[0]))
-                .limit(size)
-                .map(item -> item[0])
-                .sorted()
-                .toList();
-    }
-
-    private int predictMostFrequent(List<List<Integer>> history, int max) {
-        Map<Integer, Integer> freq = new HashMap<>();
-        for (List<Integer> draw : history) {
-            for (int number : draw) {
-                freq.merge(number, 1, Integer::sum);
-            }
-        }
-        int best = 1;
-        int bestScore = -1;
-        for (int number = 1; number <= max; number += 1) {
-            int score = freq.getOrDefault(number, 0) * 100 + Math.min(currentOmission(history, number), 20);
-            if (score > bestScore) {
-                bestScore = score;
-                best = number;
-            }
-        }
-        return best;
-    }
-
-    private int currentOmission(List<List<Integer>> history, int number) {
-        int omission = 0;
-        for (int index = history.size() - 1; index >= 0; index -= 1) {
-            if (history.get(index).contains(number)) {
-                break;
-            }
-            omission += 1;
-        }
-        return omission;
+        List<T> recent = new ArrayList<>(history.subList(fromIndex, history.size()));
+        java.util.Collections.reverse(recent);
+        return recent;
     }
 
     // ============ 统计与序列化 ============
@@ -475,19 +405,6 @@ public class LotterySimulationService {
         } catch (NumberFormatException e) {
             return 0;
         }
-    }
-
-    /**
-     * 模拟用开奖数据（统一结构）。
-     *
-     * @param issueNo    期号
-     * @param drawDate   开奖日期
-     * @param numbers    主号码（KL8 20 个/SSQ 红球/DLT 前区）
-     * @param backNumbers 次号码（KL8 空/SSQ 蓝球 1 个/DLT 后区 2 个）
-     * @param rawNumbers 原始号码文本
-     */
-    private record SimulationDraw(String issueNo, java.time.LocalDate drawDate,
-                                  List<Integer> numbers, List<Integer> backNumbers, String rawNumbers) {
     }
 
     /**
