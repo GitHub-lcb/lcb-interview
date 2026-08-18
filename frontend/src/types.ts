@@ -401,6 +401,24 @@ export interface DltRecommendation {
   createdAt: string
 }
 
+export interface LotterySimulation {
+  id: number
+  lotteryType: 'KL8' | 'SSQ' | 'DLT'
+  windowSize: number
+  leadHistory: number
+  startIssueNo: string
+  endIssueNo: string
+  evaluatedCount: number
+  totalHits: number
+  avgHits: number
+  hitRate: number
+  zeroHitCount: number
+  maxHits: number
+  secondaryAvg: number
+  summary: string
+  createdAt: string
+}
+
 export type StudyQuestionStatus = 'new' | 'learning' | 'mastered' | 'weak'
 export interface QuestionStudyState {
   status: StudyQuestionStatus

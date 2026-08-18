@@ -8,6 +8,7 @@ import type {
   LotteryKl8Recommendation,
   LotteryKl8SyncResult,
   LotteryKl8SyncStatus,
+  LotterySimulation,
   MarkdownExport,
   PageResult,
   ReadingExcerpt,
@@ -150,5 +151,17 @@ export async function listDltRecommendations(page = 0, size = 10): Promise<PageR
 
 export async function evaluateDltRecommendations(): Promise<number> {
   const res = await api.post('/tools/lottery/dlt/evaluate')
+  return res.data.data
+}
+
+export async function runLotterySimulation(lotteryType: string, windowSize: number): Promise<LotterySimulation> {
+  const res = await api.post('/tools/lottery/simulation', { lotteryType, windowSize }, {
+    timeout: 300000,
+  })
+  return res.data.data
+}
+
+export async function listLotterySimulations(page = 0, size = 10): Promise<PageResult<LotterySimulation>> {
+  const res = await api.get('/tools/lottery/simulation', { params: { page, size } })
   return res.data.data
 }

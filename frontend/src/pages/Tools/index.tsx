@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Button, Spin, Tabs } from 'antd'
-import { LogoutOutlined, ReadOutlined, ThunderboltOutlined, FireOutlined, GiftOutlined } from '@ant-design/icons'
+import { LogoutOutlined, ReadOutlined, ThunderboltOutlined, FireOutlined, GiftOutlined, ExperimentOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import ReadingExcerptPanel from '../../components/ReadingExcerptPanel'
 import LotteryKl8Panel from '../../components/LotteryKl8Panel'
 import SsqPanel from '../../components/SsqPanel'
 import DltPanel from '../../components/DltPanel'
+import SimulationPanel from '../../components/SimulationPanel'
 import { getCurrentUser } from '../../api/auth'
 import { clearUserToken, readUserToken } from '../../utils/authToken'
 import type { AuthUser } from '../../types'
@@ -90,6 +91,11 @@ export default function Tools() {
             key: 'dlt',
             label: <span><GiftOutlined /> 大乐透</span>,
             children: <DltPanel />,
+          },
+          {
+            key: 'simulation',
+            label: <span><ExperimentOutlined /> 模拟战场</span>,
+            children: <SimulationPanel />,
           },
           {
             key: 'reading',
