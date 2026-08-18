@@ -37,6 +37,7 @@ public record SsqRecommendationVO(
         String analysisJson,
         String evaluatedIssueNo,
         LocalDate evaluatedDrawDate,
+        LocalDate predictedDrawDate,
         Integer totalHitCount,
         Integer maxHitCount,
         String hitSummaryJson,

@@ -33,9 +33,10 @@ public class DltAutoRecommendationScheduler {
     private final DltRecommendationService recommendationService;
 
     /**
-     * 每天 08:00 执行：仅开奖日（周一/三/六）为活跃用户生成推荐。
+     * 每天 21:35 执行（仅开奖日周一/三/六）：21:30 已同步并结算，紧随其后生成当日推荐。
+     * 同一期不重复生成，避免污染样本。
      */
-    @Scheduled(cron = "0 0 8 * * *")
+    @Scheduled(cron = "0 35 21 * * MON,WED,SAT")
     public void autoRecommendDaily() {
         if (!isDrawDay(LocalDate.now())) {
             return;

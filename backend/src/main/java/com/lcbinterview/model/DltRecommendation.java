@@ -45,6 +45,10 @@ public class DltRecommendation {
     @TableField("latest_issue_no")
     private String latestIssueNo;
 
+    /** 预测开奖日期（未结算时前端据此展示今晚/明天开） */
+    @TableField("predicted_draw_date")
+    private LocalDate predictedDrawDate;
+
     /** 历史特征摘要 */
     @TableField("feature_summary")
     private String featureSummary;

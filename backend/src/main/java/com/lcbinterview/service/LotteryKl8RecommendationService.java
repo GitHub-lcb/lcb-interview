@@ -13,6 +13,7 @@ import com.lcbinterview.dto.tools.LotteryKl8RecommendationVO;
 import com.lcbinterview.mapper.LotteryKl8RecommendationMapper;
 import com.lcbinterview.model.LotteryKl8Recommendation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.util.Map;
 /**
  * 快乐8推荐编排服务，串联历史特征、Java 规则推荐、规则校验和历史保存。
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LotteryKl8RecommendationService {
@@ -40,6 +42,7 @@ public class LotteryKl8RecommendationService {
 
 /**
  * 为当前用户生成 2 组快乐8选4推荐，组间覆盖去重。
+ * 同一基准期只保留一条推荐：手动与自动推荐结果一致时不重复生成。
  *
  * @param userId  用户 ID
  * @param request 推荐请求
@@ -50,11 +53,15 @@ public LotteryKl8RecommendationVO recommend(Long userId, LotteryKl8Recommendatio
     int baseIssueCount = request.baseIssueCount() == null ? DEFAULT_BASE_ISSUE_COUNT : request.baseIssueCount();
     int pickSize = DEFAULT_PICK_SIZE;
         evaluationService.evaluatePendingRecommendations();
-        // 用户级校准：优先用当前用户的历史推荐命中数据，不足 10 条自动回退全局
         LotteryKl8StrategyCalibration calibration = calibrationService.currentCalibration(userId);
-        // 单号命中反馈：追踪每个号码在历史推荐中的命中率，微调综合分
         Map<Integer, Double> numberHitFeedback = calibrationService.numberHitFeedback(userId);
         LotteryKl8FeatureReport report = featureService.buildReport(baseIssueCount, calibration, pickSize, numberHitFeedback);
+        // 同一基准期去重：策略是确定性的，同基准期生成结果必然相同，直接复用已有推荐
+        LotteryKl8Recommendation existing = findExisting(userId, report.latestIssueNo());
+        if (existing != null) {
+            log.info("快乐8推荐已存在，复用: userId={}, 基准期 {}", userId, report.latestIssueNo());
+            return LotteryKl8RecommendationVO.from(existing, objectMapper);
+        }
         String source = "RULE_BASED";
         LotteryKl8RecommendationPolicy.ValidatedRecommendation result = recommendationPolicy.fallbackResult(report, pickSize);
         LotteryKl8Recommendation recommendation = new LotteryKl8Recommendation();
@@ -63,6 +70,9 @@ public LotteryKl8RecommendationVO recommend(Long userId, LotteryKl8Recommendatio
         recommendation.setPickSize(pickSize);
         recommendation.setBaseIssueCount(report.baseIssueCount());
         recommendation.setLatestIssueNo(report.latestIssueNo());
+        // 快乐8 每天一期：预测开奖日 = 最新已开奖日 + 1 天
+        recommendation.setPredictedDrawDate(report.draws().isEmpty() ? null
+                : report.draws().getFirst().getDrawDate().plusDays(1));
         recommendation.setRecommendationsJson(writeGroups(result.groups()));
         recommendation.setFeatureSummary(report.deepSummary());
         recommendation.setAnalysisJson(writeAnalysis(result, report));
@@ -72,6 +82,20 @@ public LotteryKl8RecommendationVO recommend(Long userId, LotteryKl8Recommendatio
         recommendation.setDisclaimer(DISCLAIMER);
         recommendationMapper.insert(recommendation);
         return LotteryKl8RecommendationVO.from(recommendation, objectMapper);
+    }
+
+    /**
+     * 查询用户基于指定基准期的已有推荐。
+     *
+     * @param userId       用户 ID
+     * @param latestIssueNo 基准期号
+     * @return 已有推荐，无则 null
+     */
+    private LotteryKl8Recommendation findExisting(Long userId, String latestIssueNo) {
+        return recommendationMapper.selectOne(Wrappers.<LotteryKl8Recommendation>lambdaQuery()
+                .eq(LotteryKl8Recommendation::getUserId, userId)
+                .eq(LotteryKl8Recommendation::getLatestIssueNo, latestIssueNo)
+                .last("LIMIT 1"));
     }
 
     /**

@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS lottery_ssq_recommendation (
     feature_summary      TEXT COMMENT '历史特征摘要',
     analysis_json        MEDIUMTEXT COMMENT '分析 JSON（回测摘要等）',
     evaluated_issue_no   VARCHAR(32)  DEFAULT '' COMMENT '结算开奖期号',
+    predicted_draw_date  DATE         DEFAULT NULL COMMENT '预测开奖日期',
     evaluated_draw_date  DATE         DEFAULT NULL COMMENT '结算开奖日期',
     hit_summary_json     MEDIUMTEXT COMMENT '命中结果 JSON',
     total_hit_count      INT          DEFAULT NULL COMMENT '红球命中数 + 蓝球命中数',

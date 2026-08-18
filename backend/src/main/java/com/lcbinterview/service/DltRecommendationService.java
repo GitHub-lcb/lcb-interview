@@ -36,6 +36,7 @@ public class DltRecommendationService {
 
     /**
      * 为当前用户生成 5 前区 + 3 后区大乐透推荐并保存。
+     * 同一基准期只保留一条推荐：手动与自动推荐结果一致时不重复生成。
      *
      * @param userId          用户 ID
      * @param baseIssueCount  使用历史期数，空则用默认值
@@ -47,6 +48,12 @@ public class DltRecommendationService {
         DltFeatureService.DltPicks picks = featureService.generatePicks(window);
         DltFeatureService.DltFeatureReport report = picks.report();
 
+        DltRecommendation existing = findExisting(userId, report.latestIssueNo());
+        if (existing != null) {
+            log.info("大乐透推荐已存在，复用: userId={}, 基准期 {}", userId, report.latestIssueNo());
+            return toVo(existing);
+        }
+
         DltRecommendation recommendation = new DltRecommendation();
         recommendation.setUserId(userId);
         recommendation.setSource("RULE_BASED");
@@ -54,6 +61,8 @@ public class DltRecommendationService {
         recommendation.setBackNumbers(picks.backPicks().stream().map(String::valueOf).collect(Collectors.joining(",")));
         recommendation.setBaseIssueCount(window);
         recommendation.setLatestIssueNo(report.latestIssueNo());
+        // 大乐透每周一三六开奖：预测开奖日 = 最新已开奖日之后最近的开奖日
+        recommendation.setPredictedDrawDate(nextDrawDate(report.latestDrawDate()));
         recommendation.setFeatureSummary(report.deepSummary());
         recommendation.setAnalysisJson(buildAnalysisJson(report));
         recommendation.setDisclaimer(DISCLAIMER);
@@ -61,6 +70,32 @@ public class DltRecommendationService {
         log.info("大乐透推荐生成: userId={}, 前区={}, 后区={}, 基准期 {}",
                 userId, picks.frontPicks(), picks.backPicks(), report.latestIssueNo());
         return toVo(recommendation);
+    }
+
+    /**
+     * 查询用户基于指定基准期的已有推荐。
+     */
+    private DltRecommendation findExisting(Long userId, String latestIssueNo) {
+        return recommendationMapper.selectOne(Wrappers.<DltRecommendation>lambdaQuery()
+                .eq(DltRecommendation::getUserId, userId)
+                .eq(DltRecommendation::getLatestIssueNo, latestIssueNo)
+                .last("LIMIT 1"));
+    }
+
+    /**
+     * 计算最新已开奖日之后最近的开奖日（周一/三/六）。
+     *
+     * @param latestDrawDate 最新已开奖日期
+     * @return 预测开奖日期
+     */
+    static java.time.LocalDate nextDrawDate(java.time.LocalDate latestDrawDate) {
+        java.time.LocalDate date = latestDrawDate.plusDays(1);
+        while (date.getDayOfWeek() != java.time.DayOfWeek.MONDAY
+                && date.getDayOfWeek() != java.time.DayOfWeek.WEDNESDAY
+                && date.getDayOfWeek() != java.time.DayOfWeek.SATURDAY) {
+            date = date.plusDays(1);
+        }
+        return date;
     }
 
     /**
@@ -115,6 +150,7 @@ public class DltRecommendationService {
                 entity.getAnalysisJson(),
                 entity.getEvaluatedIssueNo(),
                 entity.getEvaluatedDrawDate(),
+                entity.getPredictedDrawDate(),
                 entity.getTotalHitCount(),
                 entity.getMaxHitCount(),
                 entity.getHitSummaryJson(),

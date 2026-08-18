@@ -37,9 +37,10 @@ public class SsqRecommendationService {
 
     /**
      * 为当前用户生成 7 红 + 1 蓝双色球推荐并保存。
+     * 同一基准期只保留一条推荐：手动与自动推荐结果一致时不重复生成。
      *
-     * @param userId  用户 ID
-     * @param baseIssueCount 使用历史期数，空则用默认值
+     * @param userId          用户 ID
+     * @param baseIssueCount  使用历史期数，空则用默认值
      * @return 推荐结果
      */
     @Transactional
@@ -48,6 +49,12 @@ public class SsqRecommendationService {
         SsqFeatureService.SsqPicks picks = featureService.generatePicks(window);
         SsqFeatureService.SsqFeatureReport report = picks.report();
 
+        SsqRecommendation existing = findExisting(userId, report.latestIssueNo());
+        if (existing != null) {
+            log.info("双色球推荐已存在，复用: userId={}, 基准期 {}", userId, report.latestIssueNo());
+            return toVo(existing);
+        }
+
         SsqRecommendation recommendation = new SsqRecommendation();
         recommendation.setUserId(userId);
         recommendation.setSource("RULE_BASED");
@@ -55,6 +62,8 @@ public class SsqRecommendationService {
         recommendation.setBlueNumber(String.valueOf(picks.bluePick()));
         recommendation.setBaseIssueCount(window);
         recommendation.setLatestIssueNo(report.latestIssueNo());
+        // 双色球每周二四日开奖：预测开奖日 = 最新已开奖日之后最近的开奖日
+        recommendation.setPredictedDrawDate(nextDrawDate(report.latestDrawDate()));
         recommendation.setFeatureSummary(report.deepSummary());
         recommendation.setAnalysisJson(buildAnalysisJson(report));
         recommendation.setDisclaimer(DISCLAIMER);
@@ -62,6 +71,32 @@ public class SsqRecommendationService {
         log.info("双色球推荐生成: userId={}, 红球={}, 蓝球={}, 基准期 {}",
                 userId, picks.redPicks(), picks.bluePick(), report.latestIssueNo());
         return toVo(recommendation);
+    }
+
+    /**
+     * 查询用户基于指定基准期的已有推荐。
+     */
+    private SsqRecommendation findExisting(Long userId, String latestIssueNo) {
+        return recommendationMapper.selectOne(Wrappers.<SsqRecommendation>lambdaQuery()
+                .eq(SsqRecommendation::getUserId, userId)
+                .eq(SsqRecommendation::getLatestIssueNo, latestIssueNo)
+                .last("LIMIT 1"));
+    }
+
+    /**
+     * 计算最新已开奖日之后最近的开奖日（周二/四/日）。
+     *
+     * @param latestDrawDate 最新已开奖日期
+     * @return 预测开奖日期
+     */
+    static java.time.LocalDate nextDrawDate(java.time.LocalDate latestDrawDate) {
+        java.time.LocalDate date = latestDrawDate.plusDays(1);
+        while (date.getDayOfWeek() != java.time.DayOfWeek.TUESDAY
+                && date.getDayOfWeek() != java.time.DayOfWeek.THURSDAY
+                && date.getDayOfWeek() != java.time.DayOfWeek.SUNDAY) {
+            date = date.plusDays(1);
+        }
+        return date;
     }
 
     /**
@@ -122,6 +157,7 @@ public class SsqRecommendationService {
                 entity.getAnalysisJson(),
                 entity.getEvaluatedIssueNo(),
                 entity.getEvaluatedDrawDate(),
+                entity.getPredictedDrawDate(),
                 entity.getTotalHitCount(),
                 entity.getMaxHitCount(),
                 entity.getHitSummaryJson(),

@@ -41,6 +41,10 @@ public class LotteryKl8Recommendation {
     @TableField("latest_issue_no")
     private String latestIssueNo;
 
+    /** 预测开奖日期（未结算时前端据此展示今晚/明天开） */
+    @TableField("predicted_draw_date")
+    private LocalDate predictedDrawDate;
+
     /** 推荐号码和理由 JSON */
     @TableField("recommendations_json")
     private String recommendationsJson;

@@ -30,11 +30,10 @@ public class LotteryKl8AutoRecommendationScheduler {
     private final LotteryKl8RecommendationService recommendationService;
 
     /**
-     * 每天 08:00 执行：昨晚 22:30 已同步并结算，本任务在第二天早上生成当日推荐。
+     * 每天 22:35 执行：22:30 已同步并结算，紧随其后生成次日推荐（快乐8 每天一期）。
      * 以最新期号为准，用户已有该期推荐则跳过，避免同一期重复生成污染样本。
-     * 放在第二天而不是当晚：用户早上打开工具就能看到当晚开奖的预测，信息更有时效性。
      */
-    @Scheduled(cron = "0 0 8 * * *")
+    @Scheduled(cron = "0 35 22 * * *")
     public void autoRecommendDaily() {
         LotteryKl8Draw latest = latestDraw();
         if (latest == null) {
