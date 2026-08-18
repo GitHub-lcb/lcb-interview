@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 彩票模拟战场服务：选择最近 N 期（100-1000），假设全部未开，
+ * 彩票模拟战场服务：选择最近 N 期（10-1000），假设全部未开，
  * 逐期用「该期之前的历史」预测下一期并结算，最终统计命中表现。
  * <p>
  * 三种玩法独立预测口径：
@@ -48,7 +48,7 @@ public class LotterySimulationService {
 
     /** 每期预测使用的前置历史期数（窗口外真实历史，保证特征数据充足） */
     private static final int LEAD_HISTORY = 50;
-    private static final int MIN_WINDOW = 100;
+    private static final int MIN_WINDOW = 10;
     private static final int MAX_WINDOW = 1000;
 
     private final LotteryKl8DrawMapper kl8DrawMapper;
@@ -62,7 +62,7 @@ public class LotterySimulationService {
      *
      * @param userId     用户 ID
      * @param lotteryType 模拟类型：KL8/SSQ/DLT
-     * @param windowSize  模拟期数（100-1000）
+     * @param windowSize  模拟期数（10-1000）
      * @return 模拟结果
      */
     @Transactional
@@ -203,7 +203,7 @@ public class LotterySimulationService {
                 .map(SimulationDraw::numbers).toList());
         for (int index = evaluationStart; index < ordered.size(); index += 1) {
             SimulationDraw target = ordered.get(index);
-            List<Integer> predicted = predictFrequency(history, 8, 80);
+            List<Integer> predicted = predictFrequency(recentHistory(history), 8, 80);
             List<Integer> group1 = predicted.subList(0, 4);
             List<Integer> group2 = predicted.subList(4, 8);
             Set<Integer> actual = new LinkedHashSet<>(target.numbers());
@@ -231,8 +231,8 @@ public class LotterySimulationService {
                 .map(SimulationDraw::backNumbers).toList());
         for (int index = evaluationStart; index < ordered.size(); index += 1) {
             SimulationDraw target = ordered.get(index);
-            List<Integer> reds = predictFrequency(redHistory, 7, 33);
-            int blue = predictMostFrequent(blueHistory, 16);
+            List<Integer> reds = predictFrequency(recentHistory(redHistory), 7, 33);
+            int blue = predictMostFrequent(recentHistory(blueHistory), 16);
             Set<Integer> actualReds = new LinkedHashSet<>(target.numbers());
             int redHit = (int) reds.stream().filter(actualReds::contains).count();
             int blueHit = target.backNumbers().contains(blue) ? 1 : 0;
@@ -258,8 +258,8 @@ public class LotterySimulationService {
                 .map(SimulationDraw::backNumbers).toList());
         for (int index = evaluationStart; index < ordered.size(); index += 1) {
             SimulationDraw target = ordered.get(index);
-            List<Integer> fronts = predictFrequency(frontHistory, 5, 35);
-            List<Integer> backs = predictFrequency(backHistory, 3, 12);
+            List<Integer> fronts = predictFrequency(recentHistory(frontHistory), 5, 35);
+            List<Integer> backs = predictFrequency(recentHistory(backHistory), 3, 12);
             Set<Integer> actualFronts = new LinkedHashSet<>(target.numbers());
             int frontHit = (int) fronts.stream().filter(actualFronts::contains).count();
             int backHit = (int) backs.stream().filter(target.backNumbers()::contains).count();
@@ -272,6 +272,14 @@ public class LotterySimulationService {
     }
 
     // ============ 预测算法（与线上策略同源：频次 + 遗漏回补） ============
+
+    /**
+     * 每一步预测严格只使用最近 50 期，保证不同模拟窗口在重叠区间使用完全相同的输入历史。
+     */
+    private List<List<Integer>> recentHistory(List<List<Integer>> history) {
+        int fromIndex = Math.max(0, history.size() - LEAD_HISTORY);
+        return history.subList(fromIndex, history.size());
+    }
 
     /**
      * 频次 + 遗漏回补预测：按频次占比 60% + 遗漏压力 40% 综合分排序，取前 size 个。

@@ -31,7 +31,7 @@ public class LotterySimulation {
     @TableField("lottery_type")
     private String lotteryType;
 
-    /** 模拟期数（100-1000） */
+    /** 模拟期数（10-1000） */
     @TableField("window_size")
     private Integer windowSize;
 

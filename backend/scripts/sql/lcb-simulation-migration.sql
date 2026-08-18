@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS lottery_simulation (
     id                 BIGINT       AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
     user_id            BIGINT       NOT NULL COMMENT '所属普通用户 ID',
     lottery_type       VARCHAR(20)  NOT NULL COMMENT '模拟类型：KL8/SSQ/DLT',
-    window_size        INT          NOT NULL COMMENT '模拟期数（100-1000）',
+    window_size        INT          NOT NULL COMMENT '模拟期数（10-1000）',
     lead_history       INT          NOT NULL COMMENT '每期预测使用的前置历史期数',
     start_issue_no     VARCHAR(32)  NOT NULL COMMENT '模拟起始期号',
     end_issue_no       VARCHAR(32)  NOT NULL COMMENT '模拟结束期号',

@@ -168,6 +168,21 @@ p {
   margin-bottom: 12px;
 }
 
+/* 五个工具 Tab 在手机上保持单行横向滚动，避免撑破页面宽度。 */
+.tools-tabs .ant-tabs-nav-wrap {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tools-tabs .ant-tabs-nav-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+.tools-tabs .ant-tabs-nav-list {
+  flex-wrap: nowrap;
+  min-width: max-content;
+}
+
 .tool-section {
   display: grid;
   gap: 14px;

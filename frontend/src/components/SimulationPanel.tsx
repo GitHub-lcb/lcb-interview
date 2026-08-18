@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  Alert, Button, Card, Col, Empty, Progress, Row, Segmented, Space, Statistic, Tag,
+  Alert, Button, Card, Col, Empty, InputNumber, Progress, Row, Segmented, Space, Statistic, Tag,
 } from 'antd'
-import { ExperimentOutlined, PlayCircleOutlined, ThunderboltOutlined } from '@ant-design/icons'
+import { ExperimentOutlined } from '@ant-design/icons'
 import {
   listLotterySimulations, runLotterySimulation,
 } from '../api/tools'
@@ -17,7 +17,7 @@ const TYPE_OPTIONS = [
   { label: '大乐透 5+3', value: 'DLT' },
 ]
 
-const WINDOW_OPTIONS = [100, 200, 500, 1000]
+const WINDOW_OPTIONS = [10, 50, 100, 200, 500, 1000]
 
 function formatDateTime(value?: string): string {
   if (!value) {
@@ -60,7 +60,7 @@ export default function SimulationPanel() {
   const [history, setHistory] = useState<LotterySimulation[]>([])
   const [current, setCurrent] = useState<LotterySimulation | null>(null)
   const [lotteryType, setLotteryType] = useState<string>('SSQ')
-  const [windowSize, setWindowSize] = useState<number>(200)
+  const [windowSize, setWindowSize] = useState<number | null>(200)
   const [loading, setLoading] = useState(true)
   const [running, setRunning] = useState(false)
 
@@ -88,9 +88,11 @@ export default function SimulationPanel() {
   const hitRateLabel = latest?.lotteryType === 'KL8' ? '中2个及以上' : '至少命中1个'
 
   const handleRun = async () => {
+    const safeWindow = Math.max(10, Math.min(1000, windowSize ?? 100))
+    setWindowSize(safeWindow)
     setRunning(true)
     try {
-      const result = await runLotterySimulation(lotteryType, windowSize)
+      const result = await runLotterySimulation(lotteryType, safeWindow)
       setCurrent(result)
       await load()
       emitFeedbackSuccess(`模拟完成：${result.summary}`)
@@ -129,12 +131,28 @@ export default function SimulationPanel() {
             />
           </div>
           <div>
-            <div style={{ marginBottom: 6, color: '#586069', fontSize: 12 }}>模拟最近期数（每期用前置 50 期历史预测）</div>
-            <Segmented
-              options={WINDOW_OPTIONS.map(size => ({ label: `${size} 期`, value: String(size) }))}
-              value={String(windowSize)}
-              onChange={value => setWindowSize(Number(value))}
-            />
+            <div style={{ marginBottom: 6, color: '#586069', fontSize: 12 }}>模拟最近期数（10-1000；每一步严格只用此前最近 50 期）</div>
+            <Space wrap size={8}>
+              <Space.Compact>
+                <InputNumber
+                  min={10}
+                  max={1000}
+                  value={windowSize}
+                  onChange={value => setWindowSize(value)}
+                />
+                <Button disabled>期</Button>
+              </Space.Compact>
+              {WINDOW_OPTIONS.map(size => (
+                <Button
+                  key={size}
+                  size="small"
+                  type={windowSize === size ? 'primary' : 'default'}
+                  onClick={() => setWindowSize(size)}
+                >
+                  {size}期
+                </Button>
+              ))}
+            </Space>
           </div>
         </Space>
       </Card>
@@ -190,6 +208,13 @@ export default function SimulationPanel() {
               ))}
             </div>
           </div>
+          <Alert
+            type="info"
+            showIcon
+            style={{ marginTop: 12 }}
+            message="不同窗口请比较概率，不要只看中4的绝对期数"
+            description="100期只代表最近一段历史，500期覆盖更长周期，低表现阶段会稀释概率。修正后的模拟每一步固定只用此前最近50期，所以500期包含最近100期时，同一重叠区间的预测结果一致。"
+          />
           <Alert type="success" showIcon style={{ marginTop: 12 }} message={latest.summary} />
         </Card>
       )}

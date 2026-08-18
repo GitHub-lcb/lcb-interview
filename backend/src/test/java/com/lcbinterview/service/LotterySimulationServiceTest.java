@@ -99,7 +99,7 @@ class LotterySimulationServiceTest {
 
     @Test
     void clampsWindowSize() {
-        // 验证 100-1000 边界钳制：9999 → 1000
+        // 验证 10-1000 边界钳制：9999 → 1000
         SsqDrawMapper ssqMapper = mock(SsqDrawMapper.class);
         LotteryKl8DrawMapper kl8Mapper = mock(LotteryKl8DrawMapper.class);
         DltDrawMapper dltMapper = mock(DltDrawMapper.class);
@@ -112,6 +112,22 @@ class LotterySimulationServiceTest {
         LotterySimulationVO vo = service.run(7L, "SSQ", 9999);
         assertEquals(1000, vo.windowSize());
         assertEquals(1000, vo.evaluatedCount());
+    }
+
+    @Test
+    void clampsWindowSizeToTen() {
+        SsqDrawMapper ssqMapper = mock(SsqDrawMapper.class);
+        LotteryKl8DrawMapper kl8Mapper = mock(LotteryKl8DrawMapper.class);
+        DltDrawMapper dltMapper = mock(DltDrawMapper.class);
+        LotterySimulationMapper simulationMapper = mock(LotterySimulationMapper.class);
+
+        when(ssqMapper.selectList(any(Wrapper.class))).thenReturn(ssqHistory(60));
+        LotterySimulationService service = new LotterySimulationService(
+                kl8Mapper, ssqMapper, dltMapper, simulationMapper, new com.fasterxml.jackson.databind.ObjectMapper());
+
+        LotterySimulationVO vo = service.run(7L, "SSQ", 1);
+        assertEquals(10, vo.windowSize());
+        assertEquals(10, vo.evaluatedCount());
     }
 
     @Test

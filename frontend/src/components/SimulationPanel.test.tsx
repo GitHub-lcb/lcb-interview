@@ -83,7 +83,7 @@ describe('SimulationPanel', () => {
     })
     expect(await screen.findByText('双色球 7+1 模拟 200 期：平均命中 1.37 个，至少命中 1 个占比 80.0%')).toBeInTheDocument()
     expect(screen.getByText('中4个')).toBeInTheDocument()
-    expect(screen.getByText('10期')).toBeInTheDocument()
+    expect(screen.getAllByText('10期').length).toBeGreaterThan(0)
     expect(screen.getByText('5.0%')).toBeInTheDocument()
     expect(emitFeedbackSuccess).toHaveBeenCalled()
   })
@@ -95,11 +95,27 @@ describe('SimulationPanel', () => {
 
     await screen.findByText('暂无模拟记录，选择参数后点击开始模拟。')
     await userEvent.click(screen.getByText('大乐透 5+3'))
-    await userEvent.click(screen.getByText('500 期'))
+    await userEvent.click(screen.getByRole('button', { name: '500期' }))
     await userEvent.click(screen.getByRole('button', { name: /开始模拟/ }))
 
     await waitFor(() => {
       expect(runLotterySimulation).toHaveBeenCalledWith('DLT', 500)
+    })
+  })
+
+  it('accepts a custom window from 10 to 1000', async () => {
+    vi.mocked(runLotterySimulation).mockResolvedValue(simulation({ windowSize: 10, evaluatedCount: 10 }))
+
+    render(<SimulationPanel />)
+
+    await screen.findByText('暂无模拟记录，选择参数后点击开始模拟。')
+    const input = screen.getByRole('spinbutton')
+    await userEvent.clear(input)
+    await userEvent.type(input, '10')
+    await userEvent.click(screen.getByRole('button', { name: /开始模拟/ }))
+
+    await waitFor(() => {
+      expect(runLotterySimulation).toHaveBeenCalledWith('SSQ', 10)
     })
   })
 
