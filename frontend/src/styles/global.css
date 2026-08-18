@@ -183,6 +183,33 @@ p {
   min-width: max-content;
 }
 
+.lottery-prediction-hub {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.lottery-game-switch {
+  width: min(100%, 480px);
+  padding: 4px;
+  border: 1px solid #D3D9DF;
+  background: #E9ECEF;
+}
+
+.lottery-game-switch .ant-segmented-group {
+  width: 100%;
+}
+
+.lottery-game-switch .ant-segmented-item {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+.lottery-game-panel {
+  min-width: 0;
+}
+
 .tool-section {
   display: grid;
   gap: 14px;

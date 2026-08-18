@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Button, Spin, Tabs } from 'antd'
-import { LogoutOutlined, ReadOutlined, ThunderboltOutlined, FireOutlined, GiftOutlined, ExperimentOutlined } from '@ant-design/icons'
+import { Button, Segmented, Spin, Tabs } from 'antd'
+import { LogoutOutlined, ReadOutlined, ThunderboltOutlined, ExperimentOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import ReadingExcerptPanel from '../../components/ReadingExcerptPanel'
 import LotteryKl8Panel from '../../components/LotteryKl8Panel'
@@ -15,6 +15,7 @@ export default function Tools() {
   const navigate = useNavigate()
   const [user, setUser] = useState<AuthUser | null>(null)
   const [checkingUser, setCheckingUser] = useState(true)
+  const [lotteryType, setLotteryType] = useState<string>('kl8')
 
   useEffect(() => {
     let cancelled = false
@@ -80,17 +81,27 @@ export default function Tools() {
           {
             key: 'lottery',
             label: <span><ThunderboltOutlined /> 号码预测</span>,
-            children: <LotteryKl8Panel />,
-          },
-          {
-            key: 'ssq',
-            label: <span><FireOutlined /> 双色球</span>,
-            children: <SsqPanel />,
-          },
-          {
-            key: 'dlt',
-            label: <span><GiftOutlined /> 大乐透</span>,
-            children: <DltPanel />,
+            children: (
+              <div className="lottery-prediction-hub">
+                <Segmented
+                  block
+                  className="lottery-game-switch"
+                  aria-label="选择号码预测玩法"
+                  options={[
+                    { label: '快乐8', value: 'kl8' },
+                    { label: '双色球', value: 'ssq' },
+                    { label: '大乐透', value: 'dlt' },
+                  ]}
+                  value={lotteryType}
+                  onChange={value => setLotteryType(String(value))}
+                />
+                <div className="lottery-game-panel">
+                  {lotteryType === 'kl8' && <LotteryKl8Panel />}
+                  {lotteryType === 'ssq' && <SsqPanel />}
+                  {lotteryType === 'dlt' && <DltPanel />}
+                </div>
+              </div>
+            ),
           },
           {
             key: 'simulation',
