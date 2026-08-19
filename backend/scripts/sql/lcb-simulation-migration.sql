@@ -47,3 +47,12 @@ SET @sim_dist_ddl = IF(@sim_dist_exists = 0,
 PREPARE sim_dist_stmt FROM @sim_dist_ddl;
 EXECUTE sim_dist_stmt;
 DEALLOCATE PREPARE sim_dist_stmt;
+
+SET @sim_result_exists = (SELECT COUNT(*) FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'lottery_simulation' AND COLUMN_NAME = 'result_json');
+SET @sim_result_ddl = IF(@sim_result_exists = 0,
+    'ALTER TABLE lottery_simulation ADD COLUMN result_json MEDIUMTEXT COMMENT ''逐期模拟明细 JSON''',
+    'SELECT 1');
+PREPARE sim_result_stmt FROM @sim_result_ddl;
+EXECUTE sim_result_stmt;
+DEALLOCATE PREPARE sim_result_stmt;

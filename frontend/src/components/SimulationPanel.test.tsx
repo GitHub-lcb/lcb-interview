@@ -54,7 +54,7 @@ function simulation(overrides: Partial<LotterySimulation> = {}): LotterySimulati
     secondaryAvg: 0.08,
     hit4Count: 10,
     hitDistribution: '{"0":20,"1":60,"2":80,"3":30,"4":10}',
-    summary: '双色球 7+1 模拟 200 期：平均命中 1.37 个，至少命中 1 个占比 80.0%',
+    summary: '双色球 7+1 模拟 200 期：中奖率 80.0%（中任何奖级），未中奖 20 期，单期最高中 4 个红球，奖级分布：六等奖60期、五等奖80期',
     createdAt: '2026-08-18T10:00:00',
     ...overrides,
   }
@@ -81,8 +81,10 @@ describe('SimulationPanel', () => {
     await waitFor(() => {
       expect(runLotterySimulation).toHaveBeenCalledWith('SSQ', 200)
     })
-    expect(await screen.findByText('双色球 7+1 模拟 200 期：平均命中 1.37 个，至少命中 1 个占比 80.0%')).toBeInTheDocument()
-    expect(screen.getByText('中4个')).toBeInTheDocument()
+    expect(await screen.findByText(/双色球 7\+1 模拟 200 期：中奖率 80.0%/)).toBeInTheDocument()
+    // SSQ 分布改为按奖级渲染：未中奖 / 六等奖 / 五等奖 / 四等奖 / 一等奖
+    expect(screen.getByText('六等奖')).toBeInTheDocument()
+    expect(screen.getByText('三等奖')).toBeInTheDocument()
     expect(screen.getAllByText('10期').length).toBeGreaterThan(0)
     expect(screen.getByText('5.0%')).toBeInTheDocument()
     expect(emitFeedbackSuccess).toHaveBeenCalled()
@@ -126,7 +128,7 @@ describe('SimulationPanel', () => {
 
     expect(await screen.findByText(/双色球 7\+1 · 200 期/)).toBeInTheDocument()
     expect(screen.getByText(/2026090 ~ 2026094/)).toBeInTheDocument()
-    expect(screen.getByText(/200 期结算 · 命中率 80% · 最高 4 个/)).toBeInTheDocument()
+    expect(screen.getByText(/200 期结算 · 中奖率 80% · 最高 4 个/)).toBeInTheDocument()
   })
 
   it('contains protected load failures without an unhandled rejection', async () => {

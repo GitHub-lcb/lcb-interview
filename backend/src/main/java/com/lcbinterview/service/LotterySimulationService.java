@@ -203,8 +203,9 @@ public class LotterySimulationService {
             int g1Hit = (int) group1.stream().filter(actual::contains).count();
             int g2Hit = (int) group2.stream().filter(actual::contains).count();
             int primary = Math.max(g1Hit, g2Hit);
+            // KL8 不按奖级统计，奖级固定为 0，命中口径由单组命中数决定
             entries.add(new SimulationEntry(target.getIssueNo(), target.getDrawDate(),
-                    group1, group2, List.of(), primary, g1Hit + g2Hit));
+                    group1, group2, List.of(), primary, g1Hit + g2Hit, 0));
             history.add(target);
         }
         return entries;
@@ -228,8 +229,10 @@ public class LotterySimulationService {
             Set<Integer> actualReds = new LinkedHashSet<>(parseNumbers(target.getRedNumbers()));
             int redHit = (int) reds.stream().filter(actualReds::contains).count();
             int blueHit = parseBlue(target.getBlueNumber()) == blue ? 1 : 0;
+            // 双色球中奖口径：按官方奖级判定（蓝球 alone 即中六等奖，红球≥4 或蓝球命中即中奖）
+            int prizeTier = ssqPrizeTier(redHit, blueHit);
             entries.add(new SimulationEntry(target.getIssueNo(), target.getDrawDate(),
-                    reds, List.of(blue), List.of(), redHit, blueHit));
+                    reds, List.of(blue), List.of(), redHit, blueHit, prizeTier));
             history.add(target);
         }
         return entries;
@@ -254,8 +257,10 @@ public class LotterySimulationService {
             int frontHit = (int) fronts.stream().filter(actualFronts::contains).count();
             List<Integer> actualBacks = parseNumbers(target.getBackNumbers());
             int backHit = (int) backs.stream().filter(actualBacks::contains).count();
+            // 大乐透中奖口径：后区全中（2 个）或前区≥5、或前区4/3且后区有命中即中奖
+            int prizeTier = dltPrizeTier(frontHit, backHit);
             entries.add(new SimulationEntry(target.getIssueNo(), target.getDrawDate(),
-                    fronts, backs, List.of(), frontHit, backHit));
+                    fronts, backs, List.of(), frontHit, backHit, prizeTier));
             history.add(target);
         }
         return entries;
@@ -289,7 +294,8 @@ public class LotterySimulationService {
         for (SimulationEntry entry : entries) {
             totalPrimary += entry.primaryHits();
             totalSecondary += entry.secondaryHits();
-            distribution.merge(entry.primaryHits(), 1, Integer::sum);
+            // KL8 按单组命中数分布；SSQ/DLT 按中奖奖级分布（0=未中奖）
+            distribution.merge(kl8 ? entry.primaryHits() : entry.prizeTier(), 1, Integer::sum);
             if (kl8) {
                 // 快乐8 口径：单组中 2 个及以上才算有效命中，中 1 个不计奖励
                 if (entry.primaryHits() >= 2) {
@@ -301,11 +307,11 @@ public class LotterySimulationService {
                     hit4Count += 1;
                 }
             } else {
-                if (entry.primaryHits() == 0 && entry.secondaryHits() == 0) {
-                    zeroHit += 1;
-                }
-                if (entry.primaryHits() > 0 || entry.secondaryHits() > 0) {
+                // 中奖口径：中任何奖级（奖级>0）即算中奖，否则未中奖
+                if (entry.prizeTier() > 0) {
                     hitAtLeastOne += 1;
+                } else {
+                    zeroHit += 1;
                 }
             }
             maxHits = Math.max(maxHits, entry.primaryHits());
@@ -359,8 +365,82 @@ public class LotterySimulationService {
                     .formatted(label, window, stats.avgHits(), stats.hitRate(), stats.zeroHitCount(),
                             stats.hit4Count(), stats.maxHits());
         }
-        return "%s 模拟 %d 期：平均命中 %.2f 个，至少命中 1 个占比 %.1f%%，全不中 %d 期，单期最高 %d 个"
-                .formatted(label, window, stats.avgHits(), stats.hitRate(), stats.zeroHitCount(), stats.maxHits());
+        // SSQ/DLT 改用中奖口径：中奖率=中任何奖级的比例，并列出主要奖级分布
+        String primaryName = "SSQ".equals(type) ? "红" : "前区";
+        return "%s 模拟 %d 期：中奖率 %.1f%%（中任何奖级），未中奖 %d 期，单期最高中 %d 个%s，奖级分布：%s"
+                .formatted(label, window, stats.hitRate(), stats.zeroHitCount(),
+                        stats.maxHits(), primaryName, prizeBreakdown(type, stats.distribution()));
+    }
+
+    /**
+     * 把奖级分布（奖级 rank → 期数）转成可读文本，仅展示中奖的奖级。
+     *
+     * @param type       玩法类型，决定奖级名称
+     * @param distribution 奖级 rank → 期数
+     * @return 形如「六等奖3期、五等奖1期」的文本，无中奖时返回「无」
+     */
+    private String prizeBreakdown(String type, Map<Integer, Integer> distribution) {
+        Map<Integer, String> names = "SSQ".equals(type) ? SSQ_TIER_NAMES : DLT_TIER_NAMES;
+        List<String> parts = new java.util.ArrayList<>();
+        for (Map.Entry<Integer, Integer> entry : distribution.entrySet()) {
+            if (entry.getKey() <= 0 || entry.getValue() <= 0) {
+                continue;
+            }
+            String name = names.get(entry.getKey());
+            if (name != null) {
+                parts.add(name + entry.getValue() + "期");
+            }
+        }
+        return parts.isEmpty() ? "无" : String.join("、", parts);
+    }
+
+    /** 双色球奖级名称：1六 2五 3四 4三 5二 6一 */
+    private static final Map<Integer, String> SSQ_TIER_NAMES = java.util.Map.of(
+            1, "六等奖", 2, "五等奖", 3, "四等奖", 4, "三等奖", 5, "二等奖", 6, "一等奖");
+
+    /** 大乐透奖级名称：1七 2六 3五 4四 5三 6二 7一 */
+    private static final Map<Integer, String> DLT_TIER_NAMES = java.util.Map.of(
+            1, "七等奖", 2, "六等奖", 3, "五等奖", 4, "四等奖", 5, "三等奖", 6, "二等奖", 7, "一等奖");
+
+    /**
+     * 双色球官方奖级判定（基于红球命中数 redHit 与蓝球命中 blueHit）。
+     * 蓝 alone 即中六等奖；红球≥4 或蓝球命中即至少中五/六等奖。
+     *
+     * @return 奖级 rank：0未中奖 1六 2五 3四 4三 5二 6一
+     */
+    private int ssqPrizeTier(int redHit, int blueHit) {
+        if (redHit == 6) {
+            return blueHit == 1 ? 6 : 5;
+        }
+        if (redHit == 5) {
+            return blueHit == 1 ? 4 : 3;
+        }
+        if (redHit == 4) {
+            return blueHit == 1 ? 3 : 2;
+        }
+        if (redHit == 3) {
+            return blueHit == 1 ? 2 : 0;
+        }
+        return blueHit == 1 ? 1 : 0;
+    }
+
+    /**
+     * 大乐透官方奖级判定（基于前区命中 frontHit 与后区命中 backHit）。
+     * 后区全中（2 个）即至少七等奖；前区 5 必中；前区 4/3 需后区有命中才中奖。
+     *
+     * @return 奖级 rank：0未中奖 1七 2六 3五 4四 5三 6二 7一
+     */
+    private int dltPrizeTier(int frontHit, int backHit) {
+        if (frontHit == 5) {
+            return backHit == 2 ? 7 : backHit == 1 ? 6 : 5;
+        }
+        if (frontHit == 4) {
+            return backHit == 2 ? 4 : backHit == 1 ? 3 : 0;
+        }
+        if (frontHit == 3) {
+            return backHit == 2 ? 2 : backHit == 1 ? 1 : 0;
+        }
+        return backHit == 2 ? 1 : 0;
     }
 
     private LotterySimulationVO toVo(LotterySimulation entity) {
@@ -381,6 +461,7 @@ public class LotterySimulationService {
                 entity.getHit4Count(),
                 entity.getHitDistributionJson(),
                 entity.getSummary(),
+                entity.getResultJson(),
                 entity.getCreateTime());
     }
 
@@ -413,15 +494,16 @@ public class LotterySimulationService {
      * @param issueNo       期号
      * @param drawDate      开奖日期
      * @param predicted     预测主号码
-     * @param predictedExtra 预测次号码（KL8 第二组）
+     * @param predictedExtra 预测次号码（KL8 第二组 / SSQ 蓝球 / DLT 后区）
      * @param extraExtra    预留
-     * @param primaryHits   主维度命中
-     * @param secondaryHits 次维度命中
+     * @param primaryHits   主维度命中（SSQ 红球 / DLT 前区 / KL8 单组最高）
+     * @param secondaryHits 次维度命中（SSQ 蓝球 / DLT 后区）
+     * @param prizeTier     中奖奖级（0=未中奖；SSQ 1六~6一；DLT 1七~7一；KL8 恒为 0）
      */
     private record SimulationEntry(String issueNo, java.time.LocalDate drawDate,
                                    List<Integer> predicted, List<Integer> predictedExtra,
                                    List<Integer> extraExtra,
-                                   int primaryHits, int secondaryHits) {
+                                   int primaryHits, int secondaryHits, int prizeTier) {
     }
 
     /**

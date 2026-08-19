@@ -22,8 +22,9 @@ import java.time.LocalDateTime;
  * @param maxHits       单期最高命中
  * @param secondaryAvg  次维度平均命中
  * @param hit4Count     KL8 单组全中 4 个的期数
- * @param hitDistribution 主维度命中数分布 JSON（{"0":5,"1":20,"2":40}）
+ * @param hitDistribution 主维度命中数分布 / SSQ·DLT 奖级分布 JSON（{"0":93,"1":5}）
  * @param summary       统计摘要
+ * @param resultJson    逐期模拟明细 JSON（预测号码与主次维度命中）
  * @param createdAt     创建时间
  */
 @Schema(description = "模拟战场结果")
@@ -44,6 +45,7 @@ public record LotterySimulationVO(
         Integer hit4Count,
         String hitDistribution,
         String summary,
+        String resultJson,
         LocalDateTime createdAt
 ) {
 }

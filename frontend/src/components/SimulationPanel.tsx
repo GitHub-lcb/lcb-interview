@@ -56,6 +56,40 @@ const TYPE_LABELS: Record<string, string> = {
   DLT: '大乐透 5+3',
 }
 
+// 双色球奖级标签：0未中奖 1六 2五 3四 4三 5二 6一
+const SSQ_TIER_LABELS: Record<number, string> = {
+  0: '未中奖',
+  1: '六等奖',
+  2: '五等奖',
+  3: '四等奖',
+  4: '三等奖',
+  5: '二等奖',
+  6: '一等奖',
+}
+
+// 大乐透奖级标签：0未中奖 1七 2六 3五 4四 5三 6二 7一
+const DLT_TIER_LABELS: Record<number, string> = {
+  0: '未中奖',
+  1: '七等奖',
+  2: '六等奖',
+  3: '五等奖',
+  4: '四等奖',
+  5: '三等奖',
+  6: '二等奖',
+  7: '一等奖',
+}
+
+/** 命中/奖级分布项的展示文案：KL8 为命中个数，SSQ/DLT 为中奖奖级。 */
+function tierLabel(type: string, key: number): string {
+  if (type === 'SSQ') {
+    return SSQ_TIER_LABELS[key] ?? `奖级${key}`
+  }
+  if (type === 'DLT') {
+    return DLT_TIER_LABELS[key] ?? `奖级${key}`
+  }
+  return `中${key}个`
+}
+
 export default function SimulationPanel() {
   const [history, setHistory] = useState<LotterySimulation[]>([])
   const [current, setCurrent] = useState<LotterySimulation | null>(null)
@@ -85,7 +119,7 @@ export default function SimulationPanel() {
     () => parseHitDistribution(latest?.hitDistribution, latest?.evaluatedCount ?? 0),
     [latest],
   )
-  const hitRateLabel = latest?.lotteryType === 'KL8' ? '中2个及以上' : '至少命中1个'
+  const hitRateLabel = latest?.lotteryType === 'KL8' ? '中2个及以上' : '中奖率'
 
   const handleRun = async () => {
     const safeWindow = Math.max(10, Math.min(1000, windowSize ?? 100))
@@ -177,7 +211,7 @@ export default function SimulationPanel() {
               <Statistic title="单期最高命中" value={latest.maxHits} />
             </Col>
             <Col xs={12} md={6}>
-              <Statistic title="全不中期数" value={latest.zeroHitCount} valueStyle={{ color: latest.zeroHitCount > 0 ? '#DC2626' : undefined }} />
+              <Statistic title={latest.lotteryType === 'KL8' ? '全不中期数' : '未中奖期数'} value={latest.zeroHitCount} valueStyle={{ color: latest.zeroHitCount > 0 ? '#DC2626' : undefined }} />
             </Col>
             <Col xs={12} md={6}>
               <Statistic
@@ -197,11 +231,11 @@ export default function SimulationPanel() {
             <span style={{ color: '#586069', fontSize: 12 }}>{hitRateLabel}比例</span>
           </div>
           <div className="simulation-hit-distribution" aria-label="命中数分布">
-            <div className="simulation-hit-distribution-title">命中数分布</div>
+            <div className="simulation-hit-distribution-title">{latest.lotteryType === 'KL8' ? '命中数分布' : '奖级分布'}</div>
             <div className="simulation-hit-distribution-grid">
               {hitDistribution.map(item => (
                 <div className="simulation-hit-distribution-item" key={item.hits}>
-                  <strong>中{item.hits}个</strong>
+                  <strong>{tierLabel(latest.lotteryType, item.hits)}</strong>
                   <span>{item.count}期</span>
                   <em>{item.rate.toFixed(1)}%</em>
                 </div>
@@ -231,7 +265,7 @@ export default function SimulationPanel() {
                 </strong>
                 <small>{item.startIssueNo} ~ {item.endIssueNo} · {formatDateTime(item.createdAt)}</small>
                 <span style={{ display: 'block', color: '#586069', fontSize: 12, marginTop: 4 }}>
-                  {item.evaluatedCount} 期结算 · 命中率 {item.hitRate}% · 最高 {item.maxHits} 个
+                  {item.evaluatedCount} 期结算 · {item.lotteryType === 'KL8' ? '命中率' : '中奖率'} {item.hitRate}% · 最高 {item.maxHits} 个
                 </span>
               </button>
             ))}

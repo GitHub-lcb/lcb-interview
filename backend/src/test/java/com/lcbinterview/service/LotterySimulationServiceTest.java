@@ -75,6 +75,30 @@ class LotterySimulationServiceTest {
         return draws;
     }
 
+    private DltDraw dltDraw(int index, String front, String back) {
+        DltDraw draw = new DltDraw();
+        draw.setIssueNo(String.format("%07d", 2026001 + index));
+        draw.setDrawDate(LocalDate.now());
+        draw.setFrontNumbers(front);
+        draw.setBackNumbers(back);
+        return draw;
+    }
+
+    private List<DltDraw> dltHistory(int count) {
+        List<DltDraw> draws = new ArrayList<>();
+        for (int index = 0; index < count; index += 1) {
+            // 构造稳定数据：1-5 高频出现（保证前区稳定命中），后区 1-3 轮换
+            String front = switch (index % 3) {
+                case 0 -> "1,2,3,4,5,6,7";
+                case 1 -> "1,2,3,4,5,8,9";
+                default -> "1,2,3,4,5,10,11";
+            };
+            draws.add(dltDraw(index, front, String.valueOf(1 + index % 3)));
+        }
+        java.util.Collections.reverse(draws);
+        return draws;
+    }
+
     @Test
     @SuppressWarnings({"rawtypes", "unchecked"})
     void runsSsqSimulationAndSavesStats() {
@@ -96,8 +120,13 @@ class LotterySimulationServiceTest {
         assertEquals(100, vo.windowSize());
         assertEquals(100, vo.evaluatedCount());
         assertTrue(vo.avgHits().compareTo(BigDecimal.ZERO) > 0, "高频红球应能命中");
+        // 中奖口径：成功率为中任何奖级的比例，应在 (0,100]
         assertTrue(vo.hitRate().compareTo(BigDecimal.ZERO) > 0);
+        assertTrue(vo.hitRate().compareTo(new BigDecimal(100)) <= 0);
         assertTrue(vo.summary().contains("模拟 100 期"));
+        assertTrue(vo.summary().contains("中奖率"), "SSQ 应改用中奖口径");
+        // 分布按奖级统计，至少包含未中奖(0)这一档
+        assertTrue(vo.hitDistribution().contains("\"0\""), "奖级分布应包含未中奖档，实际 " + vo.hitDistribution());
         verify(simulationMapper).insert(any(LotterySimulation.class));
     }
 
@@ -117,6 +146,32 @@ class LotterySimulationServiceTest {
         } catch (com.lcbinterview.common.BusinessException e) {
             assertTrue(e.getMessage().contains("KL8/SSQ/DLT"));
         }
+    }
+
+    @Test
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    void runsDltSimulationWithPrizeTiers() {
+        SsqDrawMapper ssqMapper = mock(SsqDrawMapper.class);
+        LotteryKl8DrawMapper kl8Mapper = mock(LotteryKl8DrawMapper.class);
+        DltDrawMapper dltMapper = mock(DltDrawMapper.class);
+        LotterySimulationMapper simulationMapper = mock(LotterySimulationMapper.class);
+
+        when(dltMapper.selectList(any(Wrapper.class))).thenReturn(dltHistory(120));
+        when(kl8Mapper.selectList(any(Wrapper.class))).thenReturn(List.of());
+        when(ssqMapper.selectList(any(Wrapper.class))).thenReturn(List.of());
+
+        LotterySimulationService service = service(kl8Mapper, ssqMapper, dltMapper, simulationMapper);
+
+        LotterySimulationVO vo = service.run(7L, "DLT", 100);
+
+        assertEquals("DLT", vo.lotteryType());
+        assertEquals(100, vo.evaluatedCount());
+        // 稳定历史下前区 1-5 应稳定命中（≥三等奖），中奖率为 100%
+        assertEquals(100.00, vo.hitRate().doubleValue(), 0.001);
+        assertTrue(vo.summary().contains("中奖率"), "DLT 应改用中奖口径");
+        // 稳定历史下前区 1-5 稳定命中，奖级分布应集中在中奖档（此处为五等奖）
+        assertTrue(vo.hitDistribution().contains("\"3\""), "奖级分布应包含中奖档，实际 " + vo.hitDistribution());
+        verify(simulationMapper).insert(any(LotterySimulation.class));
     }
 
     @Test

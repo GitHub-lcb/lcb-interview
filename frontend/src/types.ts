@@ -418,6 +418,7 @@ export interface LotterySimulation {
   hit4Count: number
   hitDistribution: string
   summary: string
+  resultJson?: string
   createdAt: string
 }
 
