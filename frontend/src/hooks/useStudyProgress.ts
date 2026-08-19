@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { InterviewAttempt, Question, StudyProgress, StudyQuestionStatus } from '../types'
+import type { InterviewAttempt, Question, RecallGrade, StudyProgress, StudyQuestionStatus } from '../types'
 import {
   STUDY_PROGRESS_EVENT,
   appendDailyPlanQuestions,
+  applyRecallGrade,
   getQuestionState,
   rememberQuestions as rememberQuestionsInProgress,
   readStudyProgress,
@@ -72,6 +73,11 @@ export function useStudyProgress() {
     save(recordInterviewAttemptInProgress(readStudyProgress(), attempt))
   }, [save])
 
+  /** 应用一次背诵回忆评分（SM-2 自适应排期）。 */
+  const applyGrade = useCallback((questionId: number, grade: RecallGrade) => {
+    save(applyRecallGrade(readStudyProgress(), questionId, grade))
+  }, [save])
+
   return useMemo(() => ({
     progress,
     getState: (questionId: number) => getQuestionState(progress, questionId),
@@ -84,5 +90,6 @@ export function useStudyProgress() {
     rememberQuestions,
     recordQuestionEncounter,
     recordInterviewAttempt,
-  }), [addDailyPlanQuestions, progress, recordQuestionEncounter, rememberQuestion, rememberQuestions, recordInterviewAttempt, setDailyPlan, setInPlan, setStatus, updateSettings])
+    applyGrade,
+  }), [addDailyPlanQuestions, applyGrade, progress, recordQuestionEncounter, rememberQuestion, rememberQuestions, recordInterviewAttempt, setDailyPlan, setInPlan, setStatus, updateSettings])
 }

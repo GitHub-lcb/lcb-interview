@@ -4,14 +4,19 @@ import com.lcbinterview.common.ApiResponse;
 import com.lcbinterview.dto.PageResult;
 import com.lcbinterview.dto.QuestionQuery;
 import com.lcbinterview.dto.QuestionVO;
+import com.lcbinterview.service.AnkiExportService;
 import com.lcbinterview.service.QuestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -26,6 +31,7 @@ import java.util.List;
 public class QuestionController {
 
     private final QuestionService questionService;
+    private final AnkiExportService ankiExportService;
 
     @Operation(summary = "分页查询题目（含搜索、筛选）")
     @GetMapping
@@ -62,5 +68,36 @@ public class QuestionController {
         List<QuestionVO> result = questionService.listPublishedVosByIds(ids);
         log.info("按 ID 批量查询题目，请求 {} 条，命中 {} 条", ids == null ? 0 : ids.size(), result.size());
         return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    /**
+     * 导出已发布题目为 Anki 可导入的 TSV 文件（公开接口，无需登录）。
+     *
+     * <p>Anki 导入方法：打开 Anki - 文件 - 导入，选择下载的 .txt 文件，
+     * 分隔符选择“制表符”，字段映射为 正面/背面/标签，并勾选“允许在字段中使用 HTML”。</p>
+     *
+     * @param category   分类 ID，可选，不传导出全部分类
+     * @param difficulty 难度筛选，可选（EASY/MEDIUM/HARD）
+     * @param limit      导出条数，默认 100，归一化到 1~500
+     * @return TSV 文件字节流
+     */
+    @Operation(summary = "导出题目为 Anki TSV 文件",
+            description = "每行一条笔记，三列：正面(题目标题)、背面(答案 HTML)、标签(分类::难度)。"
+                    + "Anki 导入时分隔符选 Tab，并允许字段使用 HTML。")
+    @GetMapping("/anki-export")
+    public ResponseEntity<byte[]> exportAnki(
+            @RequestParam(value = "category", required = false) Long category,
+            @RequestParam(value = "difficulty", required = false) String difficulty,
+            @RequestParam(value = "limit", defaultValue = "100") int limit) {
+        String tsv = ankiExportService.buildAnkiTsv(category, difficulty, limit);
+        // 文件名保持 ASCII（分类用 ID 而非中文名），避免不同浏览器对非 ASCII 文件名编码不一致
+        String fileKey = category == null ? "all" : String.valueOf(category);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("text", "tab-separated-values", StandardCharsets.UTF_8));
+        headers.setContentDisposition(ContentDisposition.attachment()
+                .filename("lcb-interview-anki-" + fileKey + ".txt", StandardCharsets.UTF_8)
+                .build());
+        log.info("Anki 导出请求，category={}, difficulty={}, limit={}, 输出 {} 字符", category, difficulty, limit, tsv.length());
+        return ResponseEntity.ok().headers(headers).body(tsv.getBytes(StandardCharsets.UTF_8));
     }
 }

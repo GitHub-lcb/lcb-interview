@@ -26,14 +26,16 @@ export function buildScheduledReviewQueue(
     }
 
     const questionId = Number(id)
-    const intervalDays = reviewIntervalDays(state.status, state.reviewCount)
+    // 有 dueAt（SM-2 评分写入）的题优先按真实到期时间调度；旧数据回退固定间隔表。
+    const sm2DueDate = parseReviewDate(state.dueAt)
+    const intervalDays = sm2DueDate ? 0 : reviewIntervalDays(state.status, state.reviewCount)
     const lastReviewedAt = parseReviewDate(state.lastReviewedAt)
     // 老数据可能没有 lastReviewedAt。宁可把已跟踪题放到今天，也不要让用户错过复习窗口。
-    const nextReviewDate = isEncounterReview
+    const nextReviewDate = sm2DueDate ?? (isEncounterReview
       ? currentDate
       : lastReviewedAt
         ? addDays(lastReviewedAt, intervalDays)
-        : currentDate
+        : currentDate)
     const dueStatus = resolveDueStatus(nextReviewDate, currentDate)
     const snapshot = progress.questionSnapshots[questionId] ?? fallbackSnapshot(questionId)
 
@@ -48,7 +50,7 @@ export function buildScheduledReviewQueue(
       dueStatus,
       nextReviewAt: nextReviewDate.toISOString(),
       daysUntilDue: daysBetween(startOfUtcDay(currentDate), startOfUtcDay(nextReviewDate)),
-      scheduleReason: scheduleReason(state.status, state.reviewCount, isEncounterReview),
+      scheduleReason: scheduleReason(state, isEncounterReview, Boolean(sm2DueDate)),
     })
   }
 
@@ -142,6 +144,13 @@ function compareScheduledReviewItems(a: ScheduledReviewItem, b: ScheduledReviewI
     return statusDiff
   }
 
+  // 同为到期题时，浏览热度高的先背：热门题被面试问到的概率更高，
+  // 复习时间有限时优先保证大概率考点的记忆强度。
+  const viewCountDiff = b.viewCount - a.viewCount
+  if (viewCountDiff !== 0) {
+    return viewCountDiff
+  }
+
   return a.nextReviewAt.localeCompare(b.nextReviewAt)
 }
 
@@ -178,10 +187,20 @@ function dueStatusLabel(status: ReviewDueStatus): string {
   return '即将到期'
 }
 
-function scheduleReason(status: StudyQuestionStatus, reviewCount: number, isEncounterReview = false): string {
+function scheduleReason(state: QuestionStudyState, isEncounterReview = false, isSm2Scheduled = false): string {
   if (isEncounterReview) {
     return '多次遇见但还没完成复习，先安排一次主动回忆。'
   }
+  if (isSm2Scheduled) {
+    // SM-2 排期的题展示实际间隔，让用户理解“为什么隔这么久/这么近”
+    const interval = state.intervalDays ?? 1
+    if (state.lastGrade === 'again') {
+      return `上次回忆失败，间隔重置为 ${interval} 天，多来几轮直到记住。`
+    }
+    return `根据你的回忆表现，SM-2 排期 ${interval} 天后复习（难度系数 ${state.easeFactor ?? 2.5}）。`
+  }
+  const status = state.status
+  const reviewCount = state.reviewCount
   if (status === 'weak') {
     return '薄弱题每天复习一次，直到能稳定讲清。'
   }

@@ -338,7 +338,8 @@ describe('StudyPlan', () => {
 
     await userEvent.click(within(reviewSection).getByRole('button', { name: /练主动回忆/ }))
 
-    expect(navigateMock).toHaveBeenCalledWith('/practice?queue=7,8&from=review-due')
+    // 同为到期题时热门优先：8（viewCount 220）排在 7（viewCount 180）前面
+    expect(navigateMock).toHaveBeenCalledWith('/practice?queue=8,7&from=review-due')
   })
 
   it('marks active-recall items inside a mixed review queue', async () => {

@@ -19,7 +19,7 @@ api.interceptors.request.use(config => {
     config.headers.Authorization = `Bearer ${token}`
   }
   const userToken = readUserToken()
-  if (userToken && (config.url?.startsWith('/tools/') || config.url === '/auth/me')) {
+  if (userToken && (config.url?.startsWith('/tools/') || config.url?.startsWith('/study/') || config.url === '/auth/me')) {
     config.headers.Authorization = `Bearer ${userToken}`
   }
   return config

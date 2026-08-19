@@ -422,6 +422,10 @@ export interface LotterySimulation {
 }
 
 export type StudyQuestionStatus = 'new' | 'learning' | 'mastered' | 'weak'
+
+/** 背诵回忆评分档位，SM-2 四档评分（again=忘了 / hard=模糊 / good=记住了 / easy=很简单）。 */
+export type RecallGrade = 'again' | 'hard' | 'good' | 'easy'
+
 export interface QuestionStudyState {
   status: StudyQuestionStatus
   addedToPlan: boolean
@@ -429,6 +433,11 @@ export interface QuestionStudyState {
   reviewCount: number
   lastEncounteredAt?: string
   encounterCount?: number
+  // SM-2 自适应间隔重复字段：旧数据没有这些字段时回退到固定间隔表，保证向后兼容。
+  easeFactor?: number      // SM-2 难度系数，初始 2.5，范围 1.3~2.8，分值越低代表越难记
+  intervalDays?: number    // 当前已确认的复习间隔（天）
+  dueAt?: string           // 下次到期复习时间（ISO 字符串）
+  lastGrade?: RecallGrade  // 最近一次背诵评分档位
 }
 
 export interface QuestionSnapshot {

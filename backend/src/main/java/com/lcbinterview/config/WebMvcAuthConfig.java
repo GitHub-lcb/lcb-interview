@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * 普通用户认证拦截配置。限定到个人工具路径，避免影响公开题库和管理后台。
+ * 普通用户认证拦截配置。限定到个人工具和学习进度同步路径，避免影响公开题库和管理后台。
  */
 @Configuration
 @ConditionalOnBean(UserAuthInterceptor.class)
@@ -24,6 +24,6 @@ public class WebMvcAuthConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(userAuthInterceptor)
-                .addPathPatterns("/api/tools/**", "/api/auth/me");
+                .addPathPatterns("/api/tools/**", "/api/auth/me", "/api/study/**");
     }
 }

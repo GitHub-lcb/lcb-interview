@@ -10,6 +10,7 @@ const QuestionDetail = lazy(() => import('./pages/QuestionDetail'))
 const SearchResult = lazy(() => import('./pages/SearchResult'))
 const StudyPlan = lazy(() => import('./pages/StudyPlan'))
 const Practice = lazy(() => import('./pages/Practice'))
+const Recall = lazy(() => import('./pages/Recall'))
 const PrepRoutes = lazy(() => import('./pages/PrepRoutes'))
 const Experiences = lazy(() => import('./pages/Experiences'))
 const Tools = lazy(() => import('./pages/Tools'))
@@ -46,6 +47,7 @@ export default function App() {
           <Route path="/tools" element={<Tools />} />
           <Route path="/study" element={<StudyPlan />} />
           <Route path="/practice" element={<Practice />} />
+          <Route path="/recall" element={<Recall />} />
           <Route path="/knowledge" element={<Knowledge />} />
           <Route path="/knowledge/:pointId" element={<Knowledge />} />
         </Route>

@@ -4,12 +4,14 @@ import type {
   QuestionSnapshot,
   QuestionStudyState,
   PracticeQueueItem,
+  RecallGrade,
   ReviewQueueItem,
   StudyProgress,
   StudyQuestionStatus,
   StudySummary,
   WeakArea,
 } from '../types'
+import { scheduleNextRecall } from './spacedRepetition'
 
 export const STUDY_PROGRESS_STORAGE_KEY = 'lcb-interview-study-progress'
 export const STUDY_PROGRESS_EVENT = 'lcb-study-progress-change'
@@ -126,6 +128,45 @@ export function updateQuestionStatus(
         status,
         lastReviewedAt: now,
         reviewCount: current.reviewCount + 1,
+      },
+    },
+    updatedAt: now,
+  }
+}
+
+/**
+ * 应用一次背诵回忆评分：用 SM-2 自适应算法计算下次复习间隔，并同步掌握状态。
+ *
+ * 这是翻转卡背诵的核心写入函数：评分不仅更新状态（忘了→薄弱、很简单→已掌握），
+ * 还把 easeFactor / intervalDays / dueAt 写进题目状态，供复习队列按真实到期时间调度。
+ *
+ * @param progress   当前学习进度
+ * @param questionId 题目 ID
+ * @param grade      回忆评分档位
+ * @param now        评分时间，默认当前时间
+ * @returns 更新后的学习进度
+ */
+export function applyRecallGrade(
+  progress: StudyProgress,
+  questionId: number,
+  grade: RecallGrade,
+  now = new Date().toISOString(),
+): StudyProgress {
+  const current = getQuestionState(progress, questionId)
+  const schedule = scheduleNextRecall(current, grade, new Date(now))
+  return {
+    ...progress,
+    questionStates: {
+      ...progress.questionStates,
+      [questionId]: {
+        ...current,
+        status: schedule.status,
+        lastReviewedAt: now,
+        reviewCount: current.reviewCount + 1,
+        easeFactor: schedule.easeFactor,
+        intervalDays: schedule.intervalDays,
+        dueAt: schedule.dueAt,
+        lastGrade: grade,
       },
     },
     updatedAt: now,
@@ -359,6 +400,20 @@ export function buildDailyPlan(progress: StudyProgress, candidates: Question[], 
   return [...new Set([...progress.dailyPlan, ...ranked])].slice(0, limit)
 }
 
+function rankQuestion(progress: StudyProgress, question: Question): number {
+  const state = getQuestionState(progress, question.id)
+  if (state.status === 'weak') {
+    return 0
+  }
+  if (state.status === 'learning') {
+    return 1
+  }
+  if (state.status === 'new') {
+    return 2
+  }
+  return 3
+}
+
 export function resolvePlanQuestions(
   progress: StudyProgress,
   candidates: Question[],
@@ -373,20 +428,6 @@ export function resolvePlanQuestions(
   }
   return buildDailyPlan(progress, candidates, limit)
     .map(id => snapshots[id] ?? fallbackSnapshot(id))
-}
-
-function rankQuestion(progress: StudyProgress, question: Question): number {
-  const state = getQuestionState(progress, question.id)
-  if (state.status === 'weak') {
-    return 0
-  }
-  if (state.status === 'learning') {
-    return 1
-  }
-  if (state.status === 'new') {
-    return 2
-  }
-  return 3
 }
 
 export function buildReviewQueue(progress: StudyProgress, limit = 8): ReviewQueueItem[] {

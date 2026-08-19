@@ -11,6 +11,7 @@ import {
   SearchOutlined,
   SolutionOutlined,
   ToolOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons'
 import packageJson from '../../../package.json'
 
@@ -19,6 +20,7 @@ const { Search } = Input
 
 const navItems = [
   { path: '/', label: '首页', icon: <HomeOutlined /> },
+  { path: '/recall', label: '背诵', icon: <ThunderboltOutlined /> },
   { path: '/practice', label: '模拟', icon: <PlayCircleOutlined /> },
   { path: '/study', label: '学习', icon: <CalendarOutlined /> },
   { path: '/banks', label: '题库', icon: <BookOutlined /> },

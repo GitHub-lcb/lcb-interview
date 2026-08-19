@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Empty, InputNumber, Progress, Segmented, Select } from 'antd'
+import { Button, Empty, InputNumber, Progress, Segmented, Select, Tag, Tooltip } from 'antd'
 import { emitFeedbackSuccess, emitFeedbackWarning } from '../../utils/feedbackMessage'
 import {
   ArrowRightOutlined,
   BookOutlined,
+  CloudDownloadOutlined,
+  CloudUploadOutlined,
   CopyOutlined,
   FireOutlined,
   PlayCircleOutlined,
@@ -27,6 +29,7 @@ import InterviewLastMinuteBriefPanel from '../../components/InterviewLastMinuteB
 import InterviewMaterialVaultPanel from '../../components/InterviewMaterialVaultPanel'
 import InterviewFollowUpDefensePanel from '../../components/InterviewFollowUpDefensePanel'
 import { useStudyProgress } from '../../hooks/useStudyProgress'
+import { useStudyProgressSync } from '../../hooks/useStudyProgressSync'
 import { getHotQuestions } from '../../api/question'
 import type { Question, ReviewDueStatus, StudyProgress } from '../../types'
 import { buildReviewScheduleMarkdown, buildScheduledReviewQueue, summarizeReviewSchedule } from '../../utils/reviewSchedule'
@@ -109,6 +112,9 @@ export default function StudyPlan() {
   } = useStudyProgress()
   const [hotQuestions, setHotQuestions] = useState<Question[]>([])
   const [isLoadingSeeds, setIsLoadingSeeds] = useState(true)
+  // 云同步：登录后自动推送本地进度，支持显式从云端拉取恢复（换设备/清缓存后找回数据）。
+  const progressSync = useStudyProgressSync(progress)
+  const [pullResult, setPullResult] = useState<string | null>(null)
   const summary = summarizeProgress(progress)
   const generatedPlanIds = useMemo(
     () => buildDailyPlan(progress, hotQuestions, Math.max(progress.dailyPlan.length, 8)),
@@ -243,7 +249,7 @@ export default function StudyPlan() {
         <div>
           <div className="dashboard-kicker">学习中心</div>
           <h1>{progress.targetRole} · {activeViewMeta.title}</h1>
-          <p>{activeViewMeta.summary} 数据保存在本机。</p>
+          <p>{activeViewMeta.summary} {pullResult ?? '数据保存在本机，登录后自动同步云端。'}</p>
         </div>
         <div className="study-plan-header-actions">
           <Button
@@ -264,9 +270,44 @@ export default function StudyPlan() {
           <Button icon={<BookOutlined />} onClick={() => navigate('/banks')}>
             继续刷题
           </Button>
+          <Tooltip title={progressSync.error ?? '登录后自动把学习进度同步到云端，换设备不丢数据'}>
+            <Button
+              icon={<CloudUploadOutlined />}
+              loading={progressSync.syncing}
+              onClick={() => {
+                void progressSync.push().then(() => {
+                  emitFeedbackSuccess('学习进度已同步到云端')
+                })
+              }}
+            >
+              同步
+            </Button>
+          </Tooltip>
+          <Tooltip title="从云端拉取最近一次同步的进度（本地更新时不会覆盖）">
+            <Button
+              icon={<CloudDownloadOutlined />}
+              loading={progressSync.syncing}
+              onClick={() => {
+                void progressSync.pull().then(result => {
+                  setPullResult(result)
+                })
+              }}
+            >
+              恢复
+            </Button>
+          </Tooltip>
+          {progressSync.lastSyncedAt && (
+            <Tag className="study-sync-tag">已同步 {new Date(progressSync.lastSyncedAt).toLocaleTimeString('zh-CN')}</Tag>
+          )}
           <SprintReportActions progress={progress} />
         </div>
       </div>
+
+      {pullResult && (
+        <div className="study-sync-result" role="status" aria-live="polite">
+          {pullResult}
+        </div>
+      )}
 
       <section className="study-settings-panel">
         <div className="study-settings-title">

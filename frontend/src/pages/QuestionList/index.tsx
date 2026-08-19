@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Select, Pagination, Skeleton, Empty, Alert, Button } from 'antd'
+import { Select, Pagination, Skeleton, Empty, Alert, Button, message } from 'antd'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeftOutlined, FilterOutlined, PlayCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined, DownloadOutlined, FilterOutlined, PlayCircleOutlined, PlusOutlined, ThunderboltOutlined } from '@ant-design/icons'
 import { getQuestions } from '../../api/question'
 import { getCategoryById } from '../../api/category'
 import StudyActionButtons from '../../components/StudyActionButtons'
@@ -222,6 +222,28 @@ export default function QuestionList() {
     navigate(`/practice?queue=${visibleQuestionIds.join(',')}${sourceParam}`)
   }
 
+  /** 背本页：把当前筛选后的题目送进翻转卡背诵队列。 */
+  const startPageRecall = () => {
+    if (visibleQuestionIds.length === 0) {
+      navigate('/recall')
+      return
+    }
+    navigate(`/recall?ids=${visibleQuestionIds.join(',')}`)
+  }
+
+  /** 导出当前分类热门题为 Anki 牌组（后端生成 TSV，浏览器直接下载）。 */
+  const exportAnki = () => {
+    const params = new URLSearchParams({
+      category: String(categoryId),
+      limit: '200',
+    })
+    if (difficulty) {
+      params.set('difficulty', difficulty)
+    }
+    window.open(`/api/questions/anki-export?${params.toString()}`, '_blank')
+    message.success('已开始下载 Anki 导入文件（TSV），在 Anki 中选择文件导入，分隔符 Tab 并允许 HTML')
+  }
+
   return (
     <div className="question-list-page">
       <button
@@ -317,6 +339,20 @@ export default function QuestionList() {
             onClick={startPagePractice}
           >
             {hasVisibleQuestions ? '练本页' : '开始训练'}
+          </Button>
+          <Button
+            icon={<ThunderboltOutlined />}
+            aria-label={hasVisibleQuestions ? '背本页' : '开始背诵'}
+            onClick={startPageRecall}
+          >
+            {hasVisibleQuestions ? '背本页' : '开始背诵'}
+          </Button>
+          <Button
+            icon={<DownloadOutlined />}
+            aria-label="导出 Anki 牌组"
+            onClick={exportAnki}
+          >
+            Anki
           </Button>
         </div>
       </div>

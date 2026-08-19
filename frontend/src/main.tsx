@@ -6,6 +6,7 @@ import App from './App'
 import FeedbackMessageBridge from './components/FeedbackMessageBridge'
 import theme from './styles/theme'
 import './styles/global.css'
+import './styles/recall.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

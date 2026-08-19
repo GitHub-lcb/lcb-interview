@@ -5,6 +5,7 @@ import com.lcbinterview.controller.CategoryController;
 import com.lcbinterview.controller.InterviewCoachController;
 import com.lcbinterview.controller.KnowledgePointController;
 import com.lcbinterview.controller.QuestionController;
+import com.lcbinterview.controller.StudyProgressController;
 import com.lcbinterview.controller.TagController;
 import com.lcbinterview.controller.admin.AdminAuthController;
 import com.lcbinterview.controller.admin.AdminDashboardController;
@@ -57,6 +58,7 @@ class ControllerConventionTest {
             LotteryKl8Controller.class,
             LotterySimulationController.class,
             ReadingToolController.class,
+            StudyProgressController.class,
             SsqController.class,
             DltController.class
     );
