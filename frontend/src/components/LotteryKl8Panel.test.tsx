@@ -41,7 +41,7 @@ function recommendation(overrides: Partial<LotteryKl8Recommendation> = {}): Lott
     id: 1,
     source: 'RULE_BASED',
     pickSize: 4,
-    baseIssueCount: 2000,
+    baseIssueCount: 30,
     latestIssueNo: '2026213',
     groups: [
       { numbers: [2, 11, 12, 73], reason: '精选组' },
@@ -171,14 +171,14 @@ describe('LotteryKl8Panel', () => {
     await userEvent.click(screen.getByRole('button', { name: /Java 推荐选4/ }))
 
     await waitFor(() => {
-      expect(createKl8Recommendation).toHaveBeenCalledWith(2000)
+      expect(createKl8Recommendation).toHaveBeenCalledWith(30)
     })
     expect(emitFeedbackWarning).toHaveBeenCalledWith('Java 推荐生成耗时较长，请稍后刷新推荐历史查看结果')
     expect(emitFeedbackSuccess).not.toHaveBeenCalled()
   })
 
   it('generates a pick-4 recommendation', async () => {
-    vi.mocked(createKl8Recommendation).mockImplementation(async (baseIssueCount = 2000) => recommendation({
+    vi.mocked(createKl8Recommendation).mockImplementation(async (baseIssueCount = 30) => recommendation({
       baseIssueCount,
     }))
 
@@ -190,7 +190,7 @@ describe('LotteryKl8Panel', () => {
     await waitFor(() => {
       expect(createKl8Recommendation).toHaveBeenCalledTimes(1)
     })
-    expect(createKl8Recommendation).toHaveBeenCalledWith(2000)
+    expect(createKl8Recommendation).toHaveBeenCalledWith(30)
     expect((await screen.findAllByText('今晚开 · 预测 2026214')).length).toBeGreaterThan(0)
     expect(emitFeedbackSuccess).toHaveBeenCalledWith('Java 推荐已生成')
   })
