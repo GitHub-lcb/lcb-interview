@@ -73,10 +73,14 @@ public class LotteryKl8FeatureService {
     private static final int NEIGHBOR_RECOMMENDATION_SIZE = 20;
     /** V20 多组覆盖：每次生成 2 组号码，组间通过复用惩罚尽量去重；号码更少组间去重更充分，提升整体命中感知 */
     /**
-     * 每天只输出 1 组推荐：综合算法（V20 四策略加权投票）按当期数据动态选出最优的一组，
-     * 不再输出第二组覆盖组，避免两组的"命中感知"稀释单组命中率口径。
+     * 每天只输出 1 组推荐：综合算法按当期数据动态选出最优的一组。
+     * 内部先用综合算法生成 2 个候选组（主投票组 + 复用惩罚 fresh 组），
+     * 再对候选组在历史窗口内实测命中概率，挑概率最高的作为当天唯一推荐，
+     * 避免两组的"命中感知"稀释单组命中率口径，同时实现"先模拟试概率再选最优"的动态化。
      */
     private static final int OPTIMIZED_GROUP_COUNT = 1;
+    /** 内部候选组数量：先生成 2 个候选，再经历史模拟择优 */
+    private static final int CANDIDATE_GROUP_COUNT = 2;
     private static final List<String> BACKTEST_FACTORS = List.of(
             "hot", "missing", "trend", "decay", "pair", "balance");
 
@@ -207,7 +211,8 @@ public class LotteryKl8FeatureService {
                 drawSets.size(),
                 calibrationToUse,
                 backtestSummary,
-                pickSize);
+                pickSize,
+                drawSets);
         List<String> analysisSections = buildAnalysisSections(
                 draws.size(),
                 hot,
@@ -904,7 +909,8 @@ public class LotteryKl8FeatureService {
             int total,
             LotteryKl8StrategyCalibration calibration,
             LotteryKl8BacktestSummary backtestSummary,
-            int pickSize) {
+            int pickSize,
+            List<Set<Integer>> drawSets) {
         if (candidatePool.size() < pickSize) {
             return LotteryKl8OptimizedPortfolio.empty();
         }
@@ -930,11 +936,11 @@ public class LotteryKl8FeatureService {
                         Math::max,
                         LinkedHashMap::new));
         Map<Integer, Integer> reuseCounts = initNumberMap(0);
-        List<LotteryKl8OptimizedGroup> groups = new ArrayList<>();
+        List<LotteryKl8OptimizedGroup> candidateGroups = new ArrayList<>();
         Set<String> usedKeys = new HashSet<>();
 
-        // V17: 传递 latestNumbers 用于邻位子策略
-        for (int groupIndex = 0; groupIndex < OPTIMIZED_GROUP_COUNT; groupIndex += 1) {
+        // 先生成 2 个候选组（主投票组 + 复用惩罚 fresh 组），再经历史模拟择优
+        for (int groupIndex = 0; groupIndex < CANDIDATE_GROUP_COUNT; groupIndex += 1) {
             List<Integer> selected = selectOptimizedNumbers(
                     groupIndex,
                     selectionPool,
@@ -950,12 +956,15 @@ public class LotteryKl8FeatureService {
             usedKeys.add(unique.toString());
             unique.forEach(number -> reuseCounts.put(number, reuseCounts.getOrDefault(number, 0) + 1));
             double groupScore = optimizedGroupScore(unique, profileByNumber, neighborScores, backtestSummary.factorWeights());
-            groups.add(new LotteryKl8OptimizedGroup(
+            candidateGroups.add(new LotteryKl8OptimizedGroup(
                     unique,
                     groupScore,
                     "组合优化：V17四策略加权投票（贪心+混合+冷号替换+邻位回归）+连号种子保证+配对协同微调，回测≥3命中率10.49%，综合评分280。",
                     optimizedEvidence(unique, groupScore, neighborScores, reuseCounts, backtestSummary)));
         }
+
+        // 先模拟试概率再选最优：对候选组在历史窗口内实测中 2 个及以上命中率，挑概率最高的作为当天唯一推荐
+        List<LotteryKl8OptimizedGroup> groups = pickBestGroupsBySimulatedHitRate(candidateGroups, drawSets);
 
         double averageScore = groups.stream().mapToDouble(LotteryKl8OptimizedGroup::score).average().orElse(0);
         int maxReuse = reuseCounts.values().stream().max(Integer::compareTo).orElse(0);
@@ -2054,6 +2063,54 @@ public class LotteryKl8FeatureService {
                 .average()
                 .orElse(0);
         return round(base);
+    }
+
+    /**
+     * 先模拟试概率再选最优：对候选组在历史窗口内实测中 2 个及以上命中率，挑概率最高的作为当天唯一推荐。
+     * 若历史不足则直接取综合分最高的候选，避免小样本抖动。
+     *
+     * @param candidates 候选组
+     * @param drawSets   历史开奖集合（最新在前，每个 Set 为当期 20 个开奖号）
+     * @return 仅含最优一组的列表
+     */
+    private List<LotteryKl8OptimizedGroup> pickBestGroupsBySimulatedHitRate(
+            List<LotteryKl8OptimizedGroup> candidates,
+            List<Set<Integer>> drawSets) {
+        if (candidates.isEmpty()) {
+            return List.of();
+        }
+        if (candidates.size() == 1) {
+            return candidates;
+        }
+        if (drawSets == null || drawSets.isEmpty()) {
+            return List.of(candidates.stream()
+                    .max(Comparator.comparingDouble(LotteryKl8OptimizedGroup::score))
+                    .orElse(candidates.get(0)));
+        }
+        // 用最近 100 期（或全部）作为模拟窗口，统计中 2 个及以上期数
+        int window = Math.min(drawSets.size(), 100);
+        List<Set<Integer>> windowSets = drawSets.subList(0, window);
+        LotteryKl8OptimizedGroup best = null;
+        int bestHitCount = -1;
+        double bestScore = -1;
+        for (LotteryKl8OptimizedGroup candidate : candidates) {
+            Set<Integer> candidateSet = new HashSet<>(candidate.numbers());
+            int hitCount = 0;
+            for (Set<Integer> drawSet : windowSets) {
+                long hit = candidateSet.stream().filter(drawSet::contains).count();
+                if (hit >= 2) {
+                    hitCount += 1;
+                }
+            }
+            // 主排序命中期数，次排序综合分
+            if (hitCount > bestHitCount
+                    || (hitCount == bestHitCount && candidate.score() > bestScore)) {
+                best = candidate;
+                bestHitCount = hitCount;
+                bestScore = candidate.score();
+            }
+        }
+        return List.of(best != null ? best : candidates.get(0));
     }
 
     private List<String> optimizedEvidence(
