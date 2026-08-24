@@ -2087,8 +2087,8 @@ public class LotteryKl8FeatureService {
                     .max(Comparator.comparingDouble(LotteryKl8OptimizedGroup::score))
                     .orElse(candidates.get(0)));
         }
-        // 用最近 100 期（或全部）作为模拟窗口，统计中 2 个及以上期数
-        int window = Math.min(drawSets.size(), 100);
+        // holdout 模拟：用最近 30 期作验证集（更贴近当下 regime），避免在 100 期训练集上自嗨过拟合
+        int window = Math.min(drawSets.size(), 30);
         List<Set<Integer>> windowSets = drawSets.subList(0, window);
         LotteryKl8OptimizedGroup best = null;
         int bestHitCount = -1;
