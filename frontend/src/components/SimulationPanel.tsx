@@ -12,7 +12,7 @@ import type { LotterySimulation } from '../types'
 const DISCLAIMER = '模拟战场用历史开奖数据回放预测算法，统计结果不代表未来命中，仅供参考。'
 
 const TYPE_OPTIONS = [
-  { label: '快乐8 选4×2组', value: 'KL8' },
+  { label: '快乐8 选4×1组', value: 'KL8' },
   { label: '双色球 7+1', value: 'SSQ' },
   { label: '大乐透 5+3', value: 'DLT' },
 ]
@@ -51,7 +51,7 @@ function parseHitDistribution(value: string | undefined, evaluatedCount: number)
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  KL8: '快乐8 选4×2组',
+  KL8: '快乐8 选4×1组',
   SSQ: '双色球 7+1',
   DLT: '大乐透 5+3',
 }
@@ -215,7 +215,7 @@ export default function SimulationPanel() {
             </Col>
             <Col xs={12} md={6}>
               <Statistic
-                title={latest.lotteryType === 'KL8' ? '两组平均总命中' : latest.lotteryType === 'SSQ' ? '蓝球平均命中' : '后区平均命中'}
+                title={latest.lotteryType === 'KL8' ? '单组平均命中' : latest.lotteryType === 'SSQ' ? '蓝球平均命中' : '后区平均命中'}
                 value={latest.secondaryAvg}
                 precision={2}
               />

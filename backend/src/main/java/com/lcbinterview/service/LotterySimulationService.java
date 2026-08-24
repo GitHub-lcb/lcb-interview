@@ -35,7 +35,7 @@ import java.util.Set;
  * 逐期调用与每日推荐相同的 FeatureService/Policy 预测并结算，最终统计命中表现。
  * <p>
  * 三种玩法独立预测口径：
- * - KL8：选4 × 2 组，统计单组最高命中与两组总命中
+ * - KL8：选4 × 1 组，统计单组命中
  * - SSQ：7 红 + 1 蓝，统计红球命中与蓝球命中率
  * - DLT：5 前区 + 3 后区，统计前区命中与后区命中
  * <p>
@@ -181,7 +181,8 @@ public class LotterySimulationService {
     // ============ 模拟算法 ============
 
     /**
-     * 快乐8 模拟：逐期调用 V20 每日正式策略（四策略投票、邻位、覆盖去重、用户校准）。
+     * 快乐8 模拟：逐期调用 V20 每日正式策略（四策略投票、邻位、用户校准），
+     * 每天只推荐 1 组，命中口径即单组命中数。
      */
     private List<SimulationEntry> simulateKl8(Long userId, List<LotteryKl8Draw> draws, int window) {
         List<SimulationEntry> entries = new ArrayList<>();
@@ -198,14 +199,11 @@ public class LotterySimulationService {
             List<LotteryKl8RecommendationGroupVO> groups = kl8RecommendationPolicy
                     .fallbackResult(report, KL8_PICK_SIZE).groups();
             List<Integer> group1 = groups.get(0).numbers();
-            List<Integer> group2 = groups.get(1).numbers();
             Set<Integer> actual = new LinkedHashSet<>(kl8FeatureService.parseNumbers(target.getNumbers()));
             int g1Hit = (int) group1.stream().filter(actual::contains).count();
-            int g2Hit = (int) group2.stream().filter(actual::contains).count();
-            int primary = Math.max(g1Hit, g2Hit);
-            // KL8 不按奖级统计，奖级固定为 0，命中口径由单组命中数决定
+            // KL8 不按奖级统计，奖级固定为 0，命中口径为单组命中数（中 2 个及以上算有效）
             entries.add(new SimulationEntry(target.getIssueNo(), target.getDrawDate(),
-                    group1, group2, List.of(), primary, g1Hit + g2Hit, 0));
+                    group1, List.of(), List.of(), g1Hit, g1Hit, 0));
             history.add(target);
         }
         return entries;
@@ -355,7 +353,7 @@ public class LotterySimulationService {
 
     private String buildSummary(String type, int window, SimulationStats stats) {
         String label = switch (type) {
-            case "KL8" -> "快乐8 选4×2组";
+            case "KL8" -> "快乐8 选4×1组";
             case "SSQ" -> "双色球 7+1";
             case "DLT" -> "大乐透 5+3";
             default -> type;

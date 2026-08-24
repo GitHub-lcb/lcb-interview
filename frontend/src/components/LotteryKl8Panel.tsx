@@ -248,10 +248,15 @@ export default function LotteryKl8Panel() {
     if (!latest || latest.groups.length === 0) {
       return
     }
-    // 按 10 元投注组合复制：第 1 组选4 2倍 + 第 2 组选4 2倍 + 两组合并的选8 1倍。
-    // 合计 2+2+1 注共 10 元，方便直接粘贴到投注站或官方 APP；第三行合并号按大小排序。
+    // 每天只推荐 1 组：复制为单组投注格式；旧的多组历史记录仍按通用格式逐行复制。
     let text: string
-    if (latest.groups.length === 2) {
+    let message: string
+    if (latest.groups.length === 1) {
+      const first = latest.groups[0].numbers.map(formatTrendNumber).join(' ')
+      text = `选4 ${first} 1倍`
+      message = '已复制精选号码（选4×1组）'
+    } else if (latest.groups.length === 2) {
+      // 兼容旧的双组历史记录：第 1 组选4 2倍 + 第 2 组选4 2倍 + 两组合并的选8 1倍。
       const first = latest.groups[0].numbers.map(formatTrendNumber).join(' ')
       const second = latest.groups[1].numbers.map(formatTrendNumber).join(' ')
       const merged = [...latest.groups[0].numbers, ...latest.groups[1].numbers]
@@ -262,15 +267,17 @@ export default function LotteryKl8Panel() {
         `选4 ${second} 2倍`,
         `选8 ${merged} 1倍`,
       ].join('\n')
+      message = '已复制 10 元组合（选4×2倍 + 选4×2倍 + 选8×1倍）'
     } else {
       // 单组或历史多组记录回退为通用格式：每组一行、空格分隔、个位补 0
       text = latest.groups
         .map(group => group.numbers.map(formatTrendNumber).join(' '))
         .join('\n')
+      message = '已复制推荐号码'
     }
     const copied = await copyToClipboard(text)
     if (copied) {
-      emitFeedbackSuccess('已复制 10 元组合（选4×2倍 + 选4×2倍 + 选8×1倍）')
+      emitFeedbackSuccess(message)
     } else {
       emitFeedbackWarning('复制失败，请手动选择号码复制')
     }
@@ -282,7 +289,7 @@ export default function LotteryKl8Panel() {
         <div>
           <div className="dashboard-kicker">快乐8选4</div>
           <h2>Java 历史数据回测推荐</h2>
-          <p>每天同步开奖后自动生成 2 组精选号码，开奖后自动结算，命中与否一眼可见。</p>
+          <p>每天同步开奖后自动生成 1 组精选号码，开奖后自动结算，命中与否一眼可见。</p>
         </div>
         <div className="tool-actions">
           <Button icon={<AuditOutlined />} loading={evaluating} onClick={handleEvaluate}>

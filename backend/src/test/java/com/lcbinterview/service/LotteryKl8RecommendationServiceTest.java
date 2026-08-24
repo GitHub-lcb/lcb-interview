@@ -65,10 +65,10 @@ class LotteryKl8RecommendationServiceTest {
                 });
         assertEquals("RULE_BASED", saved.getSource());
         assertEquals("KL8_JAVA_MULTI_GROUP_V20", saved.getStrategyVersion());
-        // 组合优化组不足 2 组时由规则补齐，最终固定输出 2 组，首组沿用组合优化结果
-        assertEquals(2, savedGroups.size());
+        // 组合优化已有 1 组候选，直接作为最终推荐输出 1 组，首组沿用组合优化结果
+        assertEquals(1, savedGroups.size());
         assertEquals(List.of(1, 2, 3, 4), savedGroups.get(0).numbers());
-        assertEquals(2, result.groups().size());
+        assertEquals(1, result.groups().size());
         assertEquals(List.of(1, 2, 3, 4), result.groups().get(0).numbers());
     }
 

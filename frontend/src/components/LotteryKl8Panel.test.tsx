@@ -44,8 +44,7 @@ function recommendation(overrides: Partial<LotteryKl8Recommendation> = {}): Lott
     baseIssueCount: 2000,
     latestIssueNo: '2026213',
     groups: [
-      { numbers: [2, 11, 12, 73], reason: '第一组' },
-      { numbers: [4, 7, 32, 51], reason: '第二组' },
+      { numbers: [2, 11, 12, 73], reason: '精选组' },
     ],
     featureSummary: '测试摘要',
     disclaimer: '测试免责声明',
@@ -80,24 +79,23 @@ describe('LotteryKl8Panel', () => {
     render(<LotteryKl8Panel />)
 
     expect((await screen.findAllByText('今晚开 · 预测 2026214')).length).toBeGreaterThan(0)
-    expect(screen.getAllByText('等今晚开奖，开奖后自动结算').length).toBe(2)
+    expect(screen.getAllByText('等今晚开奖，开奖后自动结算').length).toBe(1)
   })
 
   it('marks settled recommendation with hit count and highlights hit numbers', async () => {
     const settled = recommendation({
       evaluatedIssueNo: '2026214',
       evaluatedDrawDate: '2026-08-12',
-      totalHitCount: 3,
+      totalHitCount: 2,
       maxHitCount: 2,
       hitSummaryJson: JSON.stringify({
         issueNo: '2026214',
         drawDate: '2026-08-12',
         drawNumbers: [6, 7, 11, 12, 21, 33, 42, 56, 60, 80],
-        totalHitCount: 3,
+        totalHitCount: 2,
         maxHitCount: 2,
         groups: [
           { groupIndex: 1, numbers: [2, 11, 12, 73], hitNumbers: [11, 12], hitCount: 2 },
-          { groupIndex: 2, numbers: [4, 7, 32, 51], hitNumbers: [7], hitCount: 1 },
         ],
       }),
     })
@@ -105,9 +103,8 @@ describe('LotteryKl8Panel', () => {
 
     render(<LotteryKl8Panel />)
 
-    expect((await screen.findAllByText('已开 · 命中 3')).length).toBeGreaterThan(0)
+    expect((await screen.findAllByText('已开 · 命中 2')).length).toBeGreaterThan(0)
     expect(screen.getByText('命中 2/4')).toBeInTheDocument()
-    expect(screen.getByText('命中 1/4')).toBeInTheDocument()
     expect(screen.getByText('单组最高 2/4')).toBeInTheDocument()
   })
 
@@ -124,7 +121,6 @@ describe('LotteryKl8Panel', () => {
         maxHitCount: 0,
         groups: [
           { groupIndex: 1, numbers: [2, 11, 12, 73], hitNumbers: [], hitCount: 0 },
-          { groupIndex: 2, numbers: [4, 7, 32, 51], hitNumbers: [], hitCount: 0 },
         ],
       }),
     })
@@ -133,7 +129,7 @@ describe('LotteryKl8Panel', () => {
     render(<LotteryKl8Panel />)
 
     expect((await screen.findAllByText('已开 · 命中 0')).length).toBeGreaterThan(0)
-    expect(screen.getAllByText('命中 0/4').length).toBe(2)
+    expect(screen.getAllByText('命中 0/4').length).toBe(1)
   })
 
   it('falls back to plain label when issue number cannot be incremented', async () => {
@@ -159,9 +155,9 @@ describe('LotteryKl8Panel', () => {
     await userEvent.click(screen.getByRole('button', { name: /一键复制/ }))
 
     await waitFor(() => {
-      expect(writeText).toHaveBeenCalledWith('选4 02 11 12 73 2倍\n选4 04 07 32 51 2倍\n选8 02 04 07 11 12 32 51 73 1倍')
+      expect(writeText).toHaveBeenCalledWith('选4 02 11 12 73 1倍')
     })
-    expect(emitFeedbackSuccess).toHaveBeenCalledWith('已复制 10 元组合（选4×2倍 + 选4×2倍 + 选8×1倍）')
+    expect(emitFeedbackSuccess).toHaveBeenCalledWith('已复制精选号码（选4×1组）')
   })
 
   it('handles Java recommendation timeout with controlled feedback', async () => {

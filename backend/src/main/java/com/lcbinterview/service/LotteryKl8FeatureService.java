@@ -72,7 +72,11 @@ public class LotteryKl8FeatureService {
     private static final int PAIR_RECOMMENDATION_SIZE = 12;
     private static final int NEIGHBOR_RECOMMENDATION_SIZE = 20;
     /** V20 多组覆盖：每次生成 2 组号码，组间通过复用惩罚尽量去重；号码更少组间去重更充分，提升整体命中感知 */
-    private static final int OPTIMIZED_GROUP_COUNT = 2;
+    /**
+     * 每天只输出 1 组推荐：综合算法（V20 四策略加权投票）按当期数据动态选出最优的一组，
+     * 不再输出第二组覆盖组，避免两组的"命中感知"稀释单组命中率口径。
+     */
+    private static final int OPTIMIZED_GROUP_COUNT = 1;
     private static final List<String> BACKTEST_FACTORS = List.of(
             "hot", "missing", "trend", "decay", "pair", "balance");
 
@@ -958,7 +962,7 @@ public class LotteryKl8FeatureService {
         Set<Integer> selectedNumbers = groups.stream()
                 .flatMap(group -> group.numbers().stream())
                 .collect(Collectors.toCollection(LinkedHashSet::new));
-        // V19 覆盖度统计：3 组号码去重后覆盖的不同号码数，直接反映整体命中机会
+        // V19 覆盖度统计：单组号码覆盖的不同号码数（现为单组推荐，覆盖数=组内号码数）
         long coverageNumberCount = selectedNumbers.size();
         List<LotteryKl8NeighborRecommendation> neighborRecommendations = markSelectedNeighbors(neighborDrafts, selectedNumbers, pickSize);
         Map<String, String> diagnostics = new LinkedHashMap<>();
@@ -975,7 +979,7 @@ public class LotteryKl8FeatureService {
         diagnostics.put("longestConsecutiveRun", String.valueOf(longestConsecutiveRun(groups.get(0).numbers())));
         return new LotteryKl8OptimizedPortfolio(
                 groups,
-                "组合优化完成：基于 %d 个候选号码，四策略加权投票+连号种子保证+配对协同微调生成 %d 组号码，组间覆盖 %d 个不同号码，平均组合分 %.2f，回测平均命中 %.2f。"
+                "组合优化完成：基于 %d 个候选号码，四策略加权投票+连号种子保证+配对协同微调生成 %d 组号码，覆盖 %d 个不同号码，平均组合分 %.2f，回测平均命中 %.2f。"
                         .formatted(candidates.size(), groups.size(), coverageNumberCount, averageScore,
                                 backtestSummary.averageHitCount()),
                 diagnostics,
@@ -1278,9 +1282,8 @@ public class LotteryKl8FeatureService {
         Map<Integer, Double> votes = new LinkedHashMap<>();
         Map<Integer, Double> scoreSums = new LinkedHashMap<>();
         List<List<Integer>> allPicks = List.of(picks1, picks2, picks3, picks4);
-        // V19 多组覆盖：对已被前面组选中的号码施加投票惩罚（每复用一次扣 6.0 分），
-        // 让第 2/3 组在排序中自然让位给新鲜号码，保证 3 组之间最大程度去重覆盖。
-        // 若不惩罚，邻位策略（权重 5.0）会为 3 组选出几乎相同的号码，覆盖失效。
+        // 单组推荐：reuseCounts 全程为 0（仅生成 1 组），投票不叠加复用惩罚，
+        // 综合算法按当期数据动态选出票数最高的一批号码作为每日唯一推荐。
         for (int si = 0; si < allPicks.size(); si++) {
             double weight = strategyWeights[si];
             for (Integer num : allPicks.get(si)) {

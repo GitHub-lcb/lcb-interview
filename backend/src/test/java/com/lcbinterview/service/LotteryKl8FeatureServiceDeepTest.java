@@ -64,14 +64,14 @@ class LotteryKl8FeatureServiceDeepTest {
         assertTrue(report.backtestSummary().hitDistribution().values().stream().mapToInt(Integer::intValue).sum() > 0);
         assertTrue(report.backtestSummary().factorWeights().decayWeight() >= report.backtestSummary().factorWeights().missingWeight());
         assertNotNull(report.optimizedPortfolio());
-        assertEquals(2, report.optimizedPortfolio().groups().size());
+        assertEquals(1, report.optimizedPortfolio().groups().size());
         assertTrue(report.optimizedPortfolio().groups().stream().allMatch(group -> group.numbers().size() == 4));
-        // V20 多组覆盖：2 组号码去重后覆盖至少 6 个不同号码，避免组间大量重复
+        // V20 单组推荐：1 组号码去重后覆盖 4 个不同号码
         long coverage = report.optimizedPortfolio().groups().stream()
                 .flatMap(group -> group.numbers().stream())
                 .distinct()
                 .count();
-        assertTrue(coverage >= 6, "2 组推荐应尽量覆盖不同号码，实际覆盖 " + coverage);
+        assertTrue(coverage >= 4, "单组推荐应覆盖 4 个不同号码，实际覆盖 " + coverage);
         assertTrue(report.optimizedPortfolio().summary().contains("组合"));
         assertTrue(report.optimizedPortfolio().diagnostics().containsKey("coverageNumberCount"));
         assertEquals(report.optimizedPortfolio().groups().stream().map(LotteryKl8OptimizedGroup::numbers).toList(),

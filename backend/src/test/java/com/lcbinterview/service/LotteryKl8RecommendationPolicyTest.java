@@ -84,10 +84,10 @@ class LotteryKl8RecommendationPolicyTest {
 
         List<LotteryKl8RecommendationGroupVO> groups = policy.fallbackGroups(report);
 
-        assertEquals(2, groups.size());
+        assertEquals(1, groups.size());
         groups.forEach(group -> assertEquals(4, group.numbers().size()));
-        // 补齐组之间不能出现完全相同的一组号码
-        assertEquals(2, groups.stream().map(LotteryKl8RecommendationGroupVO::numbers).distinct().count());
+        // 单组推荐只能有一组号码
+        assertEquals(1, groups.stream().map(LotteryKl8RecommendationGroupVO::numbers).distinct().count());
     }
 
     @Test
@@ -160,11 +160,29 @@ class LotteryKl8RecommendationPolicyTest {
 
         List<LotteryKl8RecommendationGroupVO> groups = policy.fallbackGroups(report);
 
-        // 组合优化已有 5 组候选，取前 2 组作为本次推荐
-        assertEquals(2, groups.size());
+        // 组合优化已有 5 组候选，每天只取综合算法选出的最优 1 组作为本次推荐
+        assertEquals(1, groups.size());
         assertEquals(List.of(1, 2, 3, 4), groups.get(0).numbers());
-        assertEquals(List.of(5, 6, 7, 8), groups.get(1).numbers());
         assertTrue(groups.get(0).reason().contains("组合优化"));
+    }
+
+    @Test
+    void capsAiResultToSingleGroup() {
+        String json = """
+                {
+                  "confidenceLabel":"中低",
+                  "groups":[
+                    {"numbers":[1,8,23,45],"reason":"综合算法首组"},
+                    {"numbers":[2,9,24,46],"reason":"AI 额外返回的第二组"}
+                  ]
+                }
+                """;
+
+        LotteryKl8RecommendationPolicy.ValidatedRecommendation result = policy.validateAiResult(json);
+
+        // 每天只推荐 1 组：即使 AI 返回多组也只保留首组
+        assertEquals(1, result.groups().size());
+        assertEquals(List.of(1, 8, 23, 45), result.groups().get(0).numbers());
     }
 
     private Map<Integer, Integer> missingMap() {

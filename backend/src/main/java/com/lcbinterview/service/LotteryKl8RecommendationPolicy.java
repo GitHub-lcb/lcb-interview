@@ -23,8 +23,8 @@ public class LotteryKl8RecommendationPolicy {
 
     /** 默认每组 4 个号码，兼容旧记录和旧调用方 */
     public static final int DEFAULT_PICK_SIZE = 4;
-    /** 每次输出 2 组号码，组间由特征层做覆盖去重，提升整体命中感知 */
-    private static final int GROUP_COUNT = 2;
+    /** 每天只输出 1 组号码：综合算法动态选出最优的一组，AI 与 Java 回退统一按此口径 */
+    private static final int GROUP_COUNT = 1;
     private static final Set<String> CONFIDENCE_LABELS = Set.of("低", "中低", "中");
 
     private final ObjectMapper objectMapper;
@@ -97,12 +97,16 @@ public class LotteryKl8RecommendationPolicy {
                 groups.add(validateGroup(numbers, reason, pickSize));
             }
             List<LotteryKl8RecommendationGroupVO> validatedGroups = validateGroups(groups, pickSize);
+            // 每天只推荐 1 组：即使 AI 返回多组也只保留综合算法选出的首组，避免口径漂移
+            List<LotteryKl8RecommendationGroupVO> finalGroups = validatedGroups.size() > GROUP_COUNT
+                    ? validatedGroups.subList(0, GROUP_COUNT)
+                    : validatedGroups;
             String confidenceLabel = root.isObject() && CONFIDENCE_LABELS.contains(root.path("confidenceLabel").asText())
                     ? root.path("confidenceLabel").asText()
                     : "中低";
             ObjectNode analysis = normalizeAnalysis(root, confidenceLabel);
             List<String> warnings = readWarnings(analysis.path("analysis").path("riskWarnings"));
-            return new ValidatedRecommendation(validatedGroups, objectMapper.writeValueAsString(analysis), confidenceLabel, warnings);
+            return new ValidatedRecommendation(finalGroups, objectMapper.writeValueAsString(analysis), confidenceLabel, warnings);
         } catch (Exception e) {
             throw new IllegalArgumentException("AI 推荐输出不合规", e);
         }
@@ -200,11 +204,11 @@ public class LotteryKl8RecommendationPolicy {
 
     /**
      * 根据历史特征生成 Java 规则推荐。
-     * 优先复用组合优化组，不足 3 组时用规则候选补齐，组间号码尽量不重复。
+     * 优先复用组合优化组（综合算法动态选出的最优组），不足 1 组时用规则候选补齐。
      *
      * @param report   历史特征报告
      * @param pickSize 每组号码数量（1-10）
-     * @return 3 组规则推荐
+     * @return 1 组规则推荐
      */
     public List<LotteryKl8RecommendationGroupVO> fallbackGroups(LotteryKl8FeatureReport report, int pickSize) {
         Random random = new Random(System.nanoTime());
