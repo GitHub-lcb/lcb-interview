@@ -38,7 +38,7 @@ class LotteryKl8RecommendationServiceTest {
         LotteryKl8FeatureReport report = reportWithSingleOptimizedGroup();
         when(calibrationService.currentCalibration(7L)).thenReturn(calibration);
         when(calibrationService.numberHitFeedback(7L)).thenReturn(Map.of());
-        when(featureService.buildReport(eq(30), any(LotteryKl8StrategyCalibration.class), eq(4), any())).thenReturn(report);
+        when(featureService.buildReport(eq(20), any(LotteryKl8StrategyCalibration.class), eq(4), any())).thenReturn(report);
         when(recommendationMapper.insert(any())).thenAnswer(invocation -> {
             LotteryKl8Recommendation recommendation = invocation.getArgument(0);
             recommendation.setId(99L);

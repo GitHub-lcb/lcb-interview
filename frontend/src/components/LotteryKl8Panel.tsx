@@ -148,7 +148,7 @@ export default function LotteryKl8Panel() {
   const [draws, setDraws] = useState<LotteryKl8Draw[]>([])
   const [history, setHistory] = useState<LotteryKl8Recommendation[]>([])
   const [current, setCurrent] = useState<LotteryKl8Recommendation | null>(null)
-  const [baseIssueCount, setBaseIssueCount] = useState(30)
+  const [baseIssueCount, setBaseIssueCount] = useState(20)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [recommending, setRecommending] = useState(false)
@@ -325,7 +325,7 @@ export default function LotteryKl8Panel() {
                 </article>
                 <article>
                   <span>推荐基准</span>
-                  <InputNumber min={20} max={2000} value={baseIssueCount} onChange={value => setBaseIssueCount(value ?? 30)} />
+                  <InputNumber min={20} max={2000} value={baseIssueCount} onChange={value => setBaseIssueCount(value ?? 20)} />
                   <small>历史期数，默认尽量取满</small>
                 </article>
               </div>
