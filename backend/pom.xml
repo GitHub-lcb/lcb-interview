@@ -72,6 +72,7 @@
                     <include>lcb-lottery-migration.sql</include>
                     <include>lcb-simulation-migration.sql</include>
                     <include>lcb-study-progress-migration.sql</include>
+                    <include>lcb-membership-migration.sql</include>
                 </includes>
             </resource>
         </resources>

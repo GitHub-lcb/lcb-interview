@@ -31,7 +31,8 @@ public record QuestionVO(
         @Schema(description = "浏览次数") Integer viewCount,
         @Schema(description = "创建时间") LocalDateTime createTime,
         @Schema(description = "同分类上一题 ID") Long previousId,
-        @Schema(description = "同分类下一题 ID") Long nextId
+        @Schema(description = "同分类下一题 ID") Long nextId,
+        @Schema(description = "深度答案字段是否被会员墙锁定") boolean premiumLocked
 ) {
     /**
      * 从 Question 实体创建 VO，需要外部传入分类名称和标签列表。
@@ -47,7 +48,7 @@ public record QuestionVO(
                 question.getDifficulty(), question.getCategoryId(),
                 categoryName, tags,
                 question.getViewCount(), question.getCreateTime(),
-                null, null
+                null, null, false
         );
     }
 
@@ -62,7 +63,21 @@ public record QuestionVO(
         return new QuestionVO(
                 id, title, summary, content, principle, comparison, scenario, risk,
                 projectExp, codeExamples, diagrams, relatedIds, difficulty, categoryId,
-                categoryName, tags, viewCount, createTime, previousId, nextId
+                categoryName, tags, viewCount, createTime, previousId, nextId, premiumLocked
+        );
+    }
+
+    /**
+     * 返回深度字段被锁定的副本：仅保留标题、摘要、正文预览和风险提示，
+     * 其余深度字段置空并标记 premiumLocked，前端据此展示模糊遮罩和解锁引导。
+     *
+     * @return 锁定深度字段的题目 VO
+     */
+    public QuestionVO withLockedPremium() {
+        return new QuestionVO(
+                id, title, summary, content, null, null, null, risk,
+                null, null, null, relatedIds, difficulty, categoryId,
+                categoryName, tags, viewCount, createTime, previousId, nextId, true
         );
     }
 }

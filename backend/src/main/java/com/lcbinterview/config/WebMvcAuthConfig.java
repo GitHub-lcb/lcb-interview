@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * 普通用户认证拦截配置。限定到个人工具和学习进度同步路径，避免影响公开题库和管理后台。
+ * 普通用户认证拦截配置。限定到个人工具、学习进度、面试训练和会员计费路径，避免影响公开题库和管理后台。
  */
 @Configuration
 @ConditionalOnBean(UserAuthInterceptor.class)
@@ -17,13 +17,21 @@ public class WebMvcAuthConfig implements WebMvcConfigurer {
     private final UserAuthInterceptor userAuthInterceptor;
 
     /**
-     * 注册普通用户认证拦截器。
+     * 注册普通用户认证拦截器。题目详情不在此列，游客仍可浏览公开字段。
      *
      * @param registry 拦截器注册器
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(userAuthInterceptor)
-                .addPathPatterns("/api/tools/**", "/api/auth/me", "/api/study/**");
+                .addPathPatterns(
+                        "/api/tools/**",
+                        "/api/auth/me",
+                        "/api/study/**",
+                        "/api/interview/**",
+                        "/api/membership/status",
+                        "/api/orders/**",
+                        "/api/credits/**",
+                        "/api/questions/anki-export");
     }
 }

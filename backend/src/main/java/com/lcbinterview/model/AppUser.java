@@ -35,6 +35,10 @@ public class AppUser {
     /** 用户状态：ACTIVE / DISABLED */
     private String status;
 
+    /** 会员等级冗余列：FREE / PRO，仅用于展示，权益判定以 user_membership 有效期为准 */
+    @TableField("membership_level")
+    private String membershipLevel;
+
     /** 创建时间 */
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

@@ -58,6 +58,9 @@ app:
   auth:
     secret: ${APP_AUTH_SECRET:dev-user-auth-secret-change-me}
     token-ttl-hours: ${APP_AUTH_TOKEN_TTL_HOURS:168}
+  membership:
+    # 会员配额墙总开关：关闭时所有用户视同 PRO 全量放开，用于灰度期
+    enabled: ${APP_MEMBERSHIP_ENABLED:false}
   knowledge:
     corpus:
       max-import-body-bytes: ${KNOWLEDGE_CORPUS_MAX_IMPORT_BODY_BYTES:10485760}
