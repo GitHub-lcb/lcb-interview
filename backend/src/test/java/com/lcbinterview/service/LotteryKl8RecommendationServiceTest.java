@@ -137,6 +137,23 @@ class LotteryKl8RecommendationServiceTest {
     }
 
     @Test
+    void overwritesLegacyRecommendationWhenEvaluatedIssueIsBlank() {
+        LotteryKl8RecommendationMapper recommendationMapper = mock(LotteryKl8RecommendationMapper.class);
+        LotteryKl8Recommendation existing = savedRecommendation(31L, 4, "KL8_JAVA_MULTI_GROUP_V20");
+        // 线上历史数据里未结算记录的结算期号是空串，不是 NULL
+        existing.setEvaluatedIssueNo("");
+        when(recommendationMapper.selectOne(any())).thenReturn(existing);
+
+        LotteryKl8RecommendationService service = service(recommendationMapper);
+
+        LotteryKl8RecommendationVO result = service.recommend(7L, new LotteryKl8RecommendationRequest(null));
+
+        assertEquals(5, result.pickSize());
+        verify(recommendationMapper).updateById(any());
+        verify(recommendationMapper, never()).insert(any());
+    }
+
+    @Test
     void hasCurrentRecommendationRequiresPick5AndCurrentVersion() {
         LotteryKl8RecommendationMapper recommendationMapper = mock(LotteryKl8RecommendationMapper.class);
         LotteryKl8RecommendationService service = service(recommendationMapper);

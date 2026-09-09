@@ -69,7 +69,8 @@ public LotteryKl8RecommendationVO recommend(Long userId, LotteryKl8Recommendatio
         LotteryKl8RecommendationPolicy.ValidatedRecommendation result = recommendationPolicy.fallbackResult(report, pickSize);
         // 口径不同且尚未结算：直接覆盖同基准期的旧记录（否则页面会继续显示旧的选4 推荐）；
         // 已结算的旧记录保留作历史，另插入一条新口径记录。
-        LotteryKl8Recommendation recommendation = existing != null && existing.getEvaluatedIssueNo() == null
+        // 注意：历史数据里 evaluated_issue_no 可能是空串而不是 NULL，必须一并按「未结算」处理。
+        LotteryKl8Recommendation recommendation = existing != null && isUnsettled(existing)
                 ? existing
                 : new LotteryKl8Recommendation();
         recommendation.setUserId(userId);
@@ -107,6 +108,17 @@ public LotteryKl8RecommendationVO recommend(Long userId, LotteryKl8Recommendatio
     public boolean hasCurrentRecommendation(Long userId, String latestIssueNo) {
         LotteryKl8Recommendation existing = findExisting(userId, latestIssueNo);
         return existing != null && isCurrentFormat(existing, DEFAULT_PICK_SIZE);
+    }
+
+    /**
+     * 判断推荐是否尚未结算。
+     *
+     * @param recommendation 推荐记录
+     * @return true 表示结算期号为空或空串
+     */
+    private boolean isUnsettled(LotteryKl8Recommendation recommendation) {
+        String evaluatedIssueNo = recommendation.getEvaluatedIssueNo();
+        return evaluatedIssueNo == null || evaluatedIssueNo.isBlank();
     }
 
     /**
