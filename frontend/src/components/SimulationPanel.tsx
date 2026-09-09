@@ -1,20 +1,23 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  Alert, Button, Card, Col, Empty, InputNumber, Progress, Row, Segmented, Space, Statistic, Tag,
+  Alert, Button, Card, Col, InputNumber, Progress, Row, Segmented, Space, Statistic, Tag,
 } from 'antd'
 import { ExperimentOutlined } from '@ant-design/icons'
 import {
   listLotterySimulations, runLotterySimulation,
 } from '../api/tools'
 import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
+import LotteryKl8LabPanel from './LotteryKl8LabPanel'
 import type { LotterySimulation } from '../types'
 
 const DISCLAIMER = '模拟战场用历史开奖数据回放预测算法，统计结果不代表未来命中，仅供参考。'
 
-const TYPE_OPTIONS = [
-  { label: '快乐8 选4×1组', value: 'KL8' },
-  { label: '双色球 7+1', value: 'SSQ' },
-  { label: '大乐透 5+3', value: 'DLT' },
+/** 工具页只保留快乐8：模拟玩法固定为选5，与线上每日推荐同一口径 */
+const LOTTERY_TYPE = 'KL8'
+
+const MODE_OPTIONS = [
+  { label: '历史回放', value: 'replay' },
+  { label: '概率实验室', value: 'lab' },
 ]
 
 const WINDOW_OPTIONS = [10, 50, 100, 200, 500, 1000]
@@ -51,49 +54,15 @@ function parseHitDistribution(value: string | undefined, evaluatedCount: number)
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  KL8: '快乐8 选4×1组',
-  SSQ: '双色球 7+1',
-  DLT: '大乐透 5+3',
+  KL8: '快乐8 选5×1组',
 }
 
-// 双色球奖级标签：0未中奖 1六 2五 3四 4三 5二 6一
-const SSQ_TIER_LABELS: Record<number, string> = {
-  0: '未中奖',
-  1: '六等奖',
-  2: '五等奖',
-  3: '四等奖',
-  4: '三等奖',
-  5: '二等奖',
-  6: '一等奖',
-}
-
-// 大乐透奖级标签：0未中奖 1七 2六 3五 4四 5三 6二 7一
-const DLT_TIER_LABELS: Record<number, string> = {
-  0: '未中奖',
-  1: '七等奖',
-  2: '六等奖',
-  3: '五等奖',
-  4: '四等奖',
-  5: '三等奖',
-  6: '二等奖',
-  7: '一等奖',
-}
-
-/** 命中/奖级分布项的展示文案：KL8 为命中个数，SSQ/DLT 为中奖奖级。 */
-function tierLabel(type: string, key: number): string {
-  if (type === 'SSQ') {
-    return SSQ_TIER_LABELS[key] ?? `奖级${key}`
-  }
-  if (type === 'DLT') {
-    return DLT_TIER_LABELS[key] ?? `奖级${key}`
-  }
-  return `中${key}个`
-}
-
-export default function SimulationPanel() {
+/**
+ * 历史回放：选择最近期数，逐期预测并结算，统计选5 单组号码的真实命中表现。
+ */
+function SimulationReplayPanel() {
   const [history, setHistory] = useState<LotterySimulation[]>([])
   const [current, setCurrent] = useState<LotterySimulation | null>(null)
-  const [lotteryType, setLotteryType] = useState<string>('SSQ')
   const [windowSize, setWindowSize] = useState<number | null>(200)
   const [loading, setLoading] = useState(true)
   const [running, setRunning] = useState(false)
@@ -119,14 +88,20 @@ export default function SimulationPanel() {
     () => parseHitDistribution(latest?.hitDistribution, latest?.evaluatedCount ?? 0),
     [latest],
   )
-  const hitRateLabel = latest?.lotteryType === 'KL8' ? '中2个及以上' : '中奖率'
+  // 选5 的中 3 是首个有奖级别，单独统计比「中 2 个及以上」更能反映实际体验
+  const atLeastThreeRate = useMemo(() => {
+    const rate = hitDistribution
+      .filter(item => item.hits >= 3)
+      .reduce((sum, item) => sum + item.rate, 0)
+    return Number(rate.toFixed(1))
+  }, [hitDistribution])
 
   const handleRun = async () => {
     const safeWindow = Math.max(10, Math.min(1000, windowSize ?? 100))
     setWindowSize(safeWindow)
     setRunning(true)
     try {
-      const result = await runLotterySimulation(lotteryType, safeWindow)
+      const result = await runLotterySimulation(LOTTERY_TYPE, safeWindow)
       setCurrent(result)
       await load()
       emitFeedbackSuccess(`模拟完成：${result.summary}`)
@@ -141,9 +116,9 @@ export default function SimulationPanel() {
     <section className="tool-section lottery-tool" aria-label="模拟战场">
       <div className="tool-section-head">
         <div>
-          <div className="dashboard-kicker">模拟战场</div>
+          <div className="dashboard-kicker">模拟战场 · 快乐8选5</div>
           <h2>预测算法历史回放</h2>
-          <p>选择玩法与最近期数，假设这些期还没开，逐期预测并结算，统计预测算法的真实命中表现。</p>
+          <p>选择最近期数，假设这些期还没开，逐期预测并结算，统计选5 单组号码的真实命中表现。</p>
         </div>
         <div className="tool-actions">
           <Button type="primary" icon={<ExperimentOutlined />} loading={running} onClick={handleRun}>
@@ -158,11 +133,7 @@ export default function SimulationPanel() {
         <Space direction="vertical" size={12} style={{ width: '100%' }}>
           <div>
             <div style={{ marginBottom: 6, color: '#586069', fontSize: 12 }}>模拟玩法</div>
-            <Segmented
-              options={TYPE_OPTIONS}
-              value={lotteryType}
-              onChange={value => setLotteryType(String(value))}
-            />
+            <Tag color="cyan">{TYPE_LABELS[LOTTERY_TYPE]}</Tag>
           </div>
           <div>
             <div style={{ marginBottom: 6, color: '#586069', fontSize: 12 }}>模拟最近期数（10-1000；每一步使用与每日推荐相同的最近 100 期）</div>
@@ -205,37 +176,34 @@ export default function SimulationPanel() {
               <Statistic title="平均命中" value={latest.avgHits} precision={2} />
             </Col>
             <Col xs={12} md={6}>
-              <Statistic title={`${hitRateLabel}比例`} value={latest.hitRate} suffix="%" />
+              <Statistic title="中2个及以上比例" value={latest.hitRate} suffix="%" />
+            </Col>
+            <Col xs={12} md={6}>
+              <Statistic title="中3个及以上比例" value={atLeastThreeRate} suffix="%" />
             </Col>
             <Col xs={12} md={6}>
               <Statistic title="单期最高命中" value={latest.maxHits} />
             </Col>
             <Col xs={12} md={6}>
-              <Statistic title={latest.lotteryType === 'KL8' ? '全不中期数' : '未中奖期数'} value={latest.zeroHitCount} valueStyle={{ color: latest.zeroHitCount > 0 ? '#DC2626' : undefined }} />
+              <Statistic title="全不中期数" value={latest.zeroHitCount} valueStyle={{ color: latest.zeroHitCount > 0 ? '#DC2626' : undefined }} />
             </Col>
             <Col xs={12} md={6}>
-              <Statistic
-                title={latest.lotteryType === 'KL8' ? '单组平均命中' : latest.lotteryType === 'SSQ' ? '蓝球平均命中' : '后区平均命中'}
-                value={latest.secondaryAvg}
-                precision={2}
-              />
+              <Statistic title="单组平均命中" value={latest.secondaryAvg} precision={2} />
             </Col>
-            {latest.lotteryType === 'KL8' && (
-              <Col xs={12} md={6}>
-                <Statistic title="中4个期数" value={latest.hit4Count} suffix="期" />
-              </Col>
-            )}
+            <Col xs={12} md={6}>
+              <Statistic title="中4个期数" value={latest.hit4Count} suffix="期" />
+            </Col>
           </Row>
           <div style={{ marginTop: 12 }}>
             <Progress percent={Math.min(100, latest.hitRate)} format={() => `${latest.hitRate}%`} strokeColor="#0F8A8F" />
-            <span style={{ color: '#586069', fontSize: 12 }}>{hitRateLabel}比例</span>
+            <span style={{ color: '#586069', fontSize: 12 }}>中2个及以上比例</span>
           </div>
           <div className="simulation-hit-distribution" aria-label="命中数分布">
-            <div className="simulation-hit-distribution-title">{latest.lotteryType === 'KL8' ? '命中数分布' : '奖级分布'}</div>
+            <div className="simulation-hit-distribution-title">命中数分布</div>
             <div className="simulation-hit-distribution-grid">
               {hitDistribution.map(item => (
                 <div className="simulation-hit-distribution-item" key={item.hits}>
-                  <strong>{tierLabel(latest.lotteryType, item.hits)}</strong>
+                  <strong>中{item.hits}个</strong>
                   <span>{item.count}期</span>
                   <em>{item.rate.toFixed(1)}%</em>
                 </div>
@@ -247,7 +215,7 @@ export default function SimulationPanel() {
             showIcon
             style={{ marginTop: 12 }}
             message="不同窗口请比较概率，不要只看中4的绝对期数"
-            description="100期只代表最近一段历史，500期覆盖更长周期，低表现阶段会稀释概率。模拟与每日推荐共用同一个预测内核，每一步都只传入此前最近100期，因此不会读取未来开奖。"
+            description="100期只代表最近一段历史，500期覆盖更长周期，低表现阶段会稀释概率。模拟与每日推荐共用同一个预测内核（选5、同一套因子权重择优逻辑），每一步都只传入此前最近100期，因此不会读取未来开奖。"
           />
           <Alert type="success" showIcon style={{ marginTop: 12 }} message={latest.summary} />
         </Card>
@@ -265,14 +233,38 @@ export default function SimulationPanel() {
                 </strong>
                 <small>{item.startIssueNo} ~ {item.endIssueNo} · {formatDateTime(item.createdAt)}</small>
                 <span style={{ display: 'block', color: '#586069', fontSize: 12, marginTop: 4 }}>
-                  {item.evaluatedCount} 期结算 · {item.lotteryType === 'KL8' ? '命中率' : '中奖率'} {item.hitRate}% · 最高 {item.maxHits} 个
+                  {item.evaluatedCount} 期结算 · 命中率 {item.hitRate}% · 最高 {item.maxHits} 个
                 </span>
               </button>
             ))}
-            {history.length === 0 && <p>暂无模拟记录，选择参数后点击开始模拟。</p>}
+            {history.length === 0 && !loading && <p>暂无模拟记录，选择参数后点击开始模拟。</p>}
           </div>
         </section>
       </div>
     </section>
+  )
+}
+
+/**
+ * 模拟战场容器：在「历史回放」与「概率实验室」之间切换。
+ * 历史回放回答「这套算法过去打得怎么样」，概率实验室回答「提升概率到底有没有可能、可不可信」。
+ */
+export default function SimulationPanel() {
+  const [mode, setMode] = useState<string>('replay')
+
+  return (
+    <div className="lottery-prediction-hub">
+      <Segmented
+        block
+        className="lottery-game-switch"
+        aria-label="选择战场模式"
+        options={MODE_OPTIONS}
+        value={mode}
+        onChange={value => setMode(String(value))}
+      />
+      <div className="lottery-game-panel">
+        {mode === 'lab' ? <LotteryKl8LabPanel /> : <SimulationReplayPanel />}
+      </div>
+    </div>
   )
 }

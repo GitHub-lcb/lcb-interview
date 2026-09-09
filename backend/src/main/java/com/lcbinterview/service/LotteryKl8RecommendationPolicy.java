@@ -16,13 +16,13 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * 快乐8推荐策略。负责校验推荐输出，并生成纯 Java 规则推荐，支持选1到选10玩法。
+ * 快乐8推荐策略。负责校验推荐输出，并生成纯 Java 规则推荐，当前统一为选5玩法。
  */
 @Service
 public class LotteryKl8RecommendationPolicy {
 
-    /** 默认每组 4 个号码，兼容旧记录和旧调用方 */
-    public static final int DEFAULT_PICK_SIZE = 4;
+    /** 默认每组 5 个号码，全站唯一对外口径；兼容旧记录时仍按记录内的 pickSize 校验 */
+    public static final int DEFAULT_PICK_SIZE = 5;
     /** 每天只输出 1 组号码：综合算法动态选出最优的一组，AI 与 Java 回退统一按此口径 */
     private static final int GROUP_COUNT = 1;
     private static final Set<String> CONFIDENCE_LABELS = Set.of("低", "中低", "中");
@@ -215,10 +215,14 @@ public class LotteryKl8RecommendationPolicy {
         List<LotteryKl8RecommendationGroupVO> groups = new ArrayList<>();
         Set<String> usedKeys = new HashSet<>();
         Set<Integer> usedNumbers = new HashSet<>();
-        // 组合优化生成的组优先直接采用，并登记已用号码用于后续补齐组的覆盖去重
+        // 组合优化生成的组优先直接采用，并登记已用号码用于后续补齐组的覆盖去重。
+        // 只接受与当前 pickSize 一致的组：历史记录或旧报告可能是选4，直接采用会在校验阶段抛错。
         for (LotteryKl8OptimizedGroup optimizedGroup : report.optimizedPortfolio().groups()) {
             if (groups.size() >= GROUP_COUNT) {
                 break;
+            }
+            if (optimizedGroup.numbers().size() != pickSize) {
+                continue;
             }
             LotteryKl8RecommendationGroupVO group = new LotteryKl8RecommendationGroupVO(
                     optimizedGroup.numbers(), optimizedGroup.reason());
@@ -231,10 +235,10 @@ public class LotteryKl8RecommendationPolicy {
         List<Integer> freshCandidates = withoutUsed(candidateNumbers, usedNumbers);
         while (groups.size() < GROUP_COUNT) {
             LinkedHashSet<Integer> numbers = new LinkedHashSet<>();
-            // 根据选号数量动态分配候选来源比例
-            int hotCount = Math.max(1, pickSize / 4);
-            int missingCount = Math.max(1, pickSize / 4);
-            int coldCount = Math.max(1, pickSize / 4);
+            // 根据选号数量动态分配候选来源比例：选5 时按 1 深候选 + 1 热 + 1 遗漏 + 1 冷 + 1 随机兜底
+            int hotCount = Math.max(1, pickSize / 5);
+            int missingCount = Math.max(1, pickSize / 5);
+            int coldCount = Math.max(1, pickSize / 5);
             int candidateCount = pickSize - hotCount - missingCount - coldCount;
             if (candidateCount < 1) {
                 candidateCount = 1;

@@ -187,8 +187,9 @@ if (tag != null) { ... }
 | `POST` | `/api/tools/lottery/kl8/sync` | 同步快乐 8 开奖数据（需登录） |
 | `GET` | `/api/tools/lottery/kl8/sync-status` | 查询快乐 8 同步状态（需登录） |
 | `GET` | `/api/tools/lottery/kl8/draws` | 查询快乐 8 近期开奖（需登录） |
-| `POST` | `/api/tools/lottery/kl8/recommendations` | 生成快乐 8 推荐，支持选1到选10（需登录） |
+| `POST` | `/api/tools/lottery/kl8/recommendations` | 生成快乐 8 选5 推荐（需登录） |
 | `GET` | `/api/tools/lottery/kl8/recommendations` | 查询快乐 8 推荐历史（需登录） |
+| `POST` | `/api/tools/lottery/kl8/lab` | 运行快乐 8 概率实验室（配置寻优 + 投注组合，需登录） |
 
 管理后台接口：
 
@@ -239,7 +240,7 @@ if (tag != null) { ... }
 | `/study` | 学习计划与进度中心 |
 | `/practice` | 模拟练习 |
 | `/experiences` | 面试经验与材料沉淀 |
-| `/tools` | 个人工具（号码预测、书摘库，需登录） |
+| `/tools` | 个人工具（快乐8选5预测、快乐8模拟战场，需登录） |
 | `/auth/login` | 普通用户登录 |
 | `/auth/register` | 普通用户注册 |
 | `/admin/login` | 管理后台登录 |

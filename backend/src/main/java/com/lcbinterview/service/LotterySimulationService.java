@@ -35,7 +35,7 @@ import java.util.Set;
  * 逐期调用与每日推荐相同的 FeatureService/Policy 预测并结算，最终统计命中表现。
  * <p>
  * 三种玩法独立预测口径：
- * - KL8：选4 × 1 组，统计单组命中
+ * - KL8：选5 × 1 组，统计单组命中
  * - SSQ：7 红 + 1 蓝，统计红球命中与蓝球命中率
  * - DLT：5 前区 + 3 后区，统计前区命中与后区命中
  * <p>
@@ -48,7 +48,8 @@ public class LotterySimulationService {
 
     /** 每日自动推荐默认使用最近 100 期，模拟必须保持同一输入窗口。 */
     private static final int LEAD_HISTORY = 100;
-    private static final int KL8_PICK_SIZE = 4;
+    /** 与线上每日推荐保持同一口径：快乐8 固定选5 */
+    private static final int KL8_PICK_SIZE = 5;
     private static final int MIN_WINDOW = 10;
     private static final int MAX_WINDOW = 1000;
 
@@ -181,7 +182,7 @@ public class LotterySimulationService {
     // ============ 模拟算法 ============
 
     /**
-     * 快乐8 模拟：逐期调用 V20 每日正式策略（四策略投票、邻位、用户校准），
+     * 快乐8 模拟：逐期调用选5 每日正式策略（四策略投票、邻位、结构均衡、用户校准），
      * 每天只推荐 1 组，命中口径即单组命中数。
      */
     private List<SimulationEntry> simulateKl8(Long userId, List<LotteryKl8Draw> draws, int window) {
@@ -280,7 +281,7 @@ public class LotterySimulationService {
 
     private SimulationStats aggregate(List<SimulationEntry> entries, boolean kl8) {
         if (entries.isEmpty()) {
-            return new SimulationStats(0, BigDecimal.ZERO, BigDecimal.ZERO, 0, 0, BigDecimal.ZERO, 0, Map.of());
+            return new SimulationStats(0, BigDecimal.ZERO, BigDecimal.ZERO, 0, 0, BigDecimal.ZERO, 0, 0, Map.of());
         }
         long totalPrimary = 0;
         long totalSecondary = 0;
@@ -288,6 +289,7 @@ public class LotterySimulationService {
         int maxHits = 0;
         int hitAtLeastOne = 0;
         int hit4Count = 0;
+        int atLeastThreeCount = 0;
         Map<Integer, Integer> distribution = new java.util.TreeMap<>();
         for (SimulationEntry entry : entries) {
             totalPrimary += entry.primaryHits();
@@ -295,11 +297,14 @@ public class LotterySimulationService {
             // KL8 按单组命中数分布；SSQ/DLT 按中奖奖级分布（0=未中奖）
             distribution.merge(kl8 ? entry.primaryHits() : entry.prizeTier(), 1, Integer::sum);
             if (kl8) {
-                // 快乐8 口径：单组中 2 个及以上才算有效命中，中 1 个不计奖励
+                // 快乐8 口径：单组中 2 个及以上才算有效命中，中 1 个不计奖励；中 3 个是选5 的首个有奖级别
                 if (entry.primaryHits() >= 2) {
                     hitAtLeastOne += 1;
                 } else {
                     zeroHit += 1;
+                }
+                if (entry.primaryHits() >= 3) {
+                    atLeastThreeCount += 1;
                 }
                 if (entry.primaryHits() == 4) {
                     hit4Count += 1;
@@ -322,7 +327,7 @@ public class LotterySimulationService {
         BigDecimal rate = BigDecimal.valueOf(hitAtLeastOne * 100)
                 .divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP);
         return new SimulationStats((int) totalPrimary, avgPrimary, rate, zeroHit, maxHits, avgSecondary, hit4Count,
-                distribution);
+                atLeastThreeCount, distribution);
     }
 
     private String writeDistributionJson(Map<Integer, Integer> distribution) {
@@ -353,15 +358,15 @@ public class LotterySimulationService {
 
     private String buildSummary(String type, int window, SimulationStats stats) {
         String label = switch (type) {
-            case "KL8" -> "快乐8 选4×1组";
+            case "KL8" -> "快乐8 选5×1组";
             case "SSQ" -> "双色球 7+1";
             case "DLT" -> "大乐透 5+3";
             default -> type;
         };
         if ("KL8".equals(type)) {
-            return "%s 模拟 %d 期：平均命中 %.2f 个，中 2 个及以上占比 %.1f%%，无有效命中 %d 期，单组全中 4 个 %d 期，单期最高 %d 个"
-                    .formatted(label, window, stats.avgHits(), stats.hitRate(), stats.zeroHitCount(),
-                            stats.hit4Count(), stats.maxHits());
+            return "%s 模拟 %d 期：平均命中 %.2f 个，中 2 个及以上占比 %.1f%%，中 3 个及以上 %d 期，单期最高 %d 个，无有效命中 %d 期"
+                    .formatted(label, window, stats.avgHits(), stats.hitRate(), stats.atLeastThreeCount(),
+                            stats.maxHits(), stats.zeroHitCount());
         }
         // SSQ/DLT 改用中奖口径：中奖率=中任何奖级的比例，并列出主要奖级分布
         String primaryName = "SSQ".equals(type) ? "红" : "前区";
@@ -507,10 +512,11 @@ public class LotterySimulationService {
     /**
      * 模拟统计结果。
      *
+     * @param atLeastThreeCount KL8 单组中 3 个及以上的期数（选5 首个有奖级别），SSQ/DLT 恒为 0
      * @param distribution 主维度命中数分布（0-N 各多少期）
      */
     private record SimulationStats(int totalHits, BigDecimal avgHits, BigDecimal hitRate,
                                    int zeroHitCount, int maxHits, BigDecimal secondaryAvg,
-                                   int hit4Count, Map<Integer, Integer> distribution) {
+                                   int hit4Count, int atLeastThreeCount, Map<Integer, Integer> distribution) {
     }
 }

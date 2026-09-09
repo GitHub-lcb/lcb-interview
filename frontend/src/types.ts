@@ -422,6 +422,49 @@ export interface LotterySimulation {
   createdAt: string
 }
 
+export interface LotteryKl8LabVariant {
+  name: string
+  label: string
+  selected: boolean
+  evaluatedIssueCount: number
+  averageHitCount: number
+  atLeastThreeRate: number
+  ciLow: number
+  ciHigh: number
+  lift: number
+  zScore: number
+  significant: boolean
+  verdict: string
+  hitDistribution: Record<string, number>
+}
+
+export interface LotteryKl8LabPortfolioRow {
+  ticketCount: number
+  disjointRate: number
+  disjointCiLow: number
+  disjointCiHigh: number
+  repeatedRate: number
+  liftOverRepeated: number
+  liftOverSingle: number
+  evaluatedIssueCount: number
+}
+
+export interface LotteryKl8LabReport {
+  pickSize: number
+  baseIssueCount: number
+  windowSize: number
+  evaluatedIssueCount: number
+  baselineExpectedHits: number
+  baselineAtLeastThreeRate: number
+  baselineAtLeastFourRate: number
+  baselineFullHitRate: number
+  requiredSampleSizeForOnePointLift: number
+  variants: LotteryKl8LabVariant[]
+  portfolios: LotteryKl8LabPortfolioRow[]
+  conclusion: string
+  disclaimer: string
+}
+
 export type StudyQuestionStatus = 'new' | 'learning' | 'mastered' | 'weak'
 
 /** 背诵回忆评分档位，SM-2 四档评分（again=忘了 / hard=模糊 / good=记住了 / easy=很简单）。 */

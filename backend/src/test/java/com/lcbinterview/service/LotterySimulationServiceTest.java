@@ -207,7 +207,7 @@ class LotterySimulationServiceTest {
 
     @Test
     @SuppressWarnings({"rawtypes", "unchecked"})
-    void kl8SimulationCountsFullFourAndRewardThreshold() {
+    void kl8SimulationUsesPick5RewardThreshold() {
         SsqDrawMapper ssqMapper = mock(SsqDrawMapper.class);
         DltDrawMapper dltMapper = mock(DltDrawMapper.class);
         LotterySimulationMapper simulationMapper = mock(LotterySimulationMapper.class);
@@ -231,15 +231,17 @@ class LotterySimulationServiceTest {
 
         assertEquals("KL8", vo.lotteryType());
         assertEquals(100, vo.evaluatedCount());
-        // 固定开奖 1-20，预测 8 个高频号应全部命中两组各 4 个：中4 期数 > 0
-        assertTrue(vo.hit4Count() > 0, "固定历史下应存在单组全中 4 个的期数，实际 " + vo.hit4Count());
-        // 中 2 个及以上占比应为 100%（每组都中 4 个）
+        // 固定开奖 1-20，选5 预测应集中在高频区：单期最高命中至少 4 个
+        assertTrue(vo.maxHits() >= 4, "固定历史下单期最高命中应至少 4 个，实际 " + vo.maxHits());
+        // 中 2 个及以上占比应为 100%（每期都能命中高频区号码）
         assertEquals(100.00, vo.hitRate().doubleValue(), 0.001);
         assertEquals(0, vo.zeroHitCount());
         assertTrue(vo.summary().contains("中 2 个及以上"));
-        assertTrue(vo.summary().contains("单组全中 4 个"));
-        // 命中分布：固定历史下 4 个命中期数 = 全部 100 期
+        assertTrue(vo.summary().contains("选5"));
+        assertTrue(vo.summary().contains("中 3 个及以上"));
+        // 命中分布应出现中 4 个或中 5 个的期数
         String distribution = vo.hitDistribution();
-        assertTrue(distribution.contains("\"4\""), "分布应包含中4期数，实际 " + distribution);
+        assertTrue(distribution.contains("\"4\"") || distribution.contains("\"5\""),
+                "分布应包含中4或中5期数，实际 " + distribution);
     }
 }

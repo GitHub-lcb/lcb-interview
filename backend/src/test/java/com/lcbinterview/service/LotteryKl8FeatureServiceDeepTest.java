@@ -33,7 +33,7 @@ class LotteryKl8FeatureServiceDeepTest {
 
         LotteryKl8FeatureReport report = service.buildReport(60);
         LotteryKl8FeatureReport historyReport = service.buildReportFromDraws(
-                sampleDraws(), LotteryKl8StrategyCalibration.neutral(), 4, Map.of());
+                sampleDraws(), LotteryKl8StrategyCalibration.neutral(), 5, Map.of());
 
         assertEquals(80, report.numberProfiles().size());
         assertTrue(report.candidatePool().size() >= 20);
@@ -62,18 +62,25 @@ class LotteryKl8FeatureServiceDeepTest {
         assertTrue(report.backtestSummary().evaluatedIssueCount() > 0);
         assertTrue(report.backtestSummary().averageHitCount() > 0);
         assertTrue(report.backtestSummary().hitDistribution().values().stream().mapToInt(Integer::intValue).sum() > 0);
-        assertTrue(report.backtestSummary().factorWeights().decayWeight() >= report.backtestSummary().factorWeights().missingWeight());
+        // V21 走查前推择优：命中分布覆盖 0-5，且给出择优配置与中3个及以上占比
+        assertEquals(6, report.backtestSummary().hitDistribution().size());
+        assertFalse(report.backtestSummary().weightProfileName().isBlank());
+        assertTrue(report.backtestSummary().hitAtLeastThreeRate() >= 0
+                && report.backtestSummary().hitAtLeastThreeRate() <= 1);
+        assertTrue(report.backtestSummary().summary().contains("走查前推"));
         assertNotNull(report.optimizedPortfolio());
         assertEquals(1, report.optimizedPortfolio().groups().size());
-        assertTrue(report.optimizedPortfolio().groups().stream().allMatch(group -> group.numbers().size() == 4));
-        // V20 单组推荐：1 组号码去重后覆盖 4 个不同号码
+        assertTrue(report.optimizedPortfolio().groups().stream().allMatch(group -> group.numbers().size() == 5));
+        // 单组选5 推荐：1 组号码去重后覆盖 5 个不同号码
         long coverage = report.optimizedPortfolio().groups().stream()
                 .flatMap(group -> group.numbers().stream())
                 .distinct()
                 .count();
-        assertTrue(coverage >= 4, "单组推荐应覆盖 4 个不同号码，实际覆盖 " + coverage);
+        assertTrue(coverage >= 5, "单组推荐应覆盖 5 个不同号码，实际覆盖 " + coverage);
         assertTrue(report.optimizedPortfolio().summary().contains("组合"));
         assertTrue(report.optimizedPortfolio().diagnostics().containsKey("coverageNumberCount"));
+        assertTrue(report.optimizedPortfolio().diagnostics().containsKey("structureRepairs"));
+        assertTrue(report.optimizedPortfolio().diagnostics().containsKey("backtestProfile"));
         assertEquals(report.optimizedPortfolio().groups().stream().map(LotteryKl8OptimizedGroup::numbers).toList(),
                 historyReport.optimizedPortfolio().groups().stream().map(LotteryKl8OptimizedGroup::numbers).toList());
         assertNotNull(report.deepSummary());
@@ -148,10 +155,45 @@ class LotteryKl8FeatureServiceDeepTest {
         List<Integer> selected = report.optimizedPortfolio().groups().get(0).numbers();
 
         assertEquals(0, selectedPairs.size(), "新策略不再强制选择核心对子");
-        assertEquals(4, selected.size());
-        assertFalse(hasConsecutiveRun(selected, 3), "最终 4 码不得出现三连号");
+        assertEquals(5, selected.size());
+        assertFalse(hasConsecutiveRun(selected, 3), "最终 5 码不得出现三连号");
         assertFalse(report.optimizedPortfolio().neighborRecommendations().isEmpty(), "邻位只作为诊断候选保留");
         assertFalse(report.optimizedPortfolio().summary().contains("核心对子"));
+    }
+
+    @Test
+    void keepsSingleGroupWithinStructureBands() {
+        LotteryKl8DrawMapper mapper = mock(LotteryKl8DrawMapper.class);
+        when(mapper.selectList(any())).thenReturn(sampleDraws());
+        LotteryKl8FeatureService service = new LotteryKl8FeatureService(mapper);
+
+        List<Integer> selected = service.buildReport(120).optimizedPortfolio().groups().get(0).numbers();
+
+        assertEquals(5, selected.size());
+        assertFalse(hasConsecutiveRun(selected, 3), "结构均衡后不得出现三连号");
+        // 区间约束：4 个 20 号区间中最多 2 个号码
+        Map<String, Long> zoneCounts = selected.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        number -> ((number - 1) / 20) + "区", java.util.stream.Collectors.counting()));
+        assertTrue(zoneCounts.values().stream().allMatch(count -> count <= 2),
+                "单个区间最多 2 个号码，实际 " + zoneCounts);
+        // 和值带：选5 的 [120, 285]
+        int sum = selected.stream().mapToInt(Integer::intValue).sum();
+        assertTrue(sum >= 120 && sum <= 285, "和值应落在选5 常态区间，实际 " + sum);
+    }
+
+    @Test
+    void backtestSelectionIsDeterministicForSameHistory() {
+        LotteryKl8DrawMapper mapper = mock(LotteryKl8DrawMapper.class);
+        when(mapper.selectList(any())).thenReturn(sampleDraws());
+        LotteryKl8FeatureService service = new LotteryKl8FeatureService(mapper);
+
+        LotteryKl8BacktestSummary first = service.buildReport(90).backtestSummary();
+        LotteryKl8BacktestSummary second = service.buildReport(90).backtestSummary();
+
+        // 同一基准期必须选出同一权重配置，保证推荐结果可复现
+        assertEquals(first.weightProfileName(), second.weightProfileName());
+        assertEquals(first.averageHitCount(), second.averageHitCount());
     }
 
     private LotteryKl8NumberProfile profile(LotteryKl8FeatureReport report, int number) {

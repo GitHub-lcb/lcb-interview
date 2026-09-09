@@ -1,6 +1,5 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
-import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import Tools from './index'
@@ -9,21 +8,11 @@ import { USER_TOKEN_STORAGE_KEY } from '../../utils/authToken'
 
 const panelRenderSpies = vi.hoisted(() => ({
   lottery: vi.fn(),
-  ssq: vi.fn(),
-  dlt: vi.fn(),
-  reading: vi.fn(),
+  simulation: vi.fn(),
 }))
 
 vi.mock('../../api/auth', () => ({
   getCurrentUser: vi.fn(),
-}))
-
-vi.mock('../../components/ReadingExcerptPanel', () => ({
-  default: () => {
-    panelRenderSpies.reading()
-
-    return <div data-testid="reading-panel">reading</div>
-  },
 }))
 
 vi.mock('../../components/LotteryKl8Panel', () => ({
@@ -34,24 +23,12 @@ vi.mock('../../components/LotteryKl8Panel', () => ({
   },
 }))
 
-vi.mock('../../components/SsqPanel', () => ({
-  default: () => {
-    panelRenderSpies.ssq()
-
-    return <div data-testid="ssq-panel">ssq</div>
-  },
-}))
-
-vi.mock('../../components/DltPanel', () => ({
-  default: () => {
-    panelRenderSpies.dlt()
-
-    return <div data-testid="dlt-panel">dlt</div>
-  },
-}))
-
 vi.mock('../../components/SimulationPanel', () => ({
-  default: () => <div data-testid="simulation-panel">simulation</div>,
+  default: () => {
+    panelRenderSpies.simulation()
+
+    return <div data-testid="simulation-panel">simulation</div>
+  },
 }))
 
 function LocationProbe() {
@@ -87,20 +64,18 @@ describe('Tools page auth gate', () => {
 
     renderTools()
 
-    expect(screen.queryByTestId('reading-panel')).not.toBeInTheDocument()
     expect(screen.queryByTestId('lottery-panel')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('simulation-panel')).not.toBeInTheDocument()
   })
 
   it('does not mount protected tool panels when token is missing', () => {
     renderTools()
 
-    expect(panelRenderSpies.reading).not.toHaveBeenCalled()
     expect(panelRenderSpies.lottery).not.toHaveBeenCalled()
-    expect(panelRenderSpies.ssq).not.toHaveBeenCalled()
-    expect(panelRenderSpies.dlt).not.toHaveBeenCalled()
+    expect(panelRenderSpies.simulation).not.toHaveBeenCalled()
   })
 
-  it('mounts lottery prediction as the default protected tool panel after current user is verified', async () => {
+  it('mounts the KL8 prediction panel as the default protected tool', async () => {
     window.localStorage.setItem(USER_TOKEN_STORAGE_KEY, 'valid-token')
     vi.mocked(getCurrentUser).mockResolvedValue({
       id: 1,
@@ -116,7 +91,7 @@ describe('Tools page auth gate', () => {
     expect(panelRenderSpies.lottery).toHaveBeenCalled()
   })
 
-  it('keeps three primary tabs and switches lottery games inside prediction', async () => {
+  it('keeps only KL8 prediction and the KL8 simulation battlefield', async () => {
     window.localStorage.setItem(USER_TOKEN_STORAGE_KEY, 'valid-token')
     vi.mocked(getCurrentUser).mockResolvedValue({
       id: 1,
@@ -128,10 +103,12 @@ describe('Tools page auth gate', () => {
 
     await screen.findByTestId('lottery-panel')
     const primaryTabs = screen.getAllByRole('tab')
-    expect(primaryTabs.map(tab => tab.textContent?.trim())).toEqual(['号码预测', '模拟战场', '书摘库'])
+    expect(primaryTabs.map(tab => tab.textContent?.trim())).toEqual(['号码预测', '模拟战场'])
+    // 号码预测内不再有彩种切换，双色球/大乐透入口已移除
+    expect(screen.queryByText('双色球')).not.toBeInTheDocument()
+    expect(screen.queryByText('大乐透')).not.toBeInTheDocument()
+    expect(screen.queryByText('书摘库')).not.toBeInTheDocument()
 
-    await userEvent.click(screen.getByText('双色球'))
-    expect(screen.getByTestId('ssq-panel')).toBeInTheDocument()
-    expect(screen.queryByTestId('lottery-panel')).not.toBeInTheDocument()
-  })
-})
+    fireEvent.click(screen.getByRole('tab', { name: /模拟战场/ }))
+    expect(await screen.findByTestId('simulation-panel')).toBeInTheDocument()
+  })})

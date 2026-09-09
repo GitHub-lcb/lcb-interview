@@ -26,6 +26,7 @@ if (!window.matchMedia) {
 vi.mock('../api/tools', () => ({
   listLotterySimulations: vi.fn(),
   runLotterySimulation: vi.fn(),
+  runKl8Lab: vi.fn(),
 }))
 
 vi.mock('../utils/feedbackMessage', () => ({
@@ -40,21 +41,21 @@ function pageOf<T>(content: T[], total: number): PageResult<T> {
 function simulation(overrides: Partial<LotterySimulation> = {}): LotterySimulation {
   return {
     id: 1,
-    lotteryType: 'SSQ',
+    lotteryType: 'KL8',
     windowSize: 200,
-    leadHistory: 50,
+    leadHistory: 100,
     startIssueNo: '2026090',
     endIssueNo: '2026094',
     evaluatedCount: 200,
-    totalHits: 274,
-    avgHits: 1.37,
-    hitRate: 80,
+    totalHits: 250,
+    avgHits: 1.25,
+    hitRate: 43,
     zeroHitCount: 20,
     maxHits: 4,
-    secondaryAvg: 0.08,
+    secondaryAvg: 1.25,
     hit4Count: 10,
-    hitDistribution: '{"0":20,"1":60,"2":80,"3":30,"4":10}',
-    summary: '双色球 7+1 模拟 200 期：中奖率 80.0%（中任何奖级），未中奖 20 期，单期最高中 4 个红球，奖级分布：六等奖60期、五等奖80期',
+    hitDistribution: '{"0":20,"1":94,"2":60,"3":16,"4":10}',
+    summary: '快乐8 选5×1组 模拟 200 期：平均命中 1.25 个，中 2 个及以上占比 43.0%，中 3 个及以上 26 期',
     createdAt: '2026-08-18T10:00:00',
     ...overrides,
   }
@@ -70,7 +71,7 @@ describe('SimulationPanel', () => {
     vi.mocked(listLotterySimulations).mockResolvedValue(pageOf([], 0))
   })
 
-  it('runs simulation and shows stats', async () => {
+  it('runs a KL8 pick-5 simulation and shows stats', async () => {
     vi.mocked(runLotterySimulation).mockResolvedValue(simulation())
 
     render(<SimulationPanel />)
@@ -79,29 +80,27 @@ describe('SimulationPanel', () => {
     await userEvent.click(screen.getByRole('button', { name: /开始模拟/ }))
 
     await waitFor(() => {
-      expect(runLotterySimulation).toHaveBeenCalledWith('SSQ', 200)
+      expect(runLotterySimulation).toHaveBeenCalledWith('KL8', 200)
     })
-    expect(await screen.findByText(/双色球 7\+1 模拟 200 期：中奖率 80.0%/)).toBeInTheDocument()
-    // SSQ 分布改为按奖级渲染：未中奖 / 六等奖 / 五等奖 / 四等奖 / 一等奖
-    expect(screen.getByText('六等奖')).toBeInTheDocument()
-    expect(screen.getByText('三等奖')).toBeInTheDocument()
-    expect(screen.getAllByText('10期').length).toBeGreaterThan(0)
-    expect(screen.getByText('5.0%')).toBeInTheDocument()
+    expect(await screen.findByText(/快乐8 选5×1组 模拟 200 期/)).toBeInTheDocument()
+    expect(screen.getByText('中3个及以上比例')).toBeInTheDocument()
+    // 命中分布 {0:20,1:94,2:60,3:16,4:10} → 中3个及以上 = (16+10)/200 = 13%
+    expect(screen.getByText('13')).toBeInTheDocument()
+    expect(screen.getByText('中4个')).toBeInTheDocument()
     expect(emitFeedbackSuccess).toHaveBeenCalled()
   })
 
-  it('runs with selected type and window', async () => {
-    vi.mocked(runLotterySimulation).mockResolvedValue(simulation({ lotteryType: 'DLT', windowSize: 500 }))
+  it('runs with the selected window', async () => {
+    vi.mocked(runLotterySimulation).mockResolvedValue(simulation({ windowSize: 500 }))
 
     render(<SimulationPanel />)
 
     await screen.findByText('暂无模拟记录，选择参数后点击开始模拟。')
-    await userEvent.click(screen.getByText('大乐透 5+3'))
     await userEvent.click(screen.getByRole('button', { name: '500期' }))
     await userEvent.click(screen.getByRole('button', { name: /开始模拟/ }))
 
     await waitFor(() => {
-      expect(runLotterySimulation).toHaveBeenCalledWith('DLT', 500)
+      expect(runLotterySimulation).toHaveBeenCalledWith('KL8', 500)
     })
   })
 
@@ -117,7 +116,7 @@ describe('SimulationPanel', () => {
     await userEvent.click(screen.getByRole('button', { name: /开始模拟/ }))
 
     await waitFor(() => {
-      expect(runLotterySimulation).toHaveBeenCalledWith('SSQ', 10)
+      expect(runLotterySimulation).toHaveBeenCalledWith('KL8', 10)
     })
   })
 
@@ -126,9 +125,22 @@ describe('SimulationPanel', () => {
 
     render(<SimulationPanel />)
 
-    expect(await screen.findByText(/双色球 7\+1 · 200 期/)).toBeInTheDocument()
+    expect(await screen.findByText(/快乐8 选5×1组 · 200 期/)).toBeInTheDocument()
     expect(screen.getByText(/2026090 ~ 2026094/)).toBeInTheDocument()
-    expect(screen.getByText(/200 期结算 · 中奖率 80% · 最高 4 个/)).toBeInTheDocument()
+    expect(screen.getByText(/200 期结算 · 命中率 43% · 最高 4 个/)).toBeInTheDocument()
+  })
+
+  it('switches between replay and probability lab modes', async () => {
+    render(<SimulationPanel />)
+
+    await screen.findByText('暂无模拟记录，选择参数后点击开始模拟。')
+
+    await userEvent.click(screen.getByText('概率实验室'))
+    expect(await screen.findByText('还没有实验数据')).toBeInTheDocument()
+    expect(screen.queryByText('暂无模拟记录，选择参数后点击开始模拟。')).not.toBeInTheDocument()
+
+    await userEvent.click(screen.getByText('历史回放'))
+    expect(await screen.findByText('暂无模拟记录，选择参数后点击开始模拟。')).toBeInTheDocument()
   })
 
   it('contains protected load failures without an unhandled rejection', async () => {

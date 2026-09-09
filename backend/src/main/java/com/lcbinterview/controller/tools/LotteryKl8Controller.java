@@ -4,10 +4,13 @@ import com.lcbinterview.common.ApiResponse;
 import com.lcbinterview.config.AuthUserContext;
 import com.lcbinterview.dto.PageResult;
 import com.lcbinterview.dto.tools.LotteryKl8DrawVO;
+import com.lcbinterview.dto.tools.LotteryKl8LabReportVO;
+import com.lcbinterview.dto.tools.LotteryKl8LabRequest;
 import com.lcbinterview.dto.tools.LotteryKl8RecommendationRequest;
 import com.lcbinterview.dto.tools.LotteryKl8RecommendationVO;
 import com.lcbinterview.dto.tools.LotteryKl8SyncResultVO;
 import com.lcbinterview.dto.tools.LotteryKl8SyncStatusVO;
+import com.lcbinterview.service.LotteryKl8LabService;
 import com.lcbinterview.service.LotteryKl8RecommendationEvaluationService;
 import com.lcbinterview.service.LotteryKl8RecommendationService;
 import com.lcbinterview.service.LotteryKl8SyncService;
@@ -37,6 +40,7 @@ public class LotteryKl8Controller {
     private final LotteryKl8SyncService syncService;
     private final LotteryKl8RecommendationService recommendationService;
     private final LotteryKl8RecommendationEvaluationService evaluationService;
+    private final LotteryKl8LabService labService;
 
     /**
      * 手动同步快乐8开奖数据。
@@ -100,6 +104,19 @@ public class LotteryKl8Controller {
         int evaluated = evaluationService.evaluatePendingRecommendations();
         log.info("手动结算推荐命中: {} 条", evaluated);
         return ResponseEntity.ok(ApiResponse.success(evaluated));
+    }
+
+    /**
+     * 运行快乐8概率实验室：权重寻优 + 投注组合实验。
+     *
+     * @param request 实验参数
+     * @return 实验室报告
+     */
+    @Operation(summary = "运行快乐8概率实验室")
+    @PostMapping("/lab")
+    public ResponseEntity<ApiResponse<LotteryKl8LabReportVO>> lab(
+            @Valid @RequestBody LotteryKl8LabRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(labService.run(AuthUserContext.currentUserId(), request)));
     }
 
     /**

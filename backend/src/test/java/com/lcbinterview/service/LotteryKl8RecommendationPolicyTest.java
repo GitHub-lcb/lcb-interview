@@ -22,14 +22,14 @@ class LotteryKl8RecommendationPolicyTest {
     void validatesAiGroups() {
         String json = """
                 {"groups":[
-                  {"numbers":[1,2,3,4],"reason":"冷热均衡，覆盖低区间。"}
+                  {"numbers":[1,2,3,4,5],"reason":"冷热均衡，覆盖低区间。"}
                 ]}
                 """;
 
         List<LotteryKl8RecommendationGroupVO> groups = policy.validateAiContent(json);
 
         assertEquals(1, groups.size());
-        assertEquals(List.of(1, 2, 3, 4), groups.get(0).numbers());
+        assertEquals(List.of(1, 2, 3, 4, 5), groups.get(0).numbers());
     }
 
     @Test
@@ -44,7 +44,7 @@ class LotteryKl8RecommendationPolicyTest {
                     "riskWarnings":["彩票开奖结果独立随机，历史统计不能保证命中"]
                   },
                   "groups":[
-                    {"numbers":[1,8,23,45],"reason":"热号与区间均衡组合，兼顾近期频率和分散性。"}
+                    {"numbers":[1,8,23,45,60],"reason":"热号与区间均衡组合，兼顾近期频率和分散性。"}
                   ]
                 }
                 """;
@@ -85,7 +85,7 @@ class LotteryKl8RecommendationPolicyTest {
         List<LotteryKl8RecommendationGroupVO> groups = policy.fallbackGroups(report);
 
         assertEquals(1, groups.size());
-        groups.forEach(group -> assertEquals(4, group.numbers().size()));
+        groups.forEach(group -> assertEquals(5, group.numbers().size()));
         // 单组推荐只能有一组号码
         assertEquals(1, groups.stream().map(LotteryKl8RecommendationGroupVO::numbers).distinct().count());
     }
@@ -147,11 +147,11 @@ class LotteryKl8RecommendationPolicyTest {
                 LotteryKl8BacktestSummary.empty(),
                 new LotteryKl8OptimizedPortfolio(
                         List.of(
-                                new LotteryKl8OptimizedGroup(List.of(1, 2, 3, 4), 90, "组合优化第一组", List.of("测试证据")),
-                                new LotteryKl8OptimizedGroup(List.of(5, 6, 7, 8), 89, "组合优化第二组", List.of("测试证据")),
-                                new LotteryKl8OptimizedGroup(List.of(9, 10, 11, 12), 88, "组合优化第三组", List.of("测试证据")),
-                                new LotteryKl8OptimizedGroup(List.of(13, 14, 15, 16), 87, "组合优化第四组", List.of("测试证据")),
-                                new LotteryKl8OptimizedGroup(List.of(17, 18, 19, 20), 86, "组合优化第五组", List.of("测试证据"))),
+                                new LotteryKl8OptimizedGroup(List.of(1, 2, 3, 4, 5), 90, "组合优化第一组", List.of("测试证据")),
+                                new LotteryKl8OptimizedGroup(List.of(6, 7, 8, 9, 10), 89, "组合优化第二组", List.of("测试证据")),
+                                new LotteryKl8OptimizedGroup(List.of(11, 12, 13, 14, 15), 88, "组合优化第三组", List.of("测试证据")),
+                                new LotteryKl8OptimizedGroup(List.of(16, 17, 18, 19, 20), 87, "组合优化第四组", List.of("测试证据")),
+                                new LotteryKl8OptimizedGroup(List.of(21, 22, 23, 24, 25), 86, "组合优化第五组", List.of("测试证据"))),
                         "组合优化测试",
                         Map.of("maxNumberReuse", "1")),
                 List.of("组合层：测试"),
@@ -162,8 +162,41 @@ class LotteryKl8RecommendationPolicyTest {
 
         // 组合优化已有 5 组候选，每天只取综合算法选出的最优 1 组作为本次推荐
         assertEquals(1, groups.size());
-        assertEquals(List.of(1, 2, 3, 4), groups.get(0).numbers());
+        assertEquals(List.of(1, 2, 3, 4, 5), groups.get(0).numbers());
         assertTrue(groups.get(0).reason().contains("组合优化"));
+    }
+
+    @Test
+    void ignoresOptimizedGroupsWithLegacyPickSize() {
+        LotteryKl8FeatureReport report = new LotteryKl8FeatureReport(
+                20,
+                "2026150",
+                List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15),
+                List.of(16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30),
+                missingMap(),
+                Map.of("1-20", 100, "21-40", 100, "41-60", 100, "61-80", 100),
+                Map.of(),
+                Map.of(),
+                200,
+                200,
+                List.of(new LotteryKl8Draw()),
+                List.of(),
+                List.of(),
+                List.of(),
+                LotteryKl8BacktestSummary.empty(),
+                new LotteryKl8OptimizedPortfolio(
+                        List.of(new LotteryKl8OptimizedGroup(List.of(1, 2, 3, 4), 90, "旧选4组合", List.of("测试证据"))),
+                        "组合优化测试",
+                        Map.of()),
+                List.of("组合层：测试"),
+                "测试特征",
+                "测试深度");
+
+        List<LotteryKl8RecommendationGroupVO> groups = policy.fallbackGroups(report);
+
+        // 旧记录是选4，与当前选5 口径不一致时必须回退到规则生成，而不是抛错
+        assertEquals(1, groups.size());
+        assertEquals(5, groups.get(0).numbers().size());
     }
 
     @Test
@@ -172,8 +205,8 @@ class LotteryKl8RecommendationPolicyTest {
                 {
                   "confidenceLabel":"中低",
                   "groups":[
-                    {"numbers":[1,8,23,45],"reason":"综合算法首组"},
-                    {"numbers":[2,9,24,46],"reason":"AI 额外返回的第二组"}
+                    {"numbers":[1,8,23,45,60],"reason":"综合算法首组"},
+                    {"numbers":[2,9,24,46,61],"reason":"AI 额外返回的第二组"}
                   ]
                 }
                 """;
@@ -182,7 +215,7 @@ class LotteryKl8RecommendationPolicyTest {
 
         // 每天只推荐 1 组：即使 AI 返回多组也只保留首组
         assertEquals(1, result.groups().size());
-        assertEquals(List.of(1, 8, 23, 45), result.groups().get(0).numbers());
+        assertEquals(List.of(1, 8, 23, 45, 60), result.groups().get(0).numbers());
     }
 
     private Map<Integer, Integer> missingMap() {

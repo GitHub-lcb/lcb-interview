@@ -38,7 +38,7 @@ class LotteryKl8RecommendationServiceTest {
         LotteryKl8FeatureReport report = reportWithSingleOptimizedGroup();
         when(calibrationService.currentCalibration(7L)).thenReturn(calibration);
         when(calibrationService.numberHitFeedback(7L)).thenReturn(Map.of());
-        when(featureService.buildReport(eq(20), any(LotteryKl8StrategyCalibration.class), eq(4), any())).thenReturn(report);
+        when(featureService.buildReport(eq(20), any(LotteryKl8StrategyCalibration.class), eq(5), any())).thenReturn(report);
         when(recommendationMapper.insert(any())).thenAnswer(invocation -> {
             LotteryKl8Recommendation recommendation = invocation.getArgument(0);
             recommendation.setId(99L);
@@ -64,12 +64,13 @@ class LotteryKl8RecommendationServiceTest {
                 saved.getRecommendationsJson(), new TypeReference<>() {
                 });
         assertEquals("RULE_BASED", saved.getSource());
-        assertEquals("KL8_JAVA_MULTI_GROUP_V20", saved.getStrategyVersion());
-        // 组合优化已有 1 组候选，直接作为最终推荐输出 1 组，首组沿用组合优化结果
+        assertEquals("KL8_JAVA_PICK5_V21", saved.getStrategyVersion());
+        assertEquals(5, saved.getPickSize());
+        // 组合优化已有 1 组选5 候选，直接作为最终推荐输出 1 组，首组沿用组合优化结果
         assertEquals(1, savedGroups.size());
-        assertEquals(List.of(1, 2, 3, 4), savedGroups.get(0).numbers());
+        assertEquals(List.of(1, 2, 3, 4, 5), savedGroups.get(0).numbers());
         assertEquals(1, result.groups().size());
-        assertEquals(List.of(1, 2, 3, 4), result.groups().get(0).numbers());
+        assertEquals(List.of(1, 2, 3, 4, 5), result.groups().get(0).numbers());
     }
 
     private LotteryKl8FeatureReport reportWithSingleOptimizedGroup() {
@@ -90,7 +91,7 @@ class LotteryKl8RecommendationServiceTest {
                 List.of(),
                 LotteryKl8BacktestSummary.empty(),
                 new LotteryKl8OptimizedPortfolio(
-                        List.of(new LotteryKl8OptimizedGroup(List.of(1, 2, 3, 4), 90, "Java 组合优化", List.of("测试证据"))),
+                        List.of(new LotteryKl8OptimizedGroup(List.of(1, 2, 3, 4, 5), 90, "Java 组合优化", List.of("测试证据"))),
                         "Java 组合优化测试",
                         Map.of("groupCount", "1")),
                 List.of("组合层：Java 组合优化测试"),

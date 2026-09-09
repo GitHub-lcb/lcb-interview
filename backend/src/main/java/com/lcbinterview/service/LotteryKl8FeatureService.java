@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * 快乐8历史特征服务，为 Java 推荐策略提供结构化统计输入，支持选1到选10玩法。
+ * 快乐8历史特征服务，为 Java 推荐策略提供结构化统计输入，当前统一为选5玩法。
  */
 @Service
 @RequiredArgsConstructor
@@ -63,26 +63,43 @@ public class LotteryKl8FeatureService {
     private static final int COLD_REPLACEMENT_RANK_END = 60;
     private static final int MAX_BASE_ISSUE_COUNT = 2000;
     private static final int CANDIDATE_POOL_SIZE = 40;
-    /** V15 和值约束范围：选号和值须落在 [130, 270] 区间内，排除极端和值组合 */
-    private static final int SUM_CONSTRAINT_MIN = 130;
-    private static final int SUM_CONSTRAINT_MAX = 270;
-    /** 默认选4，兼容旧调用方 */
-    private static final int DEFAULT_PICK_SIZE = 4;
+    /**
+     * V21 选5 和值带：5 个号码的和值分布均值 202.5、标准差约 50，
+     * [120, 285] 覆盖约 90% 的组合，用于识别并规避极端和值组合。
+     * 注意和值带不改变期望命中（任意 5 号码组合的超几何期望相同），只用于剔除形态过于极端的组合。
+     */
+    private static final int SUM_CONSTRAINT_MIN = 120;
+    private static final int SUM_CONSTRAINT_MAX = 285;
+    /** 单个 20 号区间最多入选号码数：选5 时取 2，避免号码过度集中在一个区间 */
+    private static final int ZONE_MAX_PER_RANGE = 2;
+    /** 结构修复允许的最大票数损失，避免为了结构把高票号码直接换掉 */
+    private static final double STRUCTURE_REPAIR_VOTE_TOLERANCE = 1.0;
+    /** 默认选5，全站唯一对外口径 */
+    private static final int DEFAULT_PICK_SIZE = 5;
     private static final int PAIR_HIGHLIGHT_SIZE = 20;
     private static final int PAIR_RECOMMENDATION_SIZE = 12;
     private static final int NEIGHBOR_RECOMMENDATION_SIZE = 20;
     /** V20 多组覆盖：每次生成 2 组号码，组间通过复用惩罚尽量去重；号码更少组间去重更充分，提升整体命中感知 */
     /**
-     * 每天只输出 1 组推荐：综合算法按当期数据动态选出最优的一组。
-     * 内部先用综合算法生成 2 个候选组（主投票组 + 复用惩罚 fresh 组），
-     * 再对候选组在历史窗口内实测命中概率，挑概率最高的作为当天唯一推荐，
-     * 避免两组的"命中感知"稀释单组命中率口径，同时实现"先模拟试概率再选最优"的动态化。
+     * 每天只输出 1 组选5推荐：组合分与结构均衡共同决定唯一一组号码。
+     * V21 移除了"用最近 10 期评估在完整历史上选出的候选组"这一步——
+     * 候选组本身就由这段历史选出，再在同期上评估属于样本内自证，不能作为择优依据；
+     * 改为在滚动回测层对多个因子权重配置做无泄漏择优（见 buildBacktestSummary）。
      */
     private static final int OPTIMIZED_GROUP_COUNT = 1;
-    /** 内部候选组数量：先生成 2 个候选，再经历史模拟择优 */
-    private static final int CANDIDATE_GROUP_COUNT = 2;
     private static final List<String> BACKTEST_FACTORS = List.of(
             "hot", "missing", "trend", "decay", "pair", "balance");
+    /**
+     * V21 走查前推候选权重配置：每个配置单独强调一个因子，其余因子保持中性。
+     * 回测时对同一批快照并行打分，选出近期表现最好的配置，避免用"单因子平均命中"线性映射权重（旧做法）。
+     */
+    private static final List<WeightProfile> WEIGHT_PROFILES = List.of(
+            new WeightProfile("balanced", "均衡", new LotteryKl8BacktestFactorWeights(1.0, 1.0, 1.0, 1.0, 1.0, 1.0)),
+            new WeightProfile("hot", "热度优先", new LotteryKl8BacktestFactorWeights(1.35, 0.85, 0.95, 1.15, 0.95, 0.85)),
+            new WeightProfile("missing", "遗漏优先", new LotteryKl8BacktestFactorWeights(0.85, 1.35, 0.95, 0.95, 1.0, 1.1)),
+            new WeightProfile("decay", "衰减热度优先", new LotteryKl8BacktestFactorWeights(0.9, 0.95, 0.95, 1.35, 1.0, 0.9)),
+            new WeightProfile("pair", "共现优先", new LotteryKl8BacktestFactorWeights(0.95, 1.0, 0.95, 1.0, 1.35, 0.95)),
+            new WeightProfile("balance", "结构均衡优先", new LotteryKl8BacktestFactorWeights(0.95, 1.05, 1.0, 0.95, 0.95, 1.35)));
 
     private final LotteryKl8DrawMapper drawMapper;
 
@@ -211,8 +228,7 @@ public class LotteryKl8FeatureService {
                 drawSets.size(),
                 calibrationToUse,
                 backtestSummary,
-                pickSize,
-                drawSets);
+                pickSize);
         List<String> analysisSections = buildAnalysisSections(
                 draws.size(),
                 hot,
@@ -321,18 +337,28 @@ public class LotteryKl8FeatureService {
                 .toList();
     }
 
+    /**
+     * V21 滚动回测：对最近一段历史做走查前推（walk-forward）评估，并据此在候选权重配置间择优。
+     * <p>
+     * 每个评估期只用该期之前的历史构建号码快照，再分别用各候选配置选出 pickSize 个号码，
+     * 与该期真实开奖比对，因此整个过程不含未来信息，可用于配置之间的无泄漏比较。
+     * 旧做法先算单因子平均命中、再线性映射成组合权重，组合本身从未被验证过；
+     * 新做法直接回测组合权重，选出的配置同时用于后续号码评分。
+     *
+     * @param drawSets 历史开奖集合（最新期在前）
+     * @param pickSize 每组号码数量
+     * @return 滚动回测摘要，含择优后的因子权重
+     */
     private LotteryKl8BacktestSummary buildBacktestSummary(List<Set<Integer>> drawSets, int pickSize) {
         if (drawSets.size() < 35) {
-            return LotteryKl8BacktestSummary.empty();
+            return LotteryKl8BacktestSummary.empty(pickSize);
         }
 
         List<Set<Integer>> chronological = new ArrayList<>(drawSets);
         Collections.reverse(chronological);
-        Map<Integer, Integer> hitDistribution = initHitDistribution(pickSize);
         Map<String, Integer> factorHitTotals = initFactorTotals();
-        int combinedHitTotal = 0;
+        Map<String, ProfileStats> profileStats = initProfileStats(pickSize);
         int evaluated = 0;
-        int maxHit = 0;
         int startIndex = Math.max(30, chronological.size() - 180);
 
         for (int targetIndex = startIndex; targetIndex < chronological.size(); targetIndex += 1) {
@@ -343,11 +369,8 @@ public class LotteryKl8FeatureService {
             }
             Set<Integer> target = chronological.get(targetIndex);
             List<BacktestNumberSnapshot> snapshots = buildBacktestSnapshots(history);
-            int combinedHit = hitCount(topNumbers(snapshots, this::backtestCombinedScore, pickSize), target);
-            hitDistribution.compute(combinedHit, (ignored, value) -> value == null ? 1 : value + 1);
-            combinedHitTotal += combinedHit;
-            maxHit = Math.max(maxHit, combinedHit);
             evaluated += 1;
+            // 单因子代理命中：仅用于摘要里的因子强弱描述，不参与权重计算
             factorHitTotals.compute("hot", (ignored, value) ->
                     value + hitCount(topNumbers(snapshots, BacktestNumberSnapshot::hotScore, pickSize), target));
             factorHitTotals.compute("missing", (ignored, value) ->
@@ -360,32 +383,58 @@ public class LotteryKl8FeatureService {
                     value + hitCount(topNumbers(snapshots, BacktestNumberSnapshot::pairScore, pickSize), target));
             factorHitTotals.compute("balance", (ignored, value) ->
                     value + hitCount(topNumbers(snapshots, BacktestNumberSnapshot::balanceScore, pickSize), target));
+            // 同一批快照并行评估所有候选配置，快照构建只做一次，配置比较几乎不增加耗时
+            for (WeightProfile profile : WEIGHT_PROFILES) {
+                int hit = hitCount(
+                        topNumbers(snapshots, snapshot -> combinedScore(snapshot, profile.weights()), pickSize),
+                        target);
+                profileStats.get(profile.name()).record(hit);
+            }
         }
 
         if (evaluated == 0) {
-            return LotteryKl8BacktestSummary.empty();
+            return LotteryKl8BacktestSummary.empty(pickSize);
         }
 
-        double averageHit = round((double) combinedHitTotal / evaluated);
+        WeightProfile winner = selectWeightProfile(profileStats);
+        ProfileStats winnerStats = profileStats.get(winner.name());
+        double averageHit = round(winnerStats.averageHit());
+        double hitAtLeastThreeRate = round(winnerStats.atLeastThreeRate());
         Map<String, Double> factorAverages = new LinkedHashMap<>();
         for (String factor : BACKTEST_FACTORS) {
             factorAverages.put(factor, round((double) factorHitTotals.getOrDefault(factor, 0) / evaluated));
         }
-        LotteryKl8BacktestFactorWeights weights = buildBacktestWeights(factorAverages, averageHit);
         List<String> topFactorNames = factorAverages.entrySet().stream()
                 .sorted(Map.Entry.<String, Double>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
                 .limit(3)
                 .map(entry -> factorName(entry.getKey()) + " " + String.format("%.2f", entry.getValue()))
                 .toList();
+        List<LotteryKl8ProfileBacktest> profileBacktests = WEIGHT_PROFILES.stream()
+                .map(profile -> {
+                    ProfileStats stats = profileStats.get(profile.name());
+                    return new LotteryKl8ProfileBacktest(
+                            profile.name(),
+                            profile.label(),
+                            stats.evaluated(),
+                            round(stats.averageHit()),
+                            new LinkedHashMap<>(stats.distribution()),
+                            round(stats.atLeastThreeRate()),
+                            profile.name().equals(winner.name()));
+                })
+                .toList();
         return new LotteryKl8BacktestSummary(
                 evaluated,
                 averageHit,
-                maxHit,
-                hitDistribution,
-                weights,
+                winnerStats.maxHit(),
+                new LinkedHashMap<>(winnerStats.distribution()),
+                winner.weights(),
+                winner.label(),
+                hitAtLeastThreeRate,
                 topFactorNames,
-                "滚动回测 %d 期，模拟 %d 码平均命中 %.2f 个，最高命中 %d 个；近期表现靠前因子：%s。"
-                        .formatted(evaluated, pickSize, averageHit, maxHit, topFactorNames));
+                profileBacktests,
+                "滚动回测 %d 期（走查前推，不含未来信息）：候选配置中「%s」近期表现最好，模拟 %d 码平均命中 %.2f 个，中 3 个及以上 %.1f%%，最高命中 %d 个；因子强弱参考：%s。"
+                        .formatted(evaluated, winner.label(), pickSize, averageHit,
+                                hitAtLeastThreeRate * 100, winnerStats.maxHit(), topFactorNames));
     }
 
     private Map<Integer, Integer> initHitDistribution(int pickSize) {
@@ -404,25 +453,47 @@ public class LotteryKl8FeatureService {
         return totals;
     }
 
-    private LotteryKl8BacktestFactorWeights buildBacktestWeights(Map<String, Double> factorAverages, double averageHit) {
-        double hotWeight = factorWeight(factorAverages.getOrDefault("hot", 0.0), averageHit);
-        double missingWeight = factorWeight(factorAverages.getOrDefault("missing", 0.0), averageHit);
-        double trendWeight = factorWeight(factorAverages.getOrDefault("trend", 0.0), averageHit);
-        double decayWeight = factorWeight(factorAverages.getOrDefault("decay", 0.0), averageHit);
-        double pairWeight = factorWeight(factorAverages.getOrDefault("pair", 0.0), averageHit);
-        double balanceWeight = factorWeight(factorAverages.getOrDefault("balance", 0.0), averageHit);
-        return new LotteryKl8BacktestFactorWeights(
-                hotWeight,
-                missingWeight,
-                trendWeight,
-                Math.max(decayWeight, missingWeight),
-                pairWeight,
-                balanceWeight);
+    /**
+     * 初始化各候选配置的累计统计。
+     *
+     * @param pickSize 每组号码数量，决定命中分布的区间
+     * @return 配置名 → 统计对象
+     */
+    private Map<String, ProfileStats> initProfileStats(int pickSize) {
+        Map<String, ProfileStats> stats = new LinkedHashMap<>();
+        for (WeightProfile profile : WEIGHT_PROFILES) {
+            stats.put(profile.name(), new ProfileStats(initHitDistribution(pickSize)));
+        }
+        return stats;
     }
 
-    private double factorWeight(double factorAverageHit, double averageHit) {
-        double baseline = Math.max(0.8, averageHit);
-        return round(Math.max(0.75, Math.min(1.35, 1 + (factorAverageHit - baseline) * 0.22)));
+    /**
+     * 在候选权重配置中择优：主排序平均命中，次排序中 3 个及以上占比。
+     * 平票时保持 {@link #WEIGHT_PROFILES} 的声明顺序，保证同一基准期结果可复现。
+     *
+     * @param profileStats 各配置的累计统计
+     * @return 择优后的配置
+     */
+    private WeightProfile selectWeightProfile(Map<String, ProfileStats> profileStats) {
+        WeightProfile best = WEIGHT_PROFILES.getFirst();
+        double bestAverage = -1;
+        double bestThreeRate = -1;
+        for (WeightProfile profile : WEIGHT_PROFILES) {
+            ProfileStats stats = profileStats.get(profile.name());
+            if (stats == null || stats.evaluated() == 0) {
+                continue;
+            }
+            double average = stats.averageHit();
+            double threeRate = stats.atLeastThreeRate();
+            // 浮点比较用 1e-9 容差，避免 round 后的微小差异把顺序打乱
+            if (average > bestAverage + 1e-9
+                    || (Math.abs(average - bestAverage) <= 1e-9 && threeRate > bestThreeRate)) {
+                best = profile;
+                bestAverage = average;
+                bestThreeRate = threeRate;
+            }
+        }
+        return best;
     }
 
     private String factorName(String factor) {
@@ -518,13 +589,22 @@ public class LotteryKl8FeatureService {
         return totalWeight == 0 ? 0 : round(weightedHits / totalWeight);
     }
 
-    private double backtestCombinedScore(BacktestNumberSnapshot snapshot) {
-        return snapshot.hotScore() * 0.22
-                + snapshot.missingScore() * 0.16
-                + snapshot.trendScore() * 0.15
-                + snapshot.decayScore() * 0.2
-                + snapshot.pairScore() * 0.15
-                + snapshot.balanceScore() * 0.12;
+    /**
+     * 快照加权综合分：基础系数沿用历史调参结果，再乘以当期择优得到的因子权重。
+     * 与 {@code buildNumberProfiles} 里的综合分保持同一套因子口径，保证回测评估的
+     * 选号函数与实际生产选号方向一致。
+     *
+     * @param snapshot 号码快照
+     * @param weights  因子权重
+     * @return 加权综合分
+     */
+    private double combinedScore(BacktestNumberSnapshot snapshot, LotteryKl8BacktestFactorWeights weights) {
+        return snapshot.hotScore() * 0.22 * weights.hotWeight()
+                + snapshot.missingScore() * 0.16 * weights.missingWeight()
+                + snapshot.trendScore() * 0.15 * weights.trendWeight()
+                + snapshot.decayScore() * 0.2 * weights.decayWeight()
+                + snapshot.pairScore() * 0.15 * weights.pairWeight()
+                + snapshot.balanceScore() * 0.12 * weights.balanceWeight();
     }
 
     private List<Integer> topNumbers(
@@ -909,8 +989,7 @@ public class LotteryKl8FeatureService {
             int total,
             LotteryKl8StrategyCalibration calibration,
             LotteryKl8BacktestSummary backtestSummary,
-            int pickSize,
-            List<Set<Integer>> drawSets) {
+            int pickSize) {
         if (candidatePool.size() < pickSize) {
             return LotteryKl8OptimizedPortfolio.empty();
         }
@@ -936,38 +1015,33 @@ public class LotteryKl8FeatureService {
                         Math::max,
                         LinkedHashMap::new));
         Map<Integer, Integer> reuseCounts = initNumberMap(0);
-        List<LotteryKl8OptimizedGroup> candidateGroups = new ArrayList<>();
-        Set<String> usedKeys = new HashSet<>();
-
-        // 先生成 2 个候选组（主投票组 + 复用惩罚 fresh 组），再经历史模拟择优
-        for (int groupIndex = 0; groupIndex < CANDIDATE_GROUP_COUNT; groupIndex += 1) {
-            List<Integer> selected = selectOptimizedNumbers(
-                    groupIndex,
-                    selectionPool,
-                    selectionRanks,
-                    reuseCounts,
-                    profileByNumber,
-                    neighborScores,
-                    backtestSummary.factorWeights(),
-                    pairCounts,
-                    pickSize,
-                    latestNumbers);
-            List<Integer> unique = ensureUniqueGroup(selected, usedKeys, selectionPool, reuseCounts, pickSize);
-            usedKeys.add(unique.toString());
-            unique.forEach(number -> reuseCounts.put(number, reuseCounts.getOrDefault(number, 0) + 1));
-            double groupScore = optimizedGroupScore(unique, profileByNumber, neighborScores, backtestSummary.factorWeights());
-            candidateGroups.add(new LotteryKl8OptimizedGroup(
-                    unique,
-                    groupScore,
-                    "组合优化：V17四策略加权投票（贪心+混合+冷号替换+邻位回归）+连号种子保证+配对协同微调，回测≥3命中率10.49%，综合评分280。",
-                    optimizedEvidence(unique, groupScore, neighborScores, reuseCounts, backtestSummary)));
-        }
-
-        // 先模拟试概率再选最优：对候选组在历史窗口内实测中 2 个及以上命中率，挑概率最高的作为当天唯一推荐
-        List<LotteryKl8OptimizedGroup> groups = pickBestGroupsBySimulatedHitRate(candidateGroups, drawSets);
+        // V21 单组选5：直接生成唯一一组号码。
+        // 旧的"用近 10 期评估在完整历史上选出的候选组"属于样本内自证，已移除；
+        // 当期权重改由走查前推回测择优（见 buildBacktestSummary），因此候选组不再需要二次挑选。
+        List<Integer> selected = selectOptimizedNumbers(
+                0,
+                selectionPool,
+                selectionRanks,
+                reuseCounts,
+                profileByNumber,
+                neighborScores,
+                backtestSummary.factorWeights(),
+                pairCounts,
+                pickSize,
+                latestNumbers);
+        // V21 结构均衡：在综合分损失可控的前提下修掉区间堆积、全奇全偶和极端和值
+        StructureReport structure = applyStructureBalance(
+                selected.stream().sorted().toList(), selectionPool, profileByNumber, pickSize);
+        List<Integer> unique = structure.numbers();
+        double groupScore = optimizedGroupScore(unique, profileByNumber);
+        List<LotteryKl8OptimizedGroup> groups = List.of(new LotteryKl8OptimizedGroup(
+                unique,
+                groupScore,
+                "组合优化：选5 四策略加权投票（贪心+混合分层+冷号替换+邻位回归）+连号种子+结构均衡，因子权重由走查前推回测择优（%s）。"
+                        .formatted(backtestSummary.weightProfileName()),
+                optimizedEvidence(unique, groupScore, structure, backtestSummary)));
 
         double averageScore = groups.stream().mapToDouble(LotteryKl8OptimizedGroup::score).average().orElse(0);
-        int maxReuse = reuseCounts.values().stream().max(Integer::compareTo).orElse(0);
         Set<Integer> selectedNumbers = groups.stream()
                 .flatMap(group -> group.numbers().stream())
                 .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -978,19 +1052,24 @@ public class LotteryKl8FeatureService {
         diagnostics.put("averageGroupScore", "%.2f".formatted(averageScore));
         diagnostics.put("groupCount", String.valueOf(groups.size()));
         diagnostics.put("coverageNumberCount", String.valueOf(coverageNumberCount));
-        diagnostics.put("maxNumberReuse", String.valueOf(maxReuse));
         diagnostics.put("backtestAverageHit", "%.2f".formatted(backtestSummary.averageHitCount()));
+        diagnostics.put("backtestProfile", backtestSummary.weightProfileName());
+        diagnostics.put("backtestAtLeastThreeRate", "%.1f%%".formatted(backtestSummary.hitAtLeastThreeRate() * 100));
         diagnostics.put("topFactors", String.join("、", backtestSummary.topFactorNames()));
         diagnostics.put("neighborCandidateCount", String.valueOf(neighborDrafts.size()));
         diagnostics.put("selectedNeighborCount", String.valueOf(neighborRecommendations.stream()
                 .filter(LotteryKl8NeighborRecommendation::selected)
                 .count()));
         diagnostics.put("longestConsecutiveRun", String.valueOf(longestConsecutiveRun(groups.get(0).numbers())));
+        diagnostics.put("sumValue", String.valueOf(unique.stream().mapToInt(Integer::intValue).sum()));
+        diagnostics.put("structureRepairs", String.valueOf(structure.repairs()));
+        diagnostics.put("structureViolations", String.valueOf(structure.violations()));
         return new LotteryKl8OptimizedPortfolio(
                 groups,
-                "组合优化完成：基于 %d 个候选号码，四策略加权投票+连号种子保证+配对协同微调生成 %d 组号码，覆盖 %d 个不同号码，平均组合分 %.2f，回测平均命中 %.2f。"
+                "组合优化完成：基于 %d 个候选号码，四策略加权投票+连号种子+结构均衡生成 %d 组选5号码，覆盖 %d 个不同号码，平均组合分 %.2f，走查前推回测平均命中 %.2f 个（中 3 个及以上 %.1f%%，择优配置「%s」）。"
                         .formatted(candidates.size(), groups.size(), coverageNumberCount, averageScore,
-                                backtestSummary.averageHitCount()),
+                                backtestSummary.averageHitCount(), backtestSummary.hitAtLeastThreeRate() * 100,
+                                backtestSummary.weightProfileName()),
                 diagnostics,
                 pairRecommendations,
                 neighborRecommendations);
@@ -2024,38 +2103,16 @@ public class LotteryKl8FeatureService {
         return 0;
     }
 
-    private List<Integer> ensureUniqueGroup(
-            List<Integer> selected,
-            Set<String> usedKeys,
-            List<Integer> candidates,
-            Map<Integer, Integer> reuseCounts,
-            int pickSize) {
-        List<Integer> sorted = selected.stream().sorted().toList();
-        if (!usedKeys.contains(sorted.toString())) {
-            return sorted;
-        }
-        for (int replaceIndex = sorted.size() - 1; replaceIndex >= 0; replaceIndex -= 1) {
-            for (Integer candidate : candidates) {
-                if (sorted.contains(candidate) || reuseCounts.getOrDefault(candidate, 0) >= 2) {
-                    continue;
-                }
-                List<Integer> replacement = new ArrayList<>(sorted);
-                replacement.set(replaceIndex, candidate);
-                List<Integer> unique = replacement.stream().distinct().sorted().toList();
-                if (unique.size() == pickSize && !usedKeys.contains(unique.toString())) {
-                    return unique;
-                }
-            }
-        }
-        return sorted;
-    }
-
+    /**
+     * 组合分：组内号码综合分的均值，用于在摘要和诊断里比较不同组合的选号强度。
+     *
+     * @param numbers         号码列表
+     * @param profileByNumber 号码画像映射
+     * @return 组合分
+     */
     private double optimizedGroupScore(
             List<Integer> numbers,
-            Map<Integer, LotteryKl8NumberProfile> profileByNumber,
-            Map<Integer, Double> neighborScores,
-            LotteryKl8BacktestFactorWeights factorWeights) {
-        // 走查前推回测优化：组合分仅基于综合分均值，不再加邻位/连号加分和结构惩罚
+            Map<Integer, LotteryKl8NumberProfile> profileByNumber) {
         double base = numbers.stream()
                 .map(profileByNumber::get)
                 .filter(profile -> profile != null)
@@ -2066,67 +2123,166 @@ public class LotteryKl8FeatureService {
     }
 
     /**
-     * 先模拟试概率再选最优：对候选组在历史窗口内实测中 2 个及以上命中率，挑概率最高的作为当天唯一推荐。
-     * 若历史不足则直接取综合分最高的候选，避免小样本抖动。
+     * V21 结构均衡修复：选5 组合的形态校正。
+     * <p>
+     * 检查三类极端形态：单个 20 号区间入选超过 {@link #ZONE_MAX_PER_RANGE} 个、全奇或全偶、
+     * 和值落在 [{@link #SUM_CONSTRAINT_MIN}, {@link #SUM_CONSTRAINT_MAX}] 之外（以及异常的三连号）。
+     * 出现违规时从票数最高且未入选的号码中找替补，只有当替补能严格减少违规项、
+     * 且综合分不低于最弱号码的 95% 时才接受替换，避免为了形态把强信号号码换掉。
+     * <p>
+     * 为什么这样做：快乐8 每期随机开出 20 个号，任意 5 号码组合的期望命中数完全相同，
+     * 结构约束不会提高期望命中；它的作用是在期望不变的前提下剔除形态过于极端的组合，
+     * 让单组推荐更接近真实开奖的分布形态。
      *
-     * @param candidates 候选组
-     * @param drawSets   历史开奖集合（最新在前，每个 Set 为当期 20 个开奖号）
-     * @return 仅含最优一组的列表
+     * @param numbers         当前选号（已升序）
+     * @param sortedByVote    按票数降序排列的候选号码
+     * @param profileByNumber 号码画像映射
+     * @param pickSize        选号数量
+     * @return 修复后的号码与结构诊断
      */
-    private List<LotteryKl8OptimizedGroup> pickBestGroupsBySimulatedHitRate(
-            List<LotteryKl8OptimizedGroup> candidates,
-            List<Set<Integer>> drawSets) {
-        if (candidates.isEmpty()) {
-            return List.of();
-        }
-        if (candidates.size() == 1) {
-            return candidates;
-        }
-        if (drawSets == null || drawSets.isEmpty()) {
-            return List.of(candidates.stream()
-                    .max(Comparator.comparingDouble(LotteryKl8OptimizedGroup::score))
-                    .orElse(candidates.get(0)));
-        }
-        // holdout 模拟：用最近 10 期作验证集（直面你说的"最近10期只有3/10"痛点，10 期窗口最敏感），避免在 100 期训练集上自嗨
-        int window = Math.min(drawSets.size(), 10);
-        List<Set<Integer>> windowSets = drawSets.subList(0, window);
-        LotteryKl8OptimizedGroup best = null;
-        int bestHitCount = -1;
-        double bestScore = -1;
-        for (LotteryKl8OptimizedGroup candidate : candidates) {
-            Set<Integer> candidateSet = new HashSet<>(candidate.numbers());
-            int hitCount = 0;
-            for (Set<Integer> drawSet : windowSets) {
-                long hit = candidateSet.stream().filter(drawSet::contains).count();
-                if (hit >= 2) {
-                    hitCount += 1;
+    private StructureReport applyStructureBalance(
+            List<Integer> numbers,
+            List<Integer> sortedByVote,
+            Map<Integer, LotteryKl8NumberProfile> profileByNumber,
+            int pickSize) {
+        List<Integer> current = numbers.stream().sorted().toList();
+        int violations = structureViolationCount(current);
+        int repairs = 0;
+        // 最多修复 pickSize 次，防止在互相冲突的约束之间来回替换
+        int guard = pickSize;
+        while (violations > 0 && guard > 0) {
+            guard -= 1;
+            Integer weakest = weakestNumber(current, profileByNumber);
+            if (weakest == null) {
+                break;
+            }
+            Integer replacement = null;
+            for (Integer candidate : sortedByVote) {
+                if (current.contains(candidate)) {
+                    continue;
                 }
+                List<Integer> test = replaceNumber(current, weakest, candidate);
+                if (structureViolationCount(test) >= violations) {
+                    continue;
+                }
+                if (!withinScoreTolerance(weakest, candidate, profileByNumber)) {
+                    continue;
+                }
+                replacement = candidate;
+                break;
             }
-            // 主排序命中期数，次排序综合分
-            if (hitCount > bestHitCount
-                    || (hitCount == bestHitCount && candidate.score() > bestScore)) {
-                best = candidate;
-                bestHitCount = hitCount;
-                bestScore = candidate.score();
+            if (replacement == null) {
+                break;
+            }
+            current = replaceNumber(current, weakest, replacement).stream().sorted().toList();
+            violations = structureViolationCount(current);
+            repairs += 1;
+        }
+        return new StructureReport(current, violations, repairs);
+    }
+
+    /**
+     * 统计一组号码的结构违规项数量，数值越小形态越接近常态分布。
+     *
+     * @param numbers 号码列表
+     * @return 违规项数量
+     */
+    private int structureViolationCount(List<Integer> numbers) {
+        int violations = 0;
+        Map<String, Integer> zoneCounts = new LinkedHashMap<>();
+        for (Integer number : numbers) {
+            zoneCounts.merge(rangeLabel(number), 1, Integer::sum);
+        }
+        for (Integer count : zoneCounts.values()) {
+            if (count > ZONE_MAX_PER_RANGE) {
+                violations += count - ZONE_MAX_PER_RANGE;
             }
         }
-        return List.of(best != null ? best : candidates.get(0));
+        long oddCount = numbers.stream().filter(number -> number % 2 != 0).count();
+        if (oddCount == numbers.size() || oddCount == 0) {
+            violations += 1;
+        }
+        int sum = numbers.stream().mapToInt(Integer::intValue).sum();
+        if (sum < SUM_CONSTRAINT_MIN || sum > SUM_CONSTRAINT_MAX) {
+            violations += 1;
+        }
+        int longestRun = longestConsecutiveRun(numbers);
+        if (longestRun >= 3) {
+            violations += 1;
+        }
+        // 选4/选5 保留「至少一组 2 连号」的历史要求：把它计入违规项，
+        // 结构修复就不会在修区间/和值时顺手把唯一一组连号换掉。
+        if (numbers.size() >= 4 && longestRun < 2) {
+            violations += 1;
+        }
+        return violations;
+    }
+
+    /**
+     * 取综合分最低的号码作为替换候选。
+     *
+     * @param numbers         号码列表
+     * @param profileByNumber 号码画像映射
+     * @return 最弱号码，列表为空时返回 null
+     */
+    private Integer weakestNumber(List<Integer> numbers, Map<Integer, LotteryKl8NumberProfile> profileByNumber) {
+        return numbers.stream()
+                .min(Comparator.comparingDouble(number -> profileScore(number, profileByNumber)))
+                .orElse(null);
+    }
+
+    /**
+     * 判断替补号码的综合分是否仍在可接受范围内（不低于最弱号码的 95%）。
+     *
+     * @param weakest         被替换的号码
+     * @param candidate       替补号码
+     * @param profileByNumber 号码画像映射
+     * @return true 表示替换代价可接受
+     */
+    private boolean withinScoreTolerance(
+            Integer weakest,
+            Integer candidate,
+            Map<Integer, LotteryKl8NumberProfile> profileByNumber) {
+        double weakestScore = profileScore(weakest, profileByNumber);
+        double candidateScore = profileScore(candidate, profileByNumber);
+        return candidateScore >= weakestScore * 0.95;
+    }
+
+    private double profileScore(Integer number, Map<Integer, LotteryKl8NumberProfile> profileByNumber) {
+        LotteryKl8NumberProfile profile = number == null ? null : profileByNumber.get(number);
+        return profile == null ? 0 : profile.compositeScore();
+    }
+
+    /**
+     * 用替补号码替换指定号码，返回新列表（不修改入参）。
+     *
+     * @param numbers 原号码列表
+     * @param from    被替换号码
+     * @param to      替补号码
+     * @return 替换后的号码列表
+     */
+    private List<Integer> replaceNumber(List<Integer> numbers, Integer from, Integer to) {
+        List<Integer> result = new ArrayList<>(numbers);
+        result.remove(from);
+        result.add(to);
+        return result;
     }
 
     private List<String> optimizedEvidence(
             List<Integer> numbers,
             double groupScore,
-            Map<Integer, Double> neighborScores,
-            Map<Integer, Integer> reuseCounts,
+            StructureReport structure,
             LotteryKl8BacktestSummary backtestSummary) {
-        long neighborCount = numbers.stream().filter(neighborScores::containsKey).count();
-        int maxReuse = numbers.stream().mapToInt(number -> reuseCounts.getOrDefault(number, 0)).max().orElse(0);
         return List.of(
-                "组合分 %.2f，回测平均命中 %.2f".formatted(groupScore, backtestSummary.averageHitCount()),
-                "上一期左右邻位入选 %d 个，最长连号 %d 个。".formatted(neighborCount, longestConsecutiveRun(numbers)),
-                "区间分布 " + rangeDistribution(numbers) + "，奇偶分布 " + parityDistribution(numbers),
-                "尾数分布 " + tailDistribution(numbers) + "，优先保留邻位趋势和连号结构。",
-                "本组号码最大复用次数 " + maxReuse + "，优先因子 " + backtestSummary.topFactorNames());
+                "组合分 %.2f，走查前推回测平均命中 %.2f 个，中 3 个及以上 %.1f%%（择优配置「%s」）。"
+                        .formatted(groupScore, backtestSummary.averageHitCount(),
+                                backtestSummary.hitAtLeastThreeRate() * 100, backtestSummary.weightProfileName()),
+                "区间分布 %s，奇偶分布 %s，和值 %d，最长连号 %d。"
+                        .formatted(rangeDistribution(numbers), parityDistribution(numbers),
+                                numbers.stream().mapToInt(Integer::intValue).sum(), longestConsecutiveRun(numbers)),
+                "尾数分布 " + tailDistribution(numbers) + "。",
+                "结构均衡修复 %d 次，剩余结构违规 %d 项。".formatted(structure.repairs(), structure.violations()),
+                "因子强弱参考 " + backtestSummary.topFactorNames());
     }
 
     private int longestConsecutiveRun(List<Integer> numbers) {
@@ -2293,5 +2449,81 @@ public class LotteryKl8FeatureService {
             double pairScore,
             double balanceScore
     ) {
+    }
+
+    /**
+     * 走查前推候选权重配置。
+     *
+     * @param name    配置标识，用于统计映射
+     * @param label   中文标签，用于回测摘要
+     * @param weights 因子权重
+     */
+    private record WeightProfile(String name, String label, LotteryKl8BacktestFactorWeights weights) {
+    }
+
+    /**
+     * 结构均衡修复结果。
+     *
+     * @param numbers    修复后的号码（升序）
+     * @param violations 修复后剩余的结构违规项数量
+     * @param repairs    实际执行的替换次数
+     */
+    private record StructureReport(List<Integer> numbers, int violations, int repairs) {
+    }
+
+    /**
+     * 单个候选配置的滚动回测累计统计。
+     */
+    private static final class ProfileStats {
+
+        private final Map<Integer, Integer> distribution;
+        private int evaluated;
+        private int totalHits;
+        private int atLeastThree;
+        private int maxHit;
+
+        private ProfileStats(Map<Integer, Integer> distribution) {
+            this.distribution = distribution;
+        }
+
+        /**
+         * 记录一期评估结果。
+         *
+         * @param hit 该期命中号码个数
+         */
+        private void record(int hit) {
+            evaluated += 1;
+            totalHits += hit;
+            if (hit >= 3) {
+                atLeastThree += 1;
+            }
+            maxHit = Math.max(maxHit, hit);
+            distribution.compute(hit, (ignored, value) -> value == null ? 1 : value + 1);
+        }
+
+        private int evaluated() {
+            return evaluated;
+        }
+
+        private int maxHit() {
+            return maxHit;
+        }
+
+        private Map<Integer, Integer> distribution() {
+            return distribution;
+        }
+
+        private double averageHit() {
+            return evaluated == 0 ? 0 : (double) totalHits / evaluated;
+        }
+
+        /**
+         * 中 3 个及以上占比。选5 玩法的中 3 是首个有奖级别，比平均命中更能反映实际体验。
+         *
+         * @return 占比，0 到 1 之间
+         */
+        private double atLeastThreeRate() {
+            return evaluated == 0 ? 0 : (double) atLeastThree / evaluated;
+        }
     }
 }

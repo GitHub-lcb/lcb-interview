@@ -5,6 +5,7 @@ import type {
   DltSyncResult,
   DltSyncStatus,
   LotteryKl8Draw,
+  LotteryKl8LabReport,
   LotteryKl8Recommendation,
   LotteryKl8SyncResult,
   LotteryKl8SyncStatus,
@@ -21,6 +22,8 @@ import type {
 
 const KL8_RECOMMENDATION_TIMEOUT_MS = 120000
 const KL8_SYNC_TIMEOUT_MS = 120000
+/** 概率实验室要跑权重寻优 + 多期组合回放，给足超时 */
+const KL8_LAB_TIMEOUT_MS = 300000
 const SSQ_RECOMMENDATION_TIMEOUT_MS = 120000
 const SSQ_SYNC_TIMEOUT_MS = 120000
 const DLT_RECOMMENDATION_TIMEOUT_MS = 120000
@@ -163,5 +166,16 @@ export async function runLotterySimulation(lotteryType: string, windowSize: numb
 
 export async function listLotterySimulations(page = 0, size = 10): Promise<PageResult<LotterySimulation>> {
   const res = await api.get('/tools/lottery/simulation', { params: { page, size } })
+  return res.data.data
+}
+
+export interface LotteryKl8LabParams {
+  baseIssueCount?: number
+  windowSize?: number
+  maxTicketCount?: number
+}
+
+export async function runKl8Lab(params: LotteryKl8LabParams = {}): Promise<LotteryKl8LabReport> {
+  const res = await api.post('/tools/lottery/kl8/lab', params, { timeout: KL8_LAB_TIMEOUT_MS })
   return res.data.data
 }
