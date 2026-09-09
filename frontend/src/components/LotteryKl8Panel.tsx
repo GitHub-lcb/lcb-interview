@@ -561,6 +561,16 @@ export default function LotteryKl8Panel() {
                     />
                   )}
 
+                  {latest.pickSize !== 5 && (
+                    <Alert
+                      className="lottery-ai-fallback"
+                      type="warning"
+                      showIcon
+                      message={`这条记录是旧口径（选${latest.pickSize}）`}
+                      description="玩法已统一为选5：点右上角「Java 推荐选5」会覆盖生成当前期的选5 推荐；已开奖结算的旧记录会保留在历史里。"
+                    />
+                  )}
+
                   <div className={`lottery-group-grid${latest.groups.length === 1 ? ' is-single' : ''}`}>
                     {latest.groups.map((group, index) => {
                       const hitNumbers = hitByGroup.get(index + 1) ?? []

@@ -43,7 +43,8 @@ public class LotteryKl8RecommendationService {
 
 /**
  * 为当前用户生成 1 组快乐8选5推荐。
- * 同一基准期只保留一条推荐：手动与自动推荐结果一致时不重复生成。
+ * 同一基准期只保留一条同口径推荐：口径一致直接复用；口径升级（例如线上从选4 改为选5）
+ * 时，未结算记录原地覆盖，已结算记录另存新记录，避免同一期出现两条互相矛盾的推荐。
  *
  * @param userId  用户 ID
  * @param request 推荐请求
@@ -57,15 +58,20 @@ public LotteryKl8RecommendationVO recommend(Long userId, LotteryKl8Recommendatio
         LotteryKl8StrategyCalibration calibration = calibrationService.currentCalibration(userId);
         Map<Integer, Double> numberHitFeedback = calibrationService.numberHitFeedback(userId);
         LotteryKl8FeatureReport report = featureService.buildReport(baseIssueCount, calibration, pickSize, numberHitFeedback);
-        // 同一基准期去重：策略是确定性的，同基准期生成结果必然相同，直接复用已有推荐
         LotteryKl8Recommendation existing = findExisting(userId, report.latestIssueNo());
-        if (existing != null) {
-            log.info("快乐8推荐已存在，复用: userId={}, 基准期 {}", userId, report.latestIssueNo());
+        // 口径一致才复用：策略是确定性的，同基准期同口径生成结果必然相同
+        if (existing != null && isCurrentFormat(existing, pickSize)) {
+            log.info("快乐8推荐已存在且口径一致，复用: userId={}, 基准期 {}, 选{}",
+                    userId, report.latestIssueNo(), pickSize);
             return LotteryKl8RecommendationVO.from(existing, objectMapper);
         }
         String source = "RULE_BASED";
         LotteryKl8RecommendationPolicy.ValidatedRecommendation result = recommendationPolicy.fallbackResult(report, pickSize);
-        LotteryKl8Recommendation recommendation = new LotteryKl8Recommendation();
+        // 口径不同且尚未结算：直接覆盖同基准期的旧记录（否则页面会继续显示旧的选4 推荐）；
+        // 已结算的旧记录保留作历史，另插入一条新口径记录。
+        LotteryKl8Recommendation recommendation = existing != null && existing.getEvaluatedIssueNo() == null
+                ? existing
+                : new LotteryKl8Recommendation();
         recommendation.setUserId(userId);
         recommendation.setSource(source);
         recommendation.setPickSize(pickSize);
@@ -81,12 +87,43 @@ public LotteryKl8RecommendationVO recommend(Long userId, LotteryKl8Recommendatio
         recommendation.setCalibrationSnapshotJson(writeCalibrationSnapshot(calibration));
         recommendation.setStrategyVersion(STRATEGY_VERSION);
         recommendation.setDisclaimer(DISCLAIMER);
-        recommendationMapper.insert(recommendation);
+        if (recommendation.getId() == null) {
+            recommendationMapper.insert(recommendation);
+        } else {
+            recommendationMapper.updateById(recommendation);
+        }
         return LotteryKl8RecommendationVO.from(recommendation, objectMapper);
     }
 
     /**
-     * 查询用户基于指定基准期的已有推荐。
+     * 判断用户是否已存在当前口径（选5 + 当前策略版本）的指定基准期推荐。
+     * 自动调度器据此决定是否补生成：口径升级后即使同期已有旧记录也会重新生成。
+     *
+     * @param userId        用户 ID
+     * @param latestIssueNo 基准期号
+     * @return true 表示已存在同口径推荐
+     */
+    @Transactional(readOnly = true)
+    public boolean hasCurrentRecommendation(Long userId, String latestIssueNo) {
+        LotteryKl8Recommendation existing = findExisting(userId, latestIssueNo);
+        return existing != null && isCurrentFormat(existing, DEFAULT_PICK_SIZE);
+    }
+
+    /**
+     * 判断历史推荐是否与当前口径一致。
+     *
+     * @param recommendation 历史推荐记录
+     * @param pickSize       当前选号数量
+     * @return true 表示选号数量和策略版本都与当前一致
+     */
+    private boolean isCurrentFormat(LotteryKl8Recommendation recommendation, int pickSize) {
+        Integer storedPickSize = recommendation.getPickSize();
+        return storedPickSize != null && storedPickSize == pickSize
+                && STRATEGY_VERSION.equals(recommendation.getStrategyVersion());
+    }
+
+    /**
+     * 查询用户基于指定基准期的已有推荐，同一基准期存在多条时取最新一条。
      *
      * @param userId       用户 ID
      * @param latestIssueNo 基准期号
@@ -96,6 +133,7 @@ public LotteryKl8RecommendationVO recommend(Long userId, LotteryKl8Recommendatio
         return recommendationMapper.selectOne(Wrappers.<LotteryKl8Recommendation>lambdaQuery()
                 .eq(LotteryKl8Recommendation::getUserId, userId)
                 .eq(LotteryKl8Recommendation::getLatestIssueNo, latestIssueNo)
+                .orderByDesc(LotteryKl8Recommendation::getId)
                 .last("LIMIT 1"));
     }
 

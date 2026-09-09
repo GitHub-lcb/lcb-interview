@@ -4,10 +4,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lcbinterview.dto.tools.LotteryKl8RecommendationRequest;
 import com.lcbinterview.mapper.AppUserMapper;
 import com.lcbinterview.mapper.LotteryKl8DrawMapper;
-import com.lcbinterview.mapper.LotteryKl8RecommendationMapper;
 import com.lcbinterview.model.AppUser;
 import com.lcbinterview.model.LotteryKl8Draw;
-import com.lcbinterview.model.LotteryKl8Recommendation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,25 +24,27 @@ public class LotteryKl8AutoRecommendationScheduler {
 
     private final AppUserMapper appUserMapper;
     private final LotteryKl8DrawMapper drawMapper;
-    private final LotteryKl8RecommendationMapper recommendationMapper;
     private final LotteryKl8RecommendationService recommendationService;
 
     /**
      * 每天 22:35 执行：22:30 已同步并结算，紧随其后生成次日推荐（快乐8 每天一期）。
-     * 以最新期号为准，用户已有该期推荐则跳过，避免同一期重复生成污染样本。
+     * 以最新期号为准，用户已有同口径（选5 + 当前策略版本）推荐则跳过，
+     * 口径升级后同期旧记录会被重新生成，避免用户一直看到旧玩法。
+     *
+     * @return 本次实际生成的推荐条数
      */
     @Scheduled(cron = "0 35 22 * * *")
-    public void autoRecommendDaily() {
+    public int autoRecommendDaily() {
         LotteryKl8Draw latest = latestDraw();
         if (latest == null) {
             log.info("快乐8自动推荐跳过：暂无开奖数据");
-            return;
+            return 0;
         }
         List<AppUser> users = appUserMapper.selectList(Wrappers.<AppUser>lambdaQuery()
                 .eq(AppUser::getStatus, "ACTIVE"));
         int generated = 0;
         for (AppUser user : users) {
-            if (hasRecommendationForIssue(user.getId(), latest.getIssueNo())) {
+            if (recommendationService.hasCurrentRecommendation(user.getId(), latest.getIssueNo())) {
                 continue;
             }
             try {
@@ -55,17 +55,12 @@ public class LotteryKl8AutoRecommendationScheduler {
             }
         }
         log.info("快乐8自动推荐完成: 用户 {} 个, 生成 {} 条（基准期 {}）", users.size(), generated, latest.getIssueNo());
+        return generated;
     }
 
     private LotteryKl8Draw latestDraw() {
         return drawMapper.selectOne(Wrappers.<LotteryKl8Draw>lambdaQuery()
                 .orderByDesc(LotteryKl8Draw::getIssueNo)
                 .last("LIMIT 1"));
-    }
-
-    private boolean hasRecommendationForIssue(Long userId, String issueNo) {
-        return recommendationMapper.selectCount(Wrappers.<LotteryKl8Recommendation>lambdaQuery()
-                .eq(LotteryKl8Recommendation::getUserId, userId)
-                .eq(LotteryKl8Recommendation::getLatestIssueNo, issueNo)) > 0;
     }
 }

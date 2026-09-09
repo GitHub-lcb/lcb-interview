@@ -16,10 +16,12 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -71,6 +73,114 @@ class LotteryKl8RecommendationServiceTest {
         assertEquals(List.of(1, 2, 3, 4, 5), savedGroups.get(0).numbers());
         assertEquals(1, result.groups().size());
         assertEquals(List.of(1, 2, 3, 4, 5), result.groups().get(0).numbers());
+    }
+
+    @Test
+    void reusesExistingRecommendationWhenFormatMatches() throws Exception {
+        LotteryKl8RecommendationMapper recommendationMapper = mock(LotteryKl8RecommendationMapper.class);
+        LotteryKl8Recommendation existing = savedRecommendation(31L, 5, "KL8_JAVA_PICK5_V21");
+        when(recommendationMapper.selectOne(any())).thenReturn(existing);
+
+        LotteryKl8RecommendationService service = service(recommendationMapper);
+
+        LotteryKl8RecommendationVO result = service.recommend(7L, new LotteryKl8RecommendationRequest(null));
+
+        assertEquals(5, result.pickSize());
+        assertEquals(List.of(1, 2, 3, 4, 5), result.groups().get(0).numbers());
+        // 口径一致：既不新增也不覆盖
+        verify(recommendationMapper, never()).insert(any());
+        verify(recommendationMapper, never()).updateById(any());
+    }
+
+    @Test
+    void overwritesUnsettledLegacyPick4RecommendationInPlace() {
+        LotteryKl8RecommendationMapper recommendationMapper = mock(LotteryKl8RecommendationMapper.class);
+        LotteryKl8Recommendation existing = savedRecommendation(31L, 4, "KL8_JAVA_MULTI_GROUP_V20");
+        when(recommendationMapper.selectOne(any())).thenReturn(existing);
+
+        LotteryKl8RecommendationService service = service(recommendationMapper);
+
+        LotteryKl8RecommendationVO result = service.recommend(7L, new LotteryKl8RecommendationRequest(null));
+
+        // 同一基准期、未结算、口径不同：原地覆盖为选5，避免页面继续显示旧选4 推荐
+        assertEquals(5, result.pickSize());
+        assertEquals(5, result.groups().get(0).numbers().size());
+        ArgumentCaptor<LotteryKl8Recommendation> captor = ArgumentCaptor.forClass(LotteryKl8Recommendation.class);
+        verify(recommendationMapper).updateById(captor.capture());
+        assertEquals(31L, captor.getValue().getId());
+        assertEquals(5, captor.getValue().getPickSize());
+        assertEquals("KL8_JAVA_PICK5_V21", captor.getValue().getStrategyVersion());
+        verify(recommendationMapper, never()).insert(any());
+    }
+
+    @Test
+    void keepsSettledLegacyRecommendationAndInsertsNewOne() {
+        LotteryKl8RecommendationMapper recommendationMapper = mock(LotteryKl8RecommendationMapper.class);
+        LotteryKl8Recommendation existing = savedRecommendation(31L, 4, "KL8_JAVA_MULTI_GROUP_V20");
+        existing.setEvaluatedIssueNo("2026168");
+        when(recommendationMapper.selectOne(any())).thenReturn(existing);
+        when(recommendationMapper.insert(any())).thenAnswer(invocation -> {
+            LotteryKl8Recommendation recommendation = invocation.getArgument(0);
+            recommendation.setId(32L);
+            return 1;
+        });
+
+        LotteryKl8RecommendationService service = service(recommendationMapper);
+
+        LotteryKl8RecommendationVO result = service.recommend(7L, new LotteryKl8RecommendationRequest(null));
+
+        // 已结算的旧记录保留作历史，另存一条选5 新记录
+        assertEquals(32L, result.id());
+        assertEquals(5, result.pickSize());
+        verify(recommendationMapper).insert(any());
+        verify(recommendationMapper, never()).updateById(any());
+    }
+
+    @Test
+    void hasCurrentRecommendationRequiresPick5AndCurrentVersion() {
+        LotteryKl8RecommendationMapper recommendationMapper = mock(LotteryKl8RecommendationMapper.class);
+        LotteryKl8RecommendationService service = service(recommendationMapper);
+
+        when(recommendationMapper.selectOne(any())).thenReturn(savedRecommendation(31L, 5, "KL8_JAVA_PICK5_V21"));
+        assertTrue(service.hasCurrentRecommendation(7L, "2026168"));
+
+        when(recommendationMapper.selectOne(any())).thenReturn(savedRecommendation(31L, 4, "KL8_JAVA_PICK5_V21"));
+        assertFalse(service.hasCurrentRecommendation(7L, "2026168"));
+
+        when(recommendationMapper.selectOne(any())).thenReturn(savedRecommendation(31L, 5, "KL8_JAVA_MULTI_GROUP_V20"));
+        assertFalse(service.hasCurrentRecommendation(7L, "2026168"));
+
+        when(recommendationMapper.selectOne(any())).thenReturn(null);
+        assertFalse(service.hasCurrentRecommendation(7L, "2026168"));
+    }
+
+    private LotteryKl8RecommendationService service(LotteryKl8RecommendationMapper recommendationMapper) {
+        LotteryKl8FeatureService featureService = mock(LotteryKl8FeatureService.class);
+        LotteryKl8RecommendationPolicy recommendationPolicy = new LotteryKl8RecommendationPolicy(objectMapper);
+        LotteryKl8RecommendationEvaluationService evaluationService = mock(LotteryKl8RecommendationEvaluationService.class);
+        LotteryKl8StrategyCalibrationService calibrationService = mock(LotteryKl8StrategyCalibrationService.class);
+        when(calibrationService.currentCalibration(7L)).thenReturn(LotteryKl8StrategyCalibration.neutral());
+        when(calibrationService.numberHitFeedback(7L)).thenReturn(Map.of());
+        when(featureService.buildReport(eq(20), any(LotteryKl8StrategyCalibration.class), eq(5), any()))
+                .thenReturn(reportWithSingleOptimizedGroup());
+        return new LotteryKl8RecommendationService(
+                featureService,
+                recommendationPolicy,
+                evaluationService,
+                calibrationService,
+                recommendationMapper,
+                objectMapper);
+    }
+
+    private LotteryKl8Recommendation savedRecommendation(Long id, Integer pickSize, String strategyVersion) {
+        LotteryKl8Recommendation recommendation = new LotteryKl8Recommendation();
+        recommendation.setId(id);
+        recommendation.setUserId(7L);
+        recommendation.setPickSize(pickSize);
+        recommendation.setStrategyVersion(strategyVersion);
+        recommendation.setLatestIssueNo("2026168");
+        recommendation.setRecommendationsJson("[{\"numbers\":[1,2,3,4,5],\"reason\":\"旧记录\"}]");
+        return recommendation;
     }
 
     private LotteryKl8FeatureReport reportWithSingleOptimizedGroup() {

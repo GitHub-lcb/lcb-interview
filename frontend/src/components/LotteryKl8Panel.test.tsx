@@ -277,6 +277,19 @@ describe('LotteryKl8Panel', () => {
     expect(screen.getByText('不同尾数 4')).toBeInTheDocument()
   })
 
+  it('warns when the shown record still uses the legacy pick size', async () => {
+    const legacy = recommendation({
+      pickSize: 4,
+      groups: [{ numbers: [2, 11, 12, 73], reason: '旧选4 记录' }],
+    })
+    vi.mocked(listKl8Recommendations).mockResolvedValue(pageOf([legacy], 1))
+
+    render(<LotteryKl8Panel />)
+
+    expect(await screen.findByText('这条记录是旧口径（选4）')).toBeInTheDocument()
+    expect(screen.getByText(/点右上角「Java 推荐选5」/)).toBeInTheDocument()
+  })
+
   it('summarizes settled recommendation track record', async () => {
     const settled = (id: number, hits: number) => recommendation({
       id,
