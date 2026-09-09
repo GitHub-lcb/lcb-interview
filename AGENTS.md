@@ -214,6 +214,7 @@ if (tag != null) { ... }
 | `GET` | `/api/admin/ai/batch/status` | 查询批量生成进度 |
 | `POST` | `/api/admin/ai/fill-answer-batch` | 启动批量补答案任务 |
 | `GET` | `/api/admin/ai/fill-answer-batch/status` | 查询批量补答案进度 |
+| `POST` | `/api/admin/lottery/kl8/regenerate-current` | 重新生成当期快乐8选5推荐（口径升级后补生成） |
 
 ## 前端规范
 

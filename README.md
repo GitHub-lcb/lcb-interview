@@ -226,6 +226,7 @@ npm run dev
 | `GET` | `/api/admin/ai/fill-answer-stream` | SSE 方式补齐答案字段 |
 | `POST` | `/api/admin/ai/batch` | 启动批量生成任务 |
 | `GET` | `/api/admin/ai/batch/status` | 查询批量生成进度 |
+| `POST` | `/api/admin/lottery/kl8/regenerate-current` | 为全部活跃用户重新生成当期快乐8选5推荐（口径升级后补生成） |
 
 ## 题目数据工作流
 
