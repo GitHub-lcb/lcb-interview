@@ -13,7 +13,7 @@ import java.util.Map;
  * @param evaluatedIssueCount 参与评估的期数
  * @param averageHitCount     平均命中号码数
  * @param hitDistribution     命中数分布，key 为 0 到 pickSize
- * @param atLeastThreeRate    中 3 个及以上占比（选5 的首个有奖级别）
+ * @param atLeastThreeRate    中 2 个及以上占比（选4 的首个有奖级别，字段名沿用历史命名）
  * @param selected            是否被选为当期生产配置
  */
 public record LotteryKl8ProfileBacktest(

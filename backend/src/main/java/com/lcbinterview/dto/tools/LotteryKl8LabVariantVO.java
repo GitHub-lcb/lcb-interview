@@ -10,9 +10,9 @@ import java.util.Map;
  * @param selected            是否为当期生产配置
  * @param evaluatedIssueCount 评估期数
  * @param averageHitCount     平均命中号码数
- * @param atLeastThreeRate    中 3 个及以上占比
- * @param ciLow               中 3 个及以上占比的 95% 置信区间下限
- * @param ciHigh              中 3 个及以上占比的 95% 置信区间上限
+ * @param atLeastThreeRate    中 2 个及以上占比（字段名沿用历史命名，选4首个有奖级别）
+ * @param ciLow               中 2 个及以上占比的 95% 置信区间下限
+ * @param ciHigh              中 2 个及以上占比的 95% 置信区间上限
  * @param lift                相对理论基线的绝对提升量
  * @param zScore              相对基线的 z 值
  * @param significant         是否与基线存在统计显著差异

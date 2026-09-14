@@ -12,7 +12,7 @@ import type { LotterySimulation } from '../types'
 
 const DISCLAIMER = '模拟战场用历史开奖数据回放预测算法，统计结果不代表未来命中，仅供参考。'
 
-/** 工具页只保留快乐8：模拟玩法固定为选5，与线上每日推荐同一口径 */
+/** 工具页只保留快乐8：模拟玩法固定为选4，与线上每日推荐同一口径 */
 const LOTTERY_TYPE = 'KL8'
 
 const MODE_OPTIONS = [
@@ -54,11 +54,11 @@ function parseHitDistribution(value: string | undefined, evaluatedCount: number)
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  KL8: '快乐8 选5×1组',
+  KL8: '快乐8 选4×1组',
 }
 
 /**
- * 历史回放：选择最近期数，逐期预测并结算，统计选5 单组号码的真实命中表现。
+ * 历史回放：选择最近期数，逐期预测并结算，统计选4 单组号码的真实命中表现。
  */
 function SimulationReplayPanel() {
   const [history, setHistory] = useState<LotterySimulation[]>([])
@@ -88,7 +88,7 @@ function SimulationReplayPanel() {
     () => parseHitDistribution(latest?.hitDistribution, latest?.evaluatedCount ?? 0),
     [latest],
   )
-  // 选5 的中 3 是首个有奖级别，单独统计比「中 2 个及以上」更能反映实际体验
+  // 选4 的中 2 是首个有奖级别（已由后端 hitRate 统计），这里单独统计中 3 及以上的高奖体验
   const atLeastThreeRate = useMemo(() => {
     const rate = hitDistribution
       .filter(item => item.hits >= 3)
@@ -116,9 +116,9 @@ function SimulationReplayPanel() {
     <section className="tool-section lottery-tool" aria-label="模拟战场">
       <div className="tool-section-head">
         <div>
-          <div className="dashboard-kicker">模拟战场 · 快乐8选5</div>
+          <div className="dashboard-kicker">模拟战场 · 快乐8选4</div>
           <h2>预测算法历史回放</h2>
-          <p>选择最近期数，假设这些期还没开，逐期预测并结算，统计选5 单组号码的真实命中表现。</p>
+          <p>选择最近期数，假设这些期还没开，逐期预测并结算，统计选4 单组号码的真实命中表现。</p>
         </div>
         <div className="tool-actions">
           <Button type="primary" icon={<ExperimentOutlined />} loading={running} onClick={handleRun}>
@@ -215,7 +215,7 @@ function SimulationReplayPanel() {
             showIcon
             style={{ marginTop: 12 }}
             message="不同窗口请比较概率，不要只看中4的绝对期数"
-            description="100期只代表最近一段历史，500期覆盖更长周期，低表现阶段会稀释概率。模拟与每日推荐共用同一个预测内核（选5、同一套因子权重择优逻辑），每一步都只传入此前最近100期，因此不会读取未来开奖。"
+            description="100期只代表最近一段历史，500期覆盖更长周期，低表现阶段会稀释概率。模拟与每日推荐共用同一个预测内核（选4、同一套因子权重择优逻辑），每一步都只传入此前最近100期，因此不会读取未来开奖。"
           />
           <Alert type="success" showIcon style={{ marginTop: 12 }} message={latest.summary} />
         </Card>

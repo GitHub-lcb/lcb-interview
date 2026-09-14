@@ -32,15 +32,15 @@ vi.mock('../utils/feedbackMessage', () => ({
 
 function labReport(overrides: Partial<LotteryKl8LabReport> = {}): LotteryKl8LabReport {
   return {
-    pickSize: 5,
+    pickSize: 4,
     baseIssueCount: 2000,
     windowSize: 100,
     evaluatedIssueCount: 180,
-    baselineExpectedHits: 1.25,
-    baselineAtLeastThreeRate: 0.0967,
-    baselineAtLeastFourRate: 0.0127,
-    baselineFullHitRate: 0.000645,
-    requiredSampleSizeForOnePointLift: 7039,
+    baselineExpectedHits: 1,
+    baselineAtLeastThreeRate: 0.2589,
+    baselineAtLeastFourRate: 0.0031,
+    baselineFullHitRate: 0.0031,
+    requiredSampleSizeForOnePointLift: 15173,
     variants: [
       {
         name: 'hot',
@@ -48,14 +48,14 @@ function labReport(overrides: Partial<LotteryKl8LabReport> = {}): LotteryKl8LabR
         selected: true,
         evaluatedIssueCount: 180,
         averageHitCount: 1.28,
-        atLeastThreeRate: 0.1,
-        ciLow: 0.063,
-        ciHigh: 0.155,
-        lift: 0.0033,
-        zScore: 0.16,
+        atLeastThreeRate: 0.27,
+        ciLow: 0.21,
+        ciHigh: 0.34,
+        lift: 0.0111,
+        zScore: 0.35,
         significant: false,
         verdict: '与基线无显著差异',
-        hitDistribution: { 0: 40, 1: 70, 2: 50, 3: 15, 4: 4, 5: 1 },
+        hitDistribution: { 0: 50, 1: 80, 2: 35, 3: 12, 4: 3 },
       },
       {
         name: 'decay',
@@ -63,14 +63,14 @@ function labReport(overrides: Partial<LotteryKl8LabReport> = {}): LotteryKl8LabR
         selected: false,
         evaluatedIssueCount: 180,
         averageHitCount: 1.2,
-        atLeastThreeRate: 0.089,
-        ciLow: 0.055,
-        ciHigh: 0.14,
-        lift: -0.0077,
-        zScore: -0.35,
+        atLeastThreeRate: 0.25,
+        ciLow: 0.19,
+        ciHigh: 0.32,
+        lift: -0.0089,
+        zScore: -0.28,
         significant: false,
         verdict: '与基线无显著差异',
-        hitDistribution: { 0: 45, 1: 72, 2: 47, 3: 13, 4: 3, 5: 0 },
+        hitDistribution: { 0: 55, 1: 80, 2: 32, 3: 10, 4: 3 },
       },
     ],
     portfolios: [
@@ -95,7 +95,7 @@ function labReport(overrides: Partial<LotteryKl8LabReport> = {}): LotteryKl8LabR
         evaluatedIssueCount: 100,
       },
     ],
-    conclusion: '单注「中 3 个及以上」的理论概率固定为 9.67%（超几何分布），任何选号策略都无法改变它。',
+    conclusion: '单注「中 2 个及以上」的理论概率固定为 25.89%（超几何分布），任何选号策略都无法改变它。',
     disclaimer: '彩票结果具有随机性，本实验室只做统计检验，不构成投注建议。',
     ...overrides,
   }
@@ -132,15 +132,15 @@ describe('LotteryKl8LabPanel', () => {
     await waitFor(() => {
       expect(runKl8Lab).toHaveBeenCalledWith({ baseIssueCount: 2000, windowSize: 100, maxTicketCount: 3 })
     })
-    expect(await screen.findByText(/理论基线（选5）/)).toBeInTheDocument()
+    expect(await screen.findByText(/理论基线（选4）/)).toBeInTheDocument()
     // antd Statistic 会把整数位和小数位拆成两个 span，这里读取整块内容
-    expect(statisticValue('中3个及以上概率')).toBe('9.67%')
-    expect(statisticValue('期望命中')).toBe('1.25')
-    expect(screen.getByText(/需要约 7039 期样本/)).toBeInTheDocument()
+    expect(statisticValue('中2个及以上概率')).toBe('25.89%')
+    expect(statisticValue('期望命中')).toBe('1.00')
+    expect(screen.getByText(/需要约 15173 期样本/)).toBeInTheDocument()
     expect(screen.getByText('热度优先')).toBeInTheDocument()
     expect(screen.getByText('当前生产配置')).toBeInTheDocument()
     expect(screen.getAllByText('与基线无显著差异').length).toBe(2)
-    expect(screen.getByText('10.00%')).toBeInTheDocument()
+    expect(screen.getByText('27.00%')).toBeInTheDocument()
     expect(screen.getAllByText('3 注').length).toBeGreaterThan(0)
     expect(screen.getByText('24.00%')).toBeInTheDocument()
     expect(screen.getAllByText('+15.00%').length).toBeGreaterThan(0)

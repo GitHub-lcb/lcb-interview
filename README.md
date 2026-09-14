@@ -8,7 +8,7 @@ LCB Interview 是一个前后端分离的面试题库与备考训练系统。项
 - **题目详情**：支持摘要、原理、对比、场景、风险、项目经验、代码示例和图示等结构化答案字段。
 - **学习计划**：提供备考路线、每日任务、复习进度、能力地图、健康雷达和下一步训练队列。
 - **模拟训练**：支持按题目进行回答练习、面试评分、追问训练、反馈闭环和复盘材料沉淀。
-- **个人工具**：支持普通用户注册登录、福彩快乐8选5历史开奖同步、走查前推回测择优的 Java 统计推荐参考和快乐8模拟战场回放。
+- **个人工具**：支持普通用户注册登录、福彩快乐8选4历史开奖同步、走查前推回测择优的 Java 统计推荐参考和快乐8模拟战场回放。
 - **管理后台**：支持管理员 Token 校验、题库质量总览、草稿审核、批量发布/拒绝和 AI 生成答案。
 - **工程化支持**：Spring Boot 3 + JDK 21 后端、React 18 + Vite 前端、Vitest/JUnit 测试、Nginx SPA 部署配置。
 
@@ -158,7 +158,7 @@ npm run dev
 | `/study` | 学习计划与进度中心 |
 | `/practice` | 模拟问答与反馈闭环 |
 | `/experiences` | 面试经验与材料沉淀 |
-| `/tools` | 个人工具，包含快乐8选5预测与快乐8模拟战场 |
+| `/tools` | 个人工具，包含快乐8选4预测与快乐8模拟战场 |
 | `/auth/login` | 普通用户登录 |
 | `/auth/register` | 普通用户注册 |
 | `/admin/login` | 管理后台登录 |
@@ -201,7 +201,7 @@ npm run dev
 | `POST` | `/api/tools/lottery/kl8/sync` | 手动同步福彩快乐8开奖数据 |
 | `GET` | `/api/tools/lottery/kl8/sync-status` | 查询开奖同步状态 |
 | `GET` | `/api/tools/lottery/kl8/draws` | 分页查询近期开奖 |
-| `POST` | `/api/tools/lottery/kl8/recommendations` | 生成快乐8选5深度推荐，每次返回 1 组、每组 5 个号码，并附带分析和候选池 |
+| `POST` | `/api/tools/lottery/kl8/recommendations` | 生成快乐8选4推荐，每次返回 1 组、每组 4 个号码，并附带简要回测依据 |
 | `GET` | `/api/tools/lottery/kl8/recommendations` | 查询当前用户推荐历史 |
 | `POST` | `/api/tools/lottery/kl8/lab` | 运行概率实验室：选号配置走查前推寻优 + 多注投注组合实验 |
 
@@ -226,7 +226,7 @@ npm run dev
 | `GET` | `/api/admin/ai/fill-answer-stream` | SSE 方式补齐答案字段 |
 | `POST` | `/api/admin/ai/batch` | 启动批量生成任务 |
 | `GET` | `/api/admin/ai/batch/status` | 查询批量生成进度 |
-| `POST` | `/api/admin/lottery/kl8/regenerate-current` | 为全部活跃用户重新生成当期快乐8选5推荐（口径升级后补生成） |
+| `POST` | `/api/admin/lottery/kl8/regenerate-current` | 为全部活跃用户重新生成当期快乐8选4推荐（口径升级后补生成） |
 
 ## 题目数据工作流
 

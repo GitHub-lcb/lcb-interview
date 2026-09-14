@@ -187,7 +187,7 @@ if (tag != null) { ... }
 | `POST` | `/api/tools/lottery/kl8/sync` | 同步快乐 8 开奖数据（需登录） |
 | `GET` | `/api/tools/lottery/kl8/sync-status` | 查询快乐 8 同步状态（需登录） |
 | `GET` | `/api/tools/lottery/kl8/draws` | 查询快乐 8 近期开奖（需登录） |
-| `POST` | `/api/tools/lottery/kl8/recommendations` | 生成快乐 8 选5 推荐（需登录） |
+| `POST` | `/api/tools/lottery/kl8/recommendations` | 生成快乐 8 选4 推荐（需登录） |
 | `GET` | `/api/tools/lottery/kl8/recommendations` | 查询快乐 8 推荐历史（需登录） |
 | `POST` | `/api/tools/lottery/kl8/lab` | 运行快乐 8 概率实验室（配置寻优 + 投注组合，需登录） |
 
@@ -214,7 +214,7 @@ if (tag != null) { ... }
 | `GET` | `/api/admin/ai/batch/status` | 查询批量生成进度 |
 | `POST` | `/api/admin/ai/fill-answer-batch` | 启动批量补答案任务 |
 | `GET` | `/api/admin/ai/fill-answer-batch/status` | 查询批量补答案进度 |
-| `POST` | `/api/admin/lottery/kl8/regenerate-current` | 重新生成当期快乐8选5推荐（口径升级后补生成） |
+| `POST` | `/api/admin/lottery/kl8/regenerate-current` | 重新生成当期快乐8选4推荐（口径升级后补生成） |
 
 ## 前端规范
 
@@ -241,7 +241,7 @@ if (tag != null) { ... }
 | `/study` | 学习计划与进度中心 |
 | `/practice` | 模拟练习 |
 | `/experiences` | 面试经验与材料沉淀 |
-| `/tools` | 个人工具（快乐8选5预测、快乐8模拟战场，需登录） |
+| `/tools` | 个人工具（快乐8选4预测、快乐8模拟战场，需登录） |
 | `/auth/login` | 普通用户登录 |
 | `/auth/register` | 普通用户注册 |
 | `/admin/login` | 管理后台登录 |

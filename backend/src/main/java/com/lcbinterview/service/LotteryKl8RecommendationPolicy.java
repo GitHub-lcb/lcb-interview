@@ -16,13 +16,13 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * 快乐8推荐策略。负责校验推荐输出，并生成纯 Java 规则推荐，当前统一为选5玩法。
+ * 快乐8推荐策略。负责校验推荐输出，并生成纯 Java 规则推荐，当前统一为选4玩法。
  */
 @Service
 public class LotteryKl8RecommendationPolicy {
 
-    /** 默认每组 5 个号码，全站唯一对外口径；兼容旧记录时仍按记录内的 pickSize 校验 */
-    public static final int DEFAULT_PICK_SIZE = 5;
+    /** 默认每组 4 个号码，全站唯一对外口径；兼容旧记录时仍按记录内的 pickSize 校验 */
+    public static final int DEFAULT_PICK_SIZE = 4;
     /** 每天只输出 1 组号码：综合算法动态选出最优的一组，AI 与 Java 回退统一按此口径 */
     private static final int GROUP_COUNT = 1;
     private static final Set<String> CONFIDENCE_LABELS = Set.of("低", "中低", "中");
@@ -39,7 +39,7 @@ public class LotteryKl8RecommendationPolicy {
     }
 
     /**
-     * 从 AI 文本中解析并校验 1 组推荐（默认选5）。
+     * 从 AI 文本中解析并校验 1 组推荐（默认选4）。
      *
      * @param content AI 输出文本
      * @return 通过校验的推荐组
@@ -60,7 +60,7 @@ public class LotteryKl8RecommendationPolicy {
     }
 
     /**
-     * 从 AI 文本中解析并校验深度推荐结果（默认选5）。
+     * 从 AI 文本中解析并校验深度推荐结果（默认选4）。
      *
      * @param content AI 输出文本
      * @return 通过校验的深度推荐结果
@@ -113,7 +113,7 @@ public class LotteryKl8RecommendationPolicy {
     }
 
     /**
-     * 根据历史特征生成带分析 JSON 的 Java 规则推荐（默认选5）。
+     * 根据历史特征生成带分析 JSON 的 Java 规则推荐（默认选4）。
      *
      * @param report 历史特征报告
      * @return Java 规则推荐结果
@@ -134,7 +134,7 @@ public class LotteryKl8RecommendationPolicy {
     }
 
     /**
-     * 根据历史特征生成带分析 JSON 的 Java 规则推荐，并兼容旧 AI 失败诊断（默认选5）。
+     * 根据历史特征生成带分析 JSON 的 Java 规则推荐，并兼容旧 AI 失败诊断（默认选4）。
      *
      * @param report        历史特征报告
      * @param failureDetail AI 失败诊断，可为空
@@ -193,7 +193,7 @@ public class LotteryKl8RecommendationPolicy {
     }
 
     /**
-     * 根据历史特征生成 Java 规则推荐（默认选5）。
+     * 根据历史特征生成 Java 规则推荐（默认选4）。
      *
      * @param report 历史特征报告
      * @return 1 组规则推荐
@@ -216,7 +216,7 @@ public class LotteryKl8RecommendationPolicy {
         Set<String> usedKeys = new HashSet<>();
         Set<Integer> usedNumbers = new HashSet<>();
         // 组合优化生成的组优先直接采用，并登记已用号码用于后续补齐组的覆盖去重。
-        // 只接受与当前 pickSize 一致的组：历史记录或旧报告可能是选4，直接采用会在校验阶段抛错。
+        // 只接受与当前 pickSize 一致的组：历史记录或旧报告可能是选5，直接采用会在校验阶段抛错。
         for (LotteryKl8OptimizedGroup optimizedGroup : report.optimizedPortfolio().groups()) {
             if (groups.size() >= GROUP_COUNT) {
                 break;
@@ -235,7 +235,7 @@ public class LotteryKl8RecommendationPolicy {
         List<Integer> freshCandidates = withoutUsed(candidateNumbers, usedNumbers);
         while (groups.size() < GROUP_COUNT) {
             LinkedHashSet<Integer> numbers = new LinkedHashSet<>();
-            // 根据选号数量动态分配候选来源比例：选5 时按 1 深候选 + 1 热 + 1 遗漏 + 1 冷 + 1 随机兜底
+            // 根据选号数量动态分配候选来源比例：选4 时按 1 深候选 + 1 热 + 1 遗漏 + 1 冷兜底，随机只在去重冲突时补位
             int hotCount = Math.max(1, pickSize / 5);
             int missingCount = Math.max(1, pickSize / 5);
             int coldCount = Math.max(1, pickSize / 5);

@@ -34,10 +34,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class LotteryKl8LabService {
 
-    /** 与线上每日推荐一致的选5 口径 */
-    private static final int PICK_SIZE = 5;
-    /** 选5 的首个有奖级别：中 3 个 */
-    private static final int MIN_HIT_LEVEL = 3;
+    /** 与线上每日推荐一致的选4 口径 */
+    private static final int PICK_SIZE = 4;
+    /** 选4 的首个有奖级别：中 2 个（官方规则选四中二即中奖 3 元） */
+    private static final int MIN_HIT_LEVEL = 2;
     /** 与每日推荐一致的输入窗口 */
     private static final int LEAD_HISTORY = 100;
     private static final int MIN_WINDOW = 10;
@@ -96,8 +96,8 @@ public class LotteryKl8LabService {
      * 权重寻优：把走查前推回测里各候选配置的表现转成带置信区间和显著性判定的结果。
      *
      * @param baseIssueCount       历史期数
-     * @param baselineAtLeastThree 理论中 3 个及以上概率
-     * @return 各配置的对比结果，按中 3 个及以上占比降序
+     * @param baselineAtLeastThree 理论中 2 个及以上概率（字段名沿用历史命名，语义为选4首个有奖级别）
+     * @return 各配置的对比结果，按中 2 个及以上占比降序
      */
     private List<LotteryKl8LabVariantVO> sweepVariants(int baseIssueCount, double baselineAtLeastThree) {
         LotteryKl8FeatureReport report = featureService.buildReport(baseIssueCount);
@@ -171,7 +171,7 @@ public class LotteryKl8LabService {
             Set<Integer> actual = new LinkedHashSet<>(featureService.parseNumbers(target.getNumbers()));
             int firstHit = tickets.isEmpty() ? 0 : hitCount(tickets.getFirst(), actual);
             for (int ticketCount = 1; ticketCount <= tickets.size(); ticketCount += 1) {
-                // 不重复拆分：前 N 注里任意一注中 3 个及以上即算达成
+                // 不重复拆分：前 N 注里任意一注中 2 个及以上即算达成（选4首个有奖级别）
                 int bestDisjoint = 0;
                 for (int ticketIndex = 0; ticketIndex < ticketCount; ticketIndex += 1) {
                     bestDisjoint = Math.max(bestDisjoint, hitCount(tickets.get(ticketIndex), actual));
@@ -288,7 +288,7 @@ public class LotteryKl8LabService {
      *
      * @param variants             权重寻优结果
      * @param portfolios           投注组合结果
-     * @param baselineAtLeastThree 理论中 3 个及以上概率
+     * @param baselineAtLeastThree 理论中 2 个及以上概率（字段名沿用历史命名）
      * @return 结论
      */
     private String buildConclusion(
@@ -301,7 +301,7 @@ public class LotteryKl8LabService {
                 .orElse(null);
         String variantText = variants.isEmpty()
             ? "本次样本不足，未生成配置对比。"
-            : "本次对比了 %d 个选号配置，其中 %d 个与基线存在显著差异；表现最好的配置是「%s」，中 3 个及以上 %.2f%%（95%% 区间 %.2f%%~%.2f%%），相对基线 %+.2f 个百分点。"
+            : "本次对比了 %d 个选号配置，其中 %d 个与基线存在显著差异；表现最好的配置是「%s」，中 2 个及以上 %.2f%%（95%% 区间 %.2f%%~%.2f%%），相对基线 %+.2f 个百分点。"
                 .formatted(variants.size(), significantCount, best.label(),
                         best.atLeastThreeRate() * 100, best.ciLow() * 100, best.ciHigh() * 100,
                         best.lift() * 100);
@@ -311,7 +311,7 @@ public class LotteryKl8LabService {
             : "每期买 %d 注且号码不重复，至少中一注的概率实测 %.2f%%（重复买同一注 %.2f%%），提升 %+.2f 个百分点——这是唯一能真正提高概率的方向，代价是投注成本同比增加。"
                 .formatted(lastRow.ticketCount(), lastRow.disjointRate() * 100,
                         lastRow.repeatedRate() * 100, lastRow.liftOverRepeated() * 100);
-        return "单注「中 3 个及以上」的理论概率固定为 %.2f%%（超几何分布），任何选号策略都无法改变它。%s %s"
+        return "单注「中 2 个及以上」的理论概率固定为 %.2f%%（超几何分布），任何选号策略都无法改变它。%s %s"
                 .formatted(baselineAtLeastThree * 100, variantText, portfolioText);
     }
 

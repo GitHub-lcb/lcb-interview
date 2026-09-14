@@ -28,10 +28,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LotteryKl8RecommendationService {
 
-    private static final int DEFAULT_BASE_ISSUE_COUNT = 20;
-    /** 全站统一选5玩法：快乐8选5 是唯一对外推荐口径 */
-    private static final int DEFAULT_PICK_SIZE = 5;
-    private static final String STRATEGY_VERSION = "KL8_JAVA_PICK5_V21";
+    /** 默认使用近 100 期：保证走查前推回测有足够样本做权重择优，20 期样本下回测为空只能用中性权重。 */
+    private static final int DEFAULT_BASE_ISSUE_COUNT = 100;
+    /** 全站统一选4玩法：快乐8选4 是唯一对外推荐口径，中 2 即中奖 */
+    private static final int DEFAULT_PICK_SIZE = 4;
+    private static final String STRATEGY_VERSION = "KL8_JAVA_PICK4_V22";
     private static final String DISCLAIMER = "彩票结果具有随机性，本推荐仅为娱乐统计参考，不保证命中，不构成投注建议。";
 
     private final LotteryKl8FeatureService featureService;
@@ -42,8 +43,8 @@ public class LotteryKl8RecommendationService {
     private final ObjectMapper objectMapper;
 
 /**
- * 为当前用户生成 1 组快乐8选5推荐。
- * 同一基准期只保留一条同口径推荐：口径一致直接复用；口径升级（例如线上从选4 改为选5）
+ * 为当前用户生成 1 组快乐8选4推荐。
+ * 同一基准期只保留一条同口径推荐：口径一致直接复用；口径升级（例如线上从选5 改为选4）
  * 时，未结算记录原地覆盖，已结算记录另存新记录，避免同一期出现两条互相矛盾的推荐。
  *
  * @param userId  用户 ID
@@ -67,7 +68,7 @@ public LotteryKl8RecommendationVO recommend(Long userId, LotteryKl8Recommendatio
         }
         String source = "RULE_BASED";
         LotteryKl8RecommendationPolicy.ValidatedRecommendation result = recommendationPolicy.fallbackResult(report, pickSize);
-        // 口径不同且尚未结算：直接覆盖同基准期的旧记录（否则页面会继续显示旧的选4 推荐）；
+        // 口径不同且尚未结算：直接覆盖同基准期的旧记录（否则页面会继续显示旧的选5 推荐）；
         // 已结算的旧记录保留作历史，另插入一条新口径记录。
         // 注意：历史数据里 evaluated_issue_no 可能是空串而不是 NULL，必须一并按「未结算」处理。
         LotteryKl8Recommendation recommendation = existing != null && isUnsettled(existing)
@@ -97,7 +98,7 @@ public LotteryKl8RecommendationVO recommend(Long userId, LotteryKl8Recommendatio
     }
 
     /**
-     * 判断用户是否已存在当前口径（选5 + 当前策略版本）的指定基准期推荐。
+     * 判断用户是否已存在当前口径（选4 + 当前策略版本）的指定基准期推荐。
      * 自动调度器据此决定是否补生成：口径升级后即使同期已有旧记录也会重新生成。
      *
      * @param userId        用户 ID

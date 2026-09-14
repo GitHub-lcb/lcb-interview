@@ -113,7 +113,7 @@ public class LotteryKl8AiRecommendationService {
                     "combinationLogic":["至少3条组合逻辑"],
                     "riskWarnings":["至少2条风险提示，必须包含随机性和不保证命中"]
                   },
-                  "groups":[{"numbers":[1,2,3,4,5],"reason":"30到120字中文理由"}]
+                  "groups":[{"numbers":[1,2,3,4],"reason":"30到120字中文理由"}]
                 }。
                 必须恰好 1 组，每组恰好 %d 个整数，号码范围 1-80，组内不重复。
                 confidenceLabel 最高只能是“中”，不能输出“高”。

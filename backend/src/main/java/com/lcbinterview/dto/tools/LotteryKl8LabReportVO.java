@@ -10,9 +10,9 @@ import java.util.List;
  * @param windowSize                        投注组合回放期数
  * @param evaluatedIssueCount               权重寻优实际评估期数
  * @param baselineExpectedHits              理论期望命中数
- * @param baselineAtLeastThreeRate          理论中 3 个及以上概率
+ * @param baselineAtLeastThreeRate          理论中 2 个及以上概率（字段名沿用历史命名，选4首个有奖级别）
  * @param baselineAtLeastFourRate           理论中 4 个及以上概率
- * @param baselineFullHitRate               理论中 5 个概率
+ * @param baselineFullHitRate               理论中 4 个概率（选4全中）
  * @param requiredSampleSizeForOnePointLift 确认 +1 个百分点提升所需的样本量
  * @param variants                          各选号配置的走查前推表现
  * @param portfolios                        投注组合实验结果

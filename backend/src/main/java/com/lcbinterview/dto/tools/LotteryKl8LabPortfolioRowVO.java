@@ -1,7 +1,7 @@
 package com.lcbinterview.dto.tools;
 
 /**
- * 投注组合实验的一行结果：每期买 N 注时「至少一注中 3 个及以上」的概率。
+ * 投注组合实验的一行结果：每期买 N 注时「至少一注中 2 个及以上」的概率（选4首个有奖级别）。
  *
  * @param ticketCount       每期注数
  * @param disjointRate      号码不重复拆分的达成率

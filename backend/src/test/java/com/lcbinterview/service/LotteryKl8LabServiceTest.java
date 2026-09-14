@@ -39,9 +39,9 @@ class LotteryKl8LabServiceTest {
 
         LotteryKl8LabReportVO report = service.run(7L, new LotteryKl8LabRequest(240, 20, 3));
 
-        assertEquals(5, report.pickSize());
-        assertEquals(1.25, report.baselineExpectedHits(), 0.000001);
-        assertEquals(0.096672, report.baselineAtLeastThreeRate(), 0.000001);
+        assertEquals(4, report.pickSize());
+        assertEquals(1.0, report.baselineExpectedHits(), 0.000001);
+        assertEquals(0.258947, report.baselineAtLeastThreeRate(), 0.000001);
         assertTrue(report.requiredSampleSizeForOnePointLift() > 6500);
 
         assertFalse(report.variants().isEmpty());
@@ -74,7 +74,7 @@ class LotteryKl8LabServiceTest {
             assertEquals(20, row.evaluatedIssueCount());
         }
         assertTrue(report.conclusion().contains("超几何分布"));
-        assertTrue(report.conclusion().contains("9.67"));
+        assertTrue(report.conclusion().contains("25.89"));
         assertFalse(report.disclaimer().isBlank());
     }
 
@@ -91,7 +91,7 @@ class LotteryKl8LabServiceTest {
 
         LotteryKl8LabReportVO report = service.run(7L, new LotteryKl8LabRequest(200, 12, 3));
 
-        // 历史固定开出 1-20，生产推荐必然命中 5 个，多注拆分同样 100%
+        // 历史固定开出 1-20，生产推荐必然命中 4 个，多注拆分同样 100%
         LotteryKl8LabPortfolioRowVO threeTickets = report.portfolios().getLast();
         assertEquals(3, threeTickets.ticketCount());
         assertEquals(1.0, threeTickets.disjointRate(), 0.000001);

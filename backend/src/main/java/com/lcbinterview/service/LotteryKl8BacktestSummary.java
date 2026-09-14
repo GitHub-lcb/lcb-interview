@@ -13,7 +13,7 @@ import java.util.Map;
  * @param hitDistribution 命中数分布，key 为 0 到 pickSize
  * @param factorWeights 走查前推择优后的因子权重
  * @param weightProfileName 择优后的权重配置中文标签
- * @param hitAtLeastThreeRate 中 3 个及以上占比，选5 玩法首个有奖级别的达成率
+ * @param hitAtLeastThreeRate 中 2 个及以上占比，选4 玩法首个有奖级别的达成率（字段名沿用历史命名）
  * @param topFactorNames 表现较好的因子名称
  * @param profileBacktests 各候选权重配置的横向回测表现，供概率实验室对比
  * @param summary 中文摘要
@@ -31,8 +31,8 @@ public record LotteryKl8BacktestSummary(
         String summary
 ) {
 
-    /** 默认展示口径：选5 */
-    private static final int DEFAULT_PICK_SIZE = 5;
+    /** 默认展示口径：选4 */
+    private static final int DEFAULT_PICK_SIZE = 4;
 
     /**
      * 创建空回测摘要，供历史样本不足或兼容旧调用时使用。

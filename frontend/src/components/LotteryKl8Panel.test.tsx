@@ -40,11 +40,11 @@ function recommendation(overrides: Partial<LotteryKl8Recommendation> = {}): Lott
   return {
     id: 1,
     source: 'RULE_BASED',
-    pickSize: 5,
-    baseIssueCount: 20,
+    pickSize: 4,
+    baseIssueCount: 100,
     latestIssueNo: '2026213',
     groups: [
-      { numbers: [2, 11, 12, 73, 74], reason: '精选组' },
+      { numbers: [2, 11, 12, 73], reason: '精选组' },
     ],
     featureSummary: '测试摘要',
     disclaimer: '测试免责声明',
@@ -95,7 +95,7 @@ describe('LotteryKl8Panel', () => {
         totalHitCount: 2,
         maxHitCount: 2,
         groups: [
-          { groupIndex: 1, numbers: [2, 11, 12, 73, 74], hitNumbers: [11, 12], hitCount: 2 },
+          { groupIndex: 1, numbers: [2, 11, 12, 73], hitNumbers: [11, 12], hitCount: 2 },
         ],
       }),
     })
@@ -104,8 +104,8 @@ describe('LotteryKl8Panel', () => {
     render(<LotteryKl8Panel />)
 
     expect((await screen.findAllByText('已开 · 命中 2')).length).toBeGreaterThan(0)
-    expect(screen.getByText('命中 2/5')).toBeInTheDocument()
-    expect(screen.getByText('单组最高 2/5')).toBeInTheDocument()
+    expect(screen.getByText('命中 2/4')).toBeInTheDocument()
+    expect(screen.getByText('单组最高 2/4')).toBeInTheDocument()
   })
 
   it('shows miss state when settled with zero hits', async () => {
@@ -120,7 +120,7 @@ describe('LotteryKl8Panel', () => {
         totalHitCount: 0,
         maxHitCount: 0,
         groups: [
-          { groupIndex: 1, numbers: [2, 11, 12, 73, 74], hitNumbers: [], hitCount: 0 },
+          { groupIndex: 1, numbers: [2, 11, 12, 73], hitNumbers: [], hitCount: 0 },
         ],
       }),
     })
@@ -129,7 +129,7 @@ describe('LotteryKl8Panel', () => {
     render(<LotteryKl8Panel />)
 
     expect((await screen.findAllByText('已开 · 命中 0')).length).toBeGreaterThan(0)
-    expect(screen.getAllByText('命中 0/5').length).toBe(1)
+    expect(screen.getAllByText('命中 0/4').length).toBe(1)
   })
 
   it('falls back to plain label when issue number cannot be incremented', async () => {
@@ -141,7 +141,7 @@ describe('LotteryKl8Panel', () => {
     expect((await screen.findAllByText('今晚开')).length).toBeGreaterThan(0)
   })
 
-  it('copies the single pick-5 group in betting format', async () => {
+  it('copies the single pick-4 group in betting format', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.defineProperty(navigator, 'clipboard', {
       value: { writeText },
@@ -155,9 +155,9 @@ describe('LotteryKl8Panel', () => {
     await userEvent.click(screen.getByRole('button', { name: /一键复制/ }))
 
     await waitFor(() => {
-      expect(writeText).toHaveBeenCalledWith('选5 02 11 12 73 74 1倍')
+      expect(writeText).toHaveBeenCalledWith('选4 02 11 12 73 1倍')
     })
-    expect(emitFeedbackSuccess).toHaveBeenCalledWith('已复制精选号码（选5×1组）')
+    expect(emitFeedbackSuccess).toHaveBeenCalledWith('已复制精选号码（选4×1组）')
   })
 
   it('handles Java recommendation timeout with controlled feedback', async () => {
@@ -168,29 +168,29 @@ describe('LotteryKl8Panel', () => {
     render(<LotteryKl8Panel />)
 
     await screen.findByText('暂无推荐历史。')
-    await userEvent.click(screen.getByRole('button', { name: /Java 推荐选5/ }))
+    await userEvent.click(screen.getByRole('button', { name: /Java 推荐选4/ }))
 
     await waitFor(() => {
-      expect(createKl8Recommendation).toHaveBeenCalledWith(20)
+      expect(createKl8Recommendation).toHaveBeenCalledWith(100)
     })
     expect(emitFeedbackWarning).toHaveBeenCalledWith('Java 推荐生成耗时较长，请稍后刷新推荐历史查看结果')
     expect(emitFeedbackSuccess).not.toHaveBeenCalled()
   })
 
-  it('generates a pick-5 recommendation', async () => {
-    vi.mocked(createKl8Recommendation).mockImplementation(async (baseIssueCount = 20) => recommendation({
+  it('generates a pick-4 recommendation', async () => {
+    vi.mocked(createKl8Recommendation).mockImplementation(async (baseIssueCount = 100) => recommendation({
       baseIssueCount,
     }))
 
     render(<LotteryKl8Panel />)
 
     await screen.findByText('暂无推荐历史。')
-    await userEvent.click(screen.getByRole('button', { name: /Java 推荐选5/ }))
+    await userEvent.click(screen.getByRole('button', { name: /Java 推荐选4/ }))
 
     await waitFor(() => {
       expect(createKl8Recommendation).toHaveBeenCalledTimes(1)
     })
-    expect(createKl8Recommendation).toHaveBeenCalledWith(20)
+    expect(createKl8Recommendation).toHaveBeenCalledWith(100)
     expect((await screen.findAllByText('今晚开 · 预测 2026214')).length).toBeGreaterThan(0)
     expect(emitFeedbackSuccess).toHaveBeenCalledWith('Java 推荐已生成')
   })
@@ -264,30 +264,17 @@ describe('LotteryKl8Panel', () => {
     expect((await screen.findAllByText('2026213')).length).toBeGreaterThan(0)
   })
 
-  it('shows the structure profile of the recommended numbers', async () => {
-    vi.mocked(listKl8Recommendations).mockResolvedValue(pageOf([recommendation()], 1))
-
-    render(<LotteryKl8Panel />)
-
-    await screen.findAllByText('今晚开 · 预测 2026214')
-    expect(screen.getByText('结构画像')).toBeInTheDocument()
-    expect(screen.getByText('和值 172')).toBeInTheDocument()
-    expect(screen.getByText('奇偶 2:3')).toBeInTheDocument()
-    expect(screen.getByText('最长连号 2')).toBeInTheDocument()
-    expect(screen.getByText('不同尾数 4')).toBeInTheDocument()
-  })
-
   it('warns when the shown record still uses the legacy pick size', async () => {
     const legacy = recommendation({
-      pickSize: 4,
-      groups: [{ numbers: [2, 11, 12, 73], reason: '旧选4 记录' }],
+      pickSize: 5,
+      groups: [{ numbers: [2, 11, 12, 73, 74], reason: '旧选5 记录' }],
     })
     vi.mocked(listKl8Recommendations).mockResolvedValue(pageOf([legacy], 1))
 
     render(<LotteryKl8Panel />)
 
-    expect(await screen.findByText('这条记录是旧口径（选4）')).toBeInTheDocument()
-    expect(screen.getByText(/点右上角「Java 推荐选5」/)).toBeInTheDocument()
+    expect(await screen.findByText('这条记录是旧口径（选5）')).toBeInTheDocument()
+    expect(screen.getByText(/点右上角「Java 推荐选4」/)).toBeInTheDocument()
   })
 
   it('summarizes settled recommendation track record', async () => {
@@ -298,7 +285,7 @@ describe('LotteryKl8Panel', () => {
       maxHitCount: hits,
     })
     vi.mocked(listKl8Recommendations).mockResolvedValue(
-      pageOf([settled(1, 3), settled(2, 1), recommendation()], 3),
+      pageOf([settled(1, 3), settled(2, 1), recommendation({ id: 3 })], 3),
     )
 
     render(<LotteryKl8Panel />)
@@ -306,76 +293,45 @@ describe('LotteryKl8Panel', () => {
     expect(await screen.findByText('近 3 次推荐表现')).toBeInTheDocument()
     expect(screen.getByText('已结算 2 次')).toBeInTheDocument()
     expect(screen.getByText('平均命中 2.00')).toBeInTheDocument()
-    expect(screen.getByText('中3个及以上 1 次')).toBeInTheDocument()
+    expect(screen.getByText('中2个及以上 1 次')).toBeInTheDocument()
     expect(screen.getByText('占比 50.0%')).toBeInTheDocument()
   })
 
-  it('renders walk-forward backtest and candidate pool tabs from analysis json', async () => {
-    vi.mocked(listKl8Draws).mockResolvedValue(pageOf([
-      {
-        issueNo: '2026213',
-        drawDate: '2026-08-11',
-        numbers: [6, 7, 8, 11, 12, 13, 18, 21, 33, 36, 37, 42, 44, 56, 57, 58, 60, 66, 71, 80],
-        sourceName: 'test',
-      },
-    ], 1))
+  it('keeps the first screen compact without diagnostic tabs', async () => {
+    vi.mocked(listKl8Recommendations).mockResolvedValue(pageOf([recommendation()], 1))
+
+    render(<LotteryKl8Panel />)
+
+    await screen.findAllByText('今晚开 · 预测 2026214')
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument()
+    expect(screen.queryByText('结构画像')).not.toBeInTheDocument()
+    expect(screen.queryByText('候选池')).not.toBeInTheDocument()
+    expect(screen.queryByRole('grid', { name: '快乐8近期开奖走势' })).not.toBeInTheDocument()
+  })
+
+  it('shows a one-line backtest basis from analysis json', async () => {
     const withAnalysis = recommendation({
       analysisJson: JSON.stringify({
-        confidenceLabel: '低',
         analysis: {
-          overview: '综合算法基于走查前推回测择优后的权重选出唯一一组选5号码。',
-          featureSignals: ['热度因子近期表现靠前'],
-          combinationLogic: ['四策略加权投票 + 连号种子 + 结构均衡'],
+          overview: '综合算法基于走查前推回测择优后的权重选出唯一一组选4号码。',
           riskWarnings: ['彩票开奖结果具有独立随机性，历史统计不能保证命中。'],
         },
         backtestSummary: {
           evaluatedIssueCount: 180,
-          averageHitCount: 1.31,
+          averageHitCount: 1.05,
           maxHitCount: 4,
-          hitDistribution: { 0: 20, 1: 80, 2: 50, 3: 20, 4: 10, 5: 0 },
-          factorWeights: {
-            hotWeight: 1.35,
-            missingWeight: 0.85,
-            trendWeight: 0.95,
-            decayWeight: 1.15,
-            pairWeight: 0.95,
-            balanceWeight: 0.85,
-          },
           weightProfileName: '热度优先',
-          hitAtLeastThreeRate: 0.1667,
-          topFactorNames: ['热度 1.40'],
+          hitAtLeastThreeRate: 0.27,
           summary: '滚动回测 180 期（走查前推，不含未来信息）',
         },
-        optimizedPortfolio: {
-          groups: [{ numbers: [2, 11, 12, 73, 74], score: 61.2, reason: '组合优化', evidence: ['结构均衡修复 0 次'] }],
-          summary: '组合优化完成',
-          diagnostics: { longestConsecutiveRun: '2' },
-          neighborRecommendations: [
-            { number: 12, anchorNumbers: [11], directions: ['右邻'], score: 9.5, selected: true, reason: '邻位', evidence: ['上一期邻位来源 [11]'] },
-          ],
-          pairRecommendations: [
-            { leftNumber: 11, rightNumber: 12, count: 30, lift: 1.2, score: 36, selected: false, reason: '共现参考', evidence: ['样本内共现 30 次'] },
-          ],
-        },
-        analysisSections: ['回测层：走查前推'],
       }),
-      candidatePoolJson: JSON.stringify([
-        { number: 11, score: 70.5, roles: ['热号'], evidence: '综合分 70.50' },
-      ]),
     })
     vi.mocked(listKl8Recommendations).mockResolvedValue(pageOf([withAnalysis], 1))
 
     render(<LotteryKl8Panel />)
 
     await screen.findAllByText('今晚开 · 预测 2026214')
-    await userEvent.click(screen.getByRole('tab', { name: /深度分析/ }))
-    expect(await screen.findByText(/择优配置 热度优先/)).toBeInTheDocument()
-    expect(screen.getByText(/中3个及以上 16.7%/)).toBeInTheDocument()
-
-    await userEvent.click(screen.getByRole('tab', { name: /候选池/ }))
-    expect(await screen.findByText('综合分 70.50')).toBeInTheDocument()
-
-    await userEvent.click(screen.getByRole('tab', { name: /走势分析/ }))
-    expect(await screen.findByRole('grid', { name: '快乐8近期开奖走势' })).toBeInTheDocument()
+    expect(await screen.findByText(/选出唯一一组选4号码/)).toBeInTheDocument()
+    expect(screen.getByText(/回测 180 期/)).toBeInTheDocument()
   })
 })

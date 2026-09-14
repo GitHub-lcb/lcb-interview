@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 快乐8工具接口，提供开奖同步、历史开奖和 Java 规则推荐能力，支持选1到选10玩法。
+ * 快乐8工具接口，提供开奖同步、历史开奖和 Java 规则推荐能力，当前统一为选4玩法。
  */
 @Slf4j
 @Tag(name = "快乐8工具")
@@ -80,7 +80,7 @@ public class LotteryKl8Controller {
     }
 
     /**
-     * 生成当前用户的快乐8选5推荐。
+     * 生成当前用户的快乐8选4推荐。
      *
      * @param request 推荐请求
      * @return 推荐结果

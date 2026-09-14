@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * 快乐8历史特征服务，为 Java 推荐策略提供结构化统计输入，当前统一为选5玩法。
+ * 快乐8历史特征服务，为 Java 推荐策略提供结构化统计输入，当前统一为选4玩法。
  */
 @Service
 @RequiredArgsConstructor
@@ -64,25 +64,25 @@ public class LotteryKl8FeatureService {
     private static final int MAX_BASE_ISSUE_COUNT = 2000;
     private static final int CANDIDATE_POOL_SIZE = 40;
     /**
-     * V21 选5 和值带：5 个号码的和值分布均值 202.5、标准差约 50，
-     * [120, 285] 覆盖约 90% 的组合，用于识别并规避极端和值组合。
-     * 注意和值带不改变期望命中（任意 5 号码组合的超几何期望相同），只用于剔除形态过于极端的组合。
+     * V22 选4 和值带：4 个号码的和值分布均值 162、标准差约 45，
+     * [90, 235] 覆盖约 90% 的组合，用于识别并规避极端和值组合。
+     * 注意和值带不改变期望命中（任意 4 号码组合的超几何期望相同），只用于剔除形态过于极端的组合。
      */
-    private static final int SUM_CONSTRAINT_MIN = 120;
-    private static final int SUM_CONSTRAINT_MAX = 285;
-    /** 单个 20 号区间最多入选号码数：选5 时取 2，避免号码过度集中在一个区间 */
+    private static final int SUM_CONSTRAINT_MIN = 90;
+    private static final int SUM_CONSTRAINT_MAX = 235;
+    /** 单个 20 号区间最多入选号码数：选4 时取 2，避免号码过度集中在一个区间 */
     private static final int ZONE_MAX_PER_RANGE = 2;
     /** 结构修复允许的最大票数损失，避免为了结构把高票号码直接换掉 */
     private static final double STRUCTURE_REPAIR_VOTE_TOLERANCE = 1.0;
-    /** 默认选5，全站唯一对外口径 */
-    private static final int DEFAULT_PICK_SIZE = 5;
+    /** 默认选4，全站唯一对外口径 */
+    private static final int DEFAULT_PICK_SIZE = 4;
     private static final int PAIR_HIGHLIGHT_SIZE = 20;
     private static final int PAIR_RECOMMENDATION_SIZE = 12;
     private static final int NEIGHBOR_RECOMMENDATION_SIZE = 20;
     /** V20 多组覆盖：每次生成 2 组号码，组间通过复用惩罚尽量去重；号码更少组间去重更充分，提升整体命中感知 */
     /**
-     * 每天只输出 1 组选5推荐：组合分与结构均衡共同决定唯一一组号码。
-     * V21 移除了"用最近 10 期评估在完整历史上选出的候选组"这一步——
+     * 每天只输出 1 组选4推荐：组合分与结构均衡共同决定唯一一组号码。
+     * V22 沿用 V21 结论，不再做"用最近 10 期评估在完整历史上选出的候选组"——
      * 候选组本身就由这段历史选出，再在同期上评估属于样本内自证，不能作为择优依据；
      * 改为在滚动回测层对多个因子权重配置做无泄漏择优（见 buildBacktestSummary）。
      */
@@ -104,7 +104,7 @@ public class LotteryKl8FeatureService {
     private final LotteryKl8DrawMapper drawMapper;
 
     /**
-     * 基于最近指定期数构建快乐8特征报告（默认选5）。
+     * 基于最近指定期数构建快乐8特征报告（默认选4）。
      *
      * @param baseIssueCount 使用历史期数
      * @return 特征报告
@@ -115,7 +115,7 @@ public class LotteryKl8FeatureService {
     }
 
     /**
-     * 基于最近指定期数和校准参数构建快乐8特征报告（默认选5）。
+     * 基于最近指定期数和校准参数构建快乐8特征报告（默认选4）。
      *
      * @param baseIssueCount 使用历史期数
      * @param calibration    策略校准参数，空值时使用中性参数
@@ -432,7 +432,7 @@ public class LotteryKl8FeatureService {
                 hitAtLeastThreeRate,
                 topFactorNames,
                 profileBacktests,
-                "滚动回测 %d 期（走查前推，不含未来信息）：候选配置中「%s」近期表现最好，模拟 %d 码平均命中 %.2f 个，中 3 个及以上 %.1f%%，最高命中 %d 个；因子强弱参考：%s。"
+                "滚动回测 %d 期（走查前推，不含未来信息）：候选配置中「%s」近期表现最好，模拟 %d 码平均命中 %.2f 个，中 2 个及以上 %.1f%%，最高命中 %d 个；因子强弱参考：%s。"
                         .formatted(evaluated, winner.label(), pickSize, averageHit,
                                 hitAtLeastThreeRate * 100, winnerStats.maxHit(), topFactorNames));
     }
@@ -468,7 +468,7 @@ public class LotteryKl8FeatureService {
     }
 
     /**
-     * 在候选权重配置中择优：主排序平均命中，次排序中 3 个及以上占比。
+     * 在候选权重配置中择优：主排序平均命中，次排序中 2 个及以上占比（选4首个有奖级别）。
      * 平票时保持 {@link #WEIGHT_PROFILES} 的声明顺序，保证同一基准期结果可复现。
      *
      * @param profileStats 各配置的累计统计
@@ -1015,7 +1015,7 @@ public class LotteryKl8FeatureService {
                         Math::max,
                         LinkedHashMap::new));
         Map<Integer, Integer> reuseCounts = initNumberMap(0);
-        // V21 单组选5：直接生成唯一一组号码。
+        // V22 单组选4：直接生成唯一一组号码。
         // 旧的"用近 10 期评估在完整历史上选出的候选组"属于样本内自证，已移除；
         // 当期权重改由走查前推回测择优（见 buildBacktestSummary），因此候选组不再需要二次挑选。
         List<Integer> selected = selectOptimizedNumbers(
@@ -1029,7 +1029,7 @@ public class LotteryKl8FeatureService {
                 pairCounts,
                 pickSize,
                 latestNumbers);
-        // V21 结构均衡：在综合分损失可控的前提下修掉区间堆积、全奇全偶和极端和值
+        // V22 结构均衡：在综合分损失可控的前提下修掉区间堆积、全奇全偶和极端和值
         StructureReport structure = applyStructureBalance(
                 selected.stream().sorted().toList(), selectionPool, profileByNumber, pickSize);
         List<Integer> unique = structure.numbers();
@@ -1037,7 +1037,7 @@ public class LotteryKl8FeatureService {
         List<LotteryKl8OptimizedGroup> groups = List.of(new LotteryKl8OptimizedGroup(
                 unique,
                 groupScore,
-                "组合优化：选5 四策略加权投票（贪心+混合分层+冷号替换+邻位回归）+连号种子+结构均衡，因子权重由走查前推回测择优（%s）。"
+                "组合优化：选4 四策略加权投票（贪心+混合分层+冷号替换+邻位回归）+连号种子+结构均衡，因子权重由走查前推回测择优（%s）。"
                         .formatted(backtestSummary.weightProfileName()),
                 optimizedEvidence(unique, groupScore, structure, backtestSummary)));
 
@@ -1066,7 +1066,7 @@ public class LotteryKl8FeatureService {
         diagnostics.put("structureViolations", String.valueOf(structure.violations()));
         return new LotteryKl8OptimizedPortfolio(
                 groups,
-                "组合优化完成：基于 %d 个候选号码，四策略加权投票+连号种子+结构均衡生成 %d 组选5号码，覆盖 %d 个不同号码，平均组合分 %.2f，走查前推回测平均命中 %.2f 个（中 3 个及以上 %.1f%%，择优配置「%s」）。"
+                "组合优化完成：基于 %d 个候选号码，四策略加权投票+连号种子+结构均衡生成 %d 组选4号码，覆盖 %d 个不同号码，平均组合分 %.2f，走查前推回测平均命中 %.2f 个（中 2 个及以上 %.1f%%，择优配置「%s」）。"
                         .formatted(candidates.size(), groups.size(), coverageNumberCount, averageScore,
                                 backtestSummary.averageHitCount(), backtestSummary.hitAtLeastThreeRate() * 100,
                                 backtestSummary.weightProfileName()),
@@ -1429,9 +1429,9 @@ public class LotteryKl8FeatureService {
     }
 
     /**
-     * V15 和值约束修复：检查选号和值是否落在 [130, 270] 区间，超出时替换最弱号码。
+     * V15 和值约束修复（历史方法，仅保留兼容）：检查选号和值是否落在当前和值带内，超出时替换最弱号码。
      * <p>
-     * 策略原理：快乐8选5开奖号码和值有集中趋势，极端高或低的和值组合出现概率低。
+     * 策略原理：快乐8选4开奖号码和值有集中趋势，极端高或低的和值组合出现概率低。
      * 当区间约束选出的结果和值超出范围时，替换综合分最低的号码为能使和值回归范围的候选。
      * 替换需同时满足区间约束和连号约束。
      * <p>
@@ -1637,10 +1637,10 @@ public class LotteryKl8FeatureService {
     }
 
     /**
-     * 混合分层选号：2热+1温+2冷，供集成投票的子策略2使用。
+     * 混合分层选号：2热+1温+1冷，供集成投票的子策略2使用（选4 共 4 码）。
      * <p>
      * 热号取综合分 Top20，温号取排名 21-40，冷号取排名 41+ 按遗漏压力降序。
-     * 回测验证：该策略 ≥4 命中 37 次（1.94%），在所有策略中 ≥4 命中率最高。
+     * 分层保证热温冷信号都有代表，避免单组号码全部来自同一信号。
      */
     private List<Integer> selectMixed(
             List<Integer> candidates,
@@ -2085,7 +2085,7 @@ public class LotteryKl8FeatureService {
     private double consecutiveBonus(int number, List<Integer> selected) {
         // 连号策略：最多2连号加分，3+连号惩罚。
         // 快乐8单期20个号，2连号很常见但3连号概率低，
-        // 选5个号码中最多保留1组2连号，避免过度集中。
+        // 选4号码中最多保留1组2连号，避免过度集中。
         if (selected.isEmpty()) {
             return 0;
         }
@@ -2123,14 +2123,14 @@ public class LotteryKl8FeatureService {
     }
 
     /**
-     * V21 结构均衡修复：选5 组合的形态校正。
+     * V22 结构均衡修复：选4 组合的形态校正。
      * <p>
      * 检查三类极端形态：单个 20 号区间入选超过 {@link #ZONE_MAX_PER_RANGE} 个、全奇或全偶、
      * 和值落在 [{@link #SUM_CONSTRAINT_MIN}, {@link #SUM_CONSTRAINT_MAX}] 之外（以及异常的三连号）。
      * 出现违规时从票数最高且未入选的号码中找替补，只有当替补能严格减少违规项、
      * 且综合分不低于最弱号码的 95% 时才接受替换，避免为了形态把强信号号码换掉。
      * <p>
-     * 为什么这样做：快乐8 每期随机开出 20 个号，任意 5 号码组合的期望命中数完全相同，
+     * 为什么这样做：快乐8 每期随机开出 20 个号，任意 4 号码组合的期望命中数完全相同，
      * 结构约束不会提高期望命中；它的作用是在期望不变的前提下剔除形态过于极端的组合，
      * 让单组推荐更接近真实开奖的分布形态。
      *
@@ -2210,7 +2210,7 @@ public class LotteryKl8FeatureService {
         if (longestRun >= 3) {
             violations += 1;
         }
-        // 选4/选5 保留「至少一组 2 连号」的历史要求：把它计入违规项，
+        // 选4 保留「至少一组 2 连号」的历史要求：把它计入违规项，
         // 结构修复就不会在修区间/和值时顺手把唯一一组连号换掉。
         if (numbers.size() >= 4 && longestRun < 2) {
             violations += 1;
@@ -2274,7 +2274,7 @@ public class LotteryKl8FeatureService {
             StructureReport structure,
             LotteryKl8BacktestSummary backtestSummary) {
         return List.of(
-                "组合分 %.2f，走查前推回测平均命中 %.2f 个，中 3 个及以上 %.1f%%（择优配置「%s」）。"
+                "组合分 %.2f，走查前推回测平均命中 %.2f 个，中 2 个及以上 %.1f%%（择优配置「%s」）。"
                         .formatted(groupScore, backtestSummary.averageHitCount(),
                                 backtestSummary.hitAtLeastThreeRate() * 100, backtestSummary.weightProfileName()),
                 "区间分布 %s，奇偶分布 %s，和值 %d，最长连号 %d。"
@@ -2494,7 +2494,8 @@ public class LotteryKl8FeatureService {
         private void record(int hit) {
             evaluated += 1;
             totalHits += hit;
-            if (hit >= 3) {
+            // 选4首个有奖级别为中 2：回测择优用中 2 及以上占比，字段名沿用 atLeastThree 以兼容历史 API。
+            if (hit >= 2) {
                 atLeastThree += 1;
             }
             maxHit = Math.max(maxHit, hit);
@@ -2518,7 +2519,8 @@ public class LotteryKl8FeatureService {
         }
 
         /**
-         * 中 3 个及以上占比。选5 玩法的中 3 是首个有奖级别，比平均命中更能反映实际体验。
+         * 中 2 个及以上占比。选4 玩法的中 2 是首个有奖级别，比平均命中更能反映实际体验。
+         * 字段名沿用历史命名以兼容 API，语义已切换为选4口径。
          *
          * @return 占比，0 到 1 之间
          */

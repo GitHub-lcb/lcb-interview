@@ -77,7 +77,7 @@ export default function LotteryKl8LabPanel() {
       render: (value: number) => value.toFixed(2),
     },
     {
-      title: '中3个及以上',
+      title: '中2个及以上',
       dataIndex: 'atLeastThreeRate',
       key: 'atLeastThreeRate',
       align: 'right',
@@ -156,7 +156,7 @@ export default function LotteryKl8LabPanel() {
     <section className="tool-section lottery-tool" aria-label="概率实验室">
       <div className="tool-section-head">
         <div>
-          <div className="dashboard-kicker">概率实验室 · 快乐8选5</div>
+          <div className="dashboard-kicker">概率实验室 · 快乐8选4</div>
           <h2>用战场数据检验「概率能不能提升」</h2>
           <p>同一段历史、同一套选号函数，只改权重配置做走查前推对比，并同时回放多注投注方案。</p>
         </div>
@@ -172,7 +172,7 @@ export default function LotteryKl8LabPanel() {
         type="info"
         showIcon
         message="先看清数学边界：单注概率是常量，能提升的是「多注至少中一注」"
-        description="快乐8 每期从 80 个号里开出 20 个，任意固定 5 号码组合的命中数服从超几何分布，期望命中恒为 1.25 个，中 3 个及以上的概率恒为 9.67%。所以任何选号策略都无法提高单注概率；实验室真正能做的是：用置信区间判断某个配置的「提升」是不是噪声，以及量化多注不重复带来的真实概率提升。"
+        description="快乐8 每期从 80 个号里开出 20 个，任意固定 4 号码组合的命中数服从超几何分布，期望命中恒为 1.00 个，中 2 个及以上的概率恒为 25.89%。所以任何选号策略都无法提高单注概率；实验室真正能做的是：用置信区间判断某个配置的「提升」是不是噪声，以及量化多注不重复带来的真实概率提升。"
       />
 
       <Card size="small" style={{ marginBottom: 16 }}>
@@ -224,20 +224,20 @@ export default function LotteryKl8LabPanel() {
                 <Statistic title="期望命中" value={report.baselineExpectedHits} precision={2} />
               </Col>
               <Col xs={12} md={6}>
-                <Statistic title="中3个及以上概率" value={report.baselineAtLeastThreeRate * 100} precision={2} suffix="%" />
+                <Statistic title="中2个及以上概率" value={report.baselineAtLeastThreeRate * 100} precision={2} suffix="%" />
               </Col>
               <Col xs={12} md={6}>
                 <Statistic title="中4个及以上概率" value={report.baselineAtLeastFourRate * 100} precision={2} suffix="%" />
               </Col>
               <Col xs={12} md={6}>
-                <Statistic title="中5个概率" value={report.baselineFullHitRate * 100} precision={3} suffix="%" />
+                <Statistic title="中4个概率" value={report.baselineFullHitRate * 100} precision={3} suffix="%" />
               </Col>
             </Row>
             <Alert
               type="warning"
               showIcon
               style={{ marginTop: 12 }}
-              message={`要确认「中3个及以上提升 1 个百分点」，需要约 ${report.requiredSampleSizeForOnePointLift} 期样本`}
+              message={`要确认「中2个及以上提升 1 个百分点」，需要约 ${report.requiredSampleSizeForOnePointLift} 期样本`}
               description="快乐8 每天一期，这个样本量相当于十几年。这解释了为什么历史上看到的「命中率提升」几乎都落在噪声范围内：真实优势为零时，再多的策略调参也只会得到上下抖动的曲线。"
             />
           </Card>

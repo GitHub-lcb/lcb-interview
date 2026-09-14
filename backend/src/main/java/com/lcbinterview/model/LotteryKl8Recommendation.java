@@ -29,7 +29,7 @@ public class LotteryKl8Recommendation {
         /** 推荐来源：RULE_BASED，旧记录可能为 AI */
     private String source;
 
-    /** 每组推荐号码数量（1-10），旧记录为 null 时按 5 处理 */
+    /** 每组推荐号码数量（1-10），旧记录为 null 时按 4 处理 */
     @TableField("pick_size")
     private Integer pickSize;
 

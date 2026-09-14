@@ -55,7 +55,7 @@ function simulation(overrides: Partial<LotterySimulation> = {}): LotterySimulati
     secondaryAvg: 1.25,
     hit4Count: 10,
     hitDistribution: '{"0":20,"1":94,"2":60,"3":16,"4":10}',
-    summary: '快乐8 选5×1组 模拟 200 期：平均命中 1.25 个，中 2 个及以上占比 43.0%，中 3 个及以上 26 期',
+    summary: '快乐8 选4×1组 模拟 200 期：平均命中 1.00 个，中 2 个及以上占比 43.0%，中 3 个及以上 26 期',
     createdAt: '2026-08-18T10:00:00',
     ...overrides,
   }
@@ -71,7 +71,7 @@ describe('SimulationPanel', () => {
     vi.mocked(listLotterySimulations).mockResolvedValue(pageOf([], 0))
   })
 
-  it('runs a KL8 pick-5 simulation and shows stats', async () => {
+  it('runs a KL8 pick-4 simulation and shows stats', async () => {
     vi.mocked(runLotterySimulation).mockResolvedValue(simulation())
 
     render(<SimulationPanel />)
@@ -82,7 +82,7 @@ describe('SimulationPanel', () => {
     await waitFor(() => {
       expect(runLotterySimulation).toHaveBeenCalledWith('KL8', 200)
     })
-    expect(await screen.findByText(/快乐8 选5×1组 模拟 200 期/)).toBeInTheDocument()
+    expect(await screen.findByText(/快乐8 选4×1组 模拟 200 期/)).toBeInTheDocument()
     expect(screen.getByText('中3个及以上比例')).toBeInTheDocument()
     // 命中分布 {0:20,1:94,2:60,3:16,4:10} → 中3个及以上 = (16+10)/200 = 13%
     expect(screen.getByText('13')).toBeInTheDocument()
@@ -125,7 +125,7 @@ describe('SimulationPanel', () => {
 
     render(<SimulationPanel />)
 
-    expect(await screen.findByText(/快乐8 选5×1组 · 200 期/)).toBeInTheDocument()
+    expect(await screen.findByText(/快乐8 选4×1组 · 200 期/)).toBeInTheDocument()
     expect(screen.getByText(/2026090 ~ 2026094/)).toBeInTheDocument()
     expect(screen.getByText(/200 期结算 · 命中率 43% · 最高 4 个/)).toBeInTheDocument()
   })
