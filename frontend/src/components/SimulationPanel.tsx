@@ -8,6 +8,7 @@ import {
 } from '../api/tools'
 import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import LotteryKl8LabPanel from './LotteryKl8LabPanel'
+import LotteryKl8CoveragePanel from './LotteryKl8CoveragePanel'
 import type { LotterySimulation } from '../types'
 
 const DISCLAIMER = '模拟战场用历史开奖数据回放预测算法，统计结果不代表未来命中，仅供参考。'
@@ -18,6 +19,7 @@ const LOTTERY_TYPE = 'KL8'
 const MODE_OPTIONS = [
   { label: '历史回放', value: 'replay' },
   { label: '概率实验室', value: 'lab' },
+  { label: '覆盖优化', value: 'coverage' },
 ]
 
 const WINDOW_OPTIONS = [10, 50, 100, 200, 500, 1000]
@@ -263,7 +265,11 @@ export default function SimulationPanel() {
         onChange={value => setMode(String(value))}
       />
       <div className="lottery-game-panel">
-        {mode === 'lab' ? <LotteryKl8LabPanel /> : <SimulationReplayPanel />}
+        {mode === 'lab'
+          ? <LotteryKl8LabPanel />
+          : mode === 'coverage'
+            ? <LotteryKl8CoveragePanel />
+            : <SimulationReplayPanel />}
       </div>
     </div>
   )

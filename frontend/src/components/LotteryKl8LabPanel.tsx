@@ -9,7 +9,8 @@ import { emitFeedbackSuccess } from '../utils/feedbackMessage'
 import type { LotteryKl8LabPortfolioRow, LotteryKl8LabReport, LotteryKl8LabVariant } from '../types'
 
 const WINDOW_OPTIONS = [60, 100, 200]
-const TICKET_OPTIONS = [2, 3, 5]
+/** 注数上限 20 = 80 / 选4，即互不重复时能覆盖全部号码的上限 */
+const TICKET_OPTIONS = [2, 3, 5, 10, 20]
 
 function percent(value: number): string {
   return `${(value * 100).toFixed(2)}%`
@@ -45,7 +46,7 @@ export default function LotteryKl8LabPanel() {
       const result = await runKl8Lab({
         baseIssueCount: Math.max(20, Math.min(2000, baseIssueCount)),
         windowSize: Math.max(10, Math.min(300, windowSize)),
-        maxTicketCount: Math.max(1, Math.min(10, maxTicketCount)),
+        maxTicketCount: Math.max(1, Math.min(20, maxTicketCount)),
       })
       setReport(result)
       emitFeedbackSuccess('概率实验完成，结论已更新')

@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/vitest'
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
-  listLotterySimulations, runLotterySimulation,
+  getKl8Coverage, listLotterySimulations, runLotterySimulation,
 } from '../api/tools'
 import { emitFeedbackSuccess } from '../utils/feedbackMessage'
 import type { LotterySimulation, PageResult } from '../types'
@@ -27,6 +27,7 @@ vi.mock('../api/tools', () => ({
   listLotterySimulations: vi.fn(),
   runLotterySimulation: vi.fn(),
   runKl8Lab: vi.fn(),
+  getKl8Coverage: vi.fn(),
 }))
 
 vi.mock('../utils/feedbackMessage', () => ({
@@ -137,6 +138,21 @@ describe('SimulationPanel', () => {
 
     await userEvent.click(screen.getByText('概率实验室'))
     expect(await screen.findByText('还没有实验数据')).toBeInTheDocument()
+    expect(screen.queryByText('暂无模拟记录，选择参数后点击开始模拟。')).not.toBeInTheDocument()
+
+    await userEvent.click(screen.getByText('历史回放'))
+    expect(await screen.findByText('暂无模拟记录，选择参数后点击开始模拟。')).toBeInTheDocument()
+  })
+
+  it('switches to the coverage optimizer mode', async () => {
+    vi.mocked(getKl8Coverage).mockRejectedValue(new Error('unavailable'))
+
+    render(<SimulationPanel />)
+
+    await screen.findByText('暂无模拟记录，选择参数后点击开始模拟。')
+
+    await userEvent.click(screen.getByText('覆盖优化'))
+    expect(await screen.findByText('花多少钱，能买到多少中奖概率')).toBeInTheDocument()
     expect(screen.queryByText('暂无模拟记录，选择参数后点击开始模拟。')).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByText('历史回放'))

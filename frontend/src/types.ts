@@ -465,6 +465,48 @@ export interface LotteryKl8LabReport {
   disclaimer: string
 }
 
+export interface LotteryKl8CoverageCurveRow {
+  ticketCount: number
+  coveredNumbers: number
+  costYuan: number
+  atLeastMinHitRate: number
+  atLeastThreeRate: number
+  fullHitRate: number
+  marginalLift: number
+  costPerPercentPoint: number
+  expectedReturnYuan: number
+  payoutRate: number
+}
+
+export interface LotteryKl8CoverageTargetRow {
+  targetRate: number
+  requiredTickets: number
+  coveredNumbers: number
+  costYuan: number
+  achievedRate: number
+  expectedReturnYuan: number
+}
+
+export interface LotteryKl8CoverageReport {
+  pickSize: number
+  minHitLevel: number
+  ticketPriceYuan: number
+  maxDisjointTickets: number
+  singleTicketRate: number
+  expectedReturnPerTicket: number
+  payoutRate: number
+  netLossPerTicketYuan: number
+  curve: LotteryKl8CoverageCurveRow[]
+  targets: LotteryKl8CoverageTargetRow[]
+  bestValueTicketCount: number
+  bestValueCostPerPercentPoint: number
+  budgetYuan: number
+  budgetTicketCount: number
+  budgetAchievableRate: number
+  conclusion: string
+  disclaimer: string
+}
+
 export type StudyQuestionStatus = 'new' | 'learning' | 'mastered' | 'weak'
 
 /** 背诵回忆评分档位，SM-2 四档评分（again=忘了 / hard=模糊 / good=记住了 / easy=很简单）。 */

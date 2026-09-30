@@ -4,6 +4,7 @@ import type {
   DltRecommendation,
   DltSyncResult,
   DltSyncStatus,
+  LotteryKl8CoverageReport,
   LotteryKl8Draw,
   LotteryKl8LabReport,
   LotteryKl8Recommendation,
@@ -177,5 +178,21 @@ export interface LotteryKl8LabParams {
 
 export async function runKl8Lab(params: LotteryKl8LabParams = {}): Promise<LotteryKl8LabReport> {
   const res = await api.post('/tools/lottery/kl8/lab', params, { timeout: KL8_LAB_TIMEOUT_MS })
+  return res.data.data
+}
+
+export interface LotteryKl8CoverageParams {
+  pickSize?: number
+  minHitLevel?: number
+  maxTickets?: number
+  budgetYuan?: number
+}
+
+/**
+ * 查询快乐8覆盖优化报告：把「花多少钱能买到多少中奖概率」换算成精确曲线。
+ * 纯组合数学计算，不读用户数据，因此不设超时上限之外的额外等待。
+ */
+export async function getKl8Coverage(params: LotteryKl8CoverageParams = {}): Promise<LotteryKl8CoverageReport> {
+  const res = await api.get('/tools/lottery/kl8/coverage', { params })
   return res.data.data
 }

@@ -44,7 +44,11 @@ public class LotteryKl8LabService {
     private static final int MAX_WINDOW = 300;
     private static final int DEFAULT_WINDOW = 100;
     private static final int DEFAULT_MAX_TICKETS = 3;
-    private static final int MAX_TICKETS = 10;
+    /**
+     * 最大注数取 80 / 4 = 20，即互不重复时能覆盖全部号码的上限。
+     * 超过 20 注必然出现重号，而重号只会拉低「至少中一注」的概率。
+     */
+    private static final int MAX_TICKETS = 20;
     /** 用于估算样本量的提升量：1 个百分点 */
     private static final double ONE_POINT_LIFT = 0.01;
     private static final String DISCLAIMER = "彩票结果具有随机性，本实验室只做统计检验，不构成投注建议。";
@@ -158,6 +162,8 @@ public class LotteryKl8LabService {
         int[] disjointSuccess = new int[maxTickets + 1];
         int[] repeatedSuccess = new int[maxTickets + 1];
         int evaluated = 0;
+        // 逐期取最小可用注数：号码池不足时多出的行概率恒为 0，会被误读成「加注反而更差」
+        int ticketCapacity = maxTickets;
         for (int index = evaluationStart; index < ordered.size(); index += 1) {
             LotteryKl8Draw target = ordered.get(index);
             // 特征服务要求至少 20 期历史：样本不足的前几期直接跳过，避免整次实验因早期数据不足而失败
@@ -168,6 +174,7 @@ public class LotteryKl8LabService {
             LotteryKl8FeatureReport report = featureService.buildReportFromDraws(
                     recentDrawsDescending(history), calibration, PICK_SIZE, numberHitFeedback);
             List<List<Integer>> tickets = buildTickets(report, maxTickets);
+            ticketCapacity = Math.min(ticketCapacity, tickets.size());
             Set<Integer> actual = new LinkedHashSet<>(featureService.parseNumbers(target.getNumbers()));
             int firstHit = tickets.isEmpty() ? 0 : hitCount(tickets.getFirst(), actual);
             for (int ticketCount = 1; ticketCount <= tickets.size(); ticketCount += 1) {
@@ -189,10 +196,16 @@ public class LotteryKl8LabService {
         }
 
         List<LotteryKl8LabPortfolioRowVO> rows = new ArrayList<>();
-        double singleRate = evaluated == 0 ? 0 : (double) disjointSuccess[1] / evaluated;
-        for (int ticketCount = 1; ticketCount <= maxTickets; ticketCount += 1) {
-            double disjointRate = evaluated == 0 ? 0 : (double) disjointSuccess[ticketCount] / evaluated;
-            double repeatedRate = evaluated == 0 ? 0 : (double) repeatedSuccess[ticketCount] / evaluated;
+        if (evaluated == 0) {
+            // 没有可结算的期数时所有比率都是 0，直接返回空行而不是伪造一整表 0%
+            log.warn("投注组合实验无可结算期数: 请求回放 {} 期，历史 {} 期", window, ordered.size());
+            return rows;
+        }
+        double singleRate = (double) disjointSuccess[1] / evaluated;
+        // 只输出实际构造出的注数：号码池不足时多出的行概率恒为 0，会被误读成「加注反而更差」
+        for (int ticketCount = 1; ticketCount <= ticketCapacity; ticketCount += 1) {
+            double disjointRate = (double) disjointSuccess[ticketCount] / evaluated;
+            double repeatedRate = (double) repeatedSuccess[ticketCount] / evaluated;
             double[] interval = LotteryKl8Statistics.wilsonInterval(disjointSuccess[ticketCount], evaluated);
             rows.add(new LotteryKl8LabPortfolioRowVO(
                     ticketCount,
@@ -236,6 +249,10 @@ public class LotteryKl8LabService {
                 .toList();
         for (int start = 0; tickets.size() < maxTickets && start + PICK_SIZE <= ranked.size(); start += PICK_SIZE) {
             tickets.add(ranked.subList(start, start + PICK_SIZE));
+        }
+        if (tickets.size() < maxTickets) {
+            // 号码池不足时不能按 maxTickets 出行：多出来的行概率恒为 0，会被误读成「买了反而更差」
+            log.warn("投注组合实验注数不足: 期望 {} 注，实际可用 {} 注（候选号码池已耗尽）", maxTickets, tickets.size());
         }
         return tickets;
     }

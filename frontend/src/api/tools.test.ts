@@ -11,7 +11,7 @@ vi.mock('./index', () => ({
 }))
 
 import api from './index'
-import { createKl8Recommendation, syncKl8Draws } from './tools'
+import { createKl8Recommendation, getKl8Coverage, syncKl8Draws } from './tools'
 
 const recommendation: LotteryKl8Recommendation = {
   id: 1,
@@ -57,5 +57,23 @@ describe('tools api', () => {
       undefined,
       { timeout: 120000 },
     )
+  })
+
+  it('requests the coverage optimizer report with the given parameters', async () => {
+    vi.mocked(api.get).mockResolvedValue({ data: { data: { curve: [] } } })
+
+    await getKl8Coverage({ pickSize: 4, minHitLevel: 2, maxTickets: 20, budgetYuan: 20 })
+
+    expect(api.get).toHaveBeenCalledWith('/tools/lottery/kl8/coverage', {
+      params: { pickSize: 4, minHitLevel: 2, maxTickets: 20, budgetYuan: 20 },
+    })
+  })
+
+  it('sends no params when the coverage optimizer uses defaults', async () => {
+    vi.mocked(api.get).mockResolvedValue({ data: { data: { curve: [] } } })
+
+    await getKl8Coverage()
+
+    expect(api.get).toHaveBeenCalledWith('/tools/lottery/kl8/coverage', { params: {} })
   })
 })

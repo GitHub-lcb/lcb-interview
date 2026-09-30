@@ -4,6 +4,7 @@ import com.lcbinterview.common.ApiResponse;
 import com.lcbinterview.config.AuthUserContext;
 import com.lcbinterview.dto.PageResult;
 import com.lcbinterview.dto.tools.LotteryKl8DrawVO;
+import com.lcbinterview.dto.tools.LotteryKl8CoverageReportVO;
 import com.lcbinterview.dto.tools.LotteryKl8JevCalibrationRequest;
 import com.lcbinterview.dto.tools.LotteryKl8JevProbeRequest;
 import com.lcbinterview.dto.tools.LotteryKl8JevStatusVO;
@@ -16,6 +17,7 @@ import com.lcbinterview.dto.tools.LotteryKl8SyncStatusVO;
 import com.lcbinterview.service.JevRuntimeConfigService;
 import com.lcbinterview.service.LotteryKl8FeatureReport;
 import com.lcbinterview.service.LotteryKl8FeatureService;
+import com.lcbinterview.service.LotteryKl8CoverageService;
 import com.lcbinterview.service.LotteryKl8JevCalibrationReport;
 import com.lcbinterview.service.LotteryKl8JevCalibrationService;
 import com.lcbinterview.service.LotteryKl8JevProbabilityResult;
@@ -56,6 +58,7 @@ public class LotteryKl8Controller {
     private final LotteryKl8RecommendationService recommendationService;
     private final LotteryKl8RecommendationEvaluationService evaluationService;
     private final LotteryKl8LabService labService;
+    private final LotteryKl8CoverageService coverageService;
     private final LotteryKl8FeatureService featureService;
     private final LotteryKl8JevProbabilityService jevProbabilityService;
     private final LotteryKl8JevCalibrationService jevCalibrationService;
@@ -136,6 +139,35 @@ public class LotteryKl8Controller {
     public ResponseEntity<ApiResponse<LotteryKl8LabReportVO>> lab(
             @Valid @RequestBody LotteryKl8LabRequest request) {
         return ResponseEntity.ok(ApiResponse.success(labService.run(AuthUserContext.currentUserId(), request)));
+    }
+
+    /**
+     * 查询快乐8覆盖优化报告：把「花多少钱能买到多少中奖概率」换算成精确曲线。
+     * <p>
+     * 该接口是纯组合数学计算，不读用户数据也不返回号码预测，
+     * 用于纠正「选号策略能提高中奖率」的误解：单注概率是常量，只能靠加注数买概率。
+     *
+     * @param pickSize    每注选号数量，空值时回退站点默认口径
+     * @param minHitLevel 达标口径（至少命中几个），空值时默认 2
+     * @param maxTickets  曲线最大注数，空值时默认 20
+     * @param budgetYuan  预算上限（元），空值时不做预算分析
+     * @return 覆盖优化报告
+     */
+    @Operation(summary = "查询快乐8覆盖优化与预算概率曲线")
+    @GetMapping("/coverage")
+    public ResponseEntity<ApiResponse<LotteryKl8CoverageReportVO>> coverage(
+            @RequestParam(required = false) Integer pickSize,
+            @RequestParam(required = false) Integer minHitLevel,
+            @RequestParam(required = false) Integer maxTickets,
+            @RequestParam(required = false) Double budgetYuan) {
+        int effectivePickSize = pickSize == null
+                ? LotteryKl8RecommendationPolicy.DEFAULT_PICK_SIZE
+                : pickSize;
+        return ResponseEntity.ok(ApiResponse.success(coverageService.report(
+                effectivePickSize,
+                minHitLevel == null ? 0 : minHitLevel,
+                maxTickets == null ? 0 : maxTickets,
+                budgetYuan == null ? 0 : budgetYuan)));
     }
 
     /**
