@@ -4,15 +4,27 @@ import com.lcbinterview.common.ApiResponse;
 import com.lcbinterview.config.AuthUserContext;
 import com.lcbinterview.dto.PageResult;
 import com.lcbinterview.dto.tools.LotteryKl8DrawVO;
+import com.lcbinterview.dto.tools.LotteryKl8JevCalibrationRequest;
+import com.lcbinterview.dto.tools.LotteryKl8JevProbeRequest;
+import com.lcbinterview.dto.tools.LotteryKl8JevStatusVO;
 import com.lcbinterview.dto.tools.LotteryKl8LabReportVO;
 import com.lcbinterview.dto.tools.LotteryKl8LabRequest;
 import com.lcbinterview.dto.tools.LotteryKl8RecommendationRequest;
 import com.lcbinterview.dto.tools.LotteryKl8RecommendationVO;
 import com.lcbinterview.dto.tools.LotteryKl8SyncResultVO;
 import com.lcbinterview.dto.tools.LotteryKl8SyncStatusVO;
+import com.lcbinterview.service.JevRuntimeConfigService;
+import com.lcbinterview.service.LotteryKl8FeatureReport;
+import com.lcbinterview.service.LotteryKl8FeatureService;
+import com.lcbinterview.service.LotteryKl8JevCalibrationReport;
+import com.lcbinterview.service.LotteryKl8JevCalibrationService;
+import com.lcbinterview.service.LotteryKl8JevProbabilityResult;
+import com.lcbinterview.service.LotteryKl8JevProbabilityService;
 import com.lcbinterview.service.LotteryKl8LabService;
 import com.lcbinterview.service.LotteryKl8RecommendationEvaluationService;
+import com.lcbinterview.service.LotteryKl8RecommendationPolicy;
 import com.lcbinterview.service.LotteryKl8RecommendationService;
+import com.lcbinterview.service.LotteryKl8StrategyCalibration;
 import com.lcbinterview.service.LotteryKl8SyncService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,10 +49,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class LotteryKl8Controller {
 
+    /** Jev 相关接口的默认历史期数，与实验室默认口径一致。 */
+    private static final int DEFAULT_JEV_BASE_ISSUE_COUNT = LotteryKl8JevCalibrationService.DEFAULT_BASE_ISSUE_COUNT;
+
     private final LotteryKl8SyncService syncService;
     private final LotteryKl8RecommendationService recommendationService;
     private final LotteryKl8RecommendationEvaluationService evaluationService;
     private final LotteryKl8LabService labService;
+    private final LotteryKl8FeatureService featureService;
+    private final LotteryKl8JevProbabilityService jevProbabilityService;
+    private final LotteryKl8JevCalibrationService jevCalibrationService;
+    private final JevRuntimeConfigService jevRuntimeConfigService;
 
     /**
      * 手动同步快乐8开奖数据。
@@ -133,5 +152,67 @@ public class LotteryKl8Controller {
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(ApiResponse.success(
                 recommendationService.list(AuthUserContext.currentUserId(), page, size)));
+    }
+
+    /**
+     * 查询 Jev 决策模型配置状态。密钥只返回脱敏值。
+     *
+     * @return Jev 配置状态
+     */
+    @Operation(summary = "查询 Jev 决策模型配置状态")
+    @GetMapping("/jev/status")
+    public ResponseEntity<ApiResponse<LotteryKl8JevStatusVO>> jevStatus() {
+        return ResponseEntity.ok(ApiResponse.success(jevRuntimeConfigService.publicStatus()));
+    }
+
+    /**
+     * 使用 Jev 推算下一期 80 个号码的开出概率。
+     * 返回结果附带偏差统计与中文解读，概率本身不改变号码的实际开出概率。
+     *
+     * @param request 推算请求
+     * @return 概率推算结果
+     */
+    @Operation(summary = "推算快乐8号码开出概率（Jev）")
+    @PostMapping("/jev/probability")
+    public ResponseEntity<ApiResponse<LotteryKl8JevProbabilityResult>> jevProbability(
+            @Valid @RequestBody LotteryKl8JevProbeRequest request) {
+        int pickSize = resolvePickSize(request.pickSize());
+        int baseIssueCount = request.baseIssueCount() == null
+                ? DEFAULT_JEV_BASE_ISSUE_COUNT
+                : request.baseIssueCount();
+        LotteryKl8FeatureReport report = featureService.buildReport(
+                baseIssueCount, LotteryKl8StrategyCalibration.neutral(), pickSize);
+        return ResponseEntity.ok(ApiResponse.success(jevProbabilityService.estimate(report, pickSize)));
+    }
+
+    /**
+     * 运行 Jev 号码概率校准闸门。
+     * 采用走查前推逐期比对，判定 Jev 概率是否具备优于 25% 随机基线的证据；
+     * 未通过时闸门保持关闭，概率不得参与推荐排序。
+     *
+     * @param request 校准请求
+     * @return 校准报告
+     */
+    @Operation(summary = "运行 Jev 号码概率校准闸门")
+    @PostMapping("/jev/calibration")
+    public ResponseEntity<ApiResponse<LotteryKl8JevCalibrationReport>> jevCalibration(
+            @Valid @RequestBody LotteryKl8JevCalibrationRequest request) {
+        int pickSize = resolvePickSize(request.pickSize());
+        int issues = request.issues() == null ? LotteryKl8JevCalibrationService.DEFAULT_ISSUES : request.issues();
+        int baseIssueCount = request.baseIssueCount() == null
+                ? DEFAULT_JEV_BASE_ISSUE_COUNT
+                : request.baseIssueCount();
+        return ResponseEntity.ok(ApiResponse.success(
+                jevCalibrationService.calibrate(issues, baseIssueCount, pickSize)));
+    }
+
+    /**
+     * 统一解析选号数量，空值时回退站点默认口径。
+     *
+     * @param pickSize 请求中的选号数量
+     * @return 生效的选号数量
+     */
+    private int resolvePickSize(Integer pickSize) {
+        return pickSize == null ? LotteryKl8RecommendationPolicy.DEFAULT_PICK_SIZE : pickSize;
     }
 }

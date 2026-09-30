@@ -17,6 +17,8 @@ r
 # Env
 .env
 .env.local
+# 本地真实冒烟用的第三方密钥，仅落在开发机，禁止提交
+.jev-key
 
 # Generated
 .superpowers/
