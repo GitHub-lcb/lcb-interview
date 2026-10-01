@@ -4,6 +4,7 @@ import type {
   DltRecommendation,
   DltSyncResult,
   DltSyncStatus,
+  LotteryKl8AuditReport,
   LotteryKl8CoverageReport,
   LotteryKl8Draw,
   LotteryKl8LabReport,
@@ -194,5 +195,18 @@ export interface LotteryKl8CoverageParams {
  */
 export async function getKl8Coverage(params: LotteryKl8CoverageParams = {}): Promise<LotteryKl8CoverageReport> {
   const res = await api.get('/tools/lottery/kl8/coverage', { params })
+  return res.data.data
+}
+
+export interface LotteryKl8AuditParams {
+  issueCount?: number
+}
+
+/**
+ * 运行快乐8开奖数据随机性审计。
+ * 这是唯一可能推翻「选号无法提升概率」结论的方向：若真查出偏差，偏差即可被利用。
+ */
+export async function getKl8Audit(params: LotteryKl8AuditParams = {}): Promise<LotteryKl8AuditReport> {
+  const res = await api.get('/tools/lottery/kl8/audit', { params })
   return res.data.data
 }

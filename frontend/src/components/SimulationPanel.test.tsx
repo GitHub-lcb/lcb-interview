@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/vitest'
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
-  getKl8Coverage, listLotterySimulations, runLotterySimulation,
+  getKl8Audit, getKl8Coverage, listLotterySimulations, runLotterySimulation,
 } from '../api/tools'
 import { emitFeedbackSuccess } from '../utils/feedbackMessage'
 import type { LotterySimulation, PageResult } from '../types'
@@ -28,6 +28,7 @@ vi.mock('../api/tools', () => ({
   runLotterySimulation: vi.fn(),
   runKl8Lab: vi.fn(),
   getKl8Coverage: vi.fn(),
+  getKl8Audit: vi.fn(),
 }))
 
 vi.mock('../utils/feedbackMessage', () => ({
@@ -153,6 +154,21 @@ describe('SimulationPanel', () => {
 
     await userEvent.click(screen.getByText('覆盖优化'))
     expect(await screen.findByText('花多少钱，能买到多少中奖概率')).toBeInTheDocument()
+    expect(screen.queryByText('暂无模拟记录，选择参数后点击开始模拟。')).not.toBeInTheDocument()
+
+    await userEvent.click(screen.getByText('历史回放'))
+    expect(await screen.findByText('暂无模拟记录，选择参数后点击开始模拟。')).toBeInTheDocument()
+  })
+
+  it('switches to the randomness audit mode', async () => {
+    vi.mocked(getKl8Audit).mockRejectedValue(new Error('unavailable'))
+
+    render(<SimulationPanel />)
+
+    await screen.findByText('暂无模拟记录，选择参数后点击开始模拟。')
+
+    await userEvent.click(screen.getByText('随机性审计'))
+    expect(await screen.findByText('这批开奖数据本身可信吗')).toBeInTheDocument()
     expect(screen.queryByText('暂无模拟记录，选择参数后点击开始模拟。')).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByText('历史回放'))

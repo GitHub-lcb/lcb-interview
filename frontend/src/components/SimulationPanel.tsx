@@ -9,6 +9,7 @@ import {
 import { emitFeedbackSuccess, emitFeedbackWarning } from '../utils/feedbackMessage'
 import LotteryKl8LabPanel from './LotteryKl8LabPanel'
 import LotteryKl8CoveragePanel from './LotteryKl8CoveragePanel'
+import LotteryKl8AuditPanel from './LotteryKl8AuditPanel'
 import type { LotterySimulation } from '../types'
 
 const DISCLAIMER = '模拟战场用历史开奖数据回放预测算法，统计结果不代表未来命中，仅供参考。'
@@ -20,6 +21,7 @@ const MODE_OPTIONS = [
   { label: '历史回放', value: 'replay' },
   { label: '概率实验室', value: 'lab' },
   { label: '覆盖优化', value: 'coverage' },
+  { label: '随机性审计', value: 'audit' },
 ]
 
 const WINDOW_OPTIONS = [10, 50, 100, 200, 500, 1000]
@@ -269,7 +271,9 @@ export default function SimulationPanel() {
           ? <LotteryKl8LabPanel />
           : mode === 'coverage'
             ? <LotteryKl8CoveragePanel />
-            : <SimulationReplayPanel />}
+            : mode === 'audit'
+              ? <LotteryKl8AuditPanel />
+              : <SimulationReplayPanel />}
       </div>
     </div>
   )

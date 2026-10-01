@@ -507,6 +507,27 @@ export interface LotteryKl8CoverageReport {
   disclaimer: string
 }
 
+export interface LotteryKl8AuditCheck {
+  name: string
+  statistic: number
+  degreesOfFreedom: number
+  pValue: number
+  conclusion: string
+}
+
+export interface LotteryKl8AuditReport {
+  issueCount: number
+  latestIssueNo: string | null
+  checks: LotteryKl8AuditCheck[]
+  checkCount: number
+  bonferroniThreshold: number
+  significantCount: number
+  correctedSignificantCount: number
+  invalidNumberCounts: number[]
+  conclusion: string
+  disclaimer: string
+}
+
 export type StudyQuestionStatus = 'new' | 'learning' | 'mastered' | 'weak'
 
 /** 背诵回忆评分档位，SM-2 四档评分（again=忘了 / hard=模糊 / good=记住了 / easy=很简单）。 */

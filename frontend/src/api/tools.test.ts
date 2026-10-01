@@ -11,7 +11,7 @@ vi.mock('./index', () => ({
 }))
 
 import api from './index'
-import { createKl8Recommendation, getKl8Coverage, syncKl8Draws } from './tools'
+import { createKl8Recommendation, getKl8Audit, getKl8Coverage, syncKl8Draws } from './tools'
 
 const recommendation: LotteryKl8Recommendation = {
   id: 1,
@@ -75,5 +75,15 @@ describe('tools api', () => {
     await getKl8Coverage()
 
     expect(api.get).toHaveBeenCalledWith('/tools/lottery/kl8/coverage', { params: {} })
+  })
+
+  it('requests the randomness audit with the given issue count', async () => {
+    vi.mocked(api.get).mockResolvedValue({ data: { data: { checks: [] } } })
+
+    await getKl8Audit({ issueCount: 1000 })
+
+    expect(api.get).toHaveBeenCalledWith('/tools/lottery/kl8/audit', {
+      params: { issueCount: 1000 },
+    })
   })
 })

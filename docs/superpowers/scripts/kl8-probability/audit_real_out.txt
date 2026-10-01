@@ -1,0 +1,23 @@
+=== 快乐8 真实开奖数据随机性审计（Java 实现输出）===
+数据：docs/superpowers/scripts/kl8-probability/real_draws.csv 共 2073 期中彩网真实开奖
+对照：Python/scipy 独立验算结果见同目录 real_draws_report.txt
+复现命令：cd backend && mvn test -Dtest=LotteryKl8RandomnessAuditRealDataTest
+
+说明：本次共跑 91 项检验（其中 80 项为逐号码游程检验）。
+      逐项用名义 5% 判定时，纯随机出现至少一项误报的概率接近 99%，
+      因此告警一律以 Bonferroni 校正阈值 p < 0.05/91 为准。
+
+本文件由测试运行自动输出，未经手工编辑。
+
+=== real data audit summary ===
+checks=91, bonferroniThreshold=5.4945E-4
+frequency chi-square: chi2=57.20598166907863, df=79, p=0.9693123844825838
+adjacent overlap: z=-0.022689215826037595, p=0.9818980895482721
+每期和值均值: statistic=-0.9826, p=0.3258
+奇数号占比: statistic=1.1099, p=0.2670
+间隔 1 期的重号自相关: statistic=0.0449, p=0.0412
+间隔 2 期的重号自相关: statistic=0.0175, p=0.4246
+间隔 3 期的重号自相关: statistic=0.0281, p=0.2008
+间隔 4 期的重号自相关: statistic=-0.0033, p=0.8811
+间隔 5 期的重号自相关: statistic=-0.0096, p=0.6637
+KS 均匀性检验: statistic=0.0042, p=0.4659

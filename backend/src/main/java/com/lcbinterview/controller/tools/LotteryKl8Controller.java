@@ -4,6 +4,7 @@ import com.lcbinterview.common.ApiResponse;
 import com.lcbinterview.config.AuthUserContext;
 import com.lcbinterview.dto.PageResult;
 import com.lcbinterview.dto.tools.LotteryKl8DrawVO;
+import com.lcbinterview.dto.tools.LotteryKl8AuditReportVO;
 import com.lcbinterview.dto.tools.LotteryKl8CoverageReportVO;
 import com.lcbinterview.dto.tools.LotteryKl8JevCalibrationRequest;
 import com.lcbinterview.dto.tools.LotteryKl8JevProbeRequest;
@@ -19,6 +20,7 @@ import com.lcbinterview.service.LotteryKl8FeatureReport;
 import com.lcbinterview.service.LotteryKl8FeatureService;
 import com.lcbinterview.service.LotteryKl8CoverageService;
 import com.lcbinterview.service.LotteryKl8JevCalibrationReport;
+import com.lcbinterview.service.LotteryKl8RandomnessAuditService;
 import com.lcbinterview.service.LotteryKl8JevCalibrationService;
 import com.lcbinterview.service.LotteryKl8JevProbabilityResult;
 import com.lcbinterview.service.LotteryKl8JevProbabilityService;
@@ -59,6 +61,7 @@ public class LotteryKl8Controller {
     private final LotteryKl8RecommendationEvaluationService evaluationService;
     private final LotteryKl8LabService labService;
     private final LotteryKl8CoverageService coverageService;
+    private final LotteryKl8RandomnessAuditService auditService;
     private final LotteryKl8FeatureService featureService;
     private final LotteryKl8JevProbabilityService jevProbabilityService;
     private final LotteryKl8JevCalibrationService jevCalibrationService;
@@ -142,7 +145,7 @@ public class LotteryKl8Controller {
     }
 
     /**
-     * 查询快乐8覆盖优化报告：把「花多少钱能买到多少中奖概率」换算成精确曲线。
+     * 查询快乐8 覆盖优化报告：把「花多少钱能买到多少中奖概率」换算成精确曲线。
      * <p>
      * 该接口是纯组合数学计算，不读用户数据也不返回号码预测，
      * 用于纠正「选号策略能提高中奖率」的误解：单注概率是常量，只能靠加注数买概率。
@@ -168,6 +171,23 @@ public class LotteryKl8Controller {
                 minHitLevel == null ? 0 : minHitLevel,
                 maxTickets == null ? 0 : maxTickets,
                 budgetYuan == null ? 0 : budgetYuan)));
+    }
+
+    /**
+     * 运行快乐8 开奖数据随机性审计。
+     * <p>
+     * 检验号码频次、相邻期重号、和值、奇偶、区间分布与序列相关性，
+     * 用于确认抓取到的数据本身可信、是否存在可利用的系统性偏差。
+     *
+     * @param issueCount 审计使用的历史期数，空值时默认 2000
+     * @return 随机性审计报告
+     */
+    @Operation(summary = "运行快乐8开奖数据随机性审计")
+    @GetMapping("/audit")
+    public ResponseEntity<ApiResponse<LotteryKl8AuditReportVO>> audit(
+            @RequestParam(required = false) Integer issueCount) {
+        return ResponseEntity.ok(ApiResponse.success(
+                auditService.audit(issueCount == null ? 0 : issueCount)));
     }
 
     /**
