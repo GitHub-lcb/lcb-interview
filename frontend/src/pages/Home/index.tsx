@@ -72,13 +72,23 @@ export default function Home() {
     <div className="home-page">
       <LabHero categoryCount={categories.length} totalQuestions={totalQuestions} />
 
+      <FirstRunLaunchpad
+        hotQuestions={hotQuestions}
+        loading={hotLoading}
+        launchpadModel={coachModel.launchpad}
+      />
+
+      <HomeCoachOverview model={coachModel} candidates={hotQuestions} />
+
       <section className="home-section">
         <div className="home-section-header">
           <div>
-            <h2 className="section-title">题库实验室</h2>
-            <p className="section-subtitle">按中文数字编号切换模块，选中题目即可在右侧预览。</p>
+            <h2 className="section-title">按方向选题</h2>
+            <p className="section-subtitle">
+              先定位技术方向，再把题目加入今日计划或直接进入模拟面试。
+            </p>
           </div>
-          <span>选中即练</span>
+          <span>{categories.length > 0 ? `${categories.length} 个方向` : '方向加载中'}</span>
         </div>
         <CategoryWorkspace
           categories={categories}
@@ -88,19 +98,11 @@ export default function Home() {
         />
       </section>
 
-      <FirstRunLaunchpad
-        hotQuestions={hotQuestions}
-        loading={hotLoading}
-        launchpadModel={coachModel.launchpad}
-      />
-
-      <HomeCoachOverview model={coachModel} candidates={hotQuestions} />
-
       <section className="home-section home-hot-section">
         <div className="home-section-header">
           <div>
             <h2 className="section-title">热门题目</h2>
-            <p className="section-subtitle">看看其他面试者正在关注什么。</p>
+            <p className="section-subtitle">高频题适合热身，但真正的短板要靠训练记录来判断。</p>
           </div>
           <span>高频优先</span>
         </div>

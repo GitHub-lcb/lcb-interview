@@ -13,7 +13,8 @@ const Practice = lazy(() => import('./pages/Practice'))
 const Recall = lazy(() => import('./pages/Recall'))
 const PrepRoutes = lazy(() => import('./pages/PrepRoutes'))
 const Experiences = lazy(() => import('./pages/Experiences'))
-const Tools = lazy(() => import('./pages/Tools'))
+const Training = lazy(() => import('./pages/Training'))
+const Lab = lazy(() => import('./pages/Lab'))
 const Knowledge = lazy(() => import('./pages/Knowledge'))
 const Login = lazy(() => import('./pages/Auth/Login'))
 const Register = lazy(() => import('./pages/Auth/Register'))
@@ -42,9 +43,12 @@ export default function App() {
           <Route path="/bank/:id" element={<QuestionList />} />
           <Route path="/question/:id" element={<QuestionDetail />} />
           <Route path="/search" element={<SearchResult />} />
+          <Route path="/training" element={<Training />} />
           <Route path="/routes" element={<PrepRoutes />} />
           <Route path="/experiences" element={<Experiences />} />
-          <Route path="/tools" element={<Tools />} />
+          <Route path="/lab" element={<Lab />} />
+          {/* 旧的个人工具入口保留兼容重定向，避免历史链接直接 404。 */}
+          <Route path="/tools" element={<Navigate to="/lab" replace />} />
           <Route path="/study" element={<StudyPlan />} />
           <Route path="/practice" element={<Practice />} />
           <Route path="/recall" element={<Recall />} />

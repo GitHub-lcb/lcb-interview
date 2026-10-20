@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Row, Col, Skeleton, Empty, Alert, Button, Segmented } from 'antd'
-import { ArrowRightOutlined, CalendarOutlined, PlayCircleOutlined } from '@ant-design/icons'
+import { ArrowRightOutlined, CalendarOutlined, FireOutlined, PlayCircleOutlined } from '@ant-design/icons'
 import { Link, useNavigate } from 'react-router-dom'
 import { getCategories } from '../../api/category'
 import { getCategoryIcon } from '../../utils/categoryIcons'
@@ -126,6 +126,9 @@ export default function QuestionBank() {
               </Button>
               <Button icon={<CalendarOutlined />} aria-label="学习计划" onClick={() => navigate('/study')}>
                 学习计划
+              </Button>
+              <Button icon={<FireOutlined />} aria-label="高频考点" onClick={() => navigate('/knowledge')}>
+                高频考点
               </Button>
             </div>
           </div>

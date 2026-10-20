@@ -14,16 +14,16 @@ export default function Login() {
     const response = await loginUser(values)
     writeUserToken(response.token)
     emitFeedbackSuccess('登录成功')
-    const from = new URLSearchParams(location.search).get('from') || '/tools'
+    const from = new URLSearchParams(location.search).get('from') || '/lab'
     navigate(from, { replace: true })
   }
 
   return (
     <main className="auth-page">
       <section className="auth-panel">
-        <div className="dashboard-kicker">个人工具</div>
+        <div className="dashboard-kicker">实验室账号</div>
         <h1>登录</h1>
-        <p>登录后管理自己的书摘库和快乐8娱乐统计记录。</p>
+        <p>实验室是独立于面试训练主线的实验区，登录后书摘和统计记录按账号隔离保存。</p>
         <Form layout="vertical" onFinish={handleFinish}>
           <Form.Item name="username" label="用户名" rules={[{ required: true, message: '请输入用户名' }]}>
             <Input prefix={<UserOutlined />} autoComplete="username" />

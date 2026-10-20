@@ -1,34 +1,47 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Layout, Input } from 'antd'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   BookOutlined,
   CalendarOutlined,
-  FireOutlined,
+  ExperimentOutlined,
   HomeOutlined,
   PlayCircleOutlined,
-  ReadOutlined,
   SearchOutlined,
-  SolutionOutlined,
-  ToolOutlined,
-  ThunderboltOutlined,
 } from '@ant-design/icons'
 import packageJson from '../../../package.json'
 
 const { Header } = Layout
 const { Search } = Input
 
-const navItems = [
-  { path: '/', label: '首页', icon: <HomeOutlined /> },
-  { path: '/recall', label: '背诵', icon: <ThunderboltOutlined /> },
-  { path: '/practice', label: '模拟', icon: <PlayCircleOutlined /> },
-  { path: '/study', label: '学习', icon: <CalendarOutlined /> },
-  { path: '/banks', label: '题库', icon: <BookOutlined /> },
-  { path: '/knowledge', label: '考点', icon: <FireOutlined /> },
-  { path: '/routes', label: '路线', icon: <ReadOutlined /> },
-  { path: '/experiences', label: '面经', icon: <SolutionOutlined /> },
-  { path: '/tools', label: '工具', icon: <ToolOutlined /> },
+interface NavItem {
+  path: string
+  label: string
+  icon: ReactNode
+  /** 需要高亮该入口的路径前缀，避免子页面切走后导航失去上下文。 */
+  match: string[]
+}
+
+const navItems: NavItem[] = [
+  { path: '/', label: '首页', icon: <HomeOutlined />, match: ['/'] },
+  { path: '/banks', label: '题库', icon: <BookOutlined />, match: ['/banks', '/bank/', '/question/', '/search'] },
+  { path: '/training', label: '训练', icon: <PlayCircleOutlined />, match: ['/training', '/practice', '/recall', '/experiences'] },
+  { path: '/study', label: '学习', icon: <CalendarOutlined />, match: ['/study', '/routes', '/knowledge'] },
 ]
+
+const labNavItem: NavItem = {
+  path: '/lab',
+  label: '实验室',
+  icon: <ExperimentOutlined />,
+  match: ['/lab', '/tools'],
+}
+
+function isNavItemActive(item: NavItem, pathname: string): boolean {
+  if (item.path === '/') {
+    return pathname === '/'
+  }
+  return item.match.some(prefix => pathname === prefix || pathname.startsWith(prefix))
+}
 
 /** 把当前时间格式化为参考站同款「2026.08.01 11:25:36」仪表盘时间戳。 */
 function formatLabTime(now: Date): string {
@@ -83,9 +96,7 @@ export default function AppHeader() {
 
       <nav className="app-nav" aria-label="主导航">
         {navItems.map(item => {
-          const active = item.path === '/'
-            ? location.pathname === '/'
-            : location.pathname.startsWith(item.path)
+          const active = isNavItemActive(item, location.pathname)
           return (
             <button
               key={item.path}
@@ -98,6 +109,17 @@ export default function AppHeader() {
             </button>
           )
         })}
+        <span className="app-nav-divider" aria-hidden="true" />
+        <button
+          type="button"
+          className={isNavItemActive(labNavItem, location.pathname)
+            ? 'app-nav-item app-nav-item-lab active'
+            : 'app-nav-item app-nav-item-lab'}
+          onClick={() => navigate(labNavItem.path)}
+        >
+          {labNavItem.icon}
+          <span className="nav-label">{labNavItem.label}</span>
+        </button>
       </nav>
 
       <div className="app-header-side">

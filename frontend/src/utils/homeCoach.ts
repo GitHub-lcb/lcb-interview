@@ -34,9 +34,6 @@ export interface HomeCoachModel {
   readinessScore: number
   assessedCount: number
   averageScore?: number
-  focusQuestions: HomeCoachQuestion[]
-  focusCompleted: number
-  focusProgress: number
   weakAreas: HomeCoachWeakArea[]
   recommendations: HomeCoachQuestion[]
 }
@@ -68,10 +65,6 @@ export function buildHomeCoach(
     : undefined
   const summary = summarizeProgress(progress)
   const weakAreas = buildWeakAreas(progress, snapshots, latestAttempts)
-  const focusQuestions = launchpad.recommendedQuestionIds
-    .map(questionId => toCoachQuestion(progress, snapshots[questionId], latestAttempts.get(questionId)))
-    .filter((question): question is HomeCoachQuestion => Boolean(question))
-  const focusCompleted = focusQuestions.filter(question => question.score !== undefined).length
   const recommendations = buildRecommendations(progress, snapshots, latestAttempts, 6)
   const phase = resolvePhase(launchpad.mode, attempts.length)
 
@@ -82,9 +75,6 @@ export function buildHomeCoach(
     readinessScore: calculateReadinessScore(summary.masteryRate, averageScore, attempts.length),
     assessedCount: attempts.length,
     averageScore,
-    focusQuestions,
-    focusCompleted,
-    focusProgress: focusQuestions.length === 0 ? 0 : Math.round((focusCompleted / focusQuestions.length) * 100),
     weakAreas,
     recommendations,
   }

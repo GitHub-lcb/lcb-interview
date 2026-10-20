@@ -13,15 +13,15 @@ export default function Register() {
     const response = await registerUser(values)
     writeUserToken(response.token)
     emitFeedbackSuccess('注册成功')
-    navigate('/tools', { replace: true })
+    navigate('/lab', { replace: true })
   }
 
   return (
     <main className="auth-page">
       <section className="auth-panel">
-        <div className="dashboard-kicker">个人工具</div>
+        <div className="dashboard-kicker">实验室账号</div>
         <h1>注册</h1>
-        <p>创建账号后，书摘和推荐历史会保存到后端并按用户隔离。</p>
+        <p>实验室是独立于面试训练主线的实验区。创建账号后，书摘和统计历史会按用户隔离保存。</p>
         <Form layout="vertical" onFinish={handleFinish}>
           <Form.Item
             name="username"
@@ -41,7 +41,7 @@ export default function Register() {
             <Input.Password prefix={<LockOutlined />} autoComplete="new-password" />
           </Form.Item>
           <Button type="primary" htmlType="submit" icon={<UserAddOutlined />} block>
-            注册并进入工具
+            注册并进入实验室
           </Button>
         </Form>
         <div className="auth-switch">

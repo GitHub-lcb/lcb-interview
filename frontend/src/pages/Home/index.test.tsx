@@ -109,9 +109,10 @@ describe('Home', () => {
     )
 
     expect(await screen.findByLabelText('个性化面试教练')).toBeInTheDocument()
-    expect(screen.getByLabelText('今日训练与能力画像')).toBeInTheDocument()
-    expect(screen.getByText('今日行动')).toBeInTheDocument()
+    expect(screen.getByLabelText('面试准备度与能力画像')).toBeInTheDocument()
     expect(screen.getByText('能力画像')).toBeInTheDocument()
+    // 首页只保留一个主行动，避免「今日训练」和「今日行动」重复展示同一计划。
+    expect(screen.queryByText('今日行动')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('今日闭环验收')).not.toBeInTheDocument()
   })
 
@@ -147,9 +148,9 @@ describe('Home', () => {
     )
 
     expect(await screen.findByText('6,386')).toBeInTheDocument()
-    expect(screen.getByText('学习模块')).toBeInTheDocument()
+    expect(screen.getByText('技术方向')).toBeInTheDocument()
     expect(screen.getByText('道面试题')).toBeInTheDocument()
-    expect(screen.getByText('免费体验')).toBeInTheDocument()
+    expect(screen.getByText('4 步')).toBeInTheDocument()
   })
 
   it('renders chinese numeral module tabs and auto loads the first module workspace', async () => {
@@ -160,7 +161,8 @@ describe('Home', () => {
     )
 
     const tab = await screen.findByRole('tab', { name: '模块一 Java 集合' })
-    expect(tab).toHaveAttribute('aria-selected', 'true')
+    // 工作区位于首页下半部分，默认选中态在分类加载后的副作用里写入，需要等一次状态更新。
+    await waitFor(() => expect(tab).toHaveAttribute('aria-selected', 'true'))
 
     await waitFor(() => {
       expect(vi.mocked(getQuestions)).toHaveBeenCalledWith(

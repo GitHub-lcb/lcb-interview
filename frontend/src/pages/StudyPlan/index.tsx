@@ -9,7 +9,9 @@ import {
   CopyOutlined,
   FireOutlined,
   PlayCircleOutlined,
+  ReadOutlined,
   SettingOutlined,
+  SolutionOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -302,6 +304,30 @@ export default function StudyPlan() {
           <SprintReportActions progress={progress} />
         </div>
       </div>
+
+      <nav className="study-resource-strip" aria-label="备考资源入口">
+        <button type="button" onClick={() => navigate('/routes')}>
+          <ReadOutlined />
+          <span>
+            <strong>备考路线</strong>
+            <small>按岗位和周期排期</small>
+          </span>
+        </button>
+        <button type="button" onClick={() => navigate('/knowledge')}>
+          <FireOutlined />
+          <span>
+            <strong>高频考点</strong>
+            <small>面试官最常问什么</small>
+          </span>
+        </button>
+        <button type="button" onClick={() => navigate('/experiences')}>
+          <SolutionOutlined />
+          <span>
+            <strong>面经场景</strong>
+            <small>真实追问与项目证据</small>
+          </span>
+        </button>
+      </nav>
 
       {pullResult && (
         <div className="study-sync-result" role="status" aria-live="polite">

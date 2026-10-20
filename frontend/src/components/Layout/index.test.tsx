@@ -168,4 +168,22 @@ describe('AppLayout global recovery dock', () => {
 
     expect(screen.getByLabelText('前端版本号')).toHaveTextContent('v0.0.1')
   })
+
+  it('keeps five primary entries and separates the lab from the training mainline', () => {
+    render(
+      <MemoryRouter initialEntries={['/practice']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route path="/practice" element={<div>训练页面内容</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    const nav = screen.getByRole('navigation', { name: '主导航' })
+    const labels = within(nav).getAllByRole('button').map(button => button.textContent?.trim())
+    expect(labels).toEqual(['首页', '题库', '训练', '学习', '实验室'])
+    expect(within(nav).getByRole('button', { name: /训练/ })).toHaveClass('active')
+    expect(within(nav).getByRole('button', { name: /实验室/ })).toHaveClass('app-nav-item-lab')
+  })
 })

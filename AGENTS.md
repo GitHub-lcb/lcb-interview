@@ -2,7 +2,7 @@
 
 本文件对整个仓库生效。开始任何任务前先阅读本文件；如果子目录存在更近层级的 `AGENTS.md`，同时遵循更近层级文件。
 
-LCB Interview 是 Java 面试题库与备考训练系统，后端使用 Spring Boot 3 + MyBatis-Plus + JDK 21，前端使用 React 18 + Vite + Ant Design 5。项目核心能力包括题库浏览、题目搜索、结构化答案展示、学习计划、模拟练习、后台质检和 AI 批量补答案。
+LCB Interview 是 Java 面试题库与备考训练系统，后端使用 Spring Boot 3 + MyBatis-Plus + JDK 21，前端使用 React 18 + Vite + Ant Design 5。产品主线为「题库选题 → 开口训练 → 评分反馈 → 复盘进入下一轮」，核心能力包括题库浏览、题目搜索、结构化答案展示、训练台、学习计划、模拟练习、后台质检和 AI 批量补答案；彩票等实验性功能统一收在 `/lab`。
 
 ## 工作原则
 
@@ -41,7 +41,7 @@ lcb-interview/
 │       ├── api/                        # Axios 实例与 API 封装
 │       ├── build/manualChunks.ts       # 前端构建分包策略
 │       ├── components/                 # 学习、练习、复盘、后台通用组件
-│       ├── pages/                      # 首页、题库、练习、路线、后台等页面
+│       ├── pages/                      # 首页、题库、训练台、学习、实验室、后台等页面
 │       ├── styles/                     # 全局样式与 Ant Design 主题
 │       ├── types.ts                    # 前端领域类型
 │       └── utils/                      # 学习进度、评分、导出、训练策略算法
@@ -264,7 +264,9 @@ if (tag != null) { ... }
 - Axios 实例统一放在 `src/api/`，继续使用统一拦截规则处理 `res.data.code !== 200`。
 - Ant Design 5 主题配置在 `src/styles/theme.ts`；新增页面和组件优先使用现有布局、主题和组件模式。
 - 全站视觉遵循「墨纸实验室」设计系统（对标粒子先生物理实验室）：坐标纸背景 `#EEF1F4`（body 18px 网格）、墨迹 `#1A1E23`、青绿强调 `#0F8A8F`、等宽数字用 `--font-mono`；核心色值集中在 `global.css` 的 `:root` 变量，改色优先改变量而非散落硬编码。
-- 首页为「LabHero 大统计 + 中文数字模块 Tab + CategoryWorkspace 内嵌题目工作区」结构；中文数字编号用 `src/utils/chineseNumeral.ts` 的 `toChineseNumeral`，新增 lab 风格组件沿用 `lab-*` CSS 类约定。
+- 产品主线固定为「题库选题 → 开口训练 → 评分反馈 → 复盘进入下一轮」：主导航只保留首页、题库、训练、学习四个主线入口，`/lab` 以分隔样式挂在最后。
+- 实验性功能（彩票、模拟战场、会员/额度/订单等）只能放在 `/lab` 或 `/api/tools/**` 下，不得回到主导航、首页主区块或训练闭环中。新增此类功能时要同步在 `Lab` 页说明实验范围和风险。
+- 首页顺序为「LabHero + 今日教练（FirstRunLaunchpad/HomeCoachOverview）+ 按方向选题工作区 + 热门题目」；中文数字编号用 `src/utils/chineseNumeral.ts` 的 `toChineseNumeral`，新增 lab 风格组件沿用 `lab-*` CSS 类约定。
 - Markdown 渲染使用 `react-markdown` + `rehype-highlight` + `remark-gfm`；编辑场景使用 `@uiw/react-md-editor`。
 - 构建分包策略在 `src/build/manualChunks.ts`，新增重量级依赖时同步评估分包影响。
 - 测试使用 Vitest + Testing Library；新增纯逻辑放入 `src/utils/` 时配套 `*.test.ts`。
@@ -279,11 +281,15 @@ if (tag != null) { ... }
 | `/bank/:id` | 分类下题目列表 |
 | `/question/:id` | 题目详情 |
 | `/search` | 搜索结果 |
+| `/training` | 训练台（今日队列、模拟/背诵/面经入口） |
 | `/routes` | 备考路线 |
 | `/study` | 学习计划与进度中心 |
 | `/practice` | 模拟练习 |
+| `/recall` | 主动回忆与间隔复习 |
 | `/experiences` | 面试经验与材料沉淀 |
-| `/tools` | 个人工具（快乐8选4预测、快乐8模拟战场，需登录） |
+| `/knowledge` | 高频考点排行 |
+| `/lab` | 实验室（快乐8统计实验、快乐8模拟战场，需登录） |
+| `/tools` | 兼容旧链接，重定向到 `/lab` |
 | `/auth/login` | 普通用户登录 |
 | `/auth/register` | 普通用户注册 |
 | `/admin/login` | 管理后台登录 |

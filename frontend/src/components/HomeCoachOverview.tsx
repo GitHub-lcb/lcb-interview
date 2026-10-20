@@ -1,12 +1,11 @@
 import {
   ArrowRightOutlined,
   CheckCircleOutlined,
-  CompassOutlined,
   FireOutlined,
   PlayCircleOutlined,
   RadarChartOutlined,
 } from '@ant-design/icons'
-import { Button, Progress } from 'antd'
+import { Button } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import type { Question } from '../types'
 import type { HomeCoachModel } from '../utils/homeCoach'
@@ -42,49 +41,7 @@ export default function HomeCoachOverview({ model, candidates }: Props) {
 
   return (
     <>
-      <section className="home-coach-overview" aria-label="今日训练与能力画像">
-        <div className="home-today-panel">
-          <div className="home-coach-panel-head">
-            <div>
-              <span className="home-coach-eyebrow"><PlayCircleOutlined /> 今日行动</span>
-              <h2>{model.launchpad.title}</h2>
-            </div>
-            <Button type="link" onClick={() => navigate('/study?view=today')}>
-              完整计划 <ArrowRightOutlined />
-            </Button>
-          </div>
-
-          <div className="home-today-progress">
-            <Progress percent={model.focusProgress} showInfo={false} strokeColor="#0F8A8F" />
-            <span>{model.focusCompleted} / {model.focusQuestions.length || 0} 已评分</span>
-          </div>
-
-          {model.focusQuestions.length > 0 ? (
-            <div className="home-focus-list">
-              {model.focusQuestions.slice(0, 5).map((question, index) => (
-                <Link key={question.id} to={`/question/${question.id}`}>
-                  <em>{index + 1}</em>
-                  <div>
-                    <strong>{question.title}</strong>
-                    <small>{question.categoryName} · {question.difficulty}</small>
-                  </div>
-                  <span className={`status-${question.status}`}>
-                    {question.score === undefined ? statusLabels[question.status] : `${question.score} 分`}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="home-coach-empty">
-              <CompassOutlined />
-              <div>
-                <strong>当前没有待处理题目</strong>
-                <span>从岗位路线或题库建立下一组训练。</span>
-              </div>
-            </div>
-          )}
-        </div>
-
+      <section className="home-coach-overview" aria-label="面试准备度与能力画像">
         <div className="home-ability-summary">
           <div className="home-coach-panel-head">
             <div>
